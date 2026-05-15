@@ -167,3 +167,46 @@ Tiga mekanisme "grouping" berbeda:
 6. **Clarify Attribute ownership**: Detail bilang read-only P2, Custom Attributes bilang editable P0. Keduanya harus alignment.
 
 7. **Tentukan prioritas untuk conversation yang punya multiple "state"**: Misalnya: conversation yang di-snooze, punya ticket aktif, dan sedang dalam relational group. Mana yang dominant?
+
+---
+
+## UNDEVELOPED FEATURES - IMPACT AND QA TEST PLAN
+
+Fitur yang belum develop:
+
+1. Relational Conversation
+2. Multiple Ticket from Single Bubble Chat
+3. Team Member Presence
+4. Snooze Conversation
+5. WhatsApp Group Mention
+6. Reassign Account Channel
+7. Assignee and Collaborators
+8. Auto-reply Templates
+
+### PRIORITAS IMPACT TERTINGGI KE TERENDAH
+
+1. Reassign Account Channel
+2. Auto-reply Templates
+3. Assignee and Collaborators
+4. Relational Conversation
+5. Snooze Conversation
+6. Team Member Presence
+7. Multiple Ticket from Single Bubble Chat
+8. WhatsApp Group Mention
+
+### RINGKASAN QA FOCUS
+
+- **Reassign Account Channel**: fokus ke ownership, routing, reopen rule, assignee reset, SLA stop, audit, dan sticky legacy binding.
+- **Auto-reply Templates**: fokus ke inbound pipeline, availability calculation, ticket context resolution, SLA exclusion, scheduler, dan idempotency.
+- **Assignee and Collaborators**: fokus ke RBAC, composer permissions, ticket parity, move policy, dan reporting attribution.
+- **Relational Conversation**: fokus ke grouping integrity, unread/sort aggregation, room tabs, custom attribute dependency, dan overlap dengan ticket.
+- **Snooze Conversation**: fokus ke visibility state, reminder precedence, inbound auto-unsnooze, reassignment, dan SLA leakage.
+- **Team Member Presence**: fokus ke presence truth source, add/remove member side effect, auto-unassign, dan mismatch dengan availability logic.
+- **Multiple Ticket from Single Bubble**: fokus ke linked message integrity, cookie persistence, single vs multi-select mode, partial failure retry.
+- **WhatsApp Group Mention**: fokus ke metadata fallback, invalid mention drop, sender identity, dan timeline rendering.
+
+### CATATAN KRITIS
+
+- Conversation juga bersinggungan dengan Ticket, Auth, Account Channel, People, SLA Conversation, socket distribution, dan auto pull/round robin.
+- Round robin belum punya PRD tersendiri, sehingga fitur yang memakai istilah `eligible agent`, `available agent`, atau `assignment rules` wajib diberi QA assumption note dan alignment lebih dulu sebelum release.
+- Detail penuh analisis dan test plan disimpan di `Memory/conversation-undeveloped-features-analysis.md`.
