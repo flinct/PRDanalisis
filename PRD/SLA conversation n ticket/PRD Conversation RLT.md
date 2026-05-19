@@ -162,12 +162,11 @@ Ticket
 
 Linked Conversation ID, Response Metric Source, First Customer Message At, First Assigned At, First Customer Reply At, Wait Time in Queue, Response Lead Time, RLT Adjusted, Metric Status, Metric Quality Flags
 
-//promt rabu
 C:\Users\MyBook SAGA 12\Desktop\PRDanalisis\PRD\SLA conversation n ticket
 
-analisa conversation SLA dan ticket ini, ada tambahan PRD juga tentang RLT, ada di dalam folder nya
-juga ada bug terkait SLA ini
+analisa conversation SLA dan ticket ini, terutama tambahan PRD RLT, ada di dalam folder nya
 
+juga ada bug terkait SLA ini
 hasil analisa bug nya, sebenarnya ini adalah gap flow terkait SLA :
 Chat yang masuk di ticket seharusnya 1:1 dengan source conversation yang terkait. Komunikasi yang dilakukan di ticket harus diterima juga di conversation, dan sebaliknya. Saat ini message count tidak sinkron dan menyebabkan FRT/TTC tidak berjalan dengan benar.
 
@@ -235,3 +234,113 @@ FRT dihitung sejak ticket dibuat, di-trigger ketika salah satu assignee reply pe
 Jika conversation closed sebelum customer reply, FRT di-set ke nilai maksimum sesuai setting (tidak dibiarkan menggantung)
 TTC berjalan normal dari ticket created sampai ticket closed
 Ticket tanpa source conversation: FRT dihitung dari stage Not Started → Active (Opsi B), jika tidak memungkinkan secara teknis maka SLA dinonaktifkan (Opsi A)
+
+PENTING!
+skenario utama untuk SLA conversation
+
+company : wadah dimana admin dan member menghandle customer
+member : user yang tergabung di company
+agent : sebutan role untuk tingkat staff
+supervisor/spv : sebutan role untuk tingkat lead dari staff / supervisor
+admin : sebutan untuk role dengan permission tertinggi
+receipent : orang yang berhubungan dengan para member atau admin
+
+1. conversation di create ketika :
+   a. broadcast ( outbound message )
+   b. menerima message dari luar satuinbox ( inbound message )
+   c. reopen conversation dengan status closed
+
+2. lalu SLA dihitung,
+   2a. RULE : "SLA di jeda", atau bisa di sebut agent centric
+   ***
+   i. jika conversation create because a broadcast,
+   a. FRT dan TTC harus paused hingga,
+   b. receipent si penerima broadcast ini meresponse, FRT dan TTC baru di count
+   c. RLT ( fitur baru ) dihitung dari waktu pertama kali receipent membalas, hingga member di assign dan pertama kali meresponse receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   d. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   e. setelah member membalas, FRT dihitung dari waktu member di assign hingga waktu balasan member tersebut. Lalu TTC kembali dijeda, perilaku pause and count ini akan berulang terus hingga conversation di close. pengulangan pause and count hanya berlaku untuk TTC
+   f. TTC akan dihitung dari chat pertama receipent hingga chat terakhir member, TTC counted ketika conversation closed
+   ***
+   ii. jika conversation created because an inbound,
+   a. FRT dan TTC harus count,
+   b. RLT ( fitur baru ) dihitung dari waktu receipent inbound, hingga member di assign dan meresponse pertama kali receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   c. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   d. setelah member membalas, FRT dihitung dari waktu member di assign hingga waktu balasan member tersebut. Lalu TTC kembali dijeda, perilaku pause and count ini akan berulang terus hingga conversation di close. pengulangan pause and count hanya berlaku untuk TTC
+   e. TTC akan dihitung dari chat pertama receipent hingga chat terakhir member, TTC counted ketika conversation closed
+   ***
+   iii. jika conversation created because reopen,
+   a. FRT dan TTC harus paused,
+   b. member yang reopen otomatis assigned, lalu member mengirim chat
+   c. receipent meresponse, FRT dan TTC baru di count
+   d. RLT ( fitur baru ) dihitung dari waktu pertama kali receipent membalas, hingga member pertama kali meresponse receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   e. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   f. setelah member membalas, FRT dihitung dari waktu receipent chat hingga waktu balasan member tersebut. Lalu TTC kembali dijeda, perilaku pause and count ini akan berulang terus hingga conversation di close. pengulangan pause and count hanya berlaku untuk TTC
+   g. TTC akan dihitung dari chat pertama member hingga chat terakhir member, TTC counted ketika conversation closed
+   ***
+   ***
+   2b. RULE : "SLA di TIDAK jeda", atau bisa di sebut customer centric
+   ***
+   i. jika conversation create because a broadcast,
+   a. FRT dan TTC count,
+   b. receipent si penerima broadcast ini meresponse, FRT dan TTC tetap running count
+   c. RLT ( fitur baru ) dihitung dari waktu pertama kali receipent membalas, hingga member di assign dan pertama kali meresponse receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   d. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   e. setelah member membalas, FRT dihitung dari waktu member di assign hingga waktu balasan member tersebut. TTC tetap running
+   f. TTC akan dihitung dari chat pertama receipent hingga chat terakhir member, TTC counted ketika conversation closed
+   ***
+   ii. jika conversation created because an inbound,
+   a. FRT dan TTC count,
+   b. RLT ( fitur baru ) dihitung dari waktu receipent inbound, hingga member di assign dan meresponse pertama kali receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   c. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   d. setelah member membalas, FRT dihitung dari waktu member di assign hingga waktu balasan member tersebut. TTC tetap running
+   e. TTC akan dihitung dari chat pertama receipent hingga chat terakhir member, TTC counted ketika conversation closed
+   ***
+   iii. jika conversation created because reopen,
+   a. FRT dan TTC count,
+   b. member yang reopen otomatis assigned, lalu member mengirim chat
+   c. receipent meresponse, FRT dan TTC tetap running count
+   d. RLT ( fitur baru ) dihitung dari waktu pertama kali receipent membalas, hingga member pertama kali meresponse receipent chat, rentang waktu tersebut akan dikurangi dengan waktu saat member di assign k conversation, hingga member membalas chat receipent "RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time"
+   e. ketika member di assign k conversation, harus ada catatan waktu nya untuk perhitungan FRT dan RLT
+   f. setelah member membalas, FRT dihitung dari waktu receipent chat hingga waktu balasan member tersebut. TTC tetap running
+   g. TTC akan dihitung dari chat pertama member hingga chat terakhir member, TTC counted ketika conversation closed
+
+PENTING!
+skenario utama untuk SLA ticket
+
+ticket created from
+
+1. conversation as ticket ( whole conversation )
+2. bubble chat from conversation
+3. created from ticket page
+
+ticket created dari ticket page tidak memiliki channel source
+
+tiap ticket memiliki
+
+1. detail ticket
+2. ticket room chat
+3. judul dan deskripsi
+4. nomor ticket
+5. ticket type, berisi rule tertentu untuk handle operasional ticket, secara default ticket type memiliki stages submited, active, done
+   a. setiap stage, memiliki rentang waktu/SLA yg dapat di set sesuai dengan kebutuhan
+   b. active stage, dapat di customisasi, bisa di buat menjadi lebih dari 1 active stage
+
+flow create ticket :
+
+1. conversation as ticket
+   a. ketika conversation room terbuka, provide button create as ticket
+   b. butoon create di klik, popup a modal, member harus, memilih ticket type,
+   c. pilihan ticket type muncul sesuai dengan apa yang di create admin company
+   d. ketika ticket type telah di pilih, muncul field yang perlu diisi oleh member, ada yg mandatory, ada yg tidak
+   e. ketika create ticket, secara otomatis ticket akan di assign ke member yang membuat ticket, sekaligus sebagai penanggung jawab ticket tsb
+   f. setelah submit, tampilah list conversation berubah, ada nya icon ticket, lalu di conversation detail ada section that displayed related ticket / ticket yang baru di buat ( clickable as shortcut)
+   g. klik ticket shortcut, lalu di alihkan ke halaman ticket, langsung membuka ticket dan tampilkan room dan detail ticket
+   h. ticket room menampilkan value chat yang sama persis dengan converation
+   i. member bisa mengirim chat d ticket room, ada 2 opsi,
+   - defaultnya kirim chat as internal notes, dan
+   - ada opsi kirim chat to conversation, dimana chat yang dikirim ini akan di terima oleh receipent
+
+   PERHITUNGAN SLA TICKET
+   j. ketika ticket berhasil dibuat, stage submited SLA count is running
+   k. FRT and TTC ticket paused
+   l. ketika member kirim internal notes atau chat to conersation, FRT count, dihitung dari waktu ticket dibuat hingga
