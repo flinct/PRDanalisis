@@ -184,4 +184,4 @@ flow create ticket :
    j. ketika ticket berhasil dibuat, stage submited SLA count is running
    k. FRT and TTC ticket paused
    l. ketika member kirim internal notes atau chat to conersation, FRT count, dihitung dari waktu ticket dibuat hingga
-   m.
+   m. member mengirim chat di room ticket ( )
