@@ -25,7 +25,7 @@ Update global memory only if:
 
 - new rule appears across multiple features
 - architecture understanding improves
-- existing canonical rule is confirmed outdated
+- existing canonical rule confirmed outdated
 - recurring pattern becomes stable
 
 ---

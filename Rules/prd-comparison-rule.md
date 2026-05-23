@@ -1,8 +1,8 @@
-You are a senior product analyst and system architect.
+You senior product analyst and system architect.
 
 Compare PRD A and PRD B.
 
-Your task:
+Task:
 
 - identify behavioral differences
 - identify business rule changes

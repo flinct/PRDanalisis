@@ -1,6 +1,6 @@
-You are an engineering memory maintainer.
+You engineering memory maintainer.
 
-Your task:
+Task:
 
 - compare existing memory against new PRD analysis
 - preserve valid existing memory

@@ -28,6 +28,13 @@
 
 **Impact**: SLA metric tidak konsisten. Agent bisa lihat warna berbeda untuk arti yang sama. FRT hilang dari UI saat conversation di-assign (padahal SLA tetap running).
 
+**FE v2.5.0 Update:**
+- ✅ FRT sekarang visible meskipun conversation sudah assigned (tidak hanya saat Unassigned — PRD Detail AC-02 outdated)
+- ✅ RLT dan Wait Time sudah diimplementasi sebagai tracked metric (live timer + resolved badge)
+- ✅ Data model punya `firstAgentAssignmentAt` terpisah, sehingga FRT = Wait Time + RLT bisa dihitung
+- ❌ SLA color threshold masih mismatch (FE: absolute time, PRD: percentage)
+- ❌ Hold vs Snooze pause policy belum final (3-way conflict: Room=Hold pause, Snooze=no pause, RLT Adjusted=tergantung)
+
 ---
 
 ### LOOPHOLE 2 — Group Chat Lifecycle Tidak Terdefinisi
@@ -155,18 +162,18 @@ Tiga mekanisme "grouping" berbeda:
 
 ### RINGKASAN PRIORITAS IMPACT
 
-| #   | Loophole                                     | Risk Level | Most Impacted PRDs                                  |
-| --- | -------------------------------------------- | ---------- | --------------------------------------------------- |
-| L1  | SLA terfragmentasi (5 PRD beda definisi)     | 🔴 HIGH    | Session, Detail, Snooze, Chat List, Auto-Reply      |
-| L2  | Group chat lifecycle undefined               | 🔴 HIGH    | Omnichannel, Session, Room, Relational, SLA         |
-| L3  | 3 navigation model overlap                   | 🟡 MEDIUM  | Agent Pull, Team Inbox Nav, Omnichannel Nav         |
-| L4  | Assignee/Collaborator vs Move reset          | 🟡 MEDIUM  | Collaborator, Reassign, Detail, Room                |
-| L5  | Relational Group vs Session vs Ticket        | 🔴 HIGH    | Relational, Session, Create Ticket, Multiple Ticket |
-| L6  | Custom Attributes read-only vs editable      | 🟡 MEDIUM  | Detail, Custom Attributes, Relational               |
-| L7  | Snooze vs Reminder vs Auto-Reply interaction | 🟡 MEDIUM  | Snooze, Room, Auto-Reply                            |
-| L8  | Reopen = new session vs reopen modal         | 🔴 HIGH    | Session, Reassign, Room                             |
-| L9  | Agent availability definition mismatch       | 🟡 MEDIUM  | Auto-Reply, Presence                                |
-| L10 | WA Mention scope vs future channel           | 🟢 LOW     | WA Mention, Session, Omnichannel                    |
+| #   | Loophole                                     | Risk Level | FE Status | Most Impacted PRDs                                  |
+| --- | -------------------------------------------- | ---------- | --------- | --------------------------------------------------- |
+| L1  | SLA terfragmentasi (5 PRD beda definisi)     | 🔴 HIGH    | ⚠️ Partial solved | Session, Detail, Snooze, Chat List, RLT, Auto-Reply |
+| L2  | Group chat lifecycle undefined               | 🔴 HIGH    | ❌ Open    | Omnichannel, Session, Room, Relational, SLA         |
+| L3  | 3 navigation model overlap                   | 🟡 MEDIUM  | ⚠️ Partial | Agent Pull, Team Inbox Nav, Omnichannel Nav         |
+| L4  | Assignee/Collaborator vs Move reset          | 🟡 MEDIUM  | ⚠️ Partial | Collaborator, Reassign, Detail, Room                |
+| L5  | Relational Group vs Session vs Ticket        | 🔴 HIGH    | ❌ Open    | Relational, Session, Create Ticket, Multiple Ticket |
+| L6  | Custom Attributes read-only vs editable      | 🟡 MEDIUM  | ❓ Not checked | Detail, Custom Attributes, Relational               |
+| L7  | Snooze vs Reminder vs Auto-Reply interaction | 🟡 MEDIUM  | ❌ Open    | Snooze, Room, Auto-Reply                            |
+| L8  | Reopen = new session vs reopen modal         | 🔴 HIGH    | ⚠️ FE ada Close/Reopen | Session, Reassign, Room                             |
+| L9  | Agent availability definition mismatch       | 🟡 MEDIUM  | ⚠️ Partial | Auto-Reply, Presence                                |
+| L10 | WA Mention scope vs future channel           | 🟢 LOW     | ❌ Open    | WA Mention, Session, Omnichannel                    |
 
 ## Recommendations
 
@@ -188,31 +195,41 @@ Tiga mekanisme "grouping" berbeda:
 
 ---
 
-## Undeveloped Features QA View
+## Feature Development Status vs PRD (FE v2.5.0)
 
-### UNDEVELOPED FEATURES - IMPACT AND QA TEST PLAN
+### STATUS IMPLEMENTASI PER FITUR
 
-Fitur yang belum develop:
+Setelah validasi dengan FE repo `apps/omnichannel/` (v2.5.0):
 
-1. Relational Conversation
-2. Multiple Ticket from Single Bubble Chat
-3. Team Member Presence
-4. Snooze Conversation
-5. WhatsApp Group Mention
-6. Reassign Account Channel
-7. Assignee and Collaborators
-8. Auto-reply Templates
+| # | Fitur | Status FE | Catatan |
+|---|-------|-----------|---------|
+| — | **SLA Metrics (FRT/TTC/RLT/Wait Time)** | ✅ **DEVELOPED** | v2.5.0: `firstAgentAssignmentAt`, `rltMs`, `waitTimeInQueueMs`, live timer display |
+| 1 | **Relational Conversation** | ❌ **UNDEVELOPED** | Group chat handling ada (isGroup), tapi relasi Primary+Child antar conversation tidak ada |
+| 2 | **Multiple Ticket from Single Bubble** | ✅ **DEVELOPED** | `CreateTicketDraftsModal`, multi-select message, batch draft (max 20) |
+| 3 | **Team Member Presence** | ✅ **DEVELOPED** | `member-status.store` (AWAY/READY), idle detection, away reasons CRUD, shift scheduler |
+| 4 | **Snooze Conversation** | ❌ **UNDEVELOPED** | Ticket snooze saja yang ada. Conversation snooze tidak ada |
+| 5 | **WhatsApp Group Mention** | ❌ **UNDEVELOPED** | Tidak ada @mention picker. Hanya macro `/shortcut` yang ada |
+| 6 | **Reassign Account Channel** | ✅ **DEVELOPED** | `AdjustAccountModal`, `changeAccountChannel`, account group management |
+| 7 | **Assignee & Collaborators** | ⚠️ **PARTIAL** | Participants sebagai assignee sudah develop. Konsep "collaborator" tidak ada |
+| 8 | **Auto-reply Templates** | ❌ **UNDEVELOPED** | Tidak ada auto-reply, welcome message, bot reply. Hanya Macros (`/shortcut`) |
+| — | **FRT/TTC Settings (SLA Config)** | ✅ **DEVELOPED** | `ConversationSLAForm`, per-channel SLA, policy toggles, reminder popover |
+| — | **Offline Report** | ✅ **DEVELOPED** | Async export dengan RLT/Wait Time columns |
 
-### PRIORITAS IMPACT TERTINGGI KE TERENDAH
+### IMPLIKASI UNTUK PRIORITAS
 
-1. Reassign Account Channel
-2. Auto-reply Templates
-3. Assignee and Collaborators
-4. Relational Conversation
-5. Snooze Conversation
-6. Team Member Presence
-7. Multiple Ticket from Single Bubble Chat
-8. WhatsApp Group Mention
+Daftar prioritas sebelumnya perlu direvisi karena beberapa fitur sudah develop:
+
+| Prioritas Baru | Fitur | Status FE | Impact |
+|---|---|---|---|
+| 🔴 **HIGH** | Auto-reply Templates | ❌ Belum develop | Availability & SLA exclusion belum bisa diuji |
+| 🔴 **HIGH** | Relational Conversation | ❌ Belum develop | Grouping integrity, SLA aggregate, ticket overlap |
+| 🟡 **MEDIUM** | Snooze Conversation | ❌ Belum develop | Precedence rule, SLA pause policy belum bisa final |
+| 🟡 **MEDIUM** | Assignee & Collaborators | ⚠️ Partial | Collaborator fitur belum ada, move policy belum clear |
+| 🟢 **LOW** | WhatsApp Group Mention | ❌ Belum develop | Hanya untuk WA Web, channel lain belum support group |
+| ✅ **DONE** | Multiple Ticket from Bubble | ✅ Developed | Perlu regression test, bukan prioritas implementasi |
+| ✅ **DONE** | Team Member Presence | ✅ Developed | Perlu alignment test dengan auto-reply (saat auto-reply developed) |
+| ✅ **DONE** | Reassign Account Channel | ✅ Developed | Perlu regression test untuk SLA stop/resume behavior |
+| ✅ **DONE** | RLT/Wait Time (Phase 1) | ✅ Developed | Hanya reporting, alert/breach belum aktif |
 
 ### RINGKASAN QA FOCUS
 
@@ -362,6 +379,156 @@ Production document mengkonfirmasi bahwa semua filter field berikut sudah exist 
 
 - File ini menyimpan analisa detail, bukan ringkasan global.
 - Untuk ringkasan global dan canonical rules, lihat `Memory/global-memory.md`.
+- Untuk analisis detail SLA/RLT/FRT/TTC, lihat `Memory/conversation-sla-rlt-frt-ttc-analysis.md`.
+
+---
+
+## QA Analysis & Testing Guidance (FE v2.5.0)
+
+### Pendekatan: Setiap Loophole → FE Status → Impact → Testing
+
+---
+
+### L1 — SLA Fragmentasi
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ⚠️ Partial: RLT/Wait Time sudah, FRT visible after assign ✅, color threshold mismatch ❌ |
+| **Impact jika di-test** | Agent bisa lihat FRT countdown dengan benar. Tapi warna SLA di Chat List tidak sesuai PRD US-14. RLT & Wait Time muncul sebagai badge tanpa threshold. |
+| **Testing Guidance** | 1. Verifikasi FRT countdown: mulai dari inbound, stop saat first agent reply. Cross-check dengan `frtMs` dari BE. 2. Verifikasi RLT live timer: office-hours-aware, pause di luar shift. 3. Verifikasi Wait Time: wall-clock, tidak pernah pause. 4. Verifikasi `FRT = Wait Time + RLT` constraint. 5. Catat bahwa SLA color threshold masih absolute time — tidak sesuai PRD US-14. Buat bug report jika diperlukan. |
+| **Regression Risk** | Perubahan SLA engine bisa mempengaruhi RLT dan Wait Time karena share event source yang sama (`firstAgentReplyAt`, `firstAgentAssignmentAt`). |
+| **Test Level** | Integration + E2E |
+
+---
+
+### L2 — Group Chat Lifecycle
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ❌ Open: FE sembunyikan semua SLA items untuk group chat (`isGroup ? [] : slaItems`). FRT & TTC tidak muncul sama sekali. |
+| **Impact jika di-test** | Agent tidak bisa melihat SLA metrics untuk group chat sama sekali. WA Web Group TTC disabled (correct). Tapi FRT juga hilang (should be visible). |
+| **Testing Guidance** | 1. Verifikasi bahwa group chat WA Web Group tidak menampilkan TTC (correct). 2. Verifikasi bahwa FRT untuk group chat tetap muncul (currently broken). 3. Verifikasi behavior saat group chat di-close: TTC tidak boleh infinite. TTC harus disabled secara sistem. 4. Buat bug: group chat FRT disembunyikan, padahal FRT harus tetap jalan. |
+| **Regression Risk** | Jika lifecycle group chat diubah nanti (misalnya: group chat bisa di-resolve), dampak ke SLA TTC dan room history sangat besar. |
+| **Test Level** | E2E (per channel type) |
+
+---
+
+### L3 — Navigation Model Overlap
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ⚠️ Implementasi hybrid: Your Inbox/All/Unassigned/Closed/Starred/Spam filter buttons + Channel/Team sidebar. Agent Pull "Get Conversation" button ada di Your Inbox. Team Inbox sidebar ada. |
+| **Impact jika di-test** | Tiga model navigasi coexist. Agent bisa bingung karena punya "Your Inbox", "Team Inbox sidebar", dan "Get Conversation" sebagai 3 cara berbeda untuk mulai kerja. |
+| **Testing Guidance** | 1. Test bahwa "Your Inbox" hanya menampilkan conversation yang di-assign ke current user. 2. Test bahwa "Get Conversation" menarik dari queue Unassigned dan auto-assign. 3. Test bahwa Team Inbox sidebar men-scope chat list berdasarkan team. 4. Test bahwa kombinasi filter (Inbox + Channel + Team + RBAC) menghasilkan irisan yang benar. 5. Test bahwa Agent tidak melihat "Unassigned" tab (RBAC restriction). 6. Test "Assign to Me" alternate access path (notification, quick action). |
+| **Regression Risk** | Perubahan di navigation PRD bisa mengubah default landing atau visibility scope untuk Agent vs Supervisor. |
+| **Test Level** | E2E + RBAC matrix |
+
+---
+
+### L4 — Assignee & Collaborator
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ⚠️ Partial: Multi-assignee via participants ✅. Konsep "collaborator" tidak ada ❌. Move reset assignee tidak terlihat di FE. |
+| **Impact jika di-test** | Agent bisa assign/unassign multiple participants. Tapi tidak ada perbedaan antara "Assignee" dan "Collaborator". Semua participant diperlakukan sama. |
+| **Testing Guidance** | 1. Test multi-assignee: assign 2+ agent ke satu conversation, verifikasi semua muncul di chips. 2. Test unassign: hapus satu participant, verifikasi yang lain tetap. 3. Test unassign semua → status "Unassigned". 4. Test move conversation: apakah assignee di-reset? (butuh akses ke Reassign Account Channel). 5. Catat: collaborator fitur tidak ada — tidak bisa di-test. |
+| **Regression Risk** | Perubahan di participants logic akan berdampak ke Conversation Detail, Room header, Chat List, Ticket participants. |
+| **Test Level** | Integration + E2E |
+
+---
+
+### L5 — Relational Group vs Session vs Ticket
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ❌ Open: Relational Conversation tidak diimplementasi. Group chat handling ada (isGroup, PrimaryMessageSelector) tapi untuk konteks ticket creation, bukan relasi Parent-Child. |
+| **Impact jika di-test** | Fitur ini belum bisa di-test secara E2E karena belum ada UI. |
+| **Testing Guidance** | 1. Belum bisa di-test (undeveloped). 2. Siapkan test scenario untuk nanti: grouping integrity, SLA aggregate untuk Primary+Child, ticket flagging untuk child conversation. |
+| **Regression Risk** | Ketika diimplementasi, relational grouping akan berdampak ke: Chat List sorting/aggregation, SLA metrics (individual vs aggregate), ticket creation, room tabs, custom attributes matching. |
+| **Test Level** | N/A (undeveloped) |
+
+---
+
+### L6 — Custom Attributes
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ❓ Belum dive dalam. Yang terlihat: `ConversationAttributesContent` ada, `custom-attribute/` folder ada (read-only fields, select, date, text inputs). Ada konflik read-only vs editable. |
+| **Impact jika di-test** | Agent bisa melihat attributes. Tapi tidak jelas mana yang editable oleh Agent vs Admin vs API. |
+| **Testing Guidance** | 1. Test read-only attributes dari Open API: muncul, tidak bisa diedit. 2. Test custom fields: apakah bisa diedit oleh Agent? Atau hanya Admin? 3. Jika attribute berubah, apakah relational matching terpengaruh? (butuh Relational PRD). |
+| **Regression Risk** | Perubahan attribute ownership akan berdampak ke Relational Conversation matching. |
+| **Test Level** | E2E + RBAC |
+
+---
+
+### L7 — Snooze vs Reminder vs Auto-Reply
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ❌ Open: Snooze Conversation tidak ada. Auto-reply Templates tidak ada. Room Reminder tidak ada di header. Ticket Snooze ada (tapi berbeda konteks). |
+| **Impact jika di-test** | Fitur ini belum bisa di-test secara E2E. Yang bisa di-test: ticket snooze behavior, macro templates. |
+| **Testing Guidance** | 1. Untuk sekarang, test ticket snooze behavior (ada di FE). 2. Test macro `/shortcut` sebagai pengganti quick reply (bukan auto-reply). 3. Catat: conversation snooze, auto-reply, dan room reminder belum bisa di-test. |
+| **Regression Risk** | Ketika diimplementasi, interaction antara snooze, reminder, dan auto-reply bisa kompleks: precedence rule, SLA pause, notification deduplication. |
+| **Test Level** | N/A (undeveloped, kecuali ticket snooze) |
+
+---
+
+### L8 — Reopen vs New Session
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ⚠️ FE punya Close dan Reopen buttons di Room Header. Tapi behavior reopen di backend tidak terlihat dari FE. Apakah reopen = new session (Session PRD), reopen same conversation (Room PRD), atau modal (Reassign PRD)? |
+| **Impact jika di-test** | Agent klik "Reopen" → conversation jadi open lagi. Tapi apa yang terjadi dengan SLA? New cycle? Resume? FRT reset? Tergantung implementasi backend. |
+| **Testing Guidance** | 1. Test Close → conversation status jadi `closed`. 2. Test Reopen → conversation status jadi `open`. 3. Test inbound message after close → apakah auto-reopen atau new session? 4. Verifikasi SLA behavior after reopen: FRT new cycle? TTC resume? RLT reset? 5. Catat: perlu konfirmasi PM/Engineering untuk reopen behavior yang benar. |
+| **Regression Risk** | Tergantung PRD mana yang diikuti (Session, Room, atau Reassign). Validasi harus satu arah. |
+| **Test Level** | E2E + Backend integration |
+
+---
+
+### L9 — Agent Availability
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ⚠️ Partial: Team Member Presence ✅ (AWAY/READY, idle detection, away reasons CRUD, shift scheduler). Auto-reply Templates ❌. |
+| **Impact jika di-test** | Agent bisa set status AWAY. Tapi auto-reply belum ada — jadi ketika agent AWAY, tidak ada bot auto-reply yang terkirim. Status indicator di sidebar berfungsi. |
+| **Testing Guidance** | 1. Test AWAY/READY toggle: status berubah di sidebar. 2. Test idle detection: after X minutes idle → auto-AWAY. 3. Test away reasons CRUD: create, edit, delete. 4. Test bahwa saat AWAY, action buttons di Room header disabled (reopen, dll). 5. Test shift scheduling: outside hours → auto-AWAY? 6. Catat: auto-reply tidak ada — tidak bisa di-test. |
+| **Regression Risk** | Auto-reply (saat diimplementasi) harus align dengan definisi "available" dari Presence PRD. Saat ini ada mismatch: Presence PRD anggap "Away = Online", tapi Auto-Reply PRD anggap "Away = Unavailable". |
+| **Test Level** | E2E + Integration |
+
+---
+
+### L10 — WA Web Group Mention
+
+| Aspek | Detail |
+|---|---|
+| **FE Status** | ❌ Open: Tidak ada @mention picker di chat input. Hanya macro `/shortcut` yang ada sebagai shortcut tool. |
+| **Impact jika di-test** | Fitur ini belum bisa di-test. |
+| **Testing Guidance** | 1. Belum bisa di-test (undeveloped). 2. Siapkan test scenario untuk nanti: @mention picker UI, participant list, 100 mentions limit, invalid mention drop. |
+| **Regression Risk** | Ketika diimplementasi, mention akan mempengaruhi chat input component, group chat rendering, notification system. |
+| **Test Level** | N/A (undeveloped) |
+
+---
+
+### Prioritas Testing Berdasarkan FE Readiness
+
+| Prioritas | Area | Siap di-test? | Test Level |
+|---|---|---|---|
+| 🔴 **P0** | FRT/TTC/RLT/Wait Time display & live timer | ✅ **SIAP** | E2E + Integration |
+| 🔴 **P0** | SLA color threshold (Chat List) | ⚠️ **MISMATCH** (FE vs PRD) | E2E + UI |
+| 🔴 **P0** | Group chat SLA (FRT hilang) | ⚠️ **BUG DITEMUKAN** | E2E |
+| 🟡 **P1** | Chat List filter (Your Inbox, All, Unassigned, dll) | ✅ **SIAP** | E2E + RBAC |
+| 🟡 **P1** | Assignee/participants (assign, unassign, multi) | ✅ **SIAP** | E2E |
+| 🟡 **P1** | Close/Reopen behavior | ⚠️ **BACKEND TERGANTUNG** | E2E + Integration |
+| 🟡 **P1** | Agent Presence (AWAY/READY, idle) | ✅ **SIAP** | E2E |
+| 🟡 **P1** | Multiple Ticket from Bubble | ✅ **SIAP** | E2E |
+| 🟡 **P1** | Reassign Account Channel | ✅ **SIAP** | E2E |
+| 🟢 **P2** | Navigation model (Your Inbox vs Team Inbox) | ✅ **SIAP** | E2E + RBAC |
+| 🟢 **P2** | Offline Report (RLT/Wait Time columns) | ✅ **SIAP** | Integration |
+| ⏳ **Future** | Relational Conversation | ❌ **UNDEVELOPED** | — |
+| ⏳ **Future** | Snooze Conversation | ❌ **UNDEVELOPED** | — |
+| ⏳ **Future** | Auto-reply Templates | ❌ **UNDEVELOPED** | — |
+| ⏳ **Future** | WhatsApp Group Mention | ❌ **UNDEVELOPED** | — |
+| ⏳ **Future** | Collaborator (Assignee & Collaborators) | ❌ **UNDEVELOPED** | — |
 
 ---
 

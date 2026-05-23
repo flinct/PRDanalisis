@@ -1,7 +1,7 @@
 # Impact Analysis Rules
 
 Purpose:
-Identify the blast radius when a feature is created, updated, or removed.
+Identify blast radius when feature created, updated, or removed.
 
 ---
 
@@ -10,14 +10,14 @@ Identify the blast radius when a feature is created, updated, or removed.
 Analyze each area:
 
 - Direct impact: modules explicitly changed.
-- Indirect impact: modules that consume or depend on changed modules.
-- Hidden dependencies: shared entities, lifecycle, or state machines not obvious from the PRD.
+- Indirect impact: modules consuming or depending on changed modules.
+- Hidden dependencies: shared entities, lifecycle, or state machines not obvious from PRD.
 - Data consistency: schema changes, field deprecation, data migration integrity.
 - Synchronization risks: race conditions, eventual consistency guarantees, event ordering.
 - Backward compatibility: API contract, webhook payload, stored data format.
 - Performance implications: query pattern changes, new indexes needed, N+1 risks.
 - Operational flow disruption: agent workflow changes, queue behavior impact.
-- Automation test impact: existing test cases that must be updated or added.
+- Automation test impact: existing test cases requiring update or addition.
 - Monitoring and logging implications: new metrics, alerts, audit log gaps.
 
 ---
@@ -26,7 +26,7 @@ Analyze each area:
 
 Analyze each dimension:
 
-- Feature behavior: which existing features share the same entity, status, or lifecycle.
+- Feature behavior: existing features sharing same entity, status, or lifecycle.
 - Data model: schema changes, new fields, deprecated fields.
 - API: new or modified endpoints, request or response contract changes.
 - UI/UX: component changes, layout shifts, permission-driven visibility.
@@ -40,25 +40,25 @@ Analyze each dimension:
 
 # Detection Method
 
-1. Read the PRD or change specification.
+1. Read PRD or change specification.
 2. Compare against current global memory and feature memories.
 3. For each focus area and dimension, list affected features explicitly.
 4. Trace chain reactions beyond explicitly mentioned modules.
-5. Mark impact level as LOW, MEDIUM, or HIGH.
+5. Mark impact level: LOW, MEDIUM, or HIGH.
 6. For HIGH impacts, describe mitigation or required comparison analysis.
 
 ---
 
 # When to Use
 
-Impact analysis MUST be performed when:
+Impact analysis MUST run when:
 
-- A new PRD introduces a new feature.
-- An existing feature is modified.
-- A feature affects shared entities, lifecycle, or RBAC.
-- A migration is required.
+- New PRD introduces new feature.
+- Existing feature modified.
+- Feature affects shared entities, lifecycle, or RBAC.
+- Migration required.
 
-Impact analysis MAY be skipped for:
+Impact analysis MAY skip for:
 
 - Pure UI copy changes.
 - Bug fixes with no behavioral change.
@@ -70,11 +70,11 @@ Impact analysis MAY be skipped for:
 
 ## Directly Affected Modules
 
-Modules explicitly changed by this feature.
+Modules explicitly changed.
 
 ## Indirectly Affected Modules
 
-Modules that depend on or consume changed modules.
+Modules depending on or consuming changed modules.
 
 ## Database Impact
 
@@ -114,13 +114,13 @@ Backward compatibility, rollback plan, feature flag strategy.
 
 ## Recommended Additional Validations
 
-Specific edge cases or integration scenarios to verify beyond standard test coverage.
+Specific edge cases or integration scenarios beyond standard test coverage.
 
 ---
 
 # Impact Level
 
-Every finding MUST be marked as:
+Mark every finding:
 
 - LOW: isolated, no downstream effect.
 - MEDIUM: affects one or two related modules.

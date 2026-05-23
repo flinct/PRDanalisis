@@ -1,15 +1,15 @@
 # Memory Routing Rules
 
 Purpose:
-Determine whether discovered knowledge belongs to global memory, feature memory, or should not be persisted.
+Determine whether discovered knowledge belongs to global memory, feature memory, or not persisted.
 
 ---
 
 # Global Memory Criteria
 
-Store in global memory if the knowledge:
+Store in global memory if knowledge:
 
-- is reusable across multiple features
+- reusable across multiple features
 - defines system-wide behavior
 - defines shared lifecycle or state machine
 - defines shared RBAC logic
@@ -18,7 +18,7 @@ Store in global memory if the knowledge:
 - defines core entity definitions
 - defines canonical workflow rules
 - documents organization-wide risk patterns
-- is repeatedly referenced across feature memories
+- repeatedly referenced across feature memories
 
 Examples: chat lifecycle, assignment flow, webhook behavior, RBAC inheritance, queue ownership model.
 
@@ -26,9 +26,9 @@ Examples: chat lifecycle, assignment flow, webhook behavior, RBAC inheritance, q
 
 # Feature Memory Criteria
 
-Store in feature memory if the knowledge:
+Store in feature memory if knowledge:
 
-- is feature-specific behavior
+- feature-specific behavior
 - documents local edge cases
 - documents feature-only dependencies
 - describes isolated UI behavior
@@ -59,8 +59,8 @@ Do NOT store:
 # Deduplication Rules
 
 - Never duplicate canonical rules across feature memories.
-- Feature memory should reference global behavior instead of redefining it.
-- Global memory is the source of truth for shared rules.
+- Feature memory should reference global behavior, not redefine it.
+- Global memory source of truth for shared rules.
 
 ---
 

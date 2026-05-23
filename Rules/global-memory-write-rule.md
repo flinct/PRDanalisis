@@ -64,7 +64,7 @@ Avoid:
 
 # Canonical Priority
 
-Global memory is:
+Global memory:
 
 - primary reasoning source
 - reusable system context

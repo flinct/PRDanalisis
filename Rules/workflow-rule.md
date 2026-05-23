@@ -1,35 +1,35 @@
 # Workflow Rules
 
 Purpose:
-Define the execution sequence an agent must follow when processing any task.
+Define execution order agent must follow processing any task.
 
 ---
 
 # Execution Order
 
-Always follow this sequence:
+Always follow sequence:
 
-1. READ all applicable rule files from `Rules/` folder.
+1. READ applicable rule files from `Rules/`.
 2. READ global memory from `Memory/global-memory.md`.
-3. READ relevant feature memory files from `Memory/` folder.
-4. EXECUTE the task.
+3. READ relevant feature memory files from `Memory/`.
+4. EXECUTE task.
 
-Do NOT skip any step.
+Skip no step.
 
 ---
 
 # Before PRD Analysis
 
-1. Read global memory for shared entity lifecycle, RBAC, and architecture constraints.
-2. Read existing feature memories that may be affected.
-3. Determine if single-PRD analysis (analisa-prd-rule.md) or comparison (prd-comparison-rule.md) is needed.
+1. Read global memory for shared entity lifecycle, RBAC, architecture constraints.
+2. Read existing feature memories affected.
+3. Determine single-PRD analysis (analisa-prd-rule.md) or comparison (prd-comparison-rule.md) needed.
 
 ---
 
 # Before Impact Analysis
 
 1. Perform PRD analysis or comparison first.
-2. Use the analysis output as input for impact analysis (impact-analysis-rule.md).
+2. Use analysis output as input for impact analysis (impact-analysis-rule.md).
 
 ---
 
@@ -45,7 +45,7 @@ Do NOT skip any step.
 # Before Creating or Updating Test Cases
 
 1. Read relevant PRD analysis and impact analysis.
-2. Read existing test cases in the affected scope.
+2. Read existing test cases in affected scope.
 3. Ensure test cases stay within feature boundary.
 4. Include regression scenarios from impact analysis.
 
