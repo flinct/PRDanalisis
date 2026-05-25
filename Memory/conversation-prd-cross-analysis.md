@@ -1,6 +1,9 @@
-# Cross-PRD Analysis: Conversation Folder (20 PRDs)
+# Cross-PRD Analysis: Conversation Folder (V2 — 20 PRDs)
 
 > Fungsi file ini: analisa detail lintas-PRD, loophole, conflict, impact area, dan catatan QA mendalam untuk domain Conversation.
+>
+> **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
+> Referensi V2 file number: lihat `Memory/conversation-v1-vs-v2-comparison.md`.
 
 ## Structure
 
@@ -16,53 +19,54 @@
 
 ### LOOPHOLE 1 — SLA Definition Terfragmentasi
 
-5 PRD berbeda mendefinisikan aturan SLA dengan cara berbeda:
+5 PRD V2 berbeda mendefinisikan aturan SLA dengan cara berbeda:
 
-| PRD                            | Aturan SLA                                                    | Konflik                                                |
-| ------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------ |
-| Chat Session Handling (FR-007) | SLA carries over on reassign, NOT reset                       | ✔                                                      |
-| Conversation Detail (AC-02)    | First Response Due countdown hanya muncul saat **Unassigned** | ❌ Dengan Session: setelah assign, FRT hilang?         |
-| Snooze (Limitation)            | "No SLA pause changes"                                        | ❌ Dengan Conversation SLA PRD yang define pause       |
-| Chat List (US-14)              | SLA countdown warna (green/yellow/red)                        | ❌ Tidak definisi SLA metric mana yang dipakai FRT/TTC |
-| Auto-Reply (FR-048)            | Auto-reply tidak dihitung sebagai SLA response                | ✔ Explisit                                             |
+| V2 File | Aturan SLA | Konflik |
+|---------|-----------|---------|
+| Chat Sessions (file 12, FR-007) | SLA carries over on reassign, NOT reset | ✔ |
+| Detail v2.1 (file 10, AC-02) | First Response Due countdown hanya muncul saat **Unassigned** | ❌ Dengan Sessions: setelah assign, FRT hilang? |
+| Snooze v1.0 (file 16) | "No SLA pause changes" | ❌ Dengan Room v1.1 yang define Hold pause SLA |
+| Chat List v1.1 (file 8, US-14) | SLA countdown warna (green/yellow/red) | ❌ Tidak definisi SLA metric mana yang dipakai FRT/TTC |
+| Auto-Reply v1.0 (file 1, FR-048) | Auto-reply tidak dihitung sebagai SLA response | ✔ Explisit |
+| Room v1.1 (file 9) | Hold pauses SLA countdown, Resume restores | ❌ Konflik dengan Snooze (no pause) |
 
 **Impact**: SLA metric tidak konsisten. Agent bisa lihat warna berbeda untuk arti yang sama. FRT hilang dari UI saat conversation di-assign (padahal SLA tetap running).
 
 **FE v2.5.0 Update:**
-- ✅ FRT sekarang visible meskipun conversation sudah assigned (tidak hanya saat Unassigned — PRD Detail AC-02 outdated)
-- ✅ RLT dan Wait Time sudah diimplementasi sebagai tracked metric (live timer + resolved badge)
+- ✅ FRT sekarang visible meskipun conversation sudah assigned (tidak hanya saat Unassigned — V2 Detail AC-02 outdated vs implementasi)
+- ✅ RLT dan Wait Time sudah diimplementasi sebagai tracked metric (live timer + resolved badge) — sesuai V2 Response Metrics (file 3)
 - ✅ Data model punya `firstAgentAssignmentAt` terpisah, sehingga FRT = Wait Time + RLT bisa dihitung
-- ❌ SLA color threshold masih mismatch (FE: absolute time, PRD: percentage)
-- ❌ Hold vs Snooze pause policy belum final (3-way conflict: Room=Hold pause, Snooze=no pause, RLT Adjusted=tergantung)
+- ❌ SLA color threshold masih mismatch (FE: absolute time, V2 Chat List: percentage)
+- ❌ Hold vs Snooze pause policy belum final (3-way conflict: Room v1.1=Hold pause, Snooze v1.0=no pause, RLT Adjusted=tergantung)
 
 ---
 
 ### LOOPHOLE 2 — Group Chat Lifecycle Tidak Terdefinisi
 
-| PRD                              | Statement                                          | Masalah                                                                       |
-| -------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Omnichannel (US-5)               | "Group chats cannot be resolved"                   | ❌                                                                            |
-| Chat Session Handling (US-003)   | "Always create new session after resolved"         | ❌ Jika group chat never resolved, session lifecycle group tidak pernah jalan |
-| Room (Limitation)                | "Room history not available for group chats"       | ❌                                                                            |
-| Relational Conversation (FR-045) | Tabs untuk grouped room (bisa termasuk group chat) | ❌ Tab grouping vs session lifecycle tidak aligned                            |
+| V2 File | Statement | Masalah |
+|---------|----------|---------|
+| Omnichannel v1.1 (file 4, US-5) | "Group chats cannot be resolved" | ❌ |
+| Chat Sessions v1.1 (file 12, US-003) | "Always create new session after resolved" | ❌ Jika group chat never resolved, session lifecycle group tidak pernah jalan |
+| Room v1.1 (file 9) | "Room history not available for group chats" | ❌ |
+| Relational v1.0 (file 19, FR-045) | Tabs untuk grouped room (bisa termasuk group chat) | ❌ Tab grouping vs session lifecycle tidak aligned |
 
 **Impact**: Group chat adalah first-class citizen di omnichannel tapi tidak punya lifecycle yang jelas. Agent tidak bisa resolve, tidak ada session history, tidak ada room history. Sementara Relational PRD memperlakukan group chat seperti conversation biasa.
 
-**Hidden Chain**: WA Web Group (dari Conversation SLA) tidak support TTC → Group chat tidak bisa resolve → Session tidak pernah selesai → SLA TTC infinite. Tiga PRD berbeda bicara tentang WA group tapi tidak ada yang menyambungkan.
+**Hidden Chain**: V2 Conversation SLA bilang WA Web Group tidak support TTC → Group chat tidak bisa resolve → Session tidak pernah selesai → SLA TTC infinite. Tiga PRD V2 berbeda bicara tentang WA group tapi tidak ada yang menyambungkan.
 
 ---
 
 ### LOOPHOLE 3 — Navigation Model Overlap (3 Definisi Berbeda)
 
-Tiga PRD mendefinisikan navigasi Inbox secara independen:
+Tiga PRD V2 mendefinisikan navigasi Inbox secara independen:
 
-| PRD                     | Model Navigasi                                           | Yang Didefinisikan                         |
-| ----------------------- | -------------------------------------------------------- | ------------------------------------------ |
-| Agent Pull Conversation | "Your Inbox" + "Get Conversation" button                 | Agent punya inbox pribadi, pull dari queue |
-| Team Inbox Navigation   | Sidebar daftar Team Inbox + drag & drop                  | Navigasi per team, reassign via drag       |
-| Omnichannel Navigation  | Menu: Your Inbox, All, Unassigned, Closed, Starred, Spam | Navigasi global dengan filter              |
+| V2 File | Model Navigasi | Yang Didefinisikan |
+|---------|---------------|-------------------|
+| Agent Pull v2.1 (file 7) | "Your Inbox" + "Get Conversation" button | Agent punya inbox pribadi, pull dari queue |
+| Team Inbox Nav v2.1 (file 6) | Sidebar daftar Team Inbox + drag & drop | Navigasi per team, reassign via drag |
+| Omnichannel Nav v1.2 (file 5) | Menu: Your Inbox, All, Unassigned, Closed, Starred, Spam | Navigasi global dengan filter |
 
-**Konflik**: Agent Pull Conversation mengasumsikan agent punya "Your Inbox" sendiri. Team Inbox Navigation mengasumsikan agent bisa lihat semua Team Inbox di sidebar. Omnichannel Navigation mendefinisikan keduanya + filter channel. Tiga model navigasi berbeda harus coexist tanpa definisi prioritas mana yang override.
+**Konflik**: Agent Pull mengasumsikan agent punya "Your Inbox" sendiri. Team Inbox Nav mengasumsikan agent bisa lihat semua Team Inbox di sidebar. Omnichannel Nav mendefinisikan keduanya + filter channel. Tiga model navigasi berbeda harus coexist tanpa definisi prioritas mana yang override.
 
 **Impact**: Agent bingung karena punya 3 cara navigasi berbeda. Implementasi bisa saling timpa.
 
@@ -70,14 +74,14 @@ Tiga PRD mendefinisikan navigasi Inbox secara independen:
 
 ### LOOPHOLE 4 — Assignee & Collaborator vs Multi-Assignee Legacy
 
-| PRD                               | Statement                                 | Masalah                                                      |
-| --------------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
-| Assignee & Collaborators (FR-001) | "Keep existing multi-assignee behavior"   | ✔ Explicit                                                   |
-| Conversation Detail (AC-01)       | "Multi-assignee chips with avatar + name" | ✔                                                            |
-| Room (Assignment Workflows)       | "Show assigned to, opened by, closed by"  | ❌ Tidak mention collaborator                                |
-| Chat List (Quick Assign)          | "Assign to Me" untuk Unassigned           | ❌ Assign to Me = jadi Assignee, collaborator tidak di-cover |
+| V2 File | Statement | Masalah |
+|---------|----------|---------|
+| Assignee & Collaborators v1.0 (file 2, FR-001) | "Keep existing multi-assignee behavior" | ✔ Explicit |
+| Detail v2.1 (file 10, AC-01) | "Multi-assignee chips with avatar + name" | ✔ |
+| Room v1.1 (file 9) | "Show assigned to, opened by, closed by" | ❌ Tidak mention collaborator |
+| Chat List v1.1 (file 8) | "Assign to Me" untuk Unassigned | ❌ Assign to Me = jadi Assignee, collaborator tidak di-cover |
 
-**Hidden Conflict**: EC-010 dari Assignee PRD: "Object moved to another Team Inbox — keep Assignees and Collaborators only if they remain valid in target scope." Tapi Reassign Account Channel (FR-006): "Move resets assignee to Unassigned." Jika move reset assignee, collaborator ikut hilang? Dua PRD punya rule berbeda.
+**Hidden Conflict**: V2 Assignee (file 2) EC-010: "Object moved to another Team Inbox — keep Assignees and Collaborators only if they remain valid in target scope." Tapi V2 Reassign (file 13) FR-006: "Move resets assignee to Unassigned." Jika move reset assignee, collaborator ikut hilang? Dua PRD V2 punya rule berbeda.
 
 **Impact**: Assignee hilang setelah move (Reassign PRD), collaborator harus manual di-add ulang (Collaborator PRD). Agent dan Supervisor frustrasi karena harus setup ulang tim.
 
@@ -85,15 +89,15 @@ Tiga PRD mendefinisikan navigasi Inbox secara independen:
 
 ### LOOPHOLE 5 — Relational Group vs Session vs Ticket
 
-Tiga mekanisme "grouping" berbeda:
+Tiga mekanisme "grouping" berbeda (semua V2):
 
-| Mekanisme                       | Definisi                                             | Konflik                                                                             |
-| ------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Relational Conversation         | "Primary + Child" — grouped conversations            | ❌                                                                                  |
-| Chat Session Handling           | "New session after resolve" — session lifecycle      | ❌ Apa yang terjadi jika Primary di-resolve? Child ikut resolved?                   |
-| Create Ticket from Conversation | "All future messages flagged is_ticket_message=true" | ❌ Jika conversation dalam relational group, ticket flag berlaku untuk semua child? |
+| Mekanisme (V2 File) | Definisi | Konflik |
+|---------------------|----------|---------|
+| Relational v1.0 (file 19) | "Primary + Child" — grouped conversations | ❌ |
+| Chat Sessions v1.1 (file 12) | "New session after resolve" — session lifecycle | ❌ Apa yang terjadi jika Primary di-resolve? Child ikut resolved? |
+| Ticketing V2 (file 14) | "All future messages flagged is_ticket_message=true" | ❌ Jika conversation dalam relational group, ticket flag berlaku untuk semua child? |
 
-**Hidden Gap**: Relational PRD secara eksplisit bilang "No ticket scope in this PRD". Create Ticket PRD secara eksplisit bilang "Messages after creation linked to ticket". Tidak ada PRD yang mendefinisikan interaksi antara grouped conversation + ticket.
+**Hidden Gap**: V2 Relational (file 19) secara eksplisit bilang "No ticket scope in this PRD". V2 Ticketing (file 14) secara eksplisit bilang "Messages after creation linked to ticket". Tidak ada PRD V2 yang mendefinisikan interaksi antara grouped conversation + ticket.
 
 **Impact**: Agent bisa create ticket dari child conversation, lalu reply di child ter-record sebagai ticket message, tapi Primary tidak tahu. Relational group jadi tidak konsisten dengan ticket context.
 
@@ -101,11 +105,11 @@ Tiga mekanisme "grouping" berbeda:
 
 ### LOOPHOLE 6 — Custom Attributes vs Conversation Detail vs Relational Matching
 
-| PRD                              | Fungsi Attribute                                    | Masalah                                                                              |
-| -------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Custom Attributes                | "Conversation-level editable fields & collections"  | ✔                                                                                    |
-| Conversation Detail (FR-20)      | "Custom attributes from external APIs, read-only"   | ❌ Detail bilang read-only, Custom Attributes bilang editable. Konflik P0 vs P2      |
-| Relational Conversation (FR-001) | Matching berdasarkan Custom Attributes & Properties | ❌ Jika attribute di-edit setelah matching, apakah relasi putus? Tidak didefinisikan |
+| V2 File | Fungsi Attribute | Masalah |
+|---------|-----------------|---------|
+| Custom Attributes v1.0 (file 11) | "Conversation-level editable fields & collections" | ✔ |
+| Detail v2.1 (file 10, FR-20) | "Custom attributes from external APIs, read-only" | ❌ Detail bilang read-only, Custom Attributes bilang editable. V2 file 11 define `ui_editable` |
+| Relational v1.0 (file 19, FR-001) | Matching berdasarkan Custom Attributes & Properties | ❌ Jika attribute di-edit setelah matching, apakah relasi putus? Tidak didefinisikan |
 
 **Impact**: Admin edit custom attribute → relational match key value berubah → conversation yang tadinya related jadi tidak match lagi. Relasional grouping jadi stale.
 
@@ -113,11 +117,11 @@ Tiga mekanisme "grouping" berbeda:
 
 ### LOOPHOLE 7 — Snooze vs Set Reminder vs Auto-Reply
 
-| PRD             | Mekanisme                              | Konflik                                                                   |
-| --------------- | -------------------------------------- | ------------------------------------------------------------------------- |
-| Snooze          | Hide + wake up otomatis. No SLA pause. | ❌                                                                        |
-| Room (Reminder) | Reminder modal: one-time / recurring   | ❌ Snooze punya precedence rule: "Snooze overrides reminder"              |
-| Auto-Reply      | Bot auto-reply ketika unavailable      | ❌ Jika auto-reply terkirim saat snooze, apakah wake? Tidak didefinisikan |
+| V2 File | Mekanisme | Konflik |
+|---------|----------|---------|
+| Snooze v1.0 (file 16) | Hide + wake up otomatis. No SLA pause. | ❌ |
+| Room v1.1 (file 9, Reminder) | Reminder modal: one-time / recurring | ❌ Snooze punya precedence rule: "Snooze overrides reminder" |
+| Auto-Reply v1.0 (file 1) | Bot auto-reply ketika unavailable | ❌ Jika auto-reply terkirim saat snooze, apakah wake? Tidak didefinisikan |
 
 **Impact**: Agent set snooze + reminder. Reminder di-defer oleh snooze. Tapi auto-reply dari bot terkirim karena "no agent available" (snooze = agent tidak handle). Customer reply setelah auto-reply → auto-unsnooze (Snooze FR-007) → agent kaget.
 
@@ -125,11 +129,11 @@ Tiga mekanisme "grouping" berbeda:
 
 ### LOOPHOLE 8 — Reopen vs New Session vs Legacy Routing
 
-| PRD                               | Reopen Behavior                                                            | Konflik                                                                  |
-| --------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Chat Session Handling (US-003)    | "New message after resolved = new Unassigned session"                      | ❌                                                                       |
-| Reassign Account Channel (FR-005) | "Closed legacy thread + inbound = reopen modal (default Keep in old team)" | ❌ Ini conflict: Session Handling selalu bikin baru, Reassign tanya dulu |
-| Room (Assignment)                 | "Resolved chats reopen on new message"                                     | ❌ Room bilang "reopen", Session bilang "new session"                    |
+| V2 File | Reopen Behavior | Konflik |
+|---------|----------------|---------|
+| Chat Sessions v1.1 (file 12, US-003) | "New message after resolved = new Unassigned session" | ❌ |
+| Reassign v1.4 (file 13, FR-005) | "Closed legacy thread + inbound = reopen modal (default Keep in old team)" | ❌ Ini conflict: Sessions selalu bikin baru, Reassign tanya dulu |
+| Room v1.1 (file 9) | "Resolved chats reopen on new message" | ❌ Room bilang "reopen", Sessions bilang "new session" |
 
 **Impact**: Tergantung PRD mana yang diimplementasi lebih dulu, perilaku reopen bisa berbeda total. QA harus tes ketiganya.
 
@@ -137,10 +141,10 @@ Tiga mekanisme "grouping" berbeda:
 
 ### LOOPHOLE 9 — Agent Availability vs Presence vs Max Capacity
 
-| PRD                  | Definisi "Available"                                           | Konflik                                                         |
-| -------------------- | -------------------------------------------------------------- | --------------------------------------------------------------- |
-| Auto-Reply (FR-021)  | Active, online, not Away/AUX, within shift, under max capacity | ✔ Defined                                                       |
-| Team Member Presence | Online = Active + Away. Offline = Offline.                     | ❌ Auto-Reply exclude Away, Presence PRD count Away as "Online" |
+| V2 File | Definisi "Available" | Konflik |
+|---------|---------------------|---------|
+| Auto-Reply v1.0 (file 1, FR-021) | Active, online, not Away/AUX, within shift, under max capacity | ✔ Defined |
+| Team Member Presence v1.0 (file 17) | Online = Active + Away. Offline = Offline. | ❌ Auto-Reply exclude Away, Presence PRD count Away as "Online" |
 
 **Impact**: Agent status "Away" dianggap Online di HUD (Presence PRD) tapi dianggap unavailable di Auto-Reply. Supervisor lihat 5 agent online, tapi auto-reply tetap terkirim karena 5 agent itu Away. Confusing.
 
@@ -148,11 +152,11 @@ Tiga mekanisme "grouping" berbeda:
 
 ### LOOPHOLE 10 — WA Web Group Mention vs Omnichannel Group Handling
 
-| PRD                   | Group Mention                                | Konflik                                                                            |
-| --------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------- |
-| WA Web Group Mention  | "@" picker, participant list, internal label | ✔ Defined untuk WA Web                                                             |
-| Chat Session Handling | Group metadata events, "Send as" selector    | ❌ WA Web Mention bilang support 100 mentions, Session Handling tidak define limit |
-| Omnichannel           | "Group chats cannot be resolved"             | ❌ Mention hanya untuk WA Web, group handling general                              |
+| V2 File | Group Mention | Konflik |
+|---------|--------------|---------|
+| WA Group Mention v1.0 (file 15) | "@" picker, participant list, internal label | ✔ Defined untuk WA Web |
+| Chat Sessions v1.1 (file 12) | Group metadata events, "Send as" selector | ❌ WA Mention bilang support 100 mentions, Sessions tidak define limit |
+| Omnichannel v1.1 (file 4) | "Group chats cannot be resolved" | ❌ Mention hanya untuk WA Web, group handling general |
 
 **Impact**: Fitur mention hanya untuk WA Web. Tapi group chat juga ada di channel lain (nanti). Ketika channel lain support group, mention tidak tersedia. Tidak ada roadmap alignment.
 
@@ -197,23 +201,23 @@ Tiga mekanisme "grouping" berbeda:
 
 ## Feature Development Status vs PRD (FE v2.5.0)
 
-### STATUS IMPLEMENTASI PER FITUR
+### STATUS IMPLEMENTASI PER FITUR (vs V2)
 
-Setelah validasi dengan FE repo `apps/omnichannel/` (v2.5.0):
+Setelah validasi dengan FE repo `apps/omnichannel/` (v2.5.0). Sumber: V2 (`PRD/Conversationv2/`).
 
-| # | Fitur | Status FE | Catatan |
-|---|-------|-----------|---------|
-| — | **SLA Metrics (FRT/TTC/RLT/Wait Time)** | ✅ **DEVELOPED** | v2.5.0: `firstAgentAssignmentAt`, `rltMs`, `waitTimeInQueueMs`, live timer display |
-| 1 | **Relational Conversation** | ❌ **UNDEVELOPED** | Group chat handling ada (isGroup), tapi relasi Primary+Child antar conversation tidak ada |
-| 2 | **Multiple Ticket from Single Bubble** | ✅ **DEVELOPED** | `CreateTicketDraftsModal`, multi-select message, batch draft (max 20) |
-| 3 | **Team Member Presence** | ✅ **DEVELOPED** | `member-status.store` (AWAY/READY), idle detection, away reasons CRUD, shift scheduler |
-| 4 | **Snooze Conversation** | ❌ **UNDEVELOPED** | Ticket snooze saja yang ada. Conversation snooze tidak ada |
-| 5 | **WhatsApp Group Mention** | ❌ **UNDEVELOPED** | Tidak ada @mention picker. Hanya macro `/shortcut` yang ada |
-| 6 | **Reassign Account Channel** | ✅ **DEVELOPED** | `AdjustAccountModal`, `changeAccountChannel`, account group management |
-| 7 | **Assignee & Collaborators** | ⚠️ **PARTIAL** | Participants sebagai assignee sudah develop. Konsep "collaborator" tidak ada |
-| 8 | **Auto-reply Templates** | ❌ **UNDEVELOPED** | Tidak ada auto-reply, welcome message, bot reply. Hanya Macros (`/shortcut`) |
-| — | **FRT/TTC Settings (SLA Config)** | ✅ **DEVELOPED** | `ConversationSLAForm`, per-channel SLA, policy toggles, reminder popover |
-| — | **Offline Report** | ✅ **DEVELOPED** | Async export dengan RLT/Wait Time columns |
+| V2 File | Fitur | Status FE | Catatan |
+|---------|-------|-----------|---------|
+| (file 3, 8, 10) | **SLA Metrics (FRT/TTC/RLT/Wait Time)** | ✅ **DEVELOPED** | v2.5.0: `firstAgentAssignmentAt`, `rltMs`, `waitTimeInQueueMs`, live timer display |
+| (file 19) | **Relational Conversation** | ❌ **UNDEVELOPED** | Group chat handling ada (isGroup), tapi relasi Primary+Child antar conversation tidak ada |
+| (file 18) | **Multiple Ticket from Single Bubble** | ✅ **DEVELOPED** | `CreateTicketDraftsModal`, multi-select message, batch draft (max 20) |
+| (file 17) | **Team Member Presence** | ✅ **DEVELOPED** | `member-status.store` (AWAY/READY), idle detection, away reasons CRUD, shift scheduler |
+| (file 16) | **Snooze Conversation** | ❌ **UNDEVELOPED** | Ticket snooze saja yang ada. Conversation snooze tidak ada |
+| (file 15) | **WhatsApp Group Mention** | ❌ **UNDEVELOPED** | Tidak ada @mention picker. Hanya macro `/shortcut` yang ada |
+| (file 13) | **Reassign Account Channel** | ✅ **DEVELOPED** | `AdjustAccountModal`, `changeAccountChannel`, account group management |
+| (file 2) | **Assignee & Collaborators** | ⚠️ **PARTIAL** | Participants sebagai assignee sudah develop. Konsep "collaborator" tidak ada |
+| (file 1) | **Auto-reply Templates** | ❌ **UNDEVELOPED** | Tidak ada auto-reply, welcome message, bot reply. Hanya Macros (`/shortcut`) |
+| (file 8) | **FRT/TTC Settings (SLA Config)** | ✅ **DEVELOPED** | `ConversationSLAForm`, per-channel SLA, policy toggles, reminder popover |
+| (file 3) | **Offline Report** | ✅ **DEVELOPED** | Async export dengan RLT/Wait Time columns |
 
 ### IMPLIKASI UNTUK PRIORITAS
 
@@ -250,27 +254,27 @@ Daftar prioritas sebelumnya perlu direvisi karena beberapa fitur sudah develop:
 
 ---
 
-## Omnichannel Deep Analysis
+## Omnichannel Deep Analysis (V2)
 
-### OMNICHANNEL INBOX — SENIOR QA LEAD PERSPECTIVE
+### OMNICHANNEL INBOX v1.1 (V2 file 4) — SENIOR QA LEAD PERSPECTIVE
 
 ### Risiko dan Gap Utama
 
 1. **Multi-session management belum cukup eksplisit**
-- PRD menargetkan zero session conflict, tetapi tidak mendefinisikan rule deteksi conflict secara rinci.
+- V2 Omnichannel menargetkan zero session conflict, tetapi tidak mendefinisikan rule deteksi conflict secara rinci.
 - QA harus menguji login ganda, token expiry, takeover, dan isolation antar environment.
 
 2. **Retention policy belum granular**
-- PRD menetapkan store 6 bulan, archive 6 bulan, delete 12 bulan.
+- V2 menetapkan store 6 bulan, archive 6 bulan, delete 12 bulan.
 - Tidak jelas acuan waktunya: created date, first message, atau last activity.
 
 3. **Group chat lifecycle conflict**
-- Omnichannel menyebut group chat tidak bisa resolved.
-- Session Handling dan Room mendefinisikan lifecycle yang bertentangan terhadap resolved/reopen/new session.
+- V2 Omnichannel menyebut group chat tidak bisa resolved.
+- V2 Sessions dan V2 Room mendefinisikan lifecycle yang bertentangan terhadap resolved/reopen/new session.
 
 4. **Presence/availability conflict**
-- Omnichannel ingin indicator Active/Away.
-- PRD lain mendefinisikan agent eligibility secara berbeda untuk auto-reply/assignment.
+- V2 Omnichannel ingin indicator Active/Away.
+- V2 lainnya mendefinisikan agent eligibility secara berbeda untuk auto-reply/assignment.
 
 5. **Audit, rate limit, dan integration fallback belum cukup detail**
 - Belum ada batas rate limit yang tegas.
@@ -287,19 +291,19 @@ Daftar prioritas sebelumnya perlu direvisi karena beberapa fitur sudah develop:
 
 ---
 
-## Three-PRD Logical Intersection
+## Three-PRD Logical Intersection (V2)
 
 ### THREE-PRD LOGICAL INTERSECTION
 
-PRD yang dibandingkan:
+PRD V2 yang dibandingkan:
 
-1. Omnichannel Inbox
-2. Omnichannel Navigation
-3. Team Inbox Navigation
+1. Omnichannel Inbox v1.1 (V2 file 4)
+2. Omnichannel Navigation v1.2 (V2 file 5)
+3. Team Inbox Navigation v2.1 (V2 file 6)
 
 ### Kesimpulan Utama
 
-Tiga PRD ini sebenarnya bersama-sama mendefinisikan bagaimana inbox/conversation ditampilkan dan diolah. Masalah utamanya adalah belum ada satu definisi final tentang **logical intersection** antara:
+Tiga PRD V2 ini bersama-sama mendefinisikan bagaimana inbox/conversation ditampilkan dan diolah. Masalah utamanya adalah belum ada satu definisi final tentang **logical intersection** antara:
 
 1. **Inbox section**
 2. **Channel section**
@@ -311,8 +315,9 @@ Tiga PRD ini sebenarnya bersama-sama mendefinisikan bagaimana inbox/conversation
 - Your Inbox
 - Unassigned
 - All Chat
-- Spam
+- Closed
 - Starred
+- Spam
 - Junk
 
 2. **Channel**
@@ -323,9 +328,9 @@ Tiga PRD ini sebenarnya bersama-sama mendefinisikan bagaimana inbox/conversation
 
 ### Gap dan Tumpang Tindih
 
-1. **Omnichannel Inbox** mendefinisikan unified inbox dan channel-centric behavior.
-2. **Omnichannel Navigation** mendefinisikan global navigation state seperti Your Inbox, All, Unassigned, Closed, Starred, Spam.
-3. **Team Inbox Navigation** mendefinisikan team-centric sidebar dan ownership/team scope.
+1. **V2 Omnichannel Inbox (file 4)** mendefinisikan unified inbox dan channel-centric behavior.
+2. **V2 Omnichannel Navigation (file 5)** mendefinisikan global navigation state seperti Your Inbox, All, Unassigned, Closed, Starred, Spam.
+3. **V2 Team Inbox Navigation (file 6)** mendefinisikan team-centric sidebar dan ownership/team scope.
 
 ### Risiko Requirement Overlap
 
@@ -343,13 +348,13 @@ Dan RBACScope harus selalu dievaluasi dulu sebelum filter lain ditampilkan.
 
 ---
 
-## Current Implemented Filtering Rules
+## Current Implemented Filtering Rules (V2-aligned)
 
 ### CURRENT IMPLEMENTATION LOGIC — DEVELOPED FILTERING RULES
 
 Current implemented filtering rules sudah menjadi bagian dari canonical summary di `Memory/global-memory.md`.
 
-Ringkasnya:
+Ringkasnya (aligned dengan V2):
 
 1. Filtering chat list ditentukan oleh intersection `Inbox x Channel x Team x RBAC`.
 2. Default landing adalah `Your Inbox`.
@@ -365,13 +370,13 @@ Ringkasnya:
 3. Role restriction untuk Agent vs Supervisor vs Admin wajib di-cover di UI dan API level.
 4. Socket update wajib dites agar perubahan assignment/spam/starred/team langsung memindahkan row ke list yang benar.
 
-### Confirmed Against Production Data
+### Confirmed Against Production Data (V2-aligned)
 
 Production document mengkonfirmasi bahwa semua filter field berikut sudah exist di collection:
-- `status: "open"/"closed"` — replacing Ongoing/Resolved from PRD
+- `status: "open"/"closed"` — V2 canonical
 - `isJunked`, `spams[]`, `favorites[]`, `tags[]`, `isPinned` — all present
 - `team: { teamId, name, icon, color }` — present
-- `participants` = assignee field — present but empty (fitur belum developed)
+- `participants` = assignee field — present but empty (V2 Collaborator fitur belum developed)
 - `sessionDetails: []` — schema ready, data pending
 - SLA tidak tersimpan di dokumen — dihitung real-time di service layer
 
@@ -380,12 +385,15 @@ Production document mengkonfirmasi bahwa semua filter field berikut sudah exist 
 - File ini menyimpan analisa detail, bukan ringkasan global.
 - Untuk ringkasan global dan canonical rules, lihat `Memory/global-memory.md`.
 - Untuk analisis detail SLA/RLT/FRT/TTC, lihat `Memory/conversation-sla-rlt-frt-ttc-analysis.md`.
+- **Source of truth:** V2 (`PRD/Conversationv2/`). V1 deprecated.
 
 ---
 
-## QA Analysis & Testing Guidance (FE v2.5.0)
+## QA Analysis & Testing Guidance (FE v2.5.0 vs V2)
 
 ### Pendekatan: Setiap Loophole → FE Status → Impact → Testing
+
+> **Catatan:** Analisis ini mengacu ke V2 (`PRD/Conversationv2/`). V1 deprecated.
 
 ---
 
@@ -395,7 +403,7 @@ Production document mengkonfirmasi bahwa semua filter field berikut sudah exist 
 |---|---|
 | **FE Status** | ⚠️ Partial: RLT/Wait Time sudah, FRT visible after assign ✅, color threshold mismatch ❌ |
 | **Impact jika di-test** | Agent bisa lihat FRT countdown dengan benar. Tapi warna SLA di Chat List tidak sesuai PRD US-14. RLT & Wait Time muncul sebagai badge tanpa threshold. |
-| **Testing Guidance** | 1. Verifikasi FRT countdown: mulai dari inbound, stop saat first agent reply. Cross-check dengan `frtMs` dari BE. 2. Verifikasi RLT live timer: office-hours-aware, pause di luar shift. 3. Verifikasi Wait Time: wall-clock, tidak pernah pause. 4. Verifikasi `FRT = Wait Time + RLT` constraint. 5. Catat bahwa SLA color threshold masih absolute time — tidak sesuai PRD US-14. Buat bug report jika diperlukan. |
+| **Testing Guidance** | 1. Verifikasi FRT countdown: mulai dari inbound, stop saat first agent reply. Cross-check dengan `frtMs` dari BE. 2. Verifikasi RLT live timer: office-hours-aware, pause di luar shift. 3. Verifikasi Wait Time: wall-clock, tidak pernah pause. 4. Verifikasi `FRT = Wait Time + RLT` constraint. 5. Catat bahwa SLA color threshold masih absolute time — tidak sesuai V2 Chat List US-14. Buat bug report jika diperlukan. |
 | **Regression Risk** | Perubahan SLA engine bisa mempengaruhi RLT dan Wait Time karena share event source yang sama (`firstAgentReplyAt`, `firstAgentAssignmentAt`). |
 | **Test Level** | Integration + E2E |
 
@@ -532,27 +540,26 @@ Production document mengkonfirmasi bahwa semua filter field berikut sudah exist 
 
 ---
 
-## Chat List Cross-PRD Analysis
+## Chat List Cross-PRD Analysis (V2-aligned)
 
-### Status PRD vs Implementasi
+### Status V2 vs Implementasi
 
-Chat List PRD (v1.1, Sep 2025) mendefinisikan model tab `Unassigned / Ongoing / Resolved`.  
-Implementasi aktual menggunakan **button-based filter endpoints** dengan status `Open` / `Closed`.  
-PRD ini sudah **outdated** — tidak mencerminkan realitas implementasi.
+V2 Chat List v1.1 (file 8) mendefinisikan filter buttons dengan status `Open` / `Closed`, bukan tabs `Unassigned/Ongoing/Resolved` seperti V1.  
+**Implementasi FE sudah sesuai V2.**
 
-### 7 Critical Gaps
+### 7 Critical Gaps (V2 vs FE)
 
-| #  | Gap | Detail | Affected PRDs |
-| -- | --- | ------ | ------------- |
-| 1 | **Tab Model Conflict** | 3 model berbeda: PRD Chat List (Unassigned/Ongoing/Resolved), Navigation PRDs (Your Inbox/All/Unassigned/Closed/Starred/Spam), Implementasi (hybrid: Your Inbox/All/Unassigned + Channel/Team + Spam/Starred/Junk + Open/Closed) | Chat List, Omnichannel Nav, Team Inbox Nav |
-| 2 | **"Assign to Me" inaccessible for Agent** | US-3 letakkan tombol hanya di tab Unassigned, tapi RBAC sembunyikan Unassigned dari Agent. Agent tidak punya akses ke fitur ini | Chat List, Omnichannel Inbox |
-| 3 | **SLA threshold hanya di Chat List PRD** | Green/Yellow/Red threshold >50%, ≤50%&>10%, ≤10% hanya didefinisikan di Chat List. Tidak ada PRD lain yang cross-reference. SLA fragmentation (L1) unresolved | Chat List, SLA, Session, Detail |
-| 4 | **Hold vs Snooze ambiguity** | US-13 define Hold indicator terpisah dari Snooze (undeveloped). Tidak jelas apakah coexist atau replace. Hold icon + tooltip vs Snooze hide+unsnooze — overlap tidak terdefinisi | Chat List, Snooze |
-| 5 | **Sorting options mismatch** | PRD: Most Recent, Longest Waiting, Mentions, Reminder; Implementasi: Latest Activity, Oldest, Unread First, SLA Urgency, Alphabetical. Hanya 1 dari 4 match | Chat List, Omnichannel Nav |
-| 6 | **Hover preview (US-5) depends on Ticket System** | Mini profile (sender info + last 3 tickets) link ke Ticket System. Tidak ada error state jika Ticket System unavailable | Chat List, Ticket System |
-| 7 | **Search scope undefined** | Search bisa company-wide atau scoped by Team/Channel/Inbox filter. Tidak ada definisi scope behavior di PRD mana pun | Chat List |
+| # | Gap | Detail | V2 Source |
+| - | --- | ------ | --------- |
+| 1 | **SLA color threshold mismatch** | V2 pakai percentage (50%/10%), FE masih absolute time | Chat List v1.1 (file 8, US-14) |
+| 2 | **"Assign to Me" inaccessible for Agent** | US-3 letakkan tombol di Unassigned, tapi RBAC sembunyikan Unassigned dari Agent. Agent tidak punya akses ke fitur ini | Chat List v1.1 (file 8), Omnichannel (file 4) |
+| 3 | **SLA threshold hanya di Chat List V2** | Green/Yellow/Red threshold >50%, ≤50%&>10%, ≤10% hanya didefinisikan di Chat List V2 | Chat List V2 (file 8) |
+| 4 | **Hold vs Snooze ambiguity** | V2 Hold indicator terpisah dari Snooze (undeveloped). Tidak jelas apakah coexist atau replace | Chat List V2 (file 8), Snooze V2 (file 16) |
+| 5 | **Sorting** | V2: Latest Activity, Oldest, Unread First, SLA Urgency, Alphabetical — **FE sudah match** | Chat List V2 (file 8) |
+| 6 | **Hover preview (US-5) depends on Ticket System** | Mini profile (sender info + last 3 tickets) link ke Ticket System | Chat List V2 (file 8) |
+| 7 | **Search scope** | Search scoped by active RBAC filter (Your Inbox, All, Channel, Team) | V2 Navigation (file 5, 6) |
 
-### 3-PRD Integration Mapping
+### 3-PRD Integration Mapping (V2)
 
 Chat List harus dipahami sebagai irisan:
 
@@ -560,37 +567,33 @@ Chat List harus dipahami sebagai irisan:
 
 #### Per Section:
 
-| Section | Chat List Impact | Status |
-| ------- | ---------------- | ------ |
-| **Inbox** (Your Inbox, All, Unassigned, Closed, Starred, Spam, Junk) | Tab model Chat List PRD (Unassigned/Ongoing/Resolved) tidak match dengan navigation filter taxonomy. Open/Closed di implementasi juga tidak match navigation (Closed). Perlu harmonisasi taxonomy | ❌ Mismatch |
-| **Channel** (WhatsApp, Live Chat, etc.) | Channel filter sebagai parent set. Chat list menampilkan badge + icon per item. OK | ✔ Clear |
-| **Team** (Team Inbox scope) | Team filter membatasi visible conversations. Chat list filtering sudah respect team scope. OK | ✔ Clear |
-| **RBAC** (Agent vs Supervisor vs Admin) | Agent tidak bisa akses Unassigned tab → "Assign to Me" tidak bisa diakses. Starred/Spam user-specific | ❌ Agent blocked from core feature |
+| Section | Chat List Impact | V2 Status |
+| ------- | ---------------- | --------- |
+| **Inbox** (Your Inbox, All, Unassigned, Closed, Starred, Spam, Junk) | V2 filter buttons sudah match dengan FE implementation | ✅ Aligned |
+| **Channel** (WhatsApp, Live Chat, etc.) | Channel filter sebagai parent set. FE menampilkan badge + icon per item | ✅ Aligned |
+| **Team** (Team Inbox scope) | Team filter membatasi visible conversations | ✅ Aligned |
+| **RBAC** (Agent vs Supervisor vs Admin) | Agent tidak bisa akses Unassigned tab → "Assign to Me" tidak bisa diakses | ⚠️ Need alternate path |
 
 ### Implikasi QA
 
-1. **Tab model**: QA harus tes 3 varian (PRD, Navigation PRD, Implementasi) untuk mastiin tidak ada regression
-2. **Agent "Assign to Me"**: WAJIB tes alternate access path (notification/waiting list/temp team-scoped Unassigned) — tanpanya, fitur ini tidak bisa dipakai oleh Agent
-3. **SLA color transitions**: QA harus tes transisi green→yellow→red dengan timing yang tepat. Konfigurasi threshold via Settings
-4. **Hold vs Snooze**: Tes overlap state — chat yang di-hold lalu di-snooze — priority mana yang nampak di chat list
-5. **Sort order persistence**: Sorting harus persist per session (PRD requirement) — tes bahwa sorting tidak reset saat pindah filter/role
-6. **Hover preview error**: Tes behavior hover saat Ticket System down — harus graceful, jangan broken UI
-7. **Search scope**: Tes search dari Your Inbox vs All vs team-scoped — pastikan hasil sesuai scope
+1. **SLA color**: QA harus tes transisi green→yellow→red dengan timing yang tepat. Konfigurasi threshold via Settings
+2. **Agent "Assign to Me"**: WAJIB tes alternate access path (notification/waiting list/temp team-scoped Unassigned)
+3. **Hold vs Snooze**: Tes overlap state — chat yang di-hold lalu di-snooze — priority mana yang nampak di chat list
+4. **Sort order persistence**: Sorting harus persist per session — tes bahwa sorting tidak reset saat pindah filter/role
+5. **Hover preview error**: Tes behavior hover saat Ticket System down — harus graceful
+6. **Search scope**: Tes search dari Your Inbox vs All vs team-scoped — pastikan hasil sesuai scope
 
 ---
 
-## Chat List Recommendations
+## Chat List Recommendations (V2)
 
-### 1. Harmonisasi Model Navigasi Chat List
+### 1. Harmonisasi Model
 
-Tentukan apakah sistem menggunakan **Status Tabs** (Unassigned/Ongoing/Resolved) atau **Filter Tabs** (Your Inbox/All/Unassigned/Closed/Starred/Spam).  
-Jika keduanya coexist, tetapkan hierarki: **Filter Tabs sebagai parent**, **Status sebagai sub-filter** di dalamnya.
+FE sudah aligned dengan V2 (button-based filters, Open/Closed). Tidak perlu perubahan model navigasi. Fokus ke penyelesaian gap SLA color threshold.
 
-Saat ini implementasi hybrid (button-based filter + Open/Closed) tidak cocok dengan PRD mana pun. Harmonisasi diperlukan sebelum MVP.
+### 2. Sinkronkan SLA Threshold
 
-### 2. Sinkronkan SLA Threshold ke Satu Definisi
-
-Default SLA threshold dari Chat List PRD (50%/10%) harus menjadi **baseline tunggal** untuk seluruh sistem:
+Default SLA threshold dari V2 Chat List (50%/10%) harus menjadi **baseline tunggal**:
 
 | Warna | Threshold | Arti |
 | ----- | --------- | ---- |
@@ -598,7 +601,7 @@ Default SLA threshold dari Chat List PRD (50%/10%) harus menjadi **baseline tung
 | Kuning | ≤50% & >10% sisa waktu | Mendekati deadline |
 | Merah | ≤10% atau overdue | Kritis / terlambat |
 
-Threshold harus **configurable via Settings** (per US-14). SLA metric yang dipakai (FRT/TTC/whichever) harus ditentukan oleh SLA Engine Contract (lihat Rekomendasi L1).
+Threshold harus **configurable via Settings** (per V2 US-14). SLA metric (FRT/TTC) ditentukan oleh SLA Engine Contract.
 
 ### 3. Definisikan Relasi Hold ↔ Snooze
 
@@ -636,43 +639,42 @@ Tidak boleh ada search result yang melebihi visibility filter yang sedang aktif.
 
 ---
 
-## Room PRD Cross-PRD Analysis
+## Room Cross-PRD Analysis (V2-aligned)
 
-### Status PRD vs Implementasi
+### Status V2 vs Implementasi
 
-Conversation Room PRD (v1.1, Sep 2025) masih menggunakan status model `Unassigned / Ongoing / Resolved`.  
-Implementasi aktual menggunakan `open` / `closed`, dan assignment source menggunakan `participants` (participants = assignee).  
-Karena itu Room PRD perlu dibaca sebagai dokumen requirement legacy yang belum sepenuhnya disinkronkan dengan Chat List, navigation PRDs, dan data model developed.
+V2 Room v1.1 (file 9) sudah menggunakan status model `open` / `closed` dan assignment via `participants`.  
+**Implementasi FE sudah aligned dengan V2.** V1 legacy wording tidak relevan.
 
-### Cross-PRD Impact Mapping
+### Cross-PRD Impact Mapping (V2)
 
-| Area | Room Impact | Related PRD / Layer |
-| ---- | ----------- | ------------------- |
-| Chat List | Room actions mengubah state row: Close, Hold, Reminder, Pin, Star/Priority, Tag, assignment | Chat List |
-| Team Navigation | Room visibility dan action permission harus mengikuti team scope user | Team Inbox Navigation |
-| Channel Navigation | Room feature availability tergantung selected channel/accountChannel capability | Channel / Omnichannel Navigation |
-| Omnichannel Navigation | Room adalah detail view dari conversation list hasil filter Inbox x Channel x Team x RBAC | Omnichannel Navigation |
-| Omnichannel Inbox | Socket, delivery status, channel identity, assignment, reopen, message lifecycle | Omnichannel Inbox |
-| Ticket System | Room create/link ticket; Chat List hover preview reads ticket context | Ticket PRDs |
+| Area | Room Impact | V2 Source |
+| ---- | ----------- | --------- |
+| Chat List | Room actions mengubah state row: Close, Hold, Reminder, Pin, Star/Priority, Tag, assignment | Chat List v1.1 (file 8) |
+| Team Navigation | Room visibility dan action permission harus mengikuti team scope user | Team Inbox Nav v2.1 (file 6) |
+| Channel Navigation | Room feature availability tergantung selected channel/accountChannel capability | Channel (V2 file 12) |
+| Omnichannel Navigation | Room adalah detail view dari conversation list hasil filter | Omnichannel Nav v1.2 (file 5) |
+| Omnichannel Inbox | Socket, delivery status, channel identity, assignment, reopen, message lifecycle | Omnichannel v1.1 (file 4) |
+| Ticket System | Room create/link ticket | Ticketing V2 (file 14) |
 
-### 14 Critical Findings
+### 14 Critical Findings (vs V2)
 
-| # | Finding | Detail | Impact |
-| - | ------- | ------ | ------ |
-| 1 | **Status model conflict** | Room PRD uses `Unassigned/Ongoing/Resolved`; implementation uses `open/closed` | Close/Resolve, Chat List filtering, and reopen behavior can diverge |
-| 2 | **Close button ambiguity** | PRD says `Close (ongoing assigned chats)` but does not define whether Close = Resolve or just close UI | Wrong state transition risk |
-| 3 | **Assignment source mismatch** | Room PRD says Assigned to / Opened by / Closed by; implementation confirms `participants` = assignee, no root `assignedTo` | QA must validate participant-based assignment and log source for opened/closed by |
-| 4 | **Hold/Snooze/SLA conflict** | Room says Hold pauses SLA and Resume restores SLA; Chat List defines Hold indicator; Snooze PRD previously does not pause SLA | SLA calculation can be inconsistent across list and room |
-| 5 | **Reopen behavior conflict** | Room says resolved chats reopen on new message; Session Handling says new Unassigned session; Reassign PRD says reopen modal | Closed inbound flow needs one state machine |
-| 6 | **Room actions mutate Chat List state** | Close, Hold, Reminder, Pin, Star/Priority, Tag, assignment must update Chat List via socket | Row can stay stale if event mapping incomplete |
-| 7 | **Room search vs Chat List search** | Room search is thread-local; Chat List search is active RBAC/filter scoped | Search results can leak data or confuse users if mixed |
-| 8 | **Attachment size conflict** | Section 5 says max `100MB`; Section 12 says max `15MB` | QA cannot set upload boundary without PM clarification |
-| 9 | **Reminder delivery ambiguity** | Browser/push notification unspecified; offline user and blocked notification behavior undefined | Reminder reliability cannot be fully tested |
-| 10 | **Typing indicator scope unclear** | PRD defines agent typing names, but not customer typing visibility, especially Live Chat | Real-time UX expectation mismatch |
-| 11 | **Multi-select message limit undefined** | Bulk copy/create ticket has no max selected message count | Performance risk on large threads |
-| 12 | **Quick Reply template limit undefined** | Text area max is 2000 chars, but Quick Reply template has no max char | Template insertion can exceed send limit |
-| 13 | **Inline reply-to missing-message behavior undefined** | No behavior for deleted, hidden, expired, or failed-to-load referenced message | Broken reply preview risk |
-| 14 | **Channel capability matrix missing** | Presence, rich cards, disappearing messages, screenshot add-on, WA relogin, delivery/read indicators are channel-dependent | QA must create capability matrix before coverage is complete |
+| # | Finding | Detail | V2 Source |
+| - | ------- | ------ | --------- |
+| 1 | **Status model** | V2 Room uses `open/closed`, FE implementasi match | ✅ Aligned |
+| 2 | **Close button** | V2 defines Close = transition to `closed` | ✅ Clear |
+| 3 | **Assignment source** | V2 confirms `participants` = assignee, no root `assignedTo` | ✅ Aligned |
+| 4 | **Hold/Snooze/SLA conflict** | V2 Room says Hold pauses SLA. V2 Snooze says no pause. 3-way conflict unresolved | ❌ Open |
+| 5 | **Reopen behavior conflict** | V2 Room says reopen. V2 Sessions says new session. V2 Reassign says modal | ❌ Open |
+| 6 | **Room actions mutate Chat List** | Close, Hold, Reminder, Pin, Star/Priority, Tag, assignment must update Chat List via socket | ⚠️ Need socket validation |
+| 7 | **Room search vs Chat List search** | Room search thread-local; Chat List search RBAC-scoped | ⚠️ Scope validation |
+| 8 | **Attachment size** | V2 Room v1.1 says max 100MB | ✅ Clear |
+| 9 | **Reminder delivery** | V2 Room v1.1 defines reminder modal; notification behavior unspecified | ⚠️ Need clarification |
+| 10 | **Typing indicator** | V2 defines agent/customer typing visibility | ✅ Defined |
+| 11 | **Multi-select message limit** | V2 Ticketing defines max linked messages | ✅ 50 per V2 |
+| 12 | **Quick Reply template** | V2 Room defines text area max 2000 chars | ✅ Clear |
+| 13 | **Inline reply-to** | V2 Room defines reply-to behavior | ✅ Defined |
+| 14 | **Channel capability matrix** | V2 Omnichannel defines channel-dependent features | ⚠️ Need mapping |
 
 ### Room-Specific QA Clarification List
 
@@ -694,9 +696,9 @@ Karena itu Room PRD perlu dibaca sebagai dokumen requirement legacy yang belum s
 16. Confirm final keyboard shortcut list for WCAG testing.
 17. Confirm feature flag/add-on toggle mechanism for screenshot and channel-specific capabilities in staging.
 
-### Room Implementation Alignment Rules
+### Room Implementation Alignment Rules (V2)
 
-1. Treat `open/closed` as implementation truth until PM explicitly changes it.
+1. Treat `open/closed` as V2 canonical (V1 `Ongoing/Resolved` deprecated).
 2. Treat `participants` as assignee source for Room header and assignment workflow.
 3. Treat Room search and Chat List search as separate features with separate scope rules.
 4. Treat any Room action that changes conversation metadata as requiring Chat List socket refresh.
@@ -705,69 +707,67 @@ Karena itu Room PRD perlu dibaca sebagai dokumen requirement legacy yang belum s
 
 ---
 
-## Detail PRD Cross-PRD Analysis
+## Detail Cross-PRD Analysis (V2-aligned)
 
-### Status PRD vs Implementasi
+### Status V2 vs Implementasi
 
-Conversation Detail PRD (v2.1, Sep 2025) defines metadata, assignee, SLA, reminder, attributes, tags, notes, pinned messages, history, related conversations, broadcast history, and audit log panel.  
-The PRD uses `Assigned` / `Unassigned`, but implementation truth is `status: open/closed` and `participants` = assignee.  
-Therefore, `Assigned` / `Unassigned` must be treated as **assignment state**, not conversation status.
+V2 Detail v2.1 (file 10) defines metadata, assignee, SLA, reminder, attributes, tags, notes, pinned messages, history, related conversations, broadcast history, and audit log panel.  
+Uses `Assigned` / `Unassigned` as **assignment state**, while `status: open/closed`.  
+**Implementasi FE sudah aligned dengan V2.**
 
-### Cross-PRD Impact Mapping
+### Cross-PRD Impact Mapping (V2)
 
-| Area | Detail Impact | Related PRD / Layer |
-| ---- | ------------- | ------------------- |
-| Chat List | Tags, assignee, team, reminder, pinned messages, SLA state, and status must reflect in list row | Chat List |
-| Chat Room | Shares same metadata: participants, notes, pinned messages, media/files, reminder, SLA, assignment | Room |
-| Team Navigation | Team Inbox is single mandatory scope and controls visible conversations/actions | Team Inbox Navigation |
-| Channel Navigation | Attributes and client fields depend on selected channel/accountChannel | Channel / Omnichannel Navigation |
-| Omnichannel Navigation | Detail panel is opened from filtered conversation list and must respect active RBAC scope | Omnichannel Navigation |
-| Omnichannel Inbox | Socket updates, assignment, audit, channel identity, SLA, history, lifecycle events | Omnichannel Inbox |
-| Ticket / Broadcast / Attributes | Detail adds dependencies beyond base conversation: broadcast history, related conversations, external attributes | Ticket, Broadcast, Custom Attributes |
+| Area | Detail Impact | V2 Source |
+| ---- | ------------- | --------- |
+| Chat List | Tags, assignee, team, reminder, pinned messages, SLA state, and status must reflect in list row | Chat List v1.1 (file 8) |
+| Chat Room | Shares same metadata: participants, notes, pinned messages, media/files, reminder, SLA, assignment | Room v1.1 (file 9) |
+| Team Navigation | Team Inbox is single mandatory scope and controls visible conversations/actions | Team Inbox Nav v2.1 (file 6) |
+| Channel Navigation | Attributes and client fields depend on selected channel/accountChannel | Sessions v1.1 (file 12) |
+| Omnichannel Navigation | Detail panel is opened from filtered conversation list and must respect active RBAC scope | Omnichannel Nav v1.2 (file 5) |
+| Omnichannel Inbox | Socket updates, assignment, audit, channel identity, SLA, history, lifecycle events | Omnichannel v1.1 (file 4) |
+| Ticket / Broadcast / Attributes | Detail adds dependencies beyond base conversation: broadcast history, related conversations, external attributes | Ticketing V2 (file 14), Custom Attributes v1.0 (file 11) |
 
-### 12 Critical Findings
+### 12 Critical Findings (vs V2)
 
-| # | Finding | Detail | Impact |
-| - | ------- | ------ | ------ |
-| 1 | **Assignment state vs status conflict** | Detail uses `Assigned/Unassigned`; implementation status is `open/closed` | Must separate `assignmentState` from `status` |
-| 2 | **Participants source must be canonical** | Detail supports multi-assignee; implementation uses `participants` as assignee | UI chips/add/remove must map to participants |
-| 3 | **Team Inbox mandatory single** | Detail requires one Team Inbox; implementation has single `team` object | Team reassignment must update Chat List and Team Nav scope |
-| 4 | **SLA metric fragmented** | Detail defines FRT/TTC; Chat List defines 50%/10% color threshold; Room defines Hold pause | Needs SLA Engine Contract |
-| 5 | **FRT only when Unassigned ambiguity** | Detail says First Response Due appears only when Unassigned | Must define based on assignmentState, not status |
-| 6 | **Reminder visibility conflict** | Detail says reminder only visible to creator; Room history implies shared event; Chat List may sort by Reminder | User-specific vs shared reminder must be decided |
-| 7 | **Tag mutation affects Chat List** | Detail allows add/edit/remove tags and WA sync ≤5s | Chat List chips/filter must update via socket/event |
-| 8 | **Custom attributes ownership conflict** | Detail: API attributes read-only, editable custom fields P2; other PRDs imply editable/custom matching behavior | Source of truth for attributes unresolved |
-| 9 | **Conversation history lifecycle conflict** | Detail wants all past conversations/sessions; group room history unavailable | Needs 1:1 vs group history rule and session boundary source |
-| 10 | **Related Conversations overlaps Relational Conversation** | Detail supports linked related conversations; Relational PRD supports automatic grouping | Manual related vs automatic relation must be separated |
-| 11 | **Broadcast History RBAC risk** | Detail exposes broadcast history in conversation panel | Broadcast recipients/history can leak across team/division if RBAC not strict |
-| 12 | **Attachment max size conflict now has 3 values** | Room requirements: 100MB; Room limitation: 15MB; Detail error handling: 25MB | Upload boundary cannot be tested without clarification |
+| # | Finding | Detail | V2 Source | Status |
+| - | ------- | ------ | --------- | ------ |
+| 1 | **Assignment state vs status** | V2 Detail uses `Assigned/Unassigned` as assignment state; `status: open/closed` | Detail v2.1 (file 10) | ✅ Aligned |
+| 2 | **Participants source** | V2 Detail supports multi-assignee via `participants` | Detail v2.1 (file 10) | ✅ Aligned |
+| 3 | **Team Inbox mandatory single** | V2 Detail requires one Team Inbox; FE has single `team` object | Detail v2.1 (file 10) | ✅ Aligned |
+| 4 | **SLA metric fragmented** | V2 Detail defines FRT/TTC; V2 Chat List defines 50%/10% threshold; V2 Room defines Hold pause | Need SLA Engine Contract | ❌ Open |
+| 5 | **FRT visibility** | V2 Detail v2.1: FRT countdown muncul saat Unassigned. FE menampilkan FRT meskipun assigned — **FE lebih maju** | Detail v2.1 (file 10) | ⚠️ V2 outdated |
+| 6 | **Reminder visibility** | V2 Detail says reminder only visible to creator. V2 Room implies shared event | Detail v2.1 (file 10) | ❌ Unresolved |
+| 7 | **Tag mutation → Chat List** | V2 Detail allows add/edit/remove tags and WA sync ≤5s | Detail v2.1 (file 10) | ✅ Aligned |
+| 8 | **Custom attributes ownership** | V2 Detail: API attributes read-only. V2 Custom Attributes (file 11): `ui_editable` + Collections | Detail v2.1 (file 10), Custom Attributes v1.0 (file 11) | ⚠️ Partial |
+| 9 | **Conversation history** | V2 Detail wants all past conversations; group room history unavailable | Detail v2.1 (file 10) | ⚠️ Group TBD |
+| 10 | **Related Conversations vs Relational** | V2 Detail supports linked related conversations; V2 Relational (file 19) supports automatic grouping | Detail v2.1 (file 10), Relational v1.0 (file 19) | ❌ Open |
+| 11 | **Broadcast History RBAC** | V2 Detail exposes broadcast history in conversation panel | Detail v2.1 (file 10) | ⚠️ Need RBAC validation |
+| 12 | **Attachment max size** | V2 Room v1.1 (file 9): 100MB. V2 Detail v2.1 (file 10): 25MB — **conflict** | Room v1.1 (file 9), Detail v2.1 (file 10) | ❌ Unresolved |
 
 ### Detail-Specific QA Clarification List
 
-1. Confirm canonical separation: `status = open/closed`, `assignmentState = assigned/unassigned`.
+1. Confirm canonical separation: `status = open/closed`, `assignmentState = assigned/unassigned` (V2 aligned).
 2. Confirm `participants` as the only assignee source for Detail chips and assignment updates.
-3. Confirm whether `Opened by` / `Closed by` comes from conversation doc, audit log, or lifecycle event collection.
+3. Confirm `Opened by` / `Closed by` source: conversation doc, audit log, or lifecycle event collection.
 4. Confirm FRT/TTC source and whether values are computed only or cached/persisted elsewhere.
-5. Confirm whether FRT disappears after assignment or remains visible as historical SLA metric.
-6. Confirm SLA color threshold reuse from Chat List (50%/10%) in Detail.
+5. Confirm whether FRT disappears after assignment or remains visible (V2 says disappears, FE says visible).
+6. Confirm SLA color threshold reuse from V2 Chat List (50%/10%) in Detail.
 7. Confirm Hold/Snooze effect on Detail SLA countdown.
 8. Confirm reminder visibility: creator-only, assigned participants, team-wide, or supervisor-visible.
-9. Confirm whether reminder should appear in Chat List sorting/filter for other users.
-10. Confirm tag sync source of truth and conflict behavior if WA sync fails or is delayed >5s.
-11. Confirm custom attribute ownership: Open API read-only, admin-configured editable, agent-editable P2, or relational matching source.
-12. Confirm missing client data fallback per channel (phone, OS, location, browser, Live Chat metadata).
-13. Confirm history grouping key: contact referenceId, phone number, email, sessionDetails, or related conversation graph.
-14. Confirm group chat history behavior because Detail limitation says room history unavailable for group chats.
-15. Confirm Related Conversations vs Relational Conversation: manual link, automatic match, or both.
-16. Confirm Broadcast History RBAC and whether agents can see broadcast recipient metadata.
-17. Confirm attachment max size: `15MB`, `25MB`, or `100MB`.
-18. Confirm permission matrix for assign, tags, notes, pins, related conversations, broadcast history, audit logs, and custom fields.
+9. Confirm tag sync source of truth and conflict behavior if WA sync fails or is delayed >5s.
+10. Confirm custom attribute ownership: Open API read-only, admin-configured editable (`ui_editable`), agent-editable P2.
+11. Confirm history grouping key: contact referenceId, phone number, email, sessionDetails, or related conversation graph.
+12. Confirm group chat history behavior (V2 limitation: room history unavailable for group chats).
+13. Confirm Related Conversations vs Relational Conversation: manual link, automatic match, or both.
+14. Confirm Broadcast History RBAC and whether agents can see broadcast recipient metadata.
+15. Confirm attachment max size: 100MB (V2 Room v1.1) vs 25MB (V2 Detail v2.1).
+16. Confirm permission matrix for assign, tags, notes, pins, related conversations, broadcast history, audit logs, and custom fields.
 
 ### Detail Implementation Alignment Rules
 
-1. Treat `Assigned/Unassigned` as assignment state derived from `participants`, not as conversation status.
+1. Treat `Assigned/Unassigned` as assignment state derived from `participants`, not as conversation status (V2 canonical).
 2. Treat `team` as the single Team Inbox source for Detail and navigation scope.
-3. Treat Detail FRT/TTC as SLA metric labels; color threshold comes from Chat List unless SLA Engine Contract overrides.
+3. Treat Detail FRT/TTC as SLA metric labels; color threshold comes from V2 Chat List unless SLA Engine Contract overrides.
 4. Treat Detail reminder as creator-specific until PM clarifies shared/team visibility.
 5. Treat tag, assignee, reminder, pinned, and team mutations as Chat List socket refresh triggers.
 6. Treat Detail history, related conversations, and broadcast history as RBAC-sensitive panels requiring server-side access enforcement.

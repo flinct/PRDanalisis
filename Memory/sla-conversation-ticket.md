@@ -1,27 +1,28 @@
 # Feature Context
 
-- Cross-PRD analysis conversation SLA and ticket SLA.
+- Cross-PRD analysis conversation SLA (V2) and ticket SLA (V2).
 - Focus: alignment risk when both SLA models coexist in one support workflow.
+- **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). Ticket V2 (`PRD/ticketv2/`). Both V1 deprecated.
 
 # Canonical Business Rules
 
-- Conversation SLA channel-scoped.
-- Ticket SLA ticket-type-scoped.
+- Conversation SLA: channel-scoped (V2 Conversation SLA + Response Metrics).
+- Ticket SLA: ticket-type-scoped (PRD Ticket - SLA ticket.md + V2 files 1, 4, base).
 - Both domains use FRT and TTC.
-- Ticket domain also adds stage SLA.
+- Ticket domain also adds stage SLA (not present in conversation SLA).
 - Both domains snapshot SLA settings per new cycle. Do not retroactively update active cycles.
 - Reminder and breach notifications target supervisors and current assignee at trigger time.
 
 # Lifecycle Rules
 
-- Conversation SLA starts on first assignment to agent.
-- Ticket SLA starts when ticket created and enters non-resolved flow.
-- Ticket SLA explicitly creates new cycle on reopen.
-- Conversation reopen behavior not defined.
-- Ticket Waiting on Customer pause applies to FRT, TTC, stage SLA when enabled.
-- Conversation Waiting on Customer pause applies only to TTC.
-- Conversation AUX policy can pause active metrics when AUX counting disabled.
-- Ticket SLA has no AUX policy in current PRD.
+- Conversation SLA start: first customer inbound → FRT. BUKAN dari assignment.
+- Ticket SLA start: ticket created + enters non-resolved status.
+- Ticket SLA explicitly creates new cycle on reopen (V2: `slaState.cycleId`).
+- Conversation reopen behavior: 3-way conflict unresolved (V2 Sessions=new session, Room=reopen, Reassign=modal).
+- Ticket Waiting on Customer pause: applies to FRT, TTC, stage SLA (all metrics).
+- Conversation Waiting on Customer pause: applies to TTC only (FRT tidak pause).
+- Conversation AUX policy: can pause active metrics when AUX counting disabled (V2).
+- Ticket SLA: no AUX policy in current PRD.
 
 # Visibility/RBAC Rules
 
@@ -39,7 +40,7 @@
 # High Risk Areas
 
 - SLA start-point mismatch between conversation and ticket.
-- Pause-policy mismatch for Waiting on Customer.
+- Pause-policy mismatch for Waiting on Customer (conversation: TTC only, ticket: FRT+TTC+stage).
 - AUX policy exists only in conversation.
 - Default policy mismatch for new configuration.
 - Reminder model mismatch: conversation uses value+unit, ticket memory implies minute-based reminder fields.
@@ -48,7 +49,7 @@
 # Edge Cases
 
 - Unassigned conversation backlog can avoid SLA aging before first assignment.
-- Conversation reopened after resolved/closed has undefined SLA cycle behavior.
+- Conversation reopened after closed has undefined SLA cycle behavior (3-way conflict).
 - Same customer issue can show different SLA fairness between conversation and ticket during Waiting on Customer.
 - Ticket type without configured FRT/TTC remains underspecified for existing data.
 
@@ -77,6 +78,6 @@
 - Should SLA start from `created_at`, `assigned_at`, or metric-specific event model shared across domains?
 - Should Waiting on Customer pause FRT in both domains or only one domain?
 - AUX global workforce rule or conversation-only rule?
-- Should conversation reopen create new SLA cycle like ticket?
+- Should conversation reopen create new SLA cycle like ticket? (Currently 3-way conflict unresolved.)
 - Should ticket reminder configuration support value+unit like conversation?
 - Fallback behavior for existing ticket types without FRT/TTC config?

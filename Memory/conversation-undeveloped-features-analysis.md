@@ -1,17 +1,31 @@
-# Conversation PRD Analysis - Undeveloped Features
+# Conversation V2 - Undeveloped Features Analysis
+
+> **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
+> V2 memiliki ~20 fitur. Beberapa sudah develop di FE, beberapa masih undeveloped.
+>
+> **Cross-reference:** Untuk daftar lengkap undeveloped features semua domain (Conversation + Ticket + WhatsApp Web) dengan BE validation, lihat `Memory/comprehensive-undeveloped-features-analysis.md`.
 
 ## Scope
 
-Fitur conversation yang belum di-develop berdasarkan status terbaru:
+Fitur conversation V2 yang belum atau baru sebagian di-develop berdasarkan status FE v2.5.0:
 
-1. Relational Conversation
-2. Multiple Ticket from Single Bubble Chat
-3. Team Member Presence
-4. Snooze Conversation
-5. WhatsApp Group Mention
-6. Reassign Account Channel
-7. Assignee and Collaborators
-8. Auto-reply Templates
+### Belum Developed
+1. **Auto-reply Templates** (V2 file 1) — ❌ Undeveloped
+2. **Assignee & Collaborators — Collaborator role** (V2 file 2) — ⚠️ Partial (hanya multi-assignee, collaborator belum)
+3. **WhatsApp Group Mention** (V2 file 15) — ❌ Undeveloped
+4. **Snooze Conversation** (V2 file 16) — ❌ Undeveloped
+5. **Relational/Related Conversations** (V2 file 19) — ❌ Undeveloped
+
+### Udah Developed (tidak masuk scope undeveloped)
+6. **Reassign Account Channel** (V2 file 13) — ✅ **DEVELOPED**
+7. **Multiple Ticket from Single Bubble** (V2 file 18) — ✅ **DEVELOPED**
+8. **Team Member Presence** (V2 file 17) — ✅ **DEVELOPED**
+9. **RLT/Wait Time Response Metrics** (V2 file 3) — ✅ **DEVELOPED**
+
+### Additional V2 Features Not Yet Developed
+10. **Collections (repeatable custom attributes)** (V2 file 11) — ❌ Undeveloped
+11. **Room Reminder** (V2 file 9) — ❌ Undeveloped
+12. **Hold/Resume di Room Header** (V2 file 9) — ❌ Undeveloped
 
 Catatan dependency penting:
 
@@ -20,29 +34,30 @@ Catatan dependency penting:
 
 ## Impact Ranking (Highest to Lowest)
 
-1. Reassign Account Channel
-2. Auto-reply Templates
-3. Assignee and Collaborators
-4. Relational Conversation
-5. Snooze Conversation
-6. Team Member Presence
-7. Multiple Ticket from Single Bubble Chat
-8. WhatsApp Group Mention
+1. **Auto-reply Templates** (V2 file 1) — Availability & SLA exclusion belum bisa diuji
+2. **Assignee & Collaborators** (V2 file 2) — Partial: collaborator role belum ada
+3. **Relational Conversation** (V2 file 19) — Grouping integrity & SLA aggregate
+4. **Snooze Conversation** (V2 file 16) — Precedence rule & SLA pause policy
+5. **WhatsApp Group Mention** (V2 file 15) — Hanya untuk WA Web
+6. **Collections** (V2 file 11) — Repeatable grouped custom attributes
+7. **Room Reminder / Hold/Resume** (V2 file 9) — Room header features
 
 ### Why This Ranking
 
-- Reassign Account Channel menyentuh routing, ownership, SLA, assignee, account channel, audit, dan reopen behavior sekaligus.
-- Auto-reply Templates menyentuh inbound processing, availability evaluation, ticket context resolution, SLA exclusion, timeline, dan channel capability.
-- Assignee and Collaborators menyentuh auth, people scope, room composer, ticket room, metrics, dan move policy.
-- Relational Conversation menyentuh chat list, room, detail, custom attributes, unread aggregation, sorting, dan ticket context overlap.
-- Snooze menyentuh list visibility, reminder precedence, SLA, notification, assignee transfer, dan inbound wake-up via socket.
-- Team Member Presence menyentuh people data, presence freshness, member management, auto-unassign, dan future round robin assumptions.
-- Multiple Ticket from Single Bubble Chat menyentuh ticket creation flow, linked message reference, and bubble UI, tetapi scope state machine lebih terbatas.
-- WhatsApp Group Mention berdampak sempit ke WA group composer/rendering dan tidak mengubah core room ownership.
+1. **Auto-reply Templates** (V2 file 1) — Menyentuh inbound processing, availability evaluation, ticket context resolution, SLA exclusion, timeline, dan channel capability. Risiko bot salah kirim ke customer tinggi.
+2. **Assignee & Collaborators** (V2 file 2) — Mengubah permission model. Risiko privilege leak (collaborator bisa reply) paling besar.
+3. **Relational Conversation** (V2 file 19) — Menyentuh chat list, room, detail, custom attributes, unread aggregation, sorting, dan ticket context overlap.
+4. **Snooze Conversation** (V2 file 16) — Menyentuh list visibility, reminder precedence, SLA, notification, assignee transfer, dan inbound wake-up via socket.
+5. **WhatsApp Group Mention** (V2 file 15) — Berdampak sempit ke WA group composer/rendering.
+6. **Collections** (V2 file 11) — Repeatable grouped custom attributes, dampak ke relational matching.
+7. **Room Reminder / Hold/Resume** (V2 file 9) — Room header features yang sudah didefinisikan di V2 tapi belum di FE.
 
 ## Feature-by-Feature Analysis
 
-### 1. Reassign Account Channel
+### 1. ~~Reassign Account Channel~~ ✅ DEVELOPED (V2 file 13)
+
+> Fitur ini **sudah developed** di FE v2.5.0 berdasarkan V2 Ownership Decoupling v1.4.
+> Analisis di bawah dipertahankan untuk referensi QA regression test.
 
 #### Main Impact Areas
 
@@ -59,15 +74,15 @@ Catatan dependency penting:
 
 - Ini fitur yang paling mudah memecahkan fungsi lama karena mengubah asumsi dasar bahwa nomor/channel menentukan ownership.
 - Fitur developed yang paling rawan terdampak: omnichannel inbox, conversation room, chat sessions, team inbox navigation, agent pull, chat list, conversation detail.
-- Konflik langsung dengan PRD Session Handling dan Room pada reopen/new session.
-- Konflik langsung dengan PRD Assignee/Collaborators pada move policy.
+- Konflik langsung dengan V2 Sessions (file 12) dan V2 Room (file 9) pada reopen/new session.
+- Konflik langsung dengan V2 Assignee/Collaborators (file 2) pada move policy.
 
 #### Expected Impact to Existing Developed Features
 
 - Chat list dapat menampilkan conversation di team yang salah bila source list belum membaca `team_owner_id` baru.
 - Room header bisa tidak sinkron antara legacy badge, sender picker, assignee, dan move banner.
 - Agent pull dan round robin bisa mencoba mendistribusikan conversation yang seharusnya sticky ke old team.
-- Session handling bisa membuat session baru padahal PRD ini ingin reopen modal.
+- Session handling bisa membuat session baru padahal V2 ini ingin reopen modal.
 - Create ticket from conversation dapat tetap menunjuk team lama/assignee lama jika move tidak mensinkronkan context.
 
 #### QA Watchouts
@@ -108,7 +123,7 @@ Catatan dependency penting:
 - Verify SLA state becomes `stopped` within expected time after move.
 - Verify no unintended auto-move happens after bulk remap.
 
-### 2. Auto-reply Templates
+### 2. Auto-reply Templates (V2 file 1 — ❌ UNDEVELOPED)
 
 #### Main Impact Areas
 
@@ -125,8 +140,8 @@ Catatan dependency penting:
 #### Why QA Must Treat This as High Risk
 
 - Fitur ini masuk ke jalur inbound utama, sehingga bug kecil bisa mengirim pesan bot yang salah ke customer.
-- Mengandalkan definisi availability yang belum sinkron dengan Team Member Presence dan round robin yang belum punya PRD.
-- Menyentuh Ticket dan Conversation sekaligus; salah context akan salah template dan salah timeline.
+- Mengandalkan definisi availability yang belum sinkron dengan V2 Team Member Presence (file 17) dan round robin yang belum punya PRD.
+- Menyentuh Ticket dan Conversation sekaligus sesuai V2 Auto-Reply (file 1): dua template terpisah.
 
 #### Expected Impact to Existing Developed Features
 
@@ -137,44 +152,38 @@ Catatan dependency penting:
 
 #### QA Watchouts
 
-- Pisahkan trigger reason dari template context. Reason bisa `outside office hours`, context bisa `ticket`.
-- `No agent available` harus memakai rule distribusi yang sama dengan auto pull/round robin, bukan definisi lain.
-- Pending auto-reply harus dibatalkan hanya oleh customer-facing human reply, bukan internal note atau assignment change.
-- Snapshot settings harus dipakai untuk pending jobs agar perubahan setting tidak merusak event yang sudah terjadwal.
+- Pisahkan trigger reason dari template context sesuai V2: `outside office hours` vs `ticket`.
+- `No agent available` harus memakai rule distribusi yang sama dengan auto pull/round robin.
+- Pending auto-reply harus dibatalkan hanya oleh customer-facing human reply.
+- Snapshot settings harus dipakai untuk pending jobs.
 
 #### Test Plan
 
 1. Functional
 - Verify auto-reply disabled sends nothing.
 - Verify outside office hours trigger sends exactly one bot message.
-- Verify no-agent-available trigger sends exactly one bot message when zero eligible agents exist.
-- Verify ticket context uses ticket template and conversation context uses conversation template.
-- Verify ticket context wins when both ticket and conversation context exist.
+- Verify no-agent-available trigger sends exactly one bot message.
+- Verify ticket context uses ticket template and conversation context uses conversation template (V2: separate templates).
 - Verify frequency limit suppresses repeated sends within configured window.
-- Verify cancel-if-agent-replies-first cancels pending bot send only on customer-facing human reply.
+- Verify cancel-if-agent-replies-first cancels pending bot send.
 
 2. Regression
 - Verify bot message appears in conversation room but is visually distinct and non-editable.
-- Verify bot message does not count as FRT, ART, ticket SLA response, or agent performance reply.
-- Verify ticket timeline and conversation timeline both log ticket auto-reply once.
+- Verify bot message does not count as FRT, ART, ticket SLA response (V2 Auto-Reply FR-048).
 - Verify unsupported/disconnected channels do not break inbound processing.
 
 3. Integration
 - Verify availability check treats Away/AUX/max capacity/outside shift as not eligible.
-- Verify when availability check fails, no-agent trigger fails closed and only logs internally.
 - Verify if ticket resolved before delay ends, context is re-evaluated before send.
-- Verify if multiple active tickets linked, ambiguity falls back safely without duplicate send.
 
 4. Idempotency and Scheduler
 - Verify duplicate inbound event processing does not create duplicate auto-reply.
-- Verify timeline logging retry does not resend customer message.
-- Verify settings change after pending schedule does not alter the already-snapshotted job unexpectedly.
+- Verify settings change after pending schedule does not alter already-snapshotted job.
 
 5. Security
 - Verify only Admin/authorized Supervisor can change settings.
-- Verify unauthorized users cannot force-open or save settings.
 
-### 3. Assignee and Collaborators
+### 3. Assignee and Collaborators (V2 file 2 — ⚠️ PARTIAL)
 
 #### Main Impact Areas
 
@@ -237,7 +246,7 @@ Catatan dependency penting:
 - Verify picker only shows valid active users in Team Inbox scope.
 - Verify unauthorized users do not see collaborator management controls.
 
-### 4. Relational Conversation
+### 4. Relational Conversation (V2 file 19 — ❌ UNDEVELOPED)
 
 #### Main Impact Areas
 
@@ -296,7 +305,7 @@ Catatan dependency penting:
 - Verify move child between groups removes it from old group first.
 - Verify all group mutations are idempotent and audited.
 
-### 5. Snooze Conversation
+### 5. Snooze Conversation (V2 file 16 — ❌ UNDEVELOPED)
 
 #### Main Impact Areas
 
@@ -352,7 +361,10 @@ Catatan dependency penting:
 - Verify auto-reply and snooze interaction is defined and tested before release.
 - Verify socket-delayed inbound still results in unsnooze once, not duplicate wake.
 
-### 6. Team Member Presence
+### 6. ~~Team Member Presence~~ ✅ DEVELOPED (V2 file 17)
+
+> Fitur ini **sudah developed** di FE v2.5.0.
+> Analisis dipertahankan untuk referensi QA regression dan alignment test dengan auto-reply.
 
 #### Main Impact Areas
 
@@ -404,7 +416,10 @@ Catatan dependency penting:
 4. Forward Compatibility
 - Verify assumptions for round robin and auto-reply are documented because `online` in HUD does not equal `eligible for assignment`.
 
-### 7. Multiple Ticket from Single Bubble Chat
+### 7. ~~Multiple Ticket from Single Bubble Chat~~ ✅ DEVELOPED (V2 file 18)
+
+> Fitur ini **sudah developed** di FE v2.5.0.
+> Analisis dipertahankan untuk referensi QA regression test.
 
 #### Main Impact Areas
 
@@ -458,7 +473,7 @@ Catatan dependency penting:
 - Verify attachment fields are not restored from cookie and require re-upload.
 - Verify multiple tickets from one bubble do not break conversation-level active ticket detection assumptions.
 
-### 8. WhatsApp Group Mention
+### 8. WhatsApp Group Mention (V2 file 15 — ❌ UNDEVELOPED)
 
 #### Main Impact Areas
 
@@ -516,32 +531,33 @@ QA sebaiknya tidak hanya membuat test case per fitur, tetapi juga 1 suite integr
 
 ### Suite A - Ownership and Routing
 
-- Reassign Account Channel x Chat Sessions x Room x Team Inbox Navigation
-- Reassign Account Channel x Agent Pull x socket distribution
-- Reassign Account Channel x Assignee/Collaborators x Auth scope
+- Reassign Account Channel (V2 file 13) x Chat Sessions (V2 file 12) x Room (V2 file 9) x Team Inbox Nav (V2 file 6)
+- Reassign Account Channel x Agent Pull (V2 file 7) x socket distribution
+- Reassign Account Channel x Assignee/Collaborators (V2 file 2) x Auth scope
 
 ### Suite B - Availability and Response Automation
 
-- Team Member Presence x Auto-reply x SLA Conversation
-- Auto-reply x Ticket context x Create Ticket from Conversation
-- Snooze x Auto-reply x inbound socket wake-up
+- Team Member Presence (V2 file 17) x Auto-reply (V2 file 1) x SLA Conversation
+- Auto-reply x Ticket context (Ticket V2 file 7) x Create Ticket from Conversation (Ticket V2 file 7)
+- Snooze (V2 file 16) x Auto-reply (V2 file 1) x inbound socket wake-up
 
 ### Suite C - Conversation Structure and Context
 
-- Relational Conversation x Chat List x Room Tabs
-- Relational Conversation x Custom Attributes
-- Relational Conversation x Create Ticket x Multiple Ticket from Single Bubble
+- Relational Conversation (V2 file 19) x Chat List (V2 file 8) x Room Tabs (V2 file 9)
+- Relational Conversation x Custom Attributes (V2 file 11)
+- Relational Conversation (V2 file 19) x Ticket Creation (Ticket V2 file 7) x Multiple Ticket (V2 file 18)
 
 ### Suite D - Permissions and Collaboration
 
-- Assignee/Collaborators x Conversation Detail x Room Composer
-- Assignee/Collaborators x Ticket Room
-- Team Member Presence remove-member x auto-unassign x list/detail sync
+- Assignee/Collaborators (V2 file 2) x Conversation Detail (V2 file 10) x Room Composer (V2 file 9)
+- Assignee/Collaborators x Ticket Room (V2 file 14)
+- Team Member Presence (V2 file 17) remove-member x auto-unassign x list/detail sync
 
-## Release Gate Recommendations
+## Release Gate Recommendations (V2)
 
-1. Do not release Reassign Account Channel without a signed-off reopen rule aligned with Session Handling and Room.
-2. Do not release Auto-reply `No agent available` trigger before round robin/assignment eligibility is formally documented.
-3. Do not release Assignee and Collaborators without submit-time permission checks and reporting validation.
-4. Do not release Relational Conversation without unread/sort aggregation regression tests on chat list and room tabs.
-5. Do not release Snooze without explicit QA signoff for reminder precedence and inbound auto-unsnooze behavior.
+1. ~~Reassign Account Channel (V2 file 13)~~ ✅ **SUDAH DEVELOPED.** Need regression test for reopen rule alignment.
+2. Do not release Auto-reply `No agent available` trigger (V2 file 1) before round robin/assignment eligibility is formally documented.
+3. Do not release Assignee and Collaborators (V2 file 2) without submit-time permission checks and reporting validation.
+4. Do not release Relational Conversation (V2 file 19) without unread/sort aggregation regression tests on chat list and room tabs.
+5. Do not release Snooze (V2 file 16) without explicit QA signoff for reminder precedence and inbound auto-unsnooze behavior.
+6. **V2 yang belum developed (8 fitur) perlu timeline klarifikasi PM.**

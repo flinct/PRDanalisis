@@ -1,6 +1,9 @@
 # Conversation SLA: FRT, TTC, RLT Cross-PRD Analysis
 
-> Analisis mendalam tentang definisi, overlap, dan conflict antara PRD Conversation SLA, PRD Ticket SLA, dan PRD Conversation RLT.
+> Analisis mendalam tentang definisi, overlap, dan conflict antara PRD Conversation V2, PRD Ticket SLA, dan PRD Response Metrics.
+>
+> **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
+> RLT & Wait Time: V2 file 3 (Response Metrics). SLA: V2 files 8, 9, 10.
 
 ---
 
@@ -8,11 +11,11 @@
 
 ### FRT — First Response Time / First Response Due
 
-#### Conversation FRT (dari PRD Conversation SLA.md)
+#### Conversation FRT (dari V2 SLA metrics — files 3, 8, 10)
 
 - FRT adalah SLA metric untuk mengukur waktu sampai agent memberi response pertama ke customer.
-- Conversation SLA cycle start saat conversation pertama kali di-assign ke agent.
-- FRT completed saat first agent message yang visible ke customer dikirim setelah SLA start.
+- FRT start dari first customer inbound (V2 data model: `frtCountingStartAt` = inbound). BUKAN dari assignment.
+- FRT completed saat first agent message yang visible ke customer dikirim.
 - Internal notes tidak menghentikan FRT.
 - Waiting on Customer tidak pause FRT.
 - AUX bisa pause FRT jika policy "Hitung SLA saat agen dalam mode AUX" disabled.
@@ -36,13 +39,12 @@
 
 ### TTC — Time to Close / Time to Close Due
 
-#### Conversation TTC (dari PRD Conversation SLA.md)
+#### Conversation TTC (dari V2 — files 3, 8, 9, 10)
 
-- TTC adalah SLA metric untuk mengukur waktu sampai conversation resolved/closed.
-- Conversation SLA cycle start saat conversation pertama kali di-assign ke agent.
-- TTC completed saat conversation diset ke resolved atau closed.
+- TTC adalah SLA metric untuk mengukur waktu sampai conversation resolved/closed (`conversationClosedAt`).
+- TTC completed saat conversation diset ke `closed`.
 - TTC hanya dibuat untuk channel yang support TTC.
-- WA Web Group tidak support TTC.
+- WA Web Group tidak support TTC (V2 Omnichannel v1.1: group chats cannot be resolved).
 - Waiting on Customer hanya pause TTC, bukan FRT.
 - AUX bisa pause TTC jika AUX counting disabled.
 - TTC punya duration per channel.
@@ -50,6 +52,7 @@
 - TTC reminder/breach bisa dikirim ke supervisor dan current assignee.
 - TTC tidak dibuat retroaktif untuk unsupported channel.
 - Active TTC cycle memakai snapshot setting saat cycle start.
+- **V2 SLA mode belum final:** Agent-Centric (pause/resume TTC) vs Customer-Centric (continuous TTC).
 
 #### Ticket TTC (dari PRD Ticket - SLA ticket.md)
 
@@ -62,32 +65,32 @@
 
 ---
 
-### RLT — Response Lead Time (dari PRD Conversation RLT.md)
+### RLT — Response Lead Time (dari V2 Response Metrics — file 3)
 
-- RLT adalah tracked metric, bukan SLA threshold di Phase 1.
+- RLT adalah tracked metric, bukan SLA threshold di Phase 1 (V2 file 3).
 - RLT mengukur staff handling time setelah conversation assigned ke agent.
 - Formula: `RLT = First Customer-Facing Agent Reply Time - First Agent Assignment Time`
-- RLT start dari first assignment timestamp.
-- RLT stop saat first successful customer-facing reply dicatat.
+- RLT start dari first assignment timestamp (`firstAgentAssignmentAt`).
+- RLT stop saat first successful customer-facing reply dicatat (`firstAgentReplyAt`).
 - Internal notes, failed replies, drafts, dan system messages tidak dihitung sebagai first reply.
 - Reassignment sebelum first reply tidak reset primary RLT.
 - Multi-assignee conversation memakai earliest assignment sebagai T2.
-- First responder disimpan sebagai agent yang mengirim first customer-facing reply.
-- RLT harus ditampilkan sebagai live timer di Conversation Detail.
-- Linked Ticket Detail menampilkan inherited RLT dari linked conversation.
+- First responder disimpan sebagai agent yang mengirim first customer-facing reply (`firstResponderId`).
+- RLT harus ditampilkan sebagai live timer di Conversation Detail (V2 Detail v2.1 — file 10).
+- Linked Ticket Detail menampilkan inherited RLT dari linked conversation (V2 Ticketing — file 14).
 - Internal-only ticket tanpa linked customer conversation menampilkan "Tidak berlaku".
 - RLT harus disimpan di database: timestamps, raw duration, adjusted duration, status, quality flags.
 - RLT Adjusted bisa memakai AUX/Snooze handling hanya jika existing SLA pause policy mendukung.
 - Phase 1 tidak punya RLT SLA threshold.
 - Phase 1 tidak memicu alert, reminder, breach badge, notification, escalation, atau sound untuk RLT.
 
-### Wait Time in Queue (dari PRD Conversation RLT.md)
+### Wait Time in Queue (dari V2 Response Metrics — file 3)
 
-- Wait Time in Queue adalah tracked metric.
+- Wait Time in Queue adalah tracked metric (V2 file 3).
 - Formula: `Wait Time in Queue = First Agent Assignment Time - First Customer Inbound Message Time`
-- Timer start saat first customer inbound message masuk.
-- Timer stop saat first agent assignment dicatat.
-- Ditampilkan di Conversation Detail dan linked Ticket Detail.
+- Timer start saat first customer inbound message masuk (`firstCustomerMessageAt`).
+- Timer stop saat first agent assignment dicatat (`firstAgentAssignmentAt`).
+- Ditampilkan di Conversation Detail (V2 Detail v2.1 — file 10) dan linked Ticket Detail (V2 Ticketing — file 14).
 - Ditambahkan ke Offline Report Download.
 - Tidak punya SLA threshold, alert, reminder, breach, atau escalation di Phase 1.
 
@@ -219,11 +222,11 @@ Ticket linked ke multiple conversations atau multiple tickets dari satu bubble b
 
 ---
 
-## PRD Interconnection Analysis: RLT/FRT/TTC vs Seluruh Conversation PRD
+## PRD Interconnection Analysis: RLT/FRT/TTC vs Seluruh Conversation V2
 
 ### Metode
 
-Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
+Setiap PRD di folder `PRD/Conversationv2/` diperiksa untuk:
 - Referensi eksplisit ke FRT, TTC, RLT, SLA, First Response, Time to Close, Response Lead Time, Wait Time
 - Implicit business rule yang bersinggungan dengan lifecycle metric (assignment, inbound, reply, reopen, move, hold, snooze, resolve)
 - Broken requirement: aturan di PRD lain yang bertentangan dengan definisi FRT/TTC/RLT
@@ -231,61 +234,60 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 ---
 
-### 1. Conversation Detail PRD (`PRD Inbox Conversation - detail.md`)
+### 1. Conversation Detail V2 (file 10 — Detail v2.1)
 
 **Referensi SLA:**
 - AC-02: `First Response Due countdown appears only when Unassigned`
-- US-02: Supervisor/Admin dapat melihat SLA information (First Response Due, Time to Close Due)
+- Supervisor/Admin dapat melihat SLA information (First Response Due, Time to Close Due)
 - Header/timeline menampilkan SLA countdown
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Detail PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Detail V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **FRT visibility** | FRT countdown hanya muncul saat **Unassigned** | **BROKEN REQUIREMENT.** FRT adalah metric dari inbound ke first reply. Jika FRT hanya muncul saat Unassigned, agent tidak bisa melihat FRT countdown setelah di-assign. Ini tabrakan langsung dengan definisi FRT yang memerlukan assignment sebagai start point (versi lama) atau inbound sebagai start point (versi baru). |
-| **RLT live timer** | Tidak ada referensi | **MISSING.** RLT PRD mensyaratkan live timer di Conversation Detail. Detail PRD tidak punya slot UI untuk metric tambahan selain FRT/TTC. |
-| **Wait Time display** | Tidak ada referensi | **MISSING.** Wait Time tidak disebut di mana pun di Detail PRD. |
-| **Assignment state** | AC-01: Unassigned state vs Assigned state | **PENTING.** FRT/TTC start point bergantung pada assignment. Detail PRD perlu diperbarui untuk mendukung _assignment timestamp_ sebagai data point metric. |
+| **FRT visibility** | FRT countdown hanya muncul saat **Unassigned** | **BROKEN REQUIREMENT.** FRT adalah metric dari inbound ke first reply. Jika FRT hanya muncul saat Unassigned, agent tidak bisa melihat FRT countdown setelah di-assign. FE sudah menampilkan FRT meskipun assigned — V2 Detail AC-02 outdated vs implementasi. |
+| **RLT live timer** | V2 Response Metrics (file 3) mensyaratkan live timer di Detail | ✅ **SUDAH di FE** — `buildRltItem`, `ElapsedBusinessMetricBadge` |
+| **Wait Time display** | V2 Response Metrics (file 3) mensyaratkan display | ✅ **SUDAH di FE** — `buildWaitTimeItem`, `ElapsedMetricBadge` |
+| **Assignment state** | V2 Detail: Assigned/Unassigned via participants | ✅ Aligned dengan FE |
 
 **Broken Requirements:**
-1. `AC-02` harus direvisi: FRT tidak boleh "hanya muncul saat Unassigned". FRT adalah end-to-end metric dari inbound. Jika FRT dihitung dari inbound, maka FRT visible sejak inbound diterima, bukan hanya saat Unassigned.
-2. Detail PRD perlu tambahan section untuk RLT live timer dan Wait Time display.
+1. V2 Detail AC-02 harus direvisi: FRT tidak boleh "hanya muncul saat Unassigned". FE sudah implementasi lebih maju.
+2. Butuh klarifikasi: apakah RLT timer muncul di tempat terpisah dari FRT/TTC, atau menggantikan FRT?
 
 **Unclear:**
 - Apakah RLT timer muncul di tempat terpisah dari FRT/TTC, atau menggantikan FRT?
-- Apakah Wait Time muncul sebagai label statis atau live timer juga?
+- Apakah Wait Time muncul sebagai label statis atau live timer juga? (FE: live timer ✅)
 
 ---
 
-### 2. Room PRD (`PRD Inbox Conversation - room.md`)
+### 2. Conversation Room V2 (file 9 — Room v1.1)
 
 **Referensi SLA:**
 - Header: "SLA countdown: Color-coded, pauses on Hold"
 - P1 user story: "Resume restores SLA timer"
-- Indicators: "SLA (color-coded)"
-- Automation: bot auto-reply, welcome message (berpotensi sebagai first reply?)
+- Automation: bot auto-reply, welcome message
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Room PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Room V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Hold → SLA pause** | Hold pauses SLA countdown, Resume restores | **FRAGMENTASI.** Room mengklaim Hold pause SLA. Tapi Conversation SLA PRD tidak mention Hold. Snooze PRD bilang "No SLA pause changes". RLT Adjusted bilang tergantung existing policy. **Tidak ada keputusan final.** |
-| **Resume → SLA restore** | Resume restores SLA timer | **ALIGNED** dengan konsep pause/resume di Agent-Centric mode. Tapi tidak jelas apakah ini berlaku untuk FRT, TTC, atau keduanya. |
-| **Reminder modal** | One-time / recurring reminder | **POTENSI DUPLIKASI.** Reminder terpisah dari SLA reminder. Bisakah reminder di Room dianggap sebagai first reply event? Tidak. |
-| **Auto-reply / welcome message** | Bot auto-reply outside hours, welcome message during hours | **BROKEN.** Apakah auto-reply dihitung sebagai first customer-facing reply untuk FRT/RLT? Room tidak mendefinisikan ini. Auto-Reply PRD bilang auto-reply tidak dihitung sebagai SLA response. |
+| **Hold → SLA pause** | Hold pauses SLA countdown, Resume restores | **FRAGMENTASI.** V2 Room klaim Hold pause SLA. Tapi V2 Snooze (file 16) bilang "No SLA pause changes". V2 RLT Adjusted (file 3) bilang tergantung existing policy. **3-way conflict unresolved.** |
+| **Resume → SLA restore** | Resume restores SLA timer | **ALIGNED** dengan Agent-Centric mode |
+| **Reminder modal** | One-time / recurring reminder | **POTENSI DUPLIKASI** dengan SLA reminder |
+| **Auto-reply / welcome message** | Bot auto-reply outside hours, welcome message during hours | V2 Auto-Reply (file 1, FR-048): auto-reply tidak dihitung sebagai SLA response |
 
 **Broken Requirements:**
-1. Room PRD mengasumsikan SLA pause pada Hold. Tapi Conversation SLA PRD dan Snooze PRD tidak sinkron. **Tiga PRD punya tiga asumsi berbeda tentang pause.**
-2. Bot auto-reply / welcome message tidak didefinisikan statusnya sebagai first reply. Ini berdampak langsung ke FRT dan RLT completion.
+1. V2 Room mengasumsikan SLA pause pada Hold. Tapi V2 Snooze (file 16) tidak sinkron. **3-way conflict unresolved.**
+2. Bot auto-reply / welcome message: V2 Auto-Reply (file 1) sudah define exclusion.
 
 **Unclear:**
 - Apakah "SLA countdown" di Room merujuk ke FRT, TTC, atau keduanya?
-- Apakah Hold pause juga RLT Adjusted? RLT Adjusted disebut AUX/Snooze, bukan Hold.
+- Apakah Hold pause juga RLT Adjusted?
 - Apakah resume setelah Hold juga meresume RLT timer?
 
 ---
 
-### 3. Snooze PRD (`PRD Inbox Conversation - snooze conversation.md`)
+### 3. Snooze Conversation V2 (file 16 — Snooze v1.0)
 
 **Referensi SLA:**
 - Out of Scope: "SLA pause policy changes"
@@ -294,45 +296,42 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Snooze PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Snooze V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA pause** | "No SLA pause changes" — eksplisit | **BROKEN dengan Room PRD.** Room bilang Hold pause SLA. Snooze bilang tidak ada pause. Keduanya adalah mekanisme "agent tidak available" tapi punya efek SLA berbeda. |
-| **RLT Adjusted** | N/A | **BROKEN dengan RLT PRD.** RLT Adjusted menyebut Snooze sebagai salah satu mekanisme pause yang mungkin berlaku ("if existing SLA pause policy supports it"). Tapi Snooze PRD secara eksplisit mengatakan tidak ada SLA pause. **Kontradiksi langsung.** |
-| **Auto-unsnooze** | Inbound customer message → auto-unsnooze | **ALIGNED.** Inbound message setelah snooze akan meng-unsnooze dan agent bisa reply. Ini relevan untuk FRT/RLT jika snooze terjadi sebelum first reply. |
-| **Wait Time** | N/A | **MISSING.** Apakah snooze mempengaruhi Wait Time? Wait Time stop di assignment. Snooze terjadi setelah assignment. Jadi Wait Time tidak terpengaruh. Tapi perlu dikonfirmasi. |
+| **SLA pause** | "No SLA pause changes" — eksplisit | **BROKEN dengan V2 Room (file 9).** Room bilang Hold pause SLA. Snooze bilang tidak ada pause. |
+| **RLT Adjusted** | N/A | **BROKEN dengan V2 Response Metrics (file 3).** RLT Adjusted menyebut Snooze sebagai mekanisme pause potensial. Tapi Snooze V2 secara eksplisit tidak ada SLA pause. **Kontradiksi langsung.** |
+| **Auto-unsnooze** | Inbound customer message → auto-unsnooze | **ALIGNED.** |
+| **Wait Time** | N/A | **MISSING.** Apakah snooze mempengaruhi Wait Time? |
 
 **Broken Requirements:**
-1. **Snooze vs Room Hold:** Dua mekanisme "agent pause" yang berbeda. Satu tidak pause SLA, satu pause SLA. **QA harus tes keduanya dan pastikan ada keputusan final.**
-2. **RLT Adjusted vs Snooze:** RLT PRD menyebut Snooze sebagai pause potensial. Snooze PRD bilang tidak ada SLA pause. **Salah satu harus direvisi.**
+1. **V2 Room Hold vs V2 Snooze:** Dua mekanisme "agent pause" berbeda. Satu pause SLA, satu tidak.
+2. **V2 RLT Adjusted vs V2 Snooze:** Kontradiksi langsung.
 
 **Unclear:**
-- Jika conversation di-snooze sebelum first reply, apakah RLT clock tetap berjalan (karena "no SLA pause changes")?
+- Jika conversation di-snooze sebelum first reply, apakah RLT clock tetap berjalan?
 - Apakah auto-unsnooze oleh inbound message juga "meresume" RLT timer?
 
 ---
 
-### 4. Chat Session Handling PRD (`PRD Inbox Conversation - chat session handling.md`)
+### 4. Chat Sessions V2 (file 12 — Sessions v1.1)
 
 **Referensi SLA:**
 - FR-007: "System MUST carry over SLA across ownership changes and MUST NOT reset timers on reassign/unassign"
 - FR-016: "On move, assignee MUST reset to Unassigned and SLA MUST stop immediately"
-- US-011: "SLA to carry over across assignment changes"
 - FR-005: "Group metadata updates MUST NOT alter session state/ownership/SLA"
-- Move dialog: "Assignee will be reset to Unassigned and SLA will stop"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Session PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Sessions V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA carry over** | SLA tidak reset pada reassign/unassign | **ALIGNED dengan RLT.** RLT juga tidak reset primary RLT pada reassignment sebelum first reply. Konsisten. |
-| **SLA stop on move** | SLA stop saat conversation di-move ke team lain | **BROKEN dengan RLT persistence.** RLT adalah persisted metric. Jika SLA stop, apakah RLT juga stop? RLT belum mendefinisikan behavior saat move. |
-| **New session on reopen** | "Resolved → new inbound → new Unassigned session" | **IMPACT ke Wait Time.** Wait Time mengukur inbound → assignment. Jika reopen selalu bikin new session, Wait Time restart. Tapi RLT PRD tidak mendefinisikan reopen behavior. |
-| **Group chat SLA** | "Group metadata updates MUST NOT alter SLA" | **ALIGNED.** Tapi group chat lifecycle masih undefined di cross-analysis L2. |
+| **SLA carry over** | SLA tidak reset pada reassign/unassign | **ALIGNED dengan RLT.** RLT juga tidak reset primary RLT pada reassignment sebelum first reply. |
+| **SLA stop on move** | SLA stop saat conversation di-move ke team lain | **BROKEN dengan RLT persistence.** Jika SLA stop, apakah RLT juga stop? Tidak didefinisikan. |
+| **New session on reopen** | "Resolved → new inbound → new Unassigned session" | **IMPACT ke Wait Time.** Wait Time restart jika reopen bikin new session? |
+| **Group chat SLA** | "Group metadata updates MUST NOT alter SLA" | **ALIGNED.** |
 
 **Broken Requirements:**
-1. **SLA carry over (FR-007) vs RLT non-reset (AC-06):** Sebenarnya aligned — keduanya tidak reset. Tapi FR-007 tidak menyebut RLT atau Wait Time karena PRD ini lebih tua.
-2. **Move → SLA stop:** Jika SLA stop, haruskah RLT dan Wait Time juga di-freeze atau di-reset? Tidak didefinisikan.
-3. **Session state machine vs FRT start:** FR-016 menciptakan "new session" tapi FRT/RLT/Wait Time mulai dari event pertama conversation. Perlu mapping lifecycle session vs lifecycle metric.
+1. **Move → SLA stop:** Haruskah RLT dan Wait Time juga di-freeze atau di-reset? Tidak didefinisikan.
+2. **Session state machine vs FRT start:** Perlu mapping lifecycle session vs lifecycle metric.
 
 **Unclear:**
 - Apakah SLA carry over berlaku juga untuk RLT dan Wait Time?
@@ -340,150 +339,144 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 ---
 
-### 5. Reassign Account Channel PRD (`PRD Inbox Conversation - reassign account channel.md`)
+### 5. Reassign Account Channel V2 (file 13 — Ownership Decoupling v1.4)
 
 **Referensi SLA:**
 - FR-006: "Move resets assignee to Unassigned and stops SLA immediately"
 - FR-015: "On reopen in same team, SLA resumes per policy; on move-and-reopen, new SLA timer MAY start"
-- PS-001: "Reassigning → SLA breaches, agent confusion"
 - Move dialog: "SLA will stop"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Reassign PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Reassign V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA stop on move** | SLA stop immediately | **BROKEN dengan RLT persistence.** Sama dengan Session PRD. RLT & Wait Time sebagai persisted metric harus punya aturan sendiri untuk move. |
-| **SLA resume on reopen** | SLA resumes per policy | **BROKEN dengan Session PRD.** Session bilang reopen = new session. Reassign bilang reopen = resume. Mana yang benar untuk FRT/TTC/RLT? |
-| **Assignee reset** | Assignee → Unassigned setelah move | **IMPACT.** Jika assignee reset, assignment timestamp pertama (T2) tetap ada untuk RLT. Tapi Wait Time sudah pernah stop. Move tidak mengubah inbound timestamp (T1). |
+| **SLA stop on move** | SLA stop immediately | **BROKEN dengan RLT persistence.** RLT & Wait Time sebagai persisted metric harus punya aturan sendiri untuk move. |
+| **SLA resume on reopen** | SLA resumes per policy | **BROKEN dengan V2 Sessions (file 12).** Sessions bilang reopen = new session. Reassign bilang reopen = resume. |
+| **Assignee reset** | Assignee → Unassigned setelah move | **IMPACT.** Assignment timestamp pertama (T2) tetap ada untuk RLT. Move tidak mengubah inbound timestamp (T1). |
 
 **Broken Requirements:**
-1. **Reopen behavior:** Tiga PRD (Session, Room, Reassign) punya tiga definisi reopen berbeda. Ini berdampak langsung ke kapan FRT/TTC/RLT restart atau resume.
-2. **SLA resume vs new SLA cycle:** Reassign bilang MAY start new SLA timer. Tapi Ticket SLA bilang reopen = new SLA cycle. Mana untuk Conversation SLA?
+1. **Reopen behavior:** Tiga V2 PRD (Sessions file 12, Room file 9, Reassign file 13) punya tiga definisi reopen berbeda.
+2. **SLA resume vs new SLA cycle:** Reassign bilang MAY start new SLA timer. Ticket SLA bilang reopen = new cycle.
 
 **Unclear:**
 - Apakah RLT & Wait Time ikut di-freeze saat move, atau tetap menyimpan nilai hingga close?
-- Jika move-and-reopen terjadi, apakah RLT dihitung dari first assignment (di team lama) atau dari assignment baru (di team baru)?
+- Jika move-and-reopen terjadi, apakah RLT dihitung dari first assignment (team lama) atau dari assignment baru (team baru)?
 
 ---
 
-### 6. Create Ticket from Conversation PRD (`PRD Inbox Conversation - create ticket from conversation.md`)
+### 6. Ticketing V2 (file 14 — Ticketing V2)
 
 **Referensi SLA:**
-- AC-05: "SLA for chat (response) and ticket (resolution) are tracked independently"
 - "Dual SLA tracking (Chat SLA & Ticket SLA)"
-- SLA Rules (Ticketing): SLA runs only when agent holds ball (Submitted/In Progress), pauses on Waiting on Customer, stops on Resolved, reopened = new countdown
+- SLA Rules: SLA runs only when agent holds ball (Submitted/In Progress), pauses on Waiting on Customer, stops on Resolved, reopened = new countdown
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Create Ticket PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Ticketing V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Dual SLA tracking** | Chat SLA dan Ticket SLA independen | **BROKEN oleh RLT.** RLT PRD bilang linked ticket menampilkan inherited RLT dari conversation. Ini menambah "third metric family" yang tidak ada dalam desain dual-SLA original. |
-| **Chat SLA** | Tracked independently dari Ticket SLA | **ALIGNED.** RLT adalah bagian dari Chat/Conversation metric, bukan Ticket metric. Inherit ke ticket detail adalah view-only. |
-| **Ticket SLA pause** | Pause on Waiting on Customer, stop on Resolved | **DIFFERENT** dari Conversation SLA. Conversation SLA hanya pause TTC pada Waiting on Customer, bukan FRT. Ticket SLA pause FRT dan TTC. |
+| **Dual SLA tracking** | Chat SLA dan Ticket SLA independen | **BROKEN oleh RLT.** V2 Response Metrics (file 3) bilang linked ticket menampilkan inherited RLT dari conversation. Ini menambah "third metric family". |
+| **Chat SLA** | Tracked independently dari Ticket SLA | **ALIGNED.** RLT adalah bagian dari Chat/Conversation metric. |
+| **Ticket SLA pause** | Pause on Waiting on Customer, stop on Resolved | **DIFFERENT** dari Conversation SLA yang hanya pause TTC pada WoC. |
 
 **Broken Requirements:**
-1. **Dual SLA menjadi Triple SLA:** Desain original adalah Chat SLA + Ticket SLA. RLT memperkenalkan Response Metrics yang inherit ke ticket. Ini perlu diklarifikasi: apakah "dual" masih valid atau perlu konsep baru.
-2. **Pause policy mismatch:** Ticket SLA pause FRT+TTC saat Waiting on Customer. Conversation SLA hanya pause TTC. Jika linked ticket menampilkan conversation metric, metric tersebut tidak terpengaruh oleh ticket pause policy. **Agent bisa lihat inkonsistensi di ticket detail.**
+1. **Dual SLA menjadi Triple SLA:** Chat SLA + Ticket SLA + Inherited Response Metrics.
+2. **Pause policy mismatch:** Ticket SLA pause FRT+TTC saat WoC. Conversation SLA hanya pause TTC.
 
 **Unclear:**
-- Jika ticket dibuat dari conversation sebelum first reply terjadi, apakah RLT terhitung? RLT memerlukan first reply untuk stop. Jika ticket dibuat sebelum reply, apakah RLT tetap running?
+- Jika ticket dibuat dari conversation sebelum first reply terjadi, apakah RLT tetap running?
 - Ticket reopened = new SLA cycle. Apakah RLT juga new cycle atau tetap dari conversation original?
 
 ---
 
-### 7. Chat List PRD (`PRD Inbox Conversation - chat list.md`)
+### 7. Chat List V2 (file 8 — Chat List v1.1)
 
 **Referensi SLA:**
 - US-14: "SLA countdown with colors: Green (>50%), Yellow (≤50% & >10%), Red (≤10% or overdue). Configurable via Settings"
-- US-11: "Filters: SLA (Overdue, Near Due)"
-- US-13: Hold indicator (icon + tooltip)
-- US-15: Sorting: Most Recent, Longest Waiting, Mentions, Reminder
+- Hold indicator (icon + tooltip)
+- Sorting: Latest Activity, Oldest, Unread First, SLA Urgency, Alphabetical
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Chat List PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Chat List V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA color threshold** | Green/Yellow/Red berdasarkan % sisa waktu | **MISSING definisi metric.** Threshold ini untuk FRT atau TTC? Tidak didefinisikan. SLA metric mana yang dipakai UI belum ditentukan. |
-| **Filter SLA** | Filter Overdue / Near Due | **RISK dengan RLT.** RLT Phase 1 tidak punya threshold/breach. Tapi filter SLA mungkin tetap memasukkan RLT sebagai metric — harus eksplisit dicegah. |
-| **Sort by SLA** | Sorting options include SLA Urgency (implementasi) | **RISK.** Jika RLT tidak boleh trigger alert, apakah RLT boleh mempengaruhi SLA Urgency sort? Tidak jelas. |
-| **Hold indicator** | Hold icon + tooltip | **HOLD vs SLA.** Room bilang Hold pause SLA. Chat List menampilkan Hold indicator. Snooze PRD bilang tidak ada pause. Chat List perlu sinkron dengan keputusan final. |
+| **SLA color threshold** | Green/Yellow/Red berdasarkan % sisa waktu | **MISSING definisi metric.** Threshold untuk FRT atau TTC? Tidak didefinisikan. |
+| **Filter SLA** | Filter Overdue / Near Due | **RISK dengan RLT.** RLT Phase 1 tidak punya threshold/breach. |
+| **Sort by SLA** | Sorting options: SLA Urgency | **RISK.** Jika RLT tidak boleh trigger alert, apakah RLT boleh mempengaruhi SLA Urgency sort? |
+| **Hold indicator** | Hold icon + tooltip | **HOLD vs SLA.** V2 Room bilang Hold pause SLA. V2 Snooze bilang tidak ada pause. |
 
 **Broken Requirements:**
-1. **SLA color metric undefined:** Chat List adalah satu-satunya PRD yang mendefinisikan threshold warna. Tapi tidak bilang metric mana. Ini harus diputuskan di SLA Engine Contract.
-2. **Hold ↔ Snooze ↔ Room ambiguity:** Tiga mekanisme berbeda untuk "agent tidak available". Chat List menampilkan Hold indicator tapi tidak bisa membedakan Hold, Snooze, atau AUX.
+1. **SLA color metric undefined:** V2 Chat List define threshold tapi tidak bilang metric mana.
+2. **Hold ↔ Snooze ambiguity:** Tiga mekanisme berbeda untuk "agent tidak available".
 
 **Unclear:**
-- Apakah warna SLA di Chat List berdasarkan FRT, TTC, atau yang lebih buruk (overdue)?
+- Apakah warna SLA di Chat List berdasarkan FRT, TTC, atau overdue?
 - Jika RLT Phase 1 tidak punya threshold, apakah Chat List tetap menampilkan timer RLT/Wait Time?
-- Apakah filter "SLA Overdue" juga mencakup conversation yang RLT-nya overdue? Harusnya tidak (Phase 1).
+- Apakah filter "SLA Overdue" juga mencakup conversation yang RLT-nya overdue? Harusnya tidak.
 
 ---
 
-### 8. Agent Pull Conversation PRD (`PRD Inbox Conversation - agent pull conversation.md`)
+### 8. Agent Pull V2 (file 7 — Agent Pull v2.1)
 
 **Referensi SLA:**
-- Future Consideration: "SLA-aware prioritization (push nearing SLA to top of queue)"
+- Future: "SLA-aware prioritization (push nearing SLA to top of queue)"
 - "Maintain SLA with optional timeout: 90% of conversations returned to queue if idle beyond timeout"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Agent Pull PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Agent Pull V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Queue prioritization** | Future: SLA-aware → push nearing SLA to top | **RISK.** Jika SLA-aware prioritization diimplementasi, metric mana yang dipakai? FRT? TTC? RLT? Wait Time? |
-| **Timeout return** | Inactive chat returned to queue | **IMPACT ke Wait Time.** Jika chat di-pull lalu timeout → return to queue → di-pull lagi oleh agent lain. Wait Time restart? Atau akumulasi? |
-| **Assignment timestamp** | Pull = auto-assign → mencatat assignment timestamp | **ALIGNED.** T2 jelas: saat pull terjadi. Tapi perlu dipastikan sistem menyimpan T2 untuk RLT dan Wait Time. |
+| **Queue prioritization** | Future: SLA-aware → push nearing SLA to top | **RISK.** Metric mana yang dipakai? FRT? TTC? RLT? Wait Time? |
+| **Timeout return** | Inactive chat returned to queue | **IMPACT ke Wait Time.** Restart atau akumulasi? |
+| **Assignment timestamp** | Pull = auto-assign → assignment timestamp | **ALIGNED.** T2 jelas: saat pull. |
 
 **Broken Requirements:**
-1. **SLA-aware prioritization metric undefined:** Jika future ini direalisasi, harus jelas metric mana yang dipakai. RLT Phase 1 seharusnya tidak masuk hitungan SLA.
-2. **Timeout → return to queue → re-assign:** Ini adalah reassignment scenario. RLT non-reset untuk first reply. Tapi Wait Time? Apakah dihitung dari T1 pertama atau di-reset?
+1. **SLA-aware prioritization metric undefined.**
+2. **Timeout → return → re-assign:** RLT non-reset untuk first reply. Tapi Wait Time?
 
 **Unclear:**
-- Apakah timeout return to queue menghapus assignment timestamp pertama atau tetap disimpan?
-- Jika agent A pull + timeout, lalu agent B pull + reply, apakah RLT agent A = 0 (tidak pernah reply) dan RLT agent B = waktu dari assignment B ke reply?
+- Apakah timeout return to queue menghapus assignment timestamp pertama?
+- Jika agent A pull + timeout, lalu agent B pull + reply, apakah RLT agent A = 0?
 
 ---
 
-### 9. Omnichannel PRD (`PRD Inbox Conversation - omnichannel.md`)
+### 9. Omnichannel V2 (file 4 — Omnichannel v1.1)
 
 **Referensi SLA:**
 - "SLA-compliance monitoring"
 - OKR: "≥95% SLA breaches flagged in real-time"
 - Success metric: "SLA Breach Detection Accuracy: 100%"
-- Observability: "Metrics: SLA breaches, query times"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Omnichannel PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Omnichannel V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA breach monitoring** | 100% breach detection accuracy | **RISK.** Jika RLT tidak punya threshold/breach (Phase 1), sistem monitoring harus exclude RLT dari breach detection. Tapi Omnichannel PRD tidak tahu tentang RLT. |
-| **Group chat lifecycle** | "Group chats cannot be resolved" | **BROKEN dengan TTC.** TTC tidak bisa pernah complete untuk group chat. WA Web Group sudah disabled TTC. Tapi group chat channel lain (WhatsApp API, Instagram) belum punya rule. |
+| **SLA breach monitoring** | 100% breach detection accuracy | **RISK.** RLT Phase 1 harus exclude dari breach detection. |
+| **Group chat lifecycle** | "Group chats cannot be resolved" | **BROKEN dengan TTC.** TTC tidak bisa complete untuk group chat. |
 
 **Broken Requirements:**
-1. **Group chat + TTC infinite:** Cross-analysis L2 sudah mendeteksi ini. WA Web Group disable TTC. Tapi group chat di channel lain tidak didefinisikan. Omnichannel bilang "cannot be resolved" → TTC infinite.
-2. **RLT tidak terintegrasi** ke monitoring SLA. Perlu ditambahkan exclusion rule.
+1. **Group chat + TTC infinite:** V2 Omnichannel bilang "cannot be resolved" → TTC infinite.
+2. **RLT tidak terintegrasi** ke monitoring SLA.
 
 **Unclear:**
 - Apakah SLA breach monitoring hanya untuk FRT dan TTC, atau nanti termasuk RLT dan Wait Time?
-- Untuk group chat yang tidak bisa resolve, apakah FRT tetap berjalan? (Seharusnya ya, FRT untuk inbound → first reply masih valid).
+- Untuk group chat yang tidak bisa resolve, apakah FRT tetap berjalan?
 
 ---
 
-### 10. Multiple Ticket from Single Bubble Chat PRD (`PRD Inbox Conversation - multiple ticket from single bubble chat.md`)
+### 10. Multi-Ticket Drafts V2 (file 18 — Multi-Ticket v0.1)
 
 **Referensi SLA:**
-- "Tickets created reference the same selected message as context. Changing ticket state machine and SLA rules."
 - FR-026: "System MUST not change the ticket SLA model and ticket state machine in this feature scope"
-- "Reference behavior to keep unchanged: Ticket state machine, SLA tracking, and audit trail remain unchanged in this feature scope"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Multiple Ticket PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Multi-Ticket V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **SLA unchanged** | Ticket SLA model tidak berubah | **ALIGNED.** PRD ini eksplisit tidak mengubah SLA. Tapi Multiple Ticket membuat satu conversation bisa memiliki >1 ticket. RLT inherit ke semua ticket? |
-| **Multiple tickets → multiple metric inheritance** | Satu conversation dengan 2+ tickets | **BROKEN.** RLT PRD bilang linked ticket menampilkan inherited RLT. Tapi jika satu conversation punya 2+ tickets, apakah RLT di-duplicate ke semua ticket? Atau hanya ke ticket pertama? |
+| **SLA unchanged** | Ticket SLA model tidak berubah | **ALIGNED.** |
+| **Multiple tickets → metric inheritance** | Satu conversation dengan 2+ tickets | **BROKEN.** V2 Response Metrics bilang linked ticket menampilkan inherited RLT. Satu conversation punya 2+ tickets — RLT di-duplicate ke semua? |
 
 **Broken Requirements:**
-1. **RLT inheritance cardinality:** Satu conversation → banyak tickets. RTL source yang mana? Jika semua ticket mewarisi RLT yang sama, itu duplikasi data. Jika hanya ticket pertama, ticket lain tidak punya response metric.
+1. **RLT inheritance cardinality:** Satu conversation → banyak tickets. Semua ticket dapat RLT yang sama? Hanya ticket pertama?
 
 **Unclear:**
 - Apakah RLT harus inherit ke semua ticket yang linked ke conversation yang sama?
@@ -491,36 +484,34 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 ---
 
-### 11. Reply via Email / Transcript PRD (`PRD Transcript email\PRD Inbox Conversation - reply via email.md`)
+### 11. Live Chat Transcript Reply via Email V2 (file 20 — Transcript v1.0)
 
 **Referensi SLA:**
-- FR-042–FR-046: SLA rules untuk Email conversation: "Start Email conversation SLA based on Email channel SLA rules", "MUST NOT restart Live Chat SLA after Email reply", "MUST attribute Email response events to Email conversation"
-- EC-012: "Email channel SLA is not configured → Apply workspace default Email SLA if available"
+- FR-042–FR-046: SLA rules untuk Email conversation: "Start Email conversation SLA based on Email channel SLA rules", "MUST NOT restart Live Chat SLA after Email reply"
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Email Transcript PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Transcript V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Dual conversation** | Email reply = new Email conversation + keep Live Chat resolved | **IMPACT.** Dua conversation, dua SLA lifecycle. Tapi RLT dari Live Chat original tetap ada. Email conversation punya RLT sendiri. |
-| **First reply attribution** | "MUST attribute Email response events to the Email conversation" | **ALIGNED.** Berarti first reply untuk Live Chat tetap dari Live Chat agent, bukan dari Email. Tapi perlu dipastikan Email reply tidak menghentikan RLT Live Chat. |
-| **Channel SLA** | Email channel SLA rules → FRT/TTC per channel | **ALIGNED** dengan Conversation SLA per-channel design. |
+| **Dual conversation** | Email reply = new Email conversation + keep Live Chat resolved | **IMPACT.** Dua conversation, dua SLA lifecycle. RLT dari Live Chat original tetap ada. |
+| **First reply attribution** | "MUST attribute Email response events to the Email conversation" | **ALIGNED.** |
+| **Channel SLA** | Email channel SLA rules → FRT/TTC per channel | **ALIGNED.** |
 
 **Unclear:**
-- Jika customer reply via Email dan agent reply di Email conversation, apakah itu dianggap "first customer-facing reply" untuk Live Chat RLT? Seharusnya tidak, karena Live Chat sudah resolved.
-- Tapi di skenario non-resolved: customer kirim Email, agent balas di Email. Live Chat tetap open. Apakah RLT di Live Chat ikut terpengaruh?
+- Jika customer reply via Email dan agent reply di Email conversation, apakah itu dianggap "first customer-facing reply" untuk Live Chat RLT? Seharusnya tidak.
 
 ---
 
-### 12. Relational Conversation PRD (`PRD Inbox Conversation - relational conversation.md`)
+### 12. Relational Conversation V2 (file 19 — Related Conversations v1.0)
 
-*(Tidak ada referensi SLA eksplisit di grep, tapi relevan secara tidak langsung)*
+*(Tidak ada referensi SLA eksplisit, tapi relevan secara tidak langsung)*
 
 **Interkoneksi dengan RLT/FRT/TTC:**
 
-| Aspek | Relational PRD | Konflik dengan FRT/TTC/RLT |
+| Aspek | Relational V2 | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Primary + Child** | Relational grouping = Primary + Child conversations | **IMPACT ke FRT/TTC/RLT.** Apakah metric dihitung per conversation individual atau di-aggregate di level Primary? |
-| **Matching** | Matching berdasarkan Custom Attributes | **RISK.** Jika attribute berubah, grouping bubar. Apa yang terjadi dengan metric history? |
+| **Primary + Child** | Relational grouping = Primary + Child | **IMPACT.** Apakah metric dihitung individual atau aggregate di level Primary? |
+| **Matching** | Matching berdasarkan Custom Attributes & Properties | **RISK.** Attribute berubah → grouping bubar → metric history? |
 
 **Unclear:**
 - Apakah FRT/TTC/RLT untuk child conversation dihitung dari inbound child atau dari inbound primary?
@@ -528,7 +519,7 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 ---
 
-### 13. Broadcast PRD (`PRD Broadcast\*`)
+### 13. Broadcast PRD (`PRD/Broadcast`)
 
 *(Relevan untuk scenario Broadcast → SLA pause/resume)*
 
@@ -536,10 +527,10 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 | Aspek | Broadcast PRD | Konflik dengan FRT/TTC/RLT |
 |---|---|---|
-| **Broadcast → inbound** | Broadcast dikirim, customer reply = inbound | **SCENARIO.** Untuk SLA Agent-Centric mode: saat broadcast dikirim, FRT/TTC pause. Saat customer reply, resume. Tapi RLT & Wait Time belum didefinisikan untuk broadcast scenario. |
+| **Broadcast → inbound** | Broadcast dikirim, customer reply = inbound | **SCENARIO.** Untuk Agent-Centric mode: saat broadcast dikirim, FRT/TTC pause. RLT & Wait Time belum didefinisikan untuk broadcast scenario. |
 
 **Unclear:**
-- Untuk broadcast scenario, apakah RLT dihitung dari assignment (yang mungkin terjadi setelah customer reply) atau dari broadcast send time?
+- Untuk broadcast scenario, apakah RLT dihitung dari assignment (setelah customer reply) atau dari broadcast send time?
 
 ---
 
@@ -628,9 +619,10 @@ Setiap PRD di folder `PRD/Conversation/` diperiksa untuk:
 
 ---
 
-## FE Implementation vs PRD: Gap Analysis v2.5.0
+## FE Implementation vs V2: Gap Analysis v2.5.0
 
 ### Sumber: `apps/omnichannel/` dari repo `omnichannel-satuinbox-fe` (v2.5.0)
+### PRD Source: V2 (`PRD/Conversationv2/`)
 
 ### 1. Conversation SLAMetrics — Data Model Aktual (v2.5.0)
 
@@ -686,75 +678,73 @@ interface ConversationSLAMetrics {
 
 ### 2. Conversation Detail — FRT/TTC/RLT/Wait Time Display (`ConversationAsigneeContent.tsx`)
 
-| Aspek | Implementasi v2.5.0 | PRD Requirement | Gap |
+| Aspek | Implementasi v2.5.0 | V2 Requirement | Gap |
 |---|---|---|---|
-| **FRT countdown** | ✅ Real-time via `RealTimeSLABadge`, 1s tick, `officeHoursSnapshot: null` (wall-clock) | FRT harus visible | ✅ |
+| **FRT countdown** | ✅ Real-time via `RealTimeSLABadge`, 1s tick, `officeHoursSnapshot: null` (wall-clock) | V2 Detail (file 10): FRT harus visible | ✅ |
 | **FRT success badge** | ✅ `outlineSuccess` / `destructive` | ✅ | ✅ |
-| **TTC countdown** | ✅ Real-time via `RealTimeSLABadge`, 1s tick, office-hours-aware | TTC countdown until SLA resolution | ✅ |
+| **TTC countdown** | ✅ Real-time via `RealTimeSLABadge`, 1s tick, office-hours-aware | V2 Detail: TTC countdown | ✅ |
 | **TTC success badge** | ✅ `outlineSuccess` / `destructive` | ✅ | ✅ |
 | **Paused state** | ✅ Grey badge + `IconPlayerPauseFilled` | ✅ | ✅ |
-| **RLT — resolved** | ✅ `buildRltItem` — `Badge variant="secondary"` + `formatSLATime(rltMs)` | RLT PRD: displayed in Detail | ✅ **BARU** |
-| **RLT — pending** | ✅ `ElapsedBusinessMetricBadge` — **office-hours-aware** live timer | RLT PRD: live timer | ✅ **BARU** |
-| **Wait Time — resolved** | ✅ `buildWaitTimeItem` — `Badge variant="secondary"` + `formatSLATime(waitTimeInQueueMs)` | RLT PRD: displayed in Detail | ✅ **BARU** |
-| **Wait Time — pending (unassigned)** | ✅ `ElapsedMetricBadge` — **wall-clock** live timer dari `firstCustomerMessageAt` | RLT PRD: live timer | ✅ **BARU** |
-| **Tooltip per metric** | ✅ `buildMetricLabel` — tooltip dengan title + description | ✅ Good UX | ✅ **BARU** |
-| **Group chat SLA** | ⚠️ Masih disembunyikan total (`isGroup ? [] : slaItems`) | FRT harus tetap jalan untuk group | ❌ **MASIH MISSING** |
-| **FRT office hours** | ✅ `{ ...metrics, officeHoursSnapshot: null }` — FRT wall-clock | ✅ Sesuai PRD: WoC tidak pause FRT | ✅ |
+| **RLT — resolved** | ✅ `buildRltItem` — `Badge variant="secondary"` + `formatSLATime(rltMs)` | V2 Response Metrics (file 3): displayed in Detail | ✅ **SESUAI V2** |
+| **RLT — pending** | ✅ `ElapsedBusinessMetricBadge` — **office-hours-aware** live timer | V2 Response Metrics (file 3): live timer | ✅ **SESUAI V2** |
+| **Wait Time — resolved** | ✅ `buildWaitTimeItem` — `Badge variant="secondary"` + `formatSLATime(waitTimeInQueueMs)` | V2 Response Metrics (file 3): displayed in Detail | ✅ **SESUAI V2** |
+| **Wait Time — pending (unassigned)** | ✅ `ElapsedMetricBadge` — **wall-clock** live timer dari `firstCustomerMessageAt` | V2 Response Metrics (file 3): live timer | ✅ **SESUAI V2** |
+| **Tooltip per metric** | ✅ `buildMetricLabel` — tooltip dengan title + description | ✅ Good UX | ✅ |
+| **Group chat SLA** | ⚠️ Masih disembunyikan total (`isGroup ? [] : slaItems`) | V2: FRT harus tetap jalan untuk group | ❌ **MASIH MISSING** |
+| **FRT office hours** | ✅ `{ ...metrics, officeHoursSnapshot: null }` — FRT wall-clock | ✅ Sesuai V2: WoC tidak pause FRT | ✅ |
 
-**Kesimpulan:** RLT dan Wait Time **SUDAH diimplementasi** di v2.5.0. Formula terlihat konsisten dengan analisis PRD.
+**Kesimpulan:** RLT dan Wait Time **SUDAH diimplementasi** sesuai V2 Response Metrics (file 3).
 
 ---
 
 ### 3. Chat List — SLA Display (`ConversationCard.tsx`)
 
-| Aspek | Implementasi v2.5.0 | PRD Requirement | Gap |
+| Aspek | Implementasi v2.5.0 | V2 Requirement | Gap |
 |---|---|---|---|
-| **SLA indicator** | ✅ `DurationBadge` — elapsed time sejak `createdAt` | ✅ Ada timer | ⚠️ Masih elapsed dari creation, bukan remaining FRT/TTC budget |
-| **SLA color** | ❌ Hanya yellow badge (`bg-yellow-100 text-yellow-600`) | **Green/Yellow/Red** (US-14) | ❌ **MASIH MISSING** |
-| **Hold indicator** | ❌ Tidak ada | US-13: Hold icon + tooltip | ❌ **MASIH MISSING** |
-| **Filter SLA Overdue/Near Due** | ❌ Tidak ada | US-11: Advanced Filters include SLA | ❌ **MASIH MISSING** |
+| **SLA indicator** | ✅ `DurationBadge` — elapsed time sejak `createdAt` | V2 Chat List (file 8): remaining budget | ⚠️ Masih elapsed, bukan remaining |
+| **SLA color** | ❌ Hanya yellow badge | V2 Chat List: **Green/Yellow/Red** (US-14) | ❌ **MASIH MISSING** |
+| **Hold indicator** | ❌ Tidak ada | V2 Chat List: Hold icon + tooltip | ❌ **MASIH MISSING** |
+| **Filter SLA** | ❌ Tidak ada | V2 Chat List: Filter Overdue/Near Due | ❌ **MASIH MISSING** |
 
 ---
 
 ### 4. Conversation Room Header (`ConversationChatRoomHeader.tsx`)
 
-| Aspek | Implementasi v2.5.0 | PRD Requirement | Gap |
+| Aspek | Implementasi v2.5.0 | V2 Requirement | Gap |
 |---|---|---|---|
-| **Close** | ✅ | ✅ | ✅ |
-| **Reopen** | ✅ | ✅ | ✅ |
-| **Screenshot** | ✅ | ✅ | ✅ |
-| **Ticket creation** | ✅ | ✅ | ✅ |
-| **Hold/Resume** | ❌ Tidak ada | Room PRD P1 | ❌ **MASIH MISSING** |
-| **Reminder** | ❌ Tidak ada | Room PRD | ❌ **MASIH MISSING** |
-| **More menu (alias, pin)** | ❌ Tidak ada | Room PRD | ❌ **MASIH MISSING** |
-| **SLA countdown di header** | ❌ Tidak ada | Room PRD | ❌ **MASIH MISSING** |
+| **Close** | ✅ | V2 Room (file 9): ✅ | ✅ |
+| **Reopen** | ✅ | V2 Room: ✅ | ✅ |
+| **Screenshot** | ✅ | V2 Room: ✅ | ✅ |
+| **Ticket creation** | ✅ | V2 Ticketing (file 14): ✅ | ✅ |
+| **Hold/Resume** | ❌ Tidak ada | V2 Room v1.1 P1 | ❌ **MASIH MISSING** |
+| **Reminder** | ❌ Tidak ada | V2 Room v1.1 | ❌ **MASIH MISSING** |
+| **SLA countdown** | ❌ Tidak ada | V2 Room v1.1: SLA countdown in header | ❌ **MASIH MISSING** |
 
 ---
 
 ### 5. SLA Color Threshold (`getDueDateBadgeVariant`)
 
-| Aspek | FE v2.5.0 | PRD Chat List US-14 | Gap |
+| Aspek | FE v2.5.0 | V2 Chat List US-14 | Gap |
 |---|---|---|---|
 | **Threshold basis** | Absolute time (ms) | **Percentage** of remaining SLA budget | ❌ **Konsep berbeda** |
 | **Green (>50%)** | ❌ Tidak ada | ✅ | ❌ |
 | **Yellow (≤50% & >10%)** | ⚠️ `warning` = < 1 hari | ✅ | ❌ |
 | **Red (≤10% / overdue)** | ⚠️ `destructive` = < 10 menit | ✅ | ❌ |
-| **Info (blue, >1 hari)** | ✅ Ada | Tidak di PRD | ⚠️ FE ekstra |
+| **Info (blue, >1 hari)** | ✅ Ada | Tidak di V2 | ⚠️ FE ekstra |
 
 ---
 
-### 6. Ringkasan Perubahan v2.5.0 (dari versi sebelumnya)
+### 6. Ringkasan Perubahan v2.5.0 (vs V2)
 
-| Sebelumnya | v2.5.0 | Status |
-|---|---|---|
-| ❌ RLT tidak ada | ✅ `rltMs`, `firstAgentAssignmentAt`, `ElapsedBusinessMetricBadge` | ✅ **FIXED** |
-| ❌ Wait Time tidak ada | ✅ `waitTimeInQueueMs`, `ElapsedMetricBadge` | ✅ **FIXED** |
-| ❓ FRT start source tidak jelas | 🆕 `firstAgentAssignmentAt` sebagai field terpisah → `frtCountingStartAt` kemungkinan inbound | ✅ **TERKLARIFIKASI** (dengan asumsi FRT = end-to-end) |
-| ❌ Group chat SLA (FRT) | Masih disembunyikan | ❌ **BELUM FIXED** |
-| ❌ Chat List SLA color | Masih yellow only | ❌ **BELUM FIXED** |
-| ❌ Hold/Resume | Masih tidak ada | ❌ **BELUM FIXED** |
-| ❌ SLA color threshold | Masih absolute time | ❌ **BELUM FIXED** |
-| ❌ Snooze Conversation | Masih tidak ada | ❌ **BELUM FIXED** (undeveloped) |
+| V2 Feature | Sebelumnya | v2.5.0 | Status vs V2 |
+|---|---|---|---|
+| RLT & Wait Time (V2 file 3) | ❌ Tidak ada | ✅ `rltMs`, `waitTimeInQueueMs` | ✅ **SESUAI V2** |
+| `firstAgentAssignmentAt` (V2 file 3) | ❌ Tidak ada | ✅ Field terpisah | ✅ **SESUAI V2** |
+| Group chat SLA (FRT) (V2 file 4) | ❌ | Masih disembunyikan | ❌ **BELUM SESUAI** |
+| Chat List SLA color (V2 file 8) | ❌ | Masih yellow only | ❌ **BELUM SESUAI** |
+| Hold/Resume (V2 file 9) | ❌ | Tidak ada | ❌ **BELUM SESUAI** |
+| SLA color threshold (V2 file 8) | ❌ | Absolute time | ❌ **BELUM SESUAI** |
+| Snooze (V2 file 16) | ❌ | Tidak ada | ❌ **UNDEVELOPED** |
 
 ---
 
@@ -866,14 +856,14 @@ interface ConversationSLAMetrics {
 
 | # | Question | Status |
 |---|---|---|
-| FE-01 | `frtCountingStartAt` — assignment atau inbound? | ✅ **Terklarisifikasi via data model** — `firstAgentAssignmentAt` adalah field terpisah, jadi `frtCountingStartAt` kemungkinan inbound. Tapi perlu konfirmasi final. |
-| FE-07 | RLT dan Wait Time — backend atau frontend? | ✅ **SELESAI** — Backend sudah expose `rltMs`, `waitTimeInQueueMs`, `firstAgentAssignmentAt` di endpoint SLA metrics. |
+| FE-01 | `frtCountingStartAt` — assignment atau inbound? | ✅ **Terklarisifikasi via data model** — `firstAgentAssignmentAt` adalah field terpisah, jadi `frtCountingStartAt` kemungkinan inbound. Sesuai V2 formula FRT = Wait Time + RLT. |
+| FE-07 | RLT dan Wait Time — backend atau frontend? | ✅ **SELESAI** — Backend sudah expose `rltMs`, `waitTimeInQueueMs`, `firstAgentAssignmentAt`. Sesuai V2 Response Metrics (file 3). |
 
-| # | Question | Relevance |
-|---|---|---|
-| FE-02 | Kenapa Chat List `DurationBadge` pakai elapsed dari `createdAt`, bukan remaining SLA budget dari FRT/TTC? | Chat List |
-| FE-03 | SLA color threshold FE berbeda dengan PRD (absolute time vs percentage). Mana yang benar? | getDueDateBadgeVariant |
-| FE-04 | Group chat FRT disembunyikan total. Apakah ini sengaja karena FRT tidak relevan untuk group, atau karena group chat lifecycle undefined? | ConversationAsigneeContent |
-| FE-05 | Hold/Resume tidak ada di Room Header. Apakah ini sengaja di-delay atau belum diimplementasi? | ConversationChatRoomHeader |
-| FE-06 | Snooze Conversation tidak ada. Sesuai cross-analysis, fitur ini undeveloped. Ada timeline? | Seluruh Snooze |
-| FE-08 | Apakah Chat List akan tetap pakai simple elapsed time, atau akan diubah ke SLA budget remaining dengan FRT/TTC threshold warna? | Chat List |
+| # | Question | Relevance | V2 Source |
+|---|---|---|---|
+| FE-02 | Kenapa Chat List `DurationBadge` pakai elapsed dari `createdAt`, bukan remaining SLA budget? | Chat List | V2 Chat List (file 8): remaining budget |
+| FE-03 | SLA color threshold FE berbeda dengan V2 (absolute time vs percentage). Mana yang benar? | `getDueDateBadgeVariant` | V2 Chat List (file 8): percentage |
+| FE-04 | Group chat FRT disembunyikan total. V2 menyebut FRT harus tetap jalan. | `ConversationAsigneeContent` | V2 Omnichannel (file 4) + SLA |
+| FE-05 | Hold/Resume tidak ada di Room Header. Sesuai V2 Room (file 9) P1. | `ConversationChatRoomHeader` | V2 Room (file 9) |
+| FE-06 | Snooze Conversation tidak ada. Sesuai V2 Snooze (file 16) — undeveloped. | Seluruh Snooze | V2 Snooze (file 16) |
+| FE-08 | Apakah Chat List akan tetap pakai simple elapsed time, atau diubah ke SLA budget remaining? | Chat List | V2 Chat List (file 8) |
