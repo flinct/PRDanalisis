@@ -1,0 +1,130 @@
+# Agent Instruction — Wajib Dibaca Sebelum Eksekusi
+
+Ini adalah **system prompt replacement**. Agent wajib mengikuti workflow ini di **setiap sesi**, tanpa terkecuali. Tidak ada tugas yang boleh dikerjakan tanpa membaca rule yang sesuai.
+
+---
+
+## Step 1: Deteksi Tipe Tugas
+
+Begitu user memberi prompt, klasifikasikan ke salah satu tipe berikut:
+
+| Jika user bilang... | Tipe Tugas |
+|---|---|
+| analisa / analyze / PRD / analisis | ANALYSIS |
+| buat memory / tulis memory / simpan ke memory / update memory | MEMORY WRITE |
+| bandingkan / compare / perbedaan / perbandingan | COMPARISON |
+| test case / test scenario / uji | TEST CASE |
+| bug / perbaiki bug / error / issue / defect | BUG FIX |
+| impact / dampak / efek samping / blast radius | IMPACT ANALYSIS |
+| feature / fitur baru /开发 | FEATURE DEV |
+
+Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini", "cek apakah ada masalah"), tetap klasifikasikan ke tipe tugas yang paling sesuai.
+
+> **Jika ragu: muat SEMUA rule dari `Rules/`.**
+
+---
+
+## Step 2: Muat Rule Berdasarkan Tipe Tugas
+
+### Untuk SEMUA tipe tugas (wajib):
+
+1. `Rules/workflow-rule.md` — execution order dan prioritas
+2. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
+
+### ANALYSIS / PRD / FEATURE DEV:
+
+```
+Rules/qa-analysis-rule.md         → WAJIB. Full methodology.
+Rules/impact-analysis-rule.md     → Untuk cek blast radius.
+```
+
+### BUG FIX:
+
+```
+Rules/qa-analysis-rule.md         → Type 2: Bug Fix Analysis.
+Rules/impact-analysis-rule.md     → Blast radius dan regression.
+```
+
+### IMPACT ANALYSIS:
+
+```
+Rules/impact-analysis-rule.md     → WAJIB. Impact dimensions.
+Rules/qa-analysis-rule.md         → Mandatory Impact Dimensions + Risk Analysis.
+```
+
+### COMPARISON (PRD vs PRD):
+
+```
+Rules/prd-comparison-rule.md      → WAJIB. Framework compare.
+Rules/qa-analysis-rule.md         → Interconnection analysis jika PRD saling terkait.
+```
+
+### TEST CASE:
+
+```
+Rules/test-case-rule.md           → WAJIB. Format dan scope.
+Rules/qa-analysis-rule.md         → Test Strategy Output section.
+```
+
+### MEMORY WRITE:
+
+```
+Rules/memory-routing-rule.md      → WAJIB. Tahu konten masuk global atau feature memory.
+Rules/memory-write-rule.md        → WAJIB. Format penulisan.
+Rules/global-memory-write-rule.md → Jika akan update global memory.
+Rules/global-memory-update-rule.md→ Jika akan update global memory.
+```
+
+---
+
+## Step 3: Muat Konteks Produk
+
+Setelah rule terbaca, muat konteks:
+
+1. `Memory/global-memory.md` — canonical product rules, dependency, open risks
+2. File memory relevan dari `Memory/` — feature-specific detail
+
+Gunakan `Memory/README.md` untuk navigasi cepat ke file yang tepat.
+
+---
+
+## Step 4: Eksekusi
+
+Gunakan rule yang sudah dimuat sebagai **metodologi kerja**, bukan sekadar referensi.
+
+- Output harus sesuai struktur yang ditentukan rule
+- Jangan lewati section impact/risk/regression
+- Jika ada kontradiksi antara input user dan rule, ikuti rule
+
+---
+
+## Aturan Kritis: Self-Triggered Actions
+
+Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa diperintah eksplisit. Contoh:
+
+| Saat sedang... | Agent perlu... | Maka baca... |
+|---|---|---|
+| Menganalisa PRD | Menyimpan temuan ke memory | Memory rules |
+| Membuat test case | Merevisi analisa karena ada temuan baru | qa-analysis-rule.md |
+| Memperbaiki bug | Mengecek dampak ke modul lain | impact-analysis-rule.md |
+| Membandingkan PRD | Analisa interkoneksi | qa-analysis-rule.md |
+
+**Setiap kali agent akan:**
+- Menganalisa sesuatu → baca `qa-analysis-rule.md`
+- Menulis/update file → baca memory rules
+- Membandingkan → baca `prd-comparison-rule.md`
+- Membuat test case → baca `test-case-rule.md`
+- Mengecek dampak → baca `impact-analysis-rule.md`
+
+Tidak ada "saya sudah tahu, tidak perlu baca ulang". **Setiap tindakan = baca rule yang sesuai.**
+
+---
+
+## Ringkasan Sederhana
+
+```
+Ada perintah → klasifikasi tipe tugas → muat rule sesuai tipe → muat konteks → eksekusi
+Dalam proses → butuh lakukan hal lain → muat rule untuk hal itu → lanjut
+```
+
+Jika ada 1 menit downtime karena baca rule, itu lebih baik daripada 1 hari downtime karena salah analisa.

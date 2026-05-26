@@ -16,6 +16,8 @@ README ini harus konsisten dengan aturan di `Rules/`:
 - `global-memory-write-rule.md`
 - `global-memory-update-rule.md`
 - `memory-write-rule.md`
+- `qa-analysis-rule.md` — **WAJIB.** Framework metodologi analisa QA senior untuk semua skenario: PRD analysis, feature dev, bug fix, interconnection, impact, risk. Merged from deprecated `analisa-prd-rule.md`.
+- ~~`analisa-prd-rule.md`~~ — **DEPRECATED.** Semua konten sudah di-merge ke `qa-analysis-rule.md`. Jangan gunakan untuk analisa baru.
 
 ## Files
 
@@ -164,6 +166,10 @@ README ini harus konsisten dengan aturan di `Rules/`:
   - BE-side features NOT implemented (10 fitur)
   - BE + FE alignment summary (no BE/FE asymmetry)
 - Pakai saat butuh referensi arsitektur BE, service boundaries, schema, atau untuk cross-check implementasi BE vs PRD
+
+## Agent Instructions
+
+Sebelum melakukan tugas apapun, baca `Rules/agent-instruction.md` — ini adalah entry point yang mendeteksi tipe tugas dan menentukan rule mana yang harus dimuat.
 
 ## Usage Rule
 
