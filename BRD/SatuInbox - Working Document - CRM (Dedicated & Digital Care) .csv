@@ -1,0 +1,82 @@
+Feature,Sub Feature,Explanation & Notes,Owner,Priority,Status,Upadate Satu Inbox/SAPX,Launch ETA,Additional Notes,Description
+Digital Channel (Komplain Channel),Email,Ready Configure,Satu Inbox,P0,Launched,"Fitur tersedia, hanya tinggal setup akun",Q1 - Early February,OK,27 February 2026
+Digital Channel (Komplain Channel),Instagram,Ready Configure (akun bisnis),Satu Inbox,P0,Launched,"Fitur tersedia, hanya tinggal setup akun",Q1 - Early February,OK,27 February 2026
+Digital Channel (Komplain Channel),Facebook,"Ready Configure (Only Messenger)
+- Propose comment posting dapat diakses",Satu Inbox,P0,Launched,"Fitur tersedia, hanya tinggal setup akun",Q1 - Early February,OK,27 February 2026
+Digital Channel (Komplain Channel),Live Chat,"Pending: 
+- Embed Logo Live Chat check To Website & Lapak Satria
+- Collor identity sapx
+- Created logo gatot kaca (Existing logo)",Satu Inbox,P0,Launched,Fitur sudah ada,Q1 - Early March,On Development: Maks Tanggal 23 ,2 March 2026
+WA Cheklist Biru Baru,WA Official New Number,Sync Jatis & Kapture related WA WABA,"SAPX - CX, SAPX - Marcom",P0,Launched,,Q1 - Mid February,On Proses di Vendor Jatis,Menunggu Jatis
+Live Chat,Verification ,"Customer wajib memasukan infomasi yag dibutuhkan sebelum terhubung ke live chat
+1. Nama 
+1. Nomer Hp (Aktif WA)
+2. Email (Wajib)
+3. Nomer Resi Pengiriman/Pickup",Satu Inbox,P0,Launched,Fitur sudah ada,Q1 - Mid March,On Development: Maks Tanggal 23 ,2 March 2026
+Live Chat,Csat Survey,"Terdapat survey saat conversation diselesaikan baik dari sapx ataupun customer
+- Survey berupa pilihan emoticon > Cek existing live chat sapx",Satu Inbox,P0,Launched,Fitur sudah ada,Q1 - Mid March,On Development: Maks Tanggal 23 ,2 March 2026
+Dahboard Monitoring,"Monitoring Traffic In
+Monitoring Ticket Status
+Monitoring Status available Agent
+Monitoring Performance","Monitorng Trafic In: Chat masuk Total, Chat belum ter-assign, Chat berjalan, chat berakhir 
+Monitoring Ticket Status: Ticket Total, Ticket Open, Ticket Ongoing, Ticket, Closed, ticket hold dll
+Monitoring Satatus available Agent: Total Login Time, Agent Login,Agent Break, Agent Aux other (Sholat, Briefing, Toilet dll relevant status)
+Monitoring Performance: FRT (In SLA, Over SLA in Percentage & Number) , ART (In SLA, Over SLA in Percentage & Number), Solving Rate (In SLA, Over SLA in Percentge & Number) , CSAT (Good Csat & Bad Csat: Good Csat 3,4,5, Bad Csat: 2,1) in percentage and number , Handling time (Seberapa lama chat di-handle sd closed)
+
+Berlaku untuk all dan individual dan (clickable)",Satu Inbox,P0,Launched,"80% Statistik sudah ready ada, jika ada kebutuhan spesifik bisa by request ",End of April,"Tersedia: Traffic Performance
+Pending: Aux 
+
+Clickable > Done",
+RBAC,Kebutuhan Nama Tribe dan Level,Cek pada lik berikut:  DATA USERNAME SATU INBOX.xlsx,Satu Inbox,P0,Launched,Data sudah dimigrasi untuk TLC dan CRM,Q1 - End of February,Sudah Create & Mapping Tanggal 23 Feb Sudah bisa digunakan dan akan ada rekon ulang di awal March,
+Group Tribe,Pembagi Group Team,"Digital Care: Team yang handle komplain melalui (Email, Socmed, Live chat dll)
+Dedicated: Team yang handle client melalui wag (Agregator, Ecommerce, 3PL Partnership, Seller, Banking, Credit Card, Valuable Goods)
+Complaint Resolution: Team yang handle untuk complaint dengan issue yang tidak dapat di selesaikan (Investigasi)",Satu Inbox,P0,Launched,Fitur sudah tersedia,Q1 - End of February,On Development: Maks Tanggal 23 ,
+Mapping Ticketing,Mapping Ticket ,"Sheet Mapping Ticket
+Penambahan Stage Ticket > Sapx (Heru)","Satu Inbox, SAPX - CX",P0,Launched,Fitur sudah tersedia,Q1 - End of February,On Development: Maks Tanggal 23 ,
+Multiple ticket created,Pembuatan ticket lebih dari satu dalam 1 conversation,"Pembuatan ticket lebih dari 1 resi dalam satu bubble, contoh : pengirim minta cek awb 15 awb> pembuatan tiket bisa langsung 15 sesuai awb yang dikomplainkan",Satu Inbox,P3,Launched,Fitur sudah tersedia,Q1 - Mid March,On Development: Maks Tanggal 23 ,Next Discussion: Friday 6 March 2026 9.00
+Live Chat,Email Summary Conversation,"- Semua percakapan setelah chat berakhir terkirim ke email terdaftar sebelumnya
+- Pada email terdapat button untuk direct kembali ke live chat sebelumnya",Satu Inbox,P0,Launched,On development,Early of May,,
+Email Forwader notifikasi,Email Summary complaint,Email untuk kebutuhan notifikasi hasil chat customer ke email ,SAPX - Tech,P0,In progress,On development,Early of May,Perlu E-Mail,
+Digital Channel (Komplain Channel),Other Channel,"Suggest : Tiktok , X, Youtube , Linked In , Google Maps for Business.",Satu Inbox,P3,In progress,Menyusul,,,
+Live Chat,Probing automation,"Terdapat pilhan kategory permasalahan sebelum terhubung
+
+1. Pengirim/Penerima (Pilihan)
+JIka pengirim
+1. Permintaan Pickup
+2. Kendala Pickup
+3. Permintaan Kirim Ulang (Sebelumnya gagal kirim)
+4. Kendala pengiriman (Masih dalam estimasi pengiriman)
+5. Kendala pengiriman (Sudah lebih dari estimasi pengiriman)
+6. Status pada tracking delivered namun belum diterima
+7. Status aktual sudah diterima namun pada tracking belum delivered
+8. Paket RUSAK/HILANG
+Jika penerima
+1. Kendala pengiriman (Masih dalam estimasi pengiriman)
+2. Kendala pengiriman (Sudah lebih dari estimasi pengiriman)
+3. Permintaan pengiriman ulang (Sebelumnya gagal kirim)
+4. Tanya Status > Auto reply status terupdate sesuai tracking > Ingin terhbung ke Satria Care?",Satu Inbox,P0,Not started,"Fitur sudah ada, Auto reply menyusul.",,,
+All Channel,Semua history chat tidak hilang baik dari sisi customer atau agent digital care,Semua Conversation tidak hilang agar tidak mengulang percakapan baru dan agent digital care tidak mengulang pertanyaan namun verification dan probing automation tetap harus ada dan munculkan satu automation question: melanjutkan percakapan dan kendala sebelumnya? jika iya tidak perlu muncul verification & probing automation,Satu Inbox,P0,Launched,History selama session tidak dihapus akan tetap ada. Email summary percakapan sedang di develop,Q1 - End of February,"On Development: Maks Tanggal 23 Feb  dan untuk button konfirmasi ""Apakah melanjutkan percakapan atau kendala sebelumnya"" on develop 25 March",
+Reporting,"Monitoring Traffic In
+Monitoring Ticket Status
+Monitoring Status available Agent
+Monioring Performance",Semua yang ada dalam cakupun monitoring masuk ada report secara raw data mentah untuk dapat diolah oleh team data analyst > Export data semua matrix monitoring,Satu Inbox,P0,Launched,Saat ini bisa by request terlebih dahulu kami kirimkan,Early of May,"First Phase> As Request  setelah live M1 
+Second Phase: Self handling > 25 March",V2.4.0
+Reporting,Export report,"dapat ditampilkan button untuk export report seperti pada sistem CRM sebelumnya
+contoh : https://prnt.sc/ywmCETVgY616
+judul kolom dapat dilihat pada excel berikut Kebutuhan Export Report Satu Inbox.xlsx",Satu Inbox,P3,Launched,Saat ini bisa by request terlebih dahulu kami kirimkan,Early of May,"First Phase> As Request  setelah live M1 
+Second Phase: Self handling > 25 March",V2.4.0
+Fitur Reminder,Reminder Notification,Tiket reminder saat di set reminder hilang dari bucket agent dan akan kembali lagi saat time waktu yang di tentukan,Satu Inbox,P0,Launched,"Fitur Tersedia, Butuh optimasi pengembangan fitur",End of April,On Monitor > 25 March,Estimated Live 10 April 2026
+SLA Setting,Mapping SLA Per Channel dll,"First Response Time: 5 Menit all channels kecuali email (60 Menit)
+Respone Time: 10 Menit (Average Handling Time)
+Closed: based on mapping ticket (Done End of Feb)",Satu Inbox,P0,Launched,Fitur tersedia namun dalam bentuk global channel,Early of May,On Monitor > 25 March,V2.4.0
+Konfirmasi Pengiriman Pesan ke Pelanggan pada Ticket Room,Ticket Room,"Muncul alert saat akan post anatara chat ke customer atau internal notes ""apakah anda yakin akan xxxxx ini""",Satu Inbox,P0,Launched,,,,V2.4.0
+WAG Flaging,Mapping WAG ,WAG dapat di lakukan mapping sesui kebutuhan dan jenis pelanggan > Satu inbox bisa menambahk ftur flaging dan penyesuain  Bucket: https://prnt.sc/xwBHGldvu0I4,Satu Inbox,P1,Not started,,,,Need Research
+Agent Dashboard,MIni Dashboard Individual,"Agent dapat melihat keseluruhan activity , ticketing status chat durasi , frt, art dan ada dashboard prealtert sesusi kebutuhan KPI   ",Satu Inbox,P1,In progress,,,,V2.5.0
+Ticketing view,View Base On Hirarchy,Cek pada screenshoot: https://prnt.sc/hRD0WMwp8gew,Satu Inbox,P0,Launched,,,,V2.4.0
+Reply Limit to External from Ticket Room for Specific Group,Ticket Room,Agent yang dapat melalkukn reply cutsomer hanya L1 > Cek pada list berikut: https://docs.google.com/spreadsheets/d/1MvOfMRJb9w-xNmOSREVaj313g5HvHzQk/edit?gid=1072274513#gid=1072274513,Satu Inbox,P1,In progress,butuh mode detail,,,V2.5.0
+Ticket Close Limit in Ticket Room for Specific Group,Ticket Room,hanya L1 yang bisa closed: https://docs.google.com/spreadsheets/d/1MvOfMRJb9w-xNmOSREVaj313g5HvHzQk/edit?gid=1072274513#gid=1072274513,Satu Inbox,P1,In progress,butuh mode detail,,,V2.5.0
+AWB Information,Order Management,"Muncul semua informasi dari system sapx pada satu inbox seperti status awb, tracking, informasi pengirim penerima, metode bayar, SLA, Aging, No hape , service packet  dll to be discuss","Satu Inbox, SAPX - Tech",P1,Launched,,End of April,,Done
+Offline Service Auto Reply All-Channel,Conversation,Sementara kita eksplorasi setting pada masing-masing platform untuk auto-reply saat away,Satu Inbox,P0,Not started,,,,V2.6.0
+Compose E-Mail (Initiate),E-Mail,,Satu Inbox,P1,,,,,V2.6.0
+Ada kalimat worsh > prioritas assign atau assign ke agent tertentu,Conversation,prioritas assign atau assign ke agent tertentu,Satu Inbox,P3,Not started,,,,V2.7.0
+Kalimat khusus > masuk ke bucket khusus dan auto closed,Conversation,masuk ke bucket khusus dan auto closed,Satu Inbox,P3,Not started,,,,V2.7.0

@@ -1,0 +1,15 @@
+Requirements,Status,ETA
+"1. Saat Agent AUX diaktifkan, Conversation Existing tetap dapat dilanjutkan Agent dan SLA tetap berjalan. Namun tidak dapat menerima New Conversation selama Agent AUX di set.",V2.3.0 (Done),
+2. Internal Notes merupakan Summary dari Conversation yang dibuat Agent untuk Bahasan Tertentu.,V2.4.0 (Done),
+"3. History Percakapan pada Conversation Detail saat ini dari atas ke bawah terurut berdasarkan yang terbaru sd terlama, diubah saja menjadi urutan Percakapan pada umumnya, yaitu dari atas ke bawah terurut berdasarkan yang terlama sd terbaru (yang terbaru di bawah).",Done,
+"4. Peningkatan Navigasi pada Conversation List, saat ini bentuknya Load When Scrolling, dapat ditambahkan Pagination.",,
+5. Display Name Livechat pada Conversation List dan Room langsung terganti karena sudah mengisi Form Awal sebelum dilayani oleh Agent,Done,
+"6. Saat memindahkan ke Junk Folder (Folder Sampah) harus ada Reason, bisa Single Action atau Multiple Action.",V2.3.0 (Done),
+"7. Junk Folder hanya memindahkan Conversation Tertentu yang ditandai dengan Reason, sementara jika Client melakukan Conversation baru, tetap muncul pada Conversation List.",V2.3.0 (Done),
+"8. Pada Junk Folder untuk Channel Livechat, ada Menu Compose E-Mail untuk Follow-Up (menggunakan E-Mail yang dicantumkan Client saat Awal masuk Livechat).",V2.5.0,
+9. Compose E-Mail untuk Initiate New Conversation (Receiver dapat dari E-Mail yang sudah terdaftar di SatuInbox maupun belum).,v2.6.0,
+10. Menambahkan Permission untuk Reopen Conversation untuk semua Level,V2.4.0,
+"11. Tampilan Dropdown terlalu panjang menyebabkan tulisan tidak ditemukan, agar dilakukan perbaikan User Interface.",Done,
+"12. Tampilan Dropdown terlalu panjang pada Create Ticket menyebabkan tulisan tidak ditemukan, agar dilakukan perbaikan User Interface.",Done,
+13. Penugasan saat ini ditampilkan Username agar diganti dengan Display Name.,Done,1 Mei 2026
+14. Display Name di sisi Client pada Livechat ditampilkan Alias Name,V2.4.0,1 Mei 2026
