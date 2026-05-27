@@ -29,6 +29,18 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 
 ---
 
+# Before PRD Writing
+
+1. Read `prd-writing-rule.md` for PRD structure, section rules, and checklist.
+2. Read global memory for canonical lifecycle, RBAC, SLA, and source-of-truth constraints.
+3. Read existing V2 PRDs in the same domain, especially `PRD/Conversationv2/` and `PRD/ticketv2/` for Conversation/Ticket work.
+4. Read relevant feature memory files from `Memory/`.
+5. Classify feature complexity and choose Lite PRD, Standard PRD, Full PRD, or Patch/Addendum mode.
+6. Define Phase 1 In Scope and Out of Scope before writing detailed requirements.
+7. If the PRD touches existing entities, flows, reports, SLA, RBAC, API/event contracts, data retention, migration, or integrations, use `qa-analysis-rule.md` and `impact-analysis-rule.md` for completeness.
+
+---
+
 # Before Impact Analysis
 
 1. Perform PRD analysis or comparison first.
@@ -66,10 +78,16 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 
 # Before Creating or Updating Test Cases
 
-1. Read relevant PRD analysis and impact analysis.
-2. Read existing test cases in affected scope.
-3. Ensure test cases stay within feature boundary.
-4. Include regression scenarios from impact analysis.
+1. Read `test-case-rule.md` for QA test writing, steps, coverage, and execution support.
+2. Read `qa-analysis-rule.md`, especially Test Specification Layer and Traceability Matrix sections.
+3. Read relevant PRD analysis and impact analysis.
+4. Read the source PRD or patch/addendum.
+5. Read existing test cases in affected scope.
+6. Build requirement-to-test coverage before writing detailed steps.
+7. Ensure test cases stay within feature boundary and do not test out-of-scope behavior as required behavior.
+8. Include regression scenarios from impact analysis.
+9. Include state, RBAC, API/event contract, data lifecycle, migration, rollout, rollback, and observability tests when triggered by PRD analysis.
+10. Define test data, environment, execution entry/exit criteria, evidence, and automation readiness.
 
 ---
 
