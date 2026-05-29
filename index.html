@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>BRD Input Form | Product Owner Workspace → Export .MD</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #eef2f5;
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        padding: 8.5rem 1rem 2rem;
+        color: #1a2c3e;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .form-header {
+        position: fixed;
+        top: 1rem;
+        left: 50%;
+        z-index: 50;
+        width: calc(100% - 2rem);
+        max-width: 1400px;
+        margin-bottom: 0;
+        padding: 1.15rem 1.4rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 12px 34px rgba(15, 44, 68, 0.12);
+        backdrop-filter: blur(16px);
+        transform: translateX(-50%);
+        transition:
+          padding 0.2s ease,
+          border-radius 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .form-header.is-compact {
+        padding: 0.55rem 1rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(15, 44, 68, 0.1);
+      }
+
+      .form-header h1 {
+        font-size: 1.9rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #1e466e, #0f2c44);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        letter-spacing: -0.3px;
+        transition: font-size 0.2s ease;
+      }
+
+      .form-header.is-compact h1 {
+        font-size: 0.95rem;
+      }
+
+      .form-header p {
+        color: #4a627a;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        max-height: 48px;
+        opacity: 1;
+        overflow: hidden;
+        transition:
+          max-height 0.2s ease,
+          margin-top 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .form-header.is-compact p {
+        max-height: 0;
+        margin-top: 0;
+        opacity: 0;
+      }
+
+      .card {
+        background: white;
+        border-radius: 24px;
+        box-shadow:
+          0 8px 20px rgba(0, 0, 0, 0.05),
+          0 2px 4px rgba(0, 0, 0, 0.02);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+
+      .card-header {
+        padding: 1.25rem 1.8rem;
+        background: #f9fbfd;
+        border-bottom: 1px solid #e9edf2;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .card-header h2 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #0b3557;
+      }
+
+      .badge-section {
+        font-size: 0.75rem;
+        background: #e9ecef;
+        padding: 4px 12px;
+        border-radius: 40px;
+        color: #2c5282;
+      }
+
+      .card-body {
+        padding: 1.8rem;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .field-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #1e4a76;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      .required:after {
+        content: "*";
+        color: #e03a3a;
+        margin-left: 4px;
+      }
+
+      .field-description {
+        font-size: 0.75rem;
+        color: #5b7a9a;
+        line-height: 1.4;
+        margin-top: -0.2rem;
+        margin-bottom: 0.2rem;
+        font-weight: normal;
+        text-transform: none;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 0.7rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 16px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        background: #fff;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #2b6e9f;
+        box-shadow: 0 0 0 3px rgba(43, 110, 159, 0.2);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .btn-add {
+        background: #eef2ff;
+        color: #1e4a76;
+        border: 1px solid #cbd5e1;
+        border-radius: 40px;
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        cursor: pointer;
+      }
+
+      .btn-add:hover {
+        background: #e0e7ff;
+      }
+
+      .remove-row {
+        color: #c2410c;
+        font-weight: bold;
+      }
+
+      hr {
+        margin: 1.5rem 0;
+        border: none;
+        height: 1px;
+        background: #e2e8f0;
+      }
+
+      .action-buttons {
+        position: fixed;
+        left: 1rem;
+        bottom: 1rem;
+        z-index: 45;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+
+      .action-buttons .btn-primary,
+      .action-buttons .btn-secondary {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+        padding: 0 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0;
+        overflow: hidden;
+        box-shadow: 0 12px 28px rgba(15, 44, 68, 0.18);
+        transition:
+          width 0.2s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .action-buttons .btn-secondary:hover,
+      .action-buttons .btn-secondary:focus-visible {
+        width: 150px;
+      }
+
+      .action-buttons .btn-primary:hover,
+      .action-buttons .btn-primary:focus-visible {
+        width: 240px;
+      }
+
+      .action-icon {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        line-height: 1;
+      }
+
+      .action-icon svg {
+        display: block;
+      }
+
+      .action-label {
+        flex: 0 0 auto;
+        max-width: 0;
+        opacity: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        transition:
+          max-width 0.2s ease,
+          opacity 0.2s ease,
+          margin-left 0.2s ease;
+      }
+
+      .action-buttons button:hover .action-label,
+      .action-buttons button:focus-visible .action-label {
+        max-width: 190px;
+        margin-left: 0.55rem;
+        opacity: 1;
+      }
+
+      .btn-primary {
+        background: #1f6392;
+        border: none;
+        padding: 0.9rem 2rem;
+        border-radius: 40px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      .btn-secondary {
+        background: white;
+        border: 1px solid #cbd5e1;
+        padding: 0.9rem 2rem;
+        border-radius: 40px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .btn-primary:hover {
+        background: #0e4a70;
+      }
+
+      .output-area {
+        background: #f8fafc;
+        border-radius: 24px;
+        margin-top: 2rem;
+        border: 1px solid #cbd5e6;
+      }
+
+      .output-header {
+        padding: 1rem 1.8rem;
+        background: #eef2f9;
+        border-radius: 24px 24px 0 0;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      pre {
+        padding: 1.5rem;
+        overflow-x: auto;
+        font-family: "SF Mono", monospace;
+        font-size: 0.8rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        background: #1e2a36;
+        color: #eef2f5;
+        border-radius: 0 0 20px 20px;
+        margin: 0;
+      }
+
+      .btn-download {
+        background: #2c7a4d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 40px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      @media (max-width: 760px) {
+        body {
+          padding-top: 7.5rem;
+        }
+
+        .form-header {
+          top: 0.75rem;
+          width: calc(100% - 1rem);
+          padding: 1rem;
+        }
+
+        .form-header h1 {
+          font-size: 1.35rem;
+        }
+
+        .form-header.is-compact h1 {
+          font-size: 0.8rem;
+        }
+
+        .action-buttons {
+          left: 0.75rem;
+          bottom: 0.75rem;
+        }
+
+        .card-body {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-header">
+        <h1>📋 Business Requirement Document · Product Owner Studio</h1>
+        <p>
+          Isi seluruh bagian sesuai deskripsi → Klik
+          <strong>Generate & Export .MD</strong> untuk mendapatkan file BRD
+          dalam format Markdown (.md) siap pakai.
+        </p>
+      </div>
+
+      <form id="brdForm">
+        <!-- 1. DOCUMENT CONTROL -->
+        <div class="card">
+          <div class="card-header">
+            <h2>📄 1. Document Control</h2>
+            <span class="badge-section">Metadata</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field-group">
+                <label class="required">Project / Initiative Name</label>
+                <div class="field-description">Nama inisiatif/proyek</div>
+                <input
+                  type="text"
+                  id="projectName"
+                  placeholder="Digital Onboarding Revamp"
+                />
+              </div>
+              <div class="field-group">
+                <label>Feature / Module</label>
+                <div class="field-description">Pilih fitur SatuInbox</div>
+                <select id="featureModule">
+                  <option value="" selected disabled>Pilih fitur SatuInbox</option>
+                  <optgroup label="Autentikasi &amp; Akun">
+                    <option>Login / Logout</option>
+                    <option>Register akun baru</option>
+                    <option>Onboarding (setup awal setelah register)</option>
+                    <option>Reset password &amp; set password baru</option>
+                    <option>Verifikasi email (member &amp; owner)</option>
+                    <option>Ganti password (dari settings)</option>
+                    <option>Manajemen role &amp; permission (RBAC)</option>
+                    <option>Privacy settings per role</option>
+                  </optgroup>
+                  <optgroup label="Conversation (Omnichannel Inbox)">
+                    <option>Inbox percakapan multi-channel</option>
+                    <option>Filter &amp; sorting percakapan</option>
+                    <option>Assign / unassign percakapan</option>
+                    <option>Kirim &amp; terima pesan teks dan media</option>
+                    <option>Edit &amp; hapus pesan</option>
+                    <option>Pin pesan</option>
+                    <option>Template pesan (quick reply)</option>
+                    <option>Catatan internal per percakapan</option>
+                    <option>Screenshot percakapan</option>
+                    <option>Riwayat percakapan</option>
+                    <option>Ganti channel akun dalam percakapan</option>
+                    <option>Tandai bintang percakapan</option>
+                    <option>Reopen, close, archive, spam, junk percakapan</option>
+                    <option>Snooze percakapan dengan reminder</option>
+                    <option>Tambah / hapus tag pada percakapan</option>
+                    <option>Buat konversi percakapan ke tiket</option>
+                    <option>Lihat media dalam percakapan</option>
+                    <option>Message utilities</option>
+                    <option>Real-time event (WebSocket)</option>
+                    <option>Bulk actions percakapan</option>
+                    <option>Conversation SLA - FRT &amp; TTC</option>
+                    <option>Akses percakapan berdasarkan section</option>
+                  </optgroup>
+                  <optgroup label="Ticketing">
+                    <option>Buat, lihat, edit, hapus tiket</option>
+                    <option>Assign tiket ke agent / tim</option>
+                    <option>Status tiket</option>
+                    <option>Tipe tiket</option>
+                    <option>Stage tiket</option>
+                    <option>View settings tiket</option>
+                    <option>Kirim &amp; hapus pesan dalam tiket</option>
+                    <option>Bulk reply tiket</option>
+                    <option>Snooze &amp; unsnooze tiket</option>
+                    <option>Export tiket</option>
+                    <option>CSAT per tiket</option>
+                    <option>SLA breakdown tiket</option>
+                    <option>Responsiveness chart &amp; summary tiket</option>
+                    <option>Tracking tiket</option>
+                  </optgroup>
+                  <optgroup label="Broadcast">
+                    <option>Buat &amp; kirim pesan broadcast</option>
+                    <option>Draft broadcast</option>
+                    <option>Jadwalkan pengiriman broadcast</option>
+                    <option>Template broadcast</option>
+                    <option>Summary / statistik broadcast</option>
+                    <option>Analitik broadcast</option>
+                  </optgroup>
+                  <optgroup label="Contacts (People)">
+                    <option>Manajemen kontak pelanggan</option>
+                    <option>Buat, lihat, edit, hapus kontak</option>
+                    <option>Riwayat percakapan per kontak</option>
+                    <option>Import / sinkronisasi kontak</option>
+                  </optgroup>
+                  <optgroup label="Leads (Sales)">
+                    <option>Manajemen leads / prospek</option>
+                    <option>Buat, lihat, edit leads</option>
+                    <option>Kunjungan / visit per lead</option>
+                    <option>Komentar internal per lead</option>
+                  </optgroup>
+                  <optgroup label="Channels &amp; Integrasi">
+                    <option>WhatsApp Web - setup &amp; manajemen akun</option>
+                    <option>WhatsApp API - setup, template, webhook</option>
+                    <option>Instagram - webhook &amp; integrasi DM</option>
+                    <option>Facebook Messenger - webhook &amp; integrasi</option>
+                    <option>Email - integrasi email channel</option>
+                    <option>Web Widget - live chat widget</option>
+                    <option>Web Widget - setting tampilan dan warna</option>
+                    <option>Web Widget - topic / kategori widget</option>
+                    <option>Addon - channel tambahan</option>
+                    <option>Account Channel Group</option>
+                  </optgroup>
+                  <optgroup label="Statistik &amp; Analitik">
+                    <option>Total metrik percakapan</option>
+                    <option>Percakapan harian</option>
+                    <option>Percakapan per platform / channel</option>
+                    <option>Balasan berdasarkan waktu</option>
+                    <option>Frekuensi tag</option>
+                    <option>Reply metrics</option>
+                    <option>Screenshot metrics</option>
+                    <option>Performa agent</option>
+                    <option>CSAT statistik</option>
+                    <option>Riwayat respons CSAT</option>
+                    <option>Responsiveness analytics</option>
+                    <option>Ticket analytics</option>
+                    <option>Export laporan</option>
+                  </optgroup>
+                  <optgroup label="Notification">
+                    <option>Notifikasi real-time dalam aplikasi</option>
+                    <option>Manajemen notifikasi</option>
+                  </optgroup>
+                  <optgroup label="Settings - Inbox">
+                    <option>Assignments - auto-assign percakapan</option>
+                    <option>CSAT - konfigurasi survey</option>
+                    <option>Macros - otomasi tindakan berulang</option>
+                    <option>SLA - pengaturan SLA per channel</option>
+                    <option>Team Inbox</option>
+                    <option>Tickets - konfigurasi tipe tiket</option>
+                  </optgroup>
+                  <optgroup label="Settings - Organization">
+                    <option>General settings perusahaan</option>
+                    <option>Manajemen member</option>
+                    <option>Manajemen role &amp; permission</option>
+                    <option>Shift hours</option>
+                    <option>Manajemen tag</option>
+                    <option>Away reason</option>
+                  </optgroup>
+                  <optgroup label="Settings - Developer">
+                    <option>Webhook outgoing</option>
+                    <option>Shipping credentials</option>
+                  </optgroup>
+                  <optgroup label="Subscription &amp; Pembayaran">
+                    <option>Manajemen paket langganan</option>
+                    <option>Billing &amp; detail pembayaran</option>
+                    <option>Wallet</option>
+                    <option>Voucher</option>
+                    <option>Quota usage</option>
+                  </optgroup>
+                  <optgroup label="Media">
+                    <option>Upload &amp; kelola media</option>
+                    <option>Generate token akses media</option>
+                  </optgroup>
+                  <optgroup label="Audit">
+                    <option>Audit log aktivitas sistem</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="required">Business Unit</label>
+                <div class="field-description">Unit bisnis pemilik/client</div>
+                <input
+                  type="text"
+                  id="businessUnit"
+                  placeholder="Retail Banking"
+                />
+              </div>
+              <div class="field-group">
+                <label class="required">Document Owner</label>
+                <div class="field-description">Pemilik dokumen</div>
+                <select id="docOwner" onchange="syncDocumentOwnerState()">
+                  <option value="" selected disabled>Pilih document owner</option>
+                  <option>Product Owner</option>
+                  <option>Client</option>
+                  <option value="Other">Other (isi sendiri)</option>
+                </select>
+                <input
+                  type="text"
+                  id="docOwnerOther"
+                  placeholder="Isi document owner lainnya"
+                  style="display: none"
+                />
+              </div>
+              <div class="field-group">
+                <label>Prepared By</label
+                ><input
+                  type="text"
+                  id="preparedBy"
+                  placeholder="Nama penyusun"
+                />
+              </div>
+              <div class="field-group">
+                <label>Version</label
+                ><input type="text" id="version" placeholder="v1.0" />
+              </div>
+              <div class="field-group">
+                <label class="required">Status</label
+                ><select id="docStatus">
+                  <option value="" selected disabled>Pilih status dokumen</option>
+                  <option>Draft</option>
+                  <option>Review</option>
+                  <option>Approved</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="required">Created Date</label
+                ><input
+                  type="date"
+                  id="createdDate"
+                  placeholder="Pilih tanggal dibuat"
+                />
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="field-group full-width">
+                <label>Revision History</label>
+                <div class="field-description">
+                  Versi, tanggal, penulis, ringkasan perubahan
+                </div>
+                <div id="revisionRows"></div>
+                <button
+                  type="button"
+                  class="btn-add"
+                  onclick="addRevisionRow()"
+                >
+                  + Tambah revisi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. EXECUTIVE SUMMARY -->
+        <div class="card">
+          <div class="card-header"><h2>📌 2. Executive Summary</h2></div>
+          <div class="card-body">
+            <div class="field-group full-width">
+              <label class="required">Executive Summary</label>
+              <div class="field-description">
+                Ringkasan singkat: masalah, solusi, dampak bisnis utama (3-4
+                kalimat).
+              </div>
+              <textarea
+                id="execSummary"
+                rows="4"
+                placeholder="Contoh: Saat ini proses onboarding memakan waktu 3 hari... Kami menginisiasi verifikasi otomatis untuk memangkas waktu menjadi 10 menit..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BUSINESS CONTEXT -->
+        <div class="card">
+          <div class="card-header"><h2>🏢 3. Business Context</h2></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field-group full-width">
+                <label>Background</label
+                ><textarea
+                  id="background"
+                  rows="2"
+                  placeholder="Konteks & kondisi saat ini"
+                ></textarea>
+              </div>
+              <div class="field-group full-width">
+                <label>Business Problem / Opportunity</label
+                ><textarea
+                  id="businessProblem"
+                  rows="2"
+                  placeholder="Masalah bisnis, peluang, risiko, atau kebutuhan utama"
+                ></textarea>
+              </div>
+              <div class="field-group">
+                <label>Current State</label
+                ><textarea
+                  id="currentState"
+                  rows="2"
+                  placeholder="Proses, sistem, channel, atau kondisi operasional saat ini"
+                ></textarea>
+              </div>
+              <div class="field-group">
+                <label>Future State</label
+                ><textarea
+                  id="futureState"
+                  rows="2"
+                  placeholder="Kondisi bisnis yang diharapkan setelah inisiatif selesai"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. OBJECTIVES -->
+        <div class="card">
+          <div class="card-header"><h2>🎯 4. Objectives & KPIs</h2></div>
+          <div class="card-body">
+            <div id="objectivesList"></div>
+            <button type="button" class="btn-add" onclick="addObjectiveRow()">
+              + Tambah objective
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. SCOPE -->
+        <div class="card">
+          <div class="card-header"><h2>📐 5. Scope</h2></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field-group">
+                <label>In Scope</label
+                ><textarea
+                  id="inScope"
+                  rows="3"
+                  placeholder="- Mobile app&#10;- Backend API"
+                ></textarea>
+              </div>
+              <div class="field-group">
+                <label>Out of Scope</label
+                ><textarea
+                  id="outScope"
+                  rows="3"
+                  placeholder="- Legacy system&#10;- Hardware"
+                ></textarea>
+              </div>
+              <div class="field-group full-width">
+                <label>Scope Notes</label
+                ><input
+                  type="text"
+                  id="scopeNotes"
+                  placeholder="Catatan batasan / fase"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. STAKEHOLDERS -->
+        <div class="card">
+          <div class="card-header"><h2>🤝 6. Stakeholders</h2></div>
+          <div class="card-body">
+            <div id="stakeholdersTable"></div>
+            <button type="button" class="btn-add" onclick="addStakeholderRow()">
+              + Tambah stakeholder
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. USER GROUPS & RBAC -->
+        <div class="card">
+          <div class="card-header">
+            <h2>👥 7. User Groups & Permissions</h2>
+          </div>
+          <div class="card-body">
+            <div id="userGroupsArea"></div>
+            <button type="button" class="btn-add" onclick="addUserGroupRow()">
+              + Tambah user group
+            </button>
+            <hr />
+            <div id="permMatrix"></div>
+            <button type="button" class="btn-add" onclick="addPermRow()">
+              + Tambah permission row
+            </button>
+          </div>
+        </div>
+
+        <!-- 8. BUSINESS PROCESS -->
+        <div class="card">
+          <div class="card-header"><h2>⚙️ 8. Business Process & Flow</h2></div>
+          <div class="card-body">
+            <div class="field-group full-width">
+              <label class="required">High-Level Flow</label>
+              <div class="field-description">
+                Trigger → Actor Action → System Response → Outcome
+              </div>
+              <textarea
+                id="highLevelFlow"
+                rows="2"
+                placeholder="Nasabah klik verifikasi → Sistem OCR membaca KTP → AI face match → notifikasi sukses"
+              ></textarea>
+            </div>
+            <div class="field-group full-width">
+              <label>Process Steps (Detail)</label>
+              <div id="processSteps"></div>
+              <button type="button" class="btn-add" onclick="addProcessStep()">
+                + Tambah step
+              </button>
+            </div>
+            <div class="field-group full-width">
+              <label>Exception Scenarios</label>
+              <div id="exceptionScenarios"></div>
+              <button type="button" class="btn-add" onclick="addExceptionRow()">
+                + Tambah skenario alternatif
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. REQUIREMENTS -->
+        <div class="card">
+          <div class="card-header"><h2>✅ 9. Business Requirements</h2></div>
+          <div class="card-body">
+            <div id="brRequirements"></div>
+            <button type="button" class="btn-add" onclick="addRequirementRow()">
+              + Tambah requirement
+            </button>
+          </div>
+        </div>
+
+        <!-- 10. RELEASE PLAN -->
+        <div class="card">
+          <div class="card-header"><h2>📅 10. Release Plan</h2></div>
+          <div class="card-body">
+            <div id="releaseRows"></div>
+            <button type="button" class="btn-add" onclick="addReleaseRow()">
+              + Tambah release phase
+            </button>
+          </div>
+        </div>
+
+        <!-- 11. BUSINESS RULES -->
+        <div class="card">
+          <div class="card-header"><h2>📜 11. Business Rules</h2></div>
+          <div class="card-body">
+            <div id="rulesRows"></div>
+            <button
+              type="button"
+              class="btn-add"
+              onclick="addBusinessRuleRow()"
+            >
+              + Tambah rule
+            </button>
+          </div>
+        </div>
+
+        <!-- 12. DATA & INTEGRATION -->
+        <div class="card">
+          <div class="card-header"><h2>🗄️ 12. Data & Integration</h2></div>
+          <div class="card-body">
+            <div id="dataRows"></div>
+            <button type="button" class="btn-add" onclick="addDataRow()">
+              + Tambah data entity
+            </button>
+            <hr />
+            <div id="integrationRows"></div>
+            <button type="button" class="btn-add" onclick="addIntegrationRow()">
+              + Tambah integration
+            </button>
+          </div>
+        </div>
+
+        <!-- 13. NON-FUNCTIONAL, RISKS -->
+        <div class="card">
+          <div class="card-header">
+            <h2>⚠️ 13. Non-Functional, Assumptions & Risks</h2>
+          </div>
+          <div class="card-body">
+            <div id="nonFunctionalRows"></div>
+            <button
+              type="button"
+              class="btn-add"
+              onclick="addNonFunctionalRow()"
+            >
+              + Tambah non-functional
+            </button>
+            <hr />
+            <div id="assumptionsRows"></div>
+            <button type="button" class="btn-add" onclick="addAssumptionRow()">
+              + Tambah asumsi
+            </button>
+            <hr />
+            <div id="risksRows"></div>
+            <button type="button" class="btn-add" onclick="addRiskRow()">
+              + Tambah risiko
+            </button>
+          </div>
+        </div>
+
+        <!-- 14. OPEN QUESTIONS -->
+        <div class="card">
+          <div class="card-header">
+            <h2>❓ 14. Open Questions & Decisions</h2>
+          </div>
+          <div class="card-body">
+            <div id="openQuestions"></div>
+            <button type="button" class="btn-add" onclick="addOpenQuestion()">
+              + Tambah question
+            </button>
+            <hr />
+            <div id="decisionsLog"></div>
+            <button type="button" class="btn-add" onclick="addDecisionRow()">
+              + Tambah decision
+            </button>
+          </div>
+        </div>
+
+        <!-- 15. GLOSSARY -->
+        <div class="card">
+          <div class="card-header"><h2>📖 15. Glossary & Appendix</h2></div>
+          <div class="card-body">
+            <div id="glossaryRows"></div>
+            <button type="button" class="btn-add" onclick="addGlossaryRow()">
+              + Tambah glossary
+            </button>
+            <div class="field-group full-width" style="margin-top: 1rem">
+              <label>Appendix (links / notes)</label
+              ><textarea
+                id="appendix"
+                rows="2"
+                placeholder="Figma, dokumentasi teknis, referensi"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="resetForm()"
+            aria-label="Reset semua"
+            title="Reset semua"
+          >
+            <span class="action-icon" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+              >
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path
+                  fill="currentColor"
+                  d="M12 20q-3.35 0-5.675-2.325T4 12t2.325-5.675T12 4q1.725 0 3.3.712T18 6.75V4h2v7h-7V9h4.2q-.8-1.4-2.187-2.2T12 6Q9.5 6 7.75 7.75T6 12t1.75 4.25T12 18q1.925 0 3.475-1.1T17.65 14h2.1q-.7 2.65-2.85 4.325T12 20"
+                />
+              </svg>
+            </span>
+            <span class="action-label">Reset semua</span>
+          </button>
+          <button
+            type="button"
+            class="btn-primary"
+            onclick="generateAndExportMD()"
+            aria-label="Generate dan export Markdown"
+            title="Generate & Export .MD"
+          >
+            <span class="action-icon" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 2048 2048"
+              >
+                <path d="M0 0h2048v2048H0z" fill="none" />
+                <path
+                  fill="currentColor"
+                  d="m2011 1728l-318 317l-90-90l163-163h-614v-128h614l-163-163l90-90zm-669 192l128 128H128V0h1115l549 549v734l-128-128V640h-512V128H256v1792zm-62-1408h293l-293-293z"
+                />
+              </svg>
+            </span>
+            <span class="action-label">Generate & Export .MD</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="output-area" id="outputArea" style="display: none">
+        <div class="output-header">
+          <span>📄 BRD dalam format MARKDOWN (.md)</span>
+          <button class="btn-download" id="downloadMdBtn">
+            ⬇️ Download BRD.md
+          </button>
+        </div>
+        <pre id="brdOutputPre"></pre>
+      </div>
+    </div>
+
+    <script>
+      // dynamic counters
+      let revisionCounter = 0,
+        objectiveCounter = 0,
+        stakeholderCounter = 0,
+        userGroupCounter = 0,
+        permCounter = 0,
+        processCounter = 0,
+        brCounter = 0,
+        releaseCounter = 0,
+        ruleCounter = 0;
+      let dataCounter = 0,
+        integrationCounter = 0,
+        nonFuncCounter = 0,
+        assumptionCounter = 0,
+        riskCounter = 0,
+        openQCounter = 0,
+        decisionCounter = 0,
+        glossaryCounter = 0,
+        exceptionCounter = 0;
+
+      function addGenericRow(containerId, headers, prefix, idx) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const div = document.createElement("div");
+        div.style.marginBottom = "12px";
+        div.style.background = "#fafcff";
+        div.style.padding = "8px";
+        div.style.borderRadius = "16px";
+        div.style.border = "1px solid #e9eff5";
+        div.id = `${prefix}${idx}`;
+        let html =
+          '<div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">';
+        headers.forEach((h) => {
+          html += `<input type="text" placeholder="${h}" style="flex:1; min-width:120px;">`;
+        });
+        html += `<button type="button" class="btn-icon remove-row" style="background:#fee2e2;" onclick="this.closest('div[id^=${prefix}]')?.remove()">🗑️</button></div>`;
+        div.innerHTML = html;
+        container.appendChild(div);
+      }
+      function addRevisionRow() {
+        addGenericRow(
+          "revisionRows",
+          ["Version", "Date", "Author", "Summary"],
+          "rev_",
+          revisionCounter++,
+        );
+      }
+      function addObjectiveRow() {
+        addGenericRow(
+          "objectivesList",
+          ["ID", "Objective", "KPI/Metric", "Baseline", "Target", "Source"],
+          "obj_",
+          objectiveCounter++,
+        );
+      }
+      function addStakeholderRow() {
+        addGenericRow(
+          "stakeholdersTable",
+          [
+            "Stakeholder/Role",
+            "Unit",
+            "Responsibility",
+            "Decision Authority",
+            "Approval Required",
+          ],
+          "stk_",
+          stakeholderCounter++,
+        );
+      }
+      function addUserGroupRow() {
+        addGenericRow(
+          "userGroupsArea",
+          ["Actor", "Description", "Responsibility", "Channel"],
+          "ug_",
+          userGroupCounter++,
+        );
+      }
+      function addPermRow() {
+        addGenericRow(
+          "permMatrix",
+          [
+            "Capability/Action",
+            "Role1 (Y/N)",
+            "Role2 (Y/N)",
+            "Role3 (Y/N)",
+            "Notes",
+          ],
+          "perm_",
+          permCounter++,
+        );
+      }
+      function addProcessStep() {
+        addGenericRow(
+          "processSteps",
+          ["Step", "Actor", "Activity", "Input", "Output"],
+          "proc_",
+          processCounter++,
+        );
+      }
+      function addExceptionRow() {
+        addGenericRow(
+          "exceptionScenarios",
+          ["ID", "Scenario", "Expected Handling", "Impact", "Owner"],
+          "exc_",
+          exceptionCounter++,
+        );
+      }
+      function addRequirementRow() {
+        addGenericRow(
+          "brRequirements",
+          [
+            "BR ID",
+            "Feature",
+            "Sub Feature",
+            "Requirement",
+            "Rationale",
+            "Priority",
+            "Status",
+            "Owner",
+            "Acceptance Criteria",
+          ],
+          "br_",
+          brCounter++,
+        );
+      }
+      function addReleaseRow() {
+        addGenericRow(
+          "releaseRows",
+          ["Phase", "Scope/Feature", "Target Date", "Owner", "Status"],
+          "rel_",
+          releaseCounter++,
+        );
+      }
+      function addBusinessRuleRow() {
+        addGenericRow(
+          "rulesRows",
+          ["Rule ID", "Rule", "Condition", "Expected Result"],
+          "rule_",
+          ruleCounter++,
+        );
+      }
+      function addDataRow() {
+        addGenericRow(
+          "dataRows",
+          ["Entity", "Field/Attribute", "Purpose", "Source", "Sensitivity"],
+          "data_",
+          dataCounter++,
+        );
+      }
+      function addIntegrationRow() {
+        addGenericRow(
+          "integrationRows",
+          ["System", "Purpose", "Data Exchanged", "Direction", "Frequency"],
+          "int_",
+          integrationCounter++,
+        );
+      }
+      function addNonFunctionalRow() {
+        addGenericRow(
+          "nonFunctionalRows",
+          ["Category", "Requirement", "Metric/Target", "Priority"],
+          "nf_",
+          nonFuncCounter++,
+        );
+      }
+      function addAssumptionRow() {
+        addGenericRow(
+          "assumptionsRows",
+          ["ID", "Assumption", "Impact If Invalid"],
+          "asm_",
+          assumptionCounter++,
+        );
+      }
+      function addRiskRow() {
+        addGenericRow(
+          "risksRows",
+          ["ID", "Risk", "Impact", "Probability", "Mitigation"],
+          "risk_",
+          riskCounter++,
+        );
+      }
+      function addOpenQuestion() {
+        addGenericRow(
+          "openQuestions",
+          ["ID", "Question", "Owner", "Target Date"],
+          "oq_",
+          openQCounter++,
+        );
+      }
+      function addDecisionRow() {
+        addGenericRow(
+          "decisionsLog",
+          ["ID", "Decision", "Decision Maker", "Date", "Rationale"],
+          "dec_",
+          decisionCounter++,
+        );
+      }
+      function addGlossaryRow() {
+        addGenericRow(
+          "glossaryRows",
+          ["Term", "Definition", "Notes"],
+          "gloss_",
+          glossaryCounter++,
+        );
+      }
+
+      function collectRows(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return [];
+        const rows = cont.querySelectorAll("div[id]");
+        let data = [];
+        rows.forEach((row) => {
+          let vals = Array.from(row.querySelectorAll("input")).map(
+            (i) => i.value,
+          );
+          if (vals.some((v) => v.trim() !== "")) data.push(vals);
+        });
+        return data;
+      }
+
+      function formatMarkdownTable(headers, rows) {
+        if (!rows.length) return "";
+        let md = "| " + headers.join(" | ") + " |\n";
+        md += "|" + headers.map(() => "---").join("|") + "|\n";
+        rows.forEach((row) => {
+          let filled = [...row];
+          while (filled.length < headers.length) filled.push("");
+          md +=
+            "| " +
+            filled.map((cell) => cell.replace(/\|/g, "\\|")).join(" | ") +
+            " |\n";
+        });
+        return md + "\n";
+      }
+
+      function getFieldValue(id) {
+        return document.getElementById(id)?.value.trim() || "";
+      }
+
+      function getDocumentOwnerValue() {
+        const selectedOwner = getFieldValue("docOwner");
+        if (selectedOwner === "Other") return getFieldValue("docOwnerOther");
+        return selectedOwner;
+      }
+
+      function syncDocumentOwnerState() {
+        const ownerSelect = document.getElementById("docOwner");
+        const ownerOther = document.getElementById("docOwnerOther");
+        const statusSelect = document.getElementById("docStatus");
+        const isOther = ownerSelect?.value === "Other";
+        const isClient = ownerSelect?.value === "Client";
+
+        if (ownerOther) {
+          ownerOther.style.display = isOther ? "block" : "none";
+          if (!isOther) ownerOther.value = "";
+        }
+
+        if (statusSelect) {
+          statusSelect.disabled = isClient;
+          if (isClient) statusSelect.value = "Draft";
+        }
+      }
+
+      function validateMandatoryFields() {
+        syncDocumentOwnerState();
+
+        const missingFields = [];
+        let firstInvalidField = null;
+
+        const addMissing = (label, fieldId) => {
+          missingFields.push(label);
+          if (!firstInvalidField) firstInvalidField = document.getElementById(fieldId);
+        };
+
+        if (!getFieldValue("businessUnit")) addMissing("Business Unit", "businessUnit");
+
+        const selectedOwner = getFieldValue("docOwner");
+        if (!selectedOwner) addMissing("Document Owner", "docOwner");
+        if (selectedOwner === "Other" && !getFieldValue("docOwnerOther")) {
+          addMissing("Document Owner - Other", "docOwnerOther");
+        }
+
+        if (!getFieldValue("createdDate")) addMissing("Created Date", "createdDate");
+        if (!getFieldValue("docStatus")) addMissing("Status", "docStatus");
+        if (!getFieldValue("highLevelFlow")) {
+          addMissing("Business Process & Flow", "highLevelFlow");
+        }
+
+        if (!missingFields.length) return true;
+
+        alert(`Field mandatory belum diisi:\n- ${missingFields.join("\n- ")}`);
+        firstInvalidField?.focus();
+        return false;
+      }
+
+      function generateMarkdown() {
+        // collect data
+        const revs = collectRows("revisionRows");
+        const objectives = collectRows("objectivesList");
+        const stakeholders = collectRows("stakeholdersTable");
+        const userGroups = collectRows("userGroupsArea");
+        const perms = collectRows("permMatrix");
+        const procSteps = collectRows("processSteps");
+        const exceptions = collectRows("exceptionScenarios");
+        const reqs = collectRows("brRequirements");
+        const releases = collectRows("releaseRows");
+        const rules = collectRows("rulesRows");
+        const dataEnt = collectRows("dataRows");
+        const ints = collectRows("integrationRows");
+        const nonFuncs = collectRows("nonFunctionalRows");
+        const assumptions = collectRows("assumptionsRows");
+        const risks = collectRows("risksRows");
+        const openQs = collectRows("openQuestions");
+        const decisions = collectRows("decisionsLog");
+        const glossary = collectRows("glossaryRows");
+
+        let md = `# Business Requirement Document\n\n`;
+        md += `## 1. Document Control\n\n`;
+        md += `| Item | Detail |\n|---|---|\n`;
+        md += `| Project / Initiative Name | ${document.getElementById("projectName").value} |\n`;
+        md += `| Feature / Module | ${document.getElementById("featureModule").value} |\n`;
+        md += `| Business Unit | ${document.getElementById("businessUnit").value} |\n`;
+        md += `| Document Owner | ${getDocumentOwnerValue()} |\n`;
+        md += `| Prepared By | ${document.getElementById("preparedBy").value} |\n`;
+        md += `| Version | ${document.getElementById("version").value} |\n`;
+        md += `| Status | ${document.getElementById("docStatus").value} |\n`;
+        md += `| Created Date | ${document.getElementById("createdDate").value} |\n\n`;
+        if (revs.length)
+          md +=
+            `### Revision History\n\n` +
+            formatMarkdownTable(
+              ["Version", "Date", "Author", "Change Summary"],
+              revs,
+            );
+
+        md += `## 2. Executive Summary\n\n${document.getElementById("execSummary").value || "_Tidak diisi_"}\n\n`;
+        md += `## 3. Business Context\n\n`;
+        md += `**Background:**\n${document.getElementById("background").value || "-"}\n\n`;
+        md += `**Business Problem / Opportunity:**\n${document.getElementById("businessProblem").value || "-"}\n\n`;
+        md += `**Current State:**\n${document.getElementById("currentState").value || "-"}\n\n`;
+        md += `**Future State:**\n${document.getElementById("futureState").value || "-"}\n\n`;
+
+        if (objectives.length)
+          md +=
+            `## 4. Business Objectives & Success Metrics\n\n` +
+            formatMarkdownTable(
+              [
+                "Objective ID",
+                "Objective",
+                "KPI/Metric",
+                "Baseline",
+                "Target",
+                "Measurement Source",
+              ],
+              objectives,
+            );
+        md += `## 5. Scope\n\n`;
+        md += `**In Scope:**\n${document.getElementById("inScope").value || "-"}\n\n`;
+        md += `**Out of Scope:**\n${document.getElementById("outScope").value || "-"}\n\n`;
+        md += `**Scope Notes:** ${document.getElementById("scopeNotes").value || "-"}\n\n`;
+
+        if (stakeholders.length)
+          md +=
+            `## 6. Stakeholders & Decision Makers\n\n` +
+            formatMarkdownTable(
+              [
+                "Stakeholder/Role",
+                "Business Unit",
+                "Responsibility",
+                "Decision Authority",
+                "Approval Required",
+              ],
+              stakeholders,
+            );
+        if (userGroups.length)
+          md +=
+            `## 7. User Groups & Permissions\n\n### User Groups\n\n` +
+            formatMarkdownTable(
+              ["Actor", "Description", "Responsibility", "Channel/System"],
+              userGroups,
+            );
+        if (perms.length)
+          md +=
+            `### Permission Matrix\n\n` +
+            formatMarkdownTable(
+              ["Capability/Action", "Role1", "Role2", "Role3", "Notes"],
+              perms,
+            );
+
+        md += `## 8. Business Process & Flow\n\n`;
+        md += `**High-Level Flow:**\n${document.getElementById("highLevelFlow").value || "-"}\n\n`;
+        if (procSteps.length)
+          md +=
+            `### Process Details\n\n` +
+            formatMarkdownTable(
+              ["Step", "Actor", "Activity", "Input", "Output"],
+              procSteps,
+            );
+        if (exceptions.length)
+          md +=
+            `### Exception / Alternative Scenarios\n\n` +
+            formatMarkdownTable(
+              [
+                "Scenario ID",
+                "Scenario",
+                "Expected Handling",
+                "Business Impact",
+                "Owner",
+              ],
+              exceptions,
+            );
+
+        if (reqs.length)
+          md +=
+            `## 9. Business Requirements\n\n` +
+            formatMarkdownTable(
+              [
+                "BR ID",
+                "Feature",
+                "Sub Feature",
+                "Requirement",
+                "Rationale",
+                "Priority",
+                "Status",
+                "Owner",
+                "Acceptance Criteria",
+              ],
+              reqs,
+            );
+        if (releases.length)
+          md +=
+            `## 10. Release Plan / Phasing\n\n` +
+            formatMarkdownTable(
+              [
+                "Phase/Version",
+                "Scope/Feature",
+                "Target Date",
+                "Owner",
+                "Status",
+              ],
+              releases,
+            );
+        if (rules.length)
+          md +=
+            `## 11. Business Rules\n\n` +
+            formatMarkdownTable(
+              ["Rule ID", "Rule", "Condition", "Expected Result"],
+              rules,
+            );
+        if (dataEnt.length)
+          md +=
+            `## 12. Data & Information Requirements\n\n` +
+            formatMarkdownTable(
+              [
+                "Data/Entity",
+                "Field/Attribute",
+                "Purpose",
+                "Source",
+                "Sensitivity",
+              ],
+              dataEnt,
+            );
+        if (ints.length)
+          md +=
+            `### Integration Requirements\n\n` +
+            formatMarkdownTable(
+              ["System", "Purpose", "Data Exchanged", "Direction", "Frequency"],
+              ints,
+            );
+        if (nonFuncs.length)
+          md +=
+            `## 13. Non-Functional Business Requirements\n\n` +
+            formatMarkdownTable(
+              ["Category", "Requirement", "Metric/Target", "Priority"],
+              nonFuncs,
+            );
+        if (assumptions.length)
+          md +=
+            `### Assumptions\n\n` +
+            formatMarkdownTable(
+              ["ID", "Assumption", "Impact If Invalid"],
+              assumptions,
+            );
+        if (risks.length)
+          md +=
+            `### Risks & Mitigation\n\n` +
+            formatMarkdownTable(
+              ["ID", "Risk", "Impact", "Probability", "Mitigation"],
+              risks,
+            );
+        if (openQs.length)
+          md +=
+            `## 14. Open Questions\n\n` +
+            formatMarkdownTable(
+              ["ID", "Question", "Owner", "Target Answer Date"],
+              openQs,
+            );
+        if (decisions.length)
+          md +=
+            `### Decision Log\n\n` +
+            formatMarkdownTable(
+              ["ID", "Decision", "Decision Maker", "Date", "Rationale"],
+              decisions,
+            );
+        if (glossary.length)
+          md +=
+            `## 15. Glossary\n\n` +
+            formatMarkdownTable(["Term", "Definition", "Notes"], glossary);
+        md += `## Appendix\n\n${document.getElementById("appendix").value || "-"}\n\n`;
+        md += `---\n*Generated from BRD Input Tool*`;
+        return md;
+      }
+
+      function generateAndExportMD() {
+        if (!validateMandatoryFields()) return;
+
+        const markdownContent = generateMarkdown();
+        const preElem = document.getElementById("brdOutputPre");
+        preElem.textContent = markdownContent;
+        const outputArea = document.getElementById("outputArea");
+        outputArea.style.display = "block";
+        outputArea.scrollIntoView({ behavior: "smooth" });
+
+        const downloadBtn = document.getElementById("downloadMdBtn");
+        downloadBtn.onclick = () => {
+          const blob = new Blob([markdownContent], { type: "text/markdown" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `BRD_${document.getElementById("projectName").value.replace(/\s/g, "_") || "document"}.md`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        };
+      }
+
+      function resetForm() {
+        document.querySelectorAll("input, textarea, select").forEach((el) => {
+          if (el.type !== "button") el.value = "";
+        });
+        const containers = [
+          "revisionRows",
+          "objectivesList",
+          "stakeholdersTable",
+          "userGroupsArea",
+          "permMatrix",
+          "processSteps",
+          "exceptionScenarios",
+          "brRequirements",
+          "releaseRows",
+          "rulesRows",
+          "dataRows",
+          "integrationRows",
+          "nonFunctionalRows",
+          "assumptionsRows",
+          "risksRows",
+          "openQuestions",
+          "decisionsLog",
+          "glossaryRows",
+        ];
+        containers.forEach((c) => {
+          let cont = document.getElementById(c);
+          if (cont) cont.innerHTML = "";
+        });
+        revisionCounter =
+          objectiveCounter =
+          stakeholderCounter =
+          userGroupCounter =
+          permCounter =
+          processCounter =
+          brCounter =
+          releaseCounter =
+          ruleCounter =
+          dataCounter =
+          integrationCounter =
+          nonFuncCounter =
+          assumptionCounter =
+          riskCounter =
+          openQCounter =
+          decisionCounter =
+          glossaryCounter =
+          exceptionCounter =
+            0;
+        document.getElementById("outputArea").style.display = "none";
+        syncDocumentOwnerState();
+      }
+      function syncHeaderState() {
+        document
+          .querySelector(".form-header")
+          ?.classList.toggle("is-compact", window.scrollY > 24);
+      }
+
+      window.addEventListener("scroll", syncHeaderState, { passive: true });
+
+      window.onload = () => {
+        addObjectiveRow();
+        addStakeholderRow();
+        addRequirementRow();
+        addReleaseRow();
+        addBusinessRuleRow();
+        addExceptionRow();
+        syncDocumentOwnerState();
+        syncHeaderState();
+      };
+    </script>
+  </body>
+</html>
