@@ -10,10 +10,11 @@ Begitu user memberi prompt, klasifikasikan ke salah satu tipe berikut:
 
 | Jika user bilang... | Tipe Tugas |
 |---|---|
-| analisa / analyze / PRD / analisis | ANALYSIS |
+| buat PRD / tulis PRD / draft PRD / create PRD / write PRD / PRD baru | PRD WRITING |
+| analisa / analyze / review PRD / cek PRD / analisis | ANALYSIS |
 | buat memory / tulis memory / simpan ke memory / update memory | MEMORY WRITE |
 | bandingkan / compare / perbedaan / perbandingan | COMPARISON |
-| test case / test scenario / uji | TEST CASE |
+| test case / test scenario / test steps / test plan / QA test / regression / UAT / uji / testing | TEST CASE |
 | bug / perbaiki bug / error / issue / defect | BUG FIX |
 | impact / dampak / efek samping / blast radius | IMPACT ANALYSIS |
 | feature / fitur baru /开发 | FEATURE DEV |
@@ -36,6 +37,14 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 ```
 Rules/qa-analysis-rule.md         → WAJIB. Full methodology.
 Rules/impact-analysis-rule.md     → Untuk cek blast radius.
+```
+
+### PRD WRITING:
+
+```
+Rules/prd-writing-rule.md         → WAJIB. Template dan framework penulisan PRD.
+Rules/qa-analysis-rule.md         → Untuk memastikan requirement testable dan lengkap.
+Rules/impact-analysis-rule.md     → Jika PRD menyentuh flow/entity existing atau cross-feature dependency.
 ```
 
 ### BUG FIX:
@@ -62,8 +71,9 @@ Rules/qa-analysis-rule.md         → Interconnection analysis jika PRD saling t
 ### TEST CASE:
 
 ```
-Rules/test-case-rule.md           → WAJIB. Format dan scope.
-Rules/qa-analysis-rule.md         → Test Strategy Output section.
+Rules/test-case-rule.md           → WAJIB. QA test writing, steps, coverage, execution support.
+Rules/qa-analysis-rule.md         → WAJIB. Source analysis dan Test Specification Layer.
+Rules/impact-analysis-rule.md     → Jika test perlu regression, rollout, rollback, atau cross-feature coverage.
 ```
 
 ### MEMORY WRITE:
@@ -105,12 +115,15 @@ Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa dipe
 | Saat sedang... | Agent perlu... | Maka baca... |
 |---|---|---|
 | Menganalisa PRD | Menyimpan temuan ke memory | Memory rules |
+| Menulis PRD | Mengecek struktur, testability, dan impact | prd-writing-rule.md, qa-analysis-rule.md, impact-analysis-rule.md |
+| Membuat QA test / steps | Menyusun coverage, traceability, execution support | test-case-rule.md, qa-analysis-rule.md |
 | Membuat test case | Merevisi analisa karena ada temuan baru | qa-analysis-rule.md |
 | Memperbaiki bug | Mengecek dampak ke modul lain | impact-analysis-rule.md |
 | Membandingkan PRD | Analisa interkoneksi | qa-analysis-rule.md |
 
 **Setiap kali agent akan:**
 - Menganalisa sesuatu → baca `qa-analysis-rule.md`
+- Menulis PRD → baca `prd-writing-rule.md`
 - Menulis/update file → baca memory rules
 - Membandingkan → baca `prd-comparison-rule.md`
 - Membuat test case → baca `test-case-rule.md`
