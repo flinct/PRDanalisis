@@ -5,7 +5,7 @@
 **Engineering Lead:** TBD  
 **Design Lead:** TBD  
 **Contributors:** Engineering Team, QA Team, Design Team  
-**Version:** v1.2
+**Version:** v1.3
 
 ---
 
@@ -13,6 +13,7 @@
 
 | Version | Date | Author | Changes |
 | ----- | ----- | ----- | ----- |
+| v1.3 | 2026-06-02 | PRD Analysis | Added `RE_INIT` event coverage, resolved lifetime scope as per-session until `DISCONNECTED`, updated event taxonomy, FRs, session rules, idempotency format, edge cases, metrics, open questions, and appendix. |
 | v1.2 | 2026-06-02 | PRD Analysis | Closed v1.1 re-analysis gaps: Redis session fallback TTL and staleness recovery, CREATED idempotency key typo, Supervisor scope resolution failure mode, suspend event ordering, FAILED status dependency, `dedupWindowMs` semantics, and duplicate CONNECTED pre-emit dedup. |
 | v1.1 | 2026-06-02 | PRD Analysis | Closed QA gaps: connection session architecture, event status semantics, dedup window, idempotency key format, Supervisor RBAC dependency, metadata whitelist, and global endpoint Phase 1 scope. |
 | v1.0 | 2026-06-02 | PRD Analysis | Initial PRD based on Account Channel Event Log analysis. |
@@ -25,7 +26,7 @@
 | ----- | ----- |
 | Purpose | Provide an immutable lifecycle event log for WhatsApp Web account channels so Admin and Supervisor can investigate account creation, initialization, QR scan, connection, disconnection, suspension, and active lifetime. |
 | Scope | WhatsApp Web account channel lifecycle in Settings -> Channels -> WhatsApp Web. Covers per-account event timeline, lifetime summary, filtering, RBAC, and backend event capture. |
-| Key Capabilities | Capture `CREATED`, `INIT`, `SCAN`, `CONNECTED`, `DISCONNECTED`, `SUSPENDED`; calculate lifetime from `CONNECTED` to `DISCONNECTED`; show timeline per account; store actor, reason, timestamp, session id, and safe metadata. |
+| Key Capabilities | Capture `CREATED`, `INIT`, `RE_INIT`, `SCAN`, `CONNECTED`, `DISCONNECTED`, `SUSPENDED`; calculate per-session lifetime from `CONNECTED` to `DISCONNECTED`; show timeline per account; store actor, reason, timestamp, session id, and safe metadata. |
 | Outcome | Faster incident investigation, clearer account uptime visibility, better audit trail for channel operations, and fewer undocumented disconnect/suspend cases. |
 
 ---
@@ -58,12 +59,13 @@
 | ----- | ----- | ----- | ----- |
 | `CREATED` | Account channel is successfully created. | User | First lifecycle event after account is added to SatuInbox. |
 | `INIT` | WhatsApp instance initialization starts. | User or System | Connection process starts, but account may not be connected yet. |
+| `RE_INIT` | Account has stored credentials/session data, but current session is not ready. System or Admin starts restore using stored credentials. | User or System | Different from `INIT`: no QR or pairing required. If restore succeeds, next event is `CONNECTED`; if restore fails, next event is `DISCONNECTED`. |
 | `SCAN` | QR is confirmed scanned or auth/pairing success signal is detected. | User or System | Must not be emitted only because QR was generated or refreshed. |
 | `CONNECTED` | WhatsApp Web session is open and ready to send/receive messages. | System | Starts an active connection session and lifetime timer. |
 | `DISCONNECTED` | WhatsApp Web session is closed or connection is lost. | User or System | Ends an active connection session and stores disconnect reason. |
 | `SUSPENDED` | Account is blocked from use by Admin or system policy. | User or System | Requires confirmation whether suspend action already exists. |
 
-`LIFETIME` is not an event. It is calculated from `CONNECTED` to `DISCONNECTED` using the same connection session.
+`LIFETIME` is not an event. Phase 1 lifetime is per-session only: start at `CONNECTED`, end at `DISCONNECTED` for the same connection session. `DISCONNECTED` includes normal disconnect and suspend-driven disconnect with reason `AUTO_SUSPEND`.
 
 ---
 
@@ -85,12 +87,12 @@
 
 | Category | Requirements |
 | ----- | ----- |
-| Event Capture | FR-001: System MUST record `CREATED` after successful account channel creation. FR-002: System MUST record `INIT` when WhatsApp instance initialization starts. FR-003: System MUST record `SCAN` only when QR scan or auth/pairing success is technically confirmed. FR-004: System MUST record `CONNECTED` when WhatsApp session is open. FR-005: System MUST record `DISCONNECTED` when WhatsApp session closes. FR-006: System MUST record `SUSPENDED` when account is suspended, if suspend action exists in scope. |
+| Event Capture | FR-001: System MUST record `CREATED` after successful account channel creation. FR-002: System MUST record `INIT` when WhatsApp instance initialization starts for fresh setup or QR/pairing flow. FR-003: System MUST record `SCAN` only when QR scan or auth/pairing success is technically confirmed. FR-004: System MUST record `CONNECTED` when WhatsApp session is open. FR-005: System MUST record `DISCONNECTED` when WhatsApp session closes. FR-006: System MUST record `SUSPENDED` when account is suspended, if suspend action exists in scope. FR-032: System MUST record `RE_INIT` when a restore attempt starts using existing stored credentials/session data and no QR or pairing is required. |
 | Event Payload | FR-007: Each event MUST include `companyId`, `organizationId`, `accountChannelId`, `eventType`, `occurredAt`, `actorType`, and `sourceService`. FR-008: Events SHOULD include account name and phone number snapshots. FR-009: `CONNECTED` and `DISCONNECTED` MUST include `connectionSessionId` when available. FR-010: `DISCONNECTED` MUST include disconnect `reason` and sanitized `reasonDetail` when available. FR-011: Events MUST include `idempotencyKey` for duplicate prevention. |
-| Lifetime | FR-012: System MUST calculate completed session lifetime from `CONNECTED` to matching `DISCONNECTED`. FR-013: System MUST calculate active lifetime from last `CONNECTED` to current time when no matching `DISCONNECTED` exists. FR-014: System SHOULD provide total lifetime by summing completed sessions in the queried range. |
+| Lifetime | FR-012: System MUST calculate completed session lifetime from `CONNECTED` to matching `DISCONNECTED`. FR-013: System MUST calculate active lifetime from last `CONNECTED` to current time when no matching `DISCONNECTED` exists. FR-014: Total lifetime across sessions is out of scope for Phase 1 and MAY be added in future analytics. |
 | Timeline UI | FR-015: UI MUST show event timeline per account. FR-016: Timeline MUST sort by `occurredAt` descending. FR-017: Timeline MUST display event type, timestamp, actor, reason, and lifetime when relevant. FR-018: UI MUST support filtering by event type and date range. FR-019: UI MUST support pagination or load more. |
 | Access Control | FR-020: Admin can view all account logs within their company/organization. FR-021: Supervisor can view only account logs in their Team Inbox scope, validated server-side via Team Inbox to account channel mapping from `channel-service` or `company-service`. FR-022: Agent cannot view logs and cannot access event log endpoints. FR-023: API MUST enforce RBAC and tenant scope server-side. |
-| Reliability | FR-024: Event write MUST be async and must not block lifecycle operation. FR-025: Duplicate disconnect from reconnect loop MUST be deduplicated using default 5 seconds window, configurable via `ACCOUNT_CHANNEL_DISCONNECT_DEDUP_WINDOW_MS`. FR-026: Event consumer MUST be idempotent on retry. FR-027: QR refresh every 30 seconds MUST NOT create repeated `SCAN` logs. FR-031: Duplicate `CONNECTED` while an active session exists MUST be skipped before RMQ emit, not only deduplicated at storage. |
+| Reliability | FR-024: Event write MUST be async and must not block lifecycle operation. FR-025: Duplicate disconnect from reconnect loop MUST be deduplicated using default 5 seconds window, configurable via `ACCOUNT_CHANNEL_DISCONNECT_DEDUP_WINDOW_MS`. FR-026: Event consumer MUST be idempotent on retry. FR-027: QR refresh every 30 seconds MUST NOT create repeated `SCAN` logs. `RE_INIT` flow MUST NOT emit `SCAN` because no QR or pairing occurs. FR-031: Duplicate `CONNECTED` while an active session exists MUST be skipped before RMQ emit, not only deduplicated at storage. |
 | Retention | FR-028: Retention policy MUST be confirmed before enabling TTL deletion. FR-029: If retention is approved, TTL MUST be configurable by environment or policy. |
 | Metadata Safety | FR-030: System MUST persist only allowlisted metadata keys and strip any credential, token, QR payload, pairing code, raw session object, or stack trace before storage. |
 
@@ -128,7 +130,7 @@ Recommended Phase 1 data fetching:
 | account_channel_id | String | acc_123 | Must reference account channel in tenant scope. | Yes |
 | account_channel_name | String | CS Jakarta 01 | Snapshot at event time. | Yes |
 | phone_number | String | +628123456789 | E.164 if available. | Optional |
-| event_type | Enum | CONNECTED | Allowed: `CREATED`, `INIT`, `SCAN`, `CONNECTED`, `DISCONNECTED`, `SUSPENDED`. | Yes |
+| event_type | Enum | CONNECTED | Allowed: `CREATED`, `INIT`, `RE_INIT`, `SCAN`, `CONNECTED`, `DISCONNECTED`, `SUSPENDED`. | Yes |
 | event_status | Enum | SUCCESS | Phase 1 stores `SUCCESS` by default. `FAILED` is allowed only when the producer has an explicit lifecycle failure signal. Deduped/skipped events are not persisted as event logs. | Yes |
 | occurred_at | Timestamp | 2026-06-02T09:14:00+07:00 | Timestamp from producer, not consumer. | Yes |
 | actor_type | Enum | system | Allowed: `user`, `system`. | Yes |
@@ -149,6 +151,9 @@ Recommended Phase 1 data fetching:
 | ----- | ----- |
 | `CONNECTED` event | When Baileys emits `connection = open` and no active session exists, `whatsapp-service` generates a UUID `connectionSessionId`. |
 | Active session storage | `whatsapp-service` stores `{ connectionSessionId, connectedAt }` in Redis key `evt:session:{accountChannelId}`. |
+| `RE_INIT` start | `RE_INIT` marks that a restore attempt has started using stored credentials. It MUST NOT create a new `connectionSessionId`. Session is created only after Baileys confirms `connection = open` and `CONNECTED` is emitted. |
+| `RE_INIT` success | Baileys emits `connection = open`, then normal `CONNECTED` flow creates a new session. |
+| `RE_INIT` failure | Baileys emits `connection = close`, then normal `DISCONNECTED` flow emits an orphan `DISCONNECTED` if no active session key exists. |
 | Session key TTL | Session key TTL MUST be configurable via `ACCOUNT_CHANNEL_ACTIVE_SESSION_TTL_MS`. Default value is 7 days (`604800000` ms) as a practical stale-key fallback independent from audit log retention policy. The key MUST also be deleted on normal disconnect/delete. |
 | Duplicate `CONNECTED` | If `evt:session:{accountChannelId}` exists and is not stale, system MUST skip creating a new session and MUST skip emitting duplicate `CONNECTED` to RabbitMQ. |
 | Stale session recovery | If `evt:session:{accountChannelId}` is older than `ACCOUNT_CHANNEL_ACTIVE_SESSION_TTL_MS` or otherwise fails active-session validation, system MUST treat it as stale, emit an orphan `DISCONNECTED` for the stale session with `metadata.orphan = true`, delete the stale key, then create a new session for the incoming `CONNECTED`. |
@@ -165,6 +170,7 @@ Every emitted event MUST include deterministic `idempotency_key` so RabbitMQ ret
 | ----- | ----- |
 | `CREATED` | `{accountChannelId}:CREATED:{occurredAtUnixMs}` |
 | `INIT` | `{accountChannelId}:INIT:{requestId\|occurredAtUnixMs}` |
+| `RE_INIT` | `{accountChannelId}:RE_INIT:{requestId\|connectionAttemptId\|occurredAtUnixMs}` |
 | `SCAN` | `{accountChannelId}:SCAN:{connectionAttemptId\|occurredAtUnixMs}` |
 | `CONNECTED` | `{accountChannelId}:CONNECTED:{connectionSessionId}` |
 | `DISCONNECTED` | `{accountChannelId}:DISCONNECTED:{connectionSessionId\|occurredAtUnixMs}` |
@@ -229,6 +235,9 @@ The consumer MUST strip all other keys before saving. Metadata MUST NOT include 
 | EC-008 | Account is suspended while connected. | Close the active session first, emit `DISCONNECTED` with `reason = AUTO_SUSPEND`, calculate `duration_ms`, then emit `SUSPENDED`. |
 | EC-009 | Event consumer retries after crash. | Idempotency key prevents duplicate event log. |
 | EC-010 | Retention TTL removes old connected event but disconnected event remains. | Lifetime query must handle missing pair gracefully. Retention policy must consider this risk before activation. |
+| EC-011 | `RE_INIT` triggered but stored session data is invalid or expired. | Emit `RE_INIT`, then emit orphan `DISCONNECTED` when restore fails. Admin may need fresh `INIT` with QR. |
+| EC-012 | `RE_INIT` and `INIT` happen sequentially. | Record both flows: `RE_INIT` failure -> `DISCONNECTED`, then Admin-triggered `INIT` for fresh QR setup. |
+| EC-013 | Service restart triggers `RE_INIT` for many accounts. | Each account gets its own `RE_INIT` event. Producers must emit async and rely on idempotency key to prevent duplicate storage. |
 
 ---
 
@@ -272,6 +281,7 @@ The consumer MUST strip all other keys before saving. Metadata MUST NOT include 
 | Duplicate disconnect suppression | Duplicate visible disconnects reduced by >= 90 percent during reconnect loops | First 30 days | Dedup skipped count and event logs |
 | Disconnect investigation time | Admin finds last disconnect reason in <= 30 seconds | UAT and post-release sample | Product/UX test |
 | Event consumer success rate | >= 99 percent | Ongoing | Audit-service metrics |
+| `RE_INIT` success rate | Percentage of `RE_INIT` events followed by `CONNECTED` within 60 seconds | First 30 days | Account channel event log |
 
 ---
 
@@ -312,6 +322,7 @@ Rollback:
 | Export CSV/XLSX | Compliance and support handover. |
 | Notification on disconnect/suspend | Faster operational reaction to outages. |
 | Uptime analytics dashboard | Fleet reliability reporting. |
+| Total lifetime across multiple sessions | Fleet uptime analysis beyond Phase 1 per-session lifetime. |
 | Dedicated realtime Socket.IO event for timeline | Faster UI updates without polling. |
 | Support non-WhatsApp channels | Unified channel lifecycle audit. |
 
@@ -327,6 +338,7 @@ Rollback:
 | Notification excluded from Phase 1 | Admin must check UI manually. | Add Phase 2 notification-service integration. |
 | Retention not finalized | TTL cannot be safely enabled. | Keep retention configurable and disabled until approved. |
 | Global event log endpoint excluded from Phase 1 | Users can only view logs per account, not across all accounts. | Add `GET /api/account-channels/event-logs` and global UI in Phase 2 if approved. |
+| Total lifetime excluded from Phase 1 | Users see per-session lifetime only, not accumulated uptime. | Add total lifetime summary in analytics or Phase 2. |
 
 ---
 
@@ -337,11 +349,13 @@ Rollback:
 | OQ-001 | Does `suspendAccountChannel` already exist? | Determines whether `SUSPENDED` is event-only or requires new action. | Engineering |
 | OQ-002 | What is the final retention policy? | Determines TTL and compliance behavior. | PM / Legal |
 | OQ-003 | What exact Baileys signal proves QR was scanned? | Determines correctness of `SCAN`. | Engineering |
-| OQ-004 | Should lifetime display per-session, total, or both? | Affects UI and API response. | PM |
+| OQ-004 | Lifetime scope confirmation | Resolved: Phase 1 displays per-session lifetime only. Start = `CONNECTED`, end = `DISCONNECTED`. | PM |
 | OQ-005 | Is export CSV/XLSX required in Phase 1? | Adds endpoint and FE effort. | PM |
 | OQ-006 | Should `DISCONNECTED` or `SUSPENDED` trigger notifications? | Adds notification-service dependency. | PM |
 | OQ-007 | Should event taxonomy be generic for future channels? | Affects schema naming and service ownership. | PM / Engineering |
 | OQ-008 | Should `SCAN` become `PAIRED` when Pairing Code exists? | Affects future enum design. | PM / Engineering |
+| OQ-009 | How should `whatsapp-service` detect `RE_INIT` condition? | Determines whether detection occurs at service startup, Baileys auto-restore interception, Admin reconnect, scheduled reconnect, or all of them. | Engineering |
+| OQ-010 | Should `RE_INIT` have a dedicated dedup window? | Prevents duplicate restore attempts from service restart loops. | Engineering |
 
 ---
 
@@ -352,6 +366,7 @@ Rollback:
 | Rule | Expected Behavior |
 | ----- | ----- |
 | New `CONNECTED` with no active session | Generate new `connectionSessionId`. |
+| `RE_INIT` does not start a session | `RE_INIT` only marks that restore attempt has started. Session is created only on `CONNECTED`. |
 | Duplicate `CONNECTED` while active | Do not create a new session unless prior session is closed. |
 | `DISCONNECTED` with active session | Use active `connectionSessionId` and calculate `durationMs`. |
 | `DISCONNECTED` without active session | Store as orphan only if useful for debugging. |
@@ -375,6 +390,9 @@ Rollback:
 | ----- | ----- |
 | Create account | `CREATED` event appears. |
 | Init connection | `INIT` event appears. |
+| Service restart or reconnect with saved credentials | `RE_INIT` event appears with `actorType = system` and `metadata.trigger = auto_restore` or `reconnect`. |
+| `RE_INIT` succeeds | `RE_INIT` is followed by `CONNECTED` within expected timeframe. |
+| `RE_INIT` fails | `RE_INIT` is followed by orphan `DISCONNECTED`. |
 | Scan/connect account | `SCAN` appears only if confirmed; `CONNECTED` appears when session opens. |
 | Disconnect/logout | `DISCONNECTED` appears with reason and lifetime. |
 | Query timeline | REST endpoint returns 200 with paginated data. |
