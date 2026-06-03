@@ -5,7 +5,7 @@
 **Engineering Lead:** TBD  
 **Design Lead:** TBD  
 **Contributors:** Engineering Team, QA Team, Design Team  
-**Version:** v1.3
+**Version:** v1.5
 
 ---
 
@@ -13,6 +13,8 @@
 
 | Version | Date       | Author       | Changes                                                                                                                                                                                                                                                                       |
 | ------- | ---------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v1.5    | 2026-06-02 | PRD Analysis | Added Redash `Whatsapp Session` dashboard compatibility requirements, analytics projection fields, terminal/transient disconnect classification, and dashboard support test cases.                                                                                            |
+| v1.4    | 2026-06-02 | PRD Analysis | Added explicit QA test cases mapped to event capture, lifetime/session, RBAC, edge cases, concurrency, regression, and smoke coverage.                                                                                                                                        |
 | v1.3    | 2026-06-02 | PRD Analysis | Added `RE_INIT` event coverage, resolved lifetime scope as per-session until `DISCONNECTED`, updated event taxonomy, FRs, session rules, idempotency format, edge cases, metrics, open questions, and appendix.                                                               |
 | v1.2    | 2026-06-02 | PRD Analysis | Closed v1.1 re-analysis gaps: Redis session fallback TTL and staleness recovery, CREATED idempotency key typo, Supervisor scope resolution failure mode, suspend event ordering, FAILED status dependency, `dedupWindowMs` semantics, and duplicate CONNECTED pre-emit dedup. |
 | v1.1    | 2026-06-02 | PRD Analysis | Closed QA gaps: connection session architecture, event status semantics, dedup window, idempotency key format, Supervisor RBAC dependency, metadata whitelist, and global endpoint Phase 1 scope.                                                                             |
@@ -95,6 +97,7 @@
 | Reliability     | FR-024: Event write MUST be async and must not block lifecycle operation. FR-025: Duplicate disconnect from reconnect loop MUST be deduplicated using default 5 seconds window, configurable via `ACCOUNT_CHANNEL_DISCONNECT_DEDUP_WINDOW_MS`. FR-026: Event consumer MUST be idempotent on retry. FR-027: QR refresh every 30 seconds MUST NOT create repeated `SCAN` logs. `RE_INIT` flow MUST NOT emit `SCAN` because no QR or pairing occurs. FR-031: Duplicate `CONNECTED` while an active session exists MUST be skipped before RMQ emit, not only deduplicated at storage.                                                                                                                               |
 | Retention       | FR-028: Retention policy MUST be confirmed before enabling TTL deletion. FR-029: If retention is approved, TTL MUST be configurable by environment or policy.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Metadata Safety | FR-030: System MUST persist only allowlisted metadata keys and strip any credential, token, QR payload, pairing code, raw session object, or stack trace before storage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Analytics and Redash Support | FR-033: Event data MUST support the existing Redash dashboard `Whatsapp Session`, including active sessions, average session age, daily login/logout trend, terminal logout rate, transient disconnect rate, logout reason breakdown, top disconnecting numbers, and session stability metrics. FR-034: `DISCONNECTED` events MUST provide a normalized disconnect classification: `TERMINAL`, `TRANSIENT`, or `UNKNOWN`. FR-035: System SHOULD provide or maintain a BI-friendly projection/view for session analytics without requiring Redash to infer session pairing from raw events only. |
 
 ---
 
@@ -137,8 +140,10 @@ Recommended Phase 1 data fetching:
 | actor_user_id         | String    | usr_123                       | Required only for user-triggered event when available.                                                                                                                            | Optional    |
 | connection_session_id | String    | sess_abc                      | Required for paired connected/disconnected session when available.                                                                                                                | Conditional |
 | reason                | Enum      | TIMEOUT                       | Required for `DISCONNECTED` when known.                                                                                                                                           | Conditional |
+| disconnect_classification | Enum | TRANSIENT | Derived for `DISCONNECTED`: `TERMINAL`, `TRANSIENT`, or `UNKNOWN`. Used by Redash terminal/transient disconnect widgets. | Conditional |
 | reason_detail         | String    | Connection timed out          | Sanitized. Must not contain credentials, tokens, keys, stack trace.                                                                                                               | Optional    |
 | duration_ms           | Number    | 123000                        | Stored on `DISCONNECTED` when paired session exists.                                                                                                                              | Optional    |
+| analytics_event_date  | Date      | 2026-06-02                    | Derived from `occurred_at` in tenant/reporting timezone for daily Redash grouping.                                                                                                | Optional    |
 | source_service        | Enum      | whatsapp-service              | Allowed: `channel-service`, `whatsapp-service`, `system`.                                                                                                                         | Yes         |
 | idempotency_key       | String    | acc_123:CONNECTED:sess_abc    | Unique per event write. See Section 9.2.                                                                                                                                          | Yes         |
 | metadata              | Object    | `{ trigger: "auto_restore" }` | Allowlisted safe metadata only. See Section 9.4.                                                                                                                                  | Optional    |
@@ -253,6 +258,50 @@ The consumer MUST strip all other keys before saving. Metadata MUST NOT include 
 | Accessibility | Timeline icons must have labels, filter and pagination must be keyboard navigable.                                                                                                                                                              |
 | Retention     | Configurable retention. TTL must not be enabled before PM/Legal approval.                                                                                                                                                                       |
 
+### **12.1 Redash Dashboard Compatibility**
+
+Existing public Redash dashboard: `Whatsapp Session`.
+
+Current Redash widgets discovered from the dashboard definition:
+
+| Redash Query | Widget / Metric | Required Support From PRD |
+| ------------ | --------------- | -------------------------- |
+| `WhatsApp Session History - Currently Active Sessions` | Active connected sessions | `CONNECTED` without matching `DISCONNECTED`, active Redis session, and/or BI session projection. |
+| `WhatsApp Session History - Average Session Age` | Average active/completed session age | `CONNECTED.occurred_at`, `DISCONNECTED.occurred_at`, `duration_ms`. |
+| `WhatsApp Session History - Daily Login vs Logout Trend` | Daily logins/logouts/terminal logouts | `CONNECTED` as login, `DISCONNECTED` as logout, `disconnect_classification = TERMINAL` for terminal logout. |
+| `WhatsApp Session History - Logout Rate Per Day (Terminal Only)` | Terminal logout rate | `DISCONNECTED` reason mapping and terminal classification. |
+| `WhatsApp Session History - Transient Disconnect Rate Per Day` | Transient disconnect rate | `DISCONNECTED` reason mapping and transient classification. |
+| `WhatsApp Session History - Logout Reason Breakdown` | Logout reason distribution | Normalized `reason` and sanitized `reason_detail`. |
+| `WhatsApp Session History - Top Disconnecting Numbers` | Numbers with most disconnects | `phone_number`, `account_channel_id`, `account_channel_name`, `DISCONNECTED` event count. |
+| `WhatsApp Session History - Session Stability Metrics` | Stability summary | Session count, disconnect count, duration, terminal/transient classification. |
+
+PRD must preserve these dashboard capabilities and fill gaps not covered by Redash:
+
+| Gap in Current Redash | PRD Complement |
+| --------------------- | -------------- |
+| Redash focuses on session login/logout metrics, not complete lifecycle. | Product event log adds `CREATED`, `INIT`, `RE_INIT`, `SCAN`, `SUSPENDED`. |
+| Redash is aggregate/dashboard oriented. | Product UI provides per-account timeline and investigation detail. |
+| Redash does not enforce product RBAC. | API Gateway enforces tenant, Admin, Supervisor, Agent access. |
+| Redash does not show actor/audit context. | Event payload stores `actor_type`, `actor_user_id`, source service, metadata. |
+| Redash cannot reliably infer lifecycle attempts without explicit events. | PRD adds `INIT`, `RE_INIT`, and `SCAN` events. |
+| Redash may need stable session pairing. | PRD defines `connectionSessionId`, Redis session key, stale recovery, and `duration_ms`. |
+
+Recommended analytics projection for Redash/BI:
+
+| Field | Description |
+| ----- | ----------- |
+| `company_id`, `organization_id` | Tenant scope. |
+| `account_channel_id`, `account_channel_name`, `phone_number` | Account identity. |
+| `connection_session_id` | Session pairing key. |
+| `connected_at` | Timestamp from `CONNECTED`. |
+| `disconnected_at` | Timestamp from `DISCONNECTED`, nullable for active session. |
+| `duration_ms` | Completed session duration. |
+| `is_active` | True if connected without matched disconnect. |
+| `disconnect_reason` | Normalized disconnect reason. |
+| `disconnect_classification` | `TERMINAL`, `TRANSIENT`, `UNKNOWN`. |
+| `last_event_type`, `last_event_at` | Latest lifecycle state. |
+| `analytics_event_date` | Reporting date for daily aggregation. |
+
 ---
 
 ## **13. Dependencies and Risks**
@@ -266,6 +315,7 @@ The consumer MUST strip all other keys before saving. Metadata MUST NOT include 
 | Internal | Redis                                 | Dedup key collision or missing namespace.                                                                         | Use dedicated namespace such as `evt:disconnected:{accountChannelId}`.                                                                                                                                      |
 | Internal | Redis active session key              | Missing, stale, or expired session key can break deterministic lifetime pairing or block future `CONNECTED`.      | Store `evt:session:{accountChannelId}` on `CONNECTED`, default TTL 7 days, delete on `DISCONNECTED`, and run stale-session recovery before new `CONNECTED` emit.                                            |
 | Internal | Team Inbox to account mapping         | Supervisor scope validation requires knowing whether an account channel belongs to Supervisor's Team Inbox scope. | API Gateway must validate against `channel-service` or `company-service` before querying audit logs. If dependency is unavailable, fail closed with 503 or use fresh tenant-scoped cache for max 5 minutes. |
+| Internal | Redash / BI session projection        | Existing Redash widgets may break or diverge if new event model changes login/logout semantics. | Preserve `CONNECTED = login`, `DISCONNECTED = logout`, provide `disconnect_classification`, and maintain BI-friendly projection/view. |
 | Product  | `SCAN` timing                         | Baileys may not expose exact scan event.                                                                          | Use auth/pairing success signal if available; otherwise fallback to `CONNECTED` metadata or revise event name.                                                                                              |
 | Security | Raw error detail exposure             | Baileys error may contain internal or sensitive info.                                                             | Sanitize `reasonDetail` before save.                                                                                                                                                                        |
 | Security | Metadata exposure                     | Free-form metadata can accidentally store sensitive session data.                                                 | Enforce metadata whitelist from Section 9.4 in audit-service consumer.                                                                                                                                      |
@@ -282,6 +332,7 @@ The consumer MUST strip all other keys before saving. Metadata MUST NOT include 
 | Disconnect investigation time        | Admin finds last disconnect reason in <= 30 seconds                           | UAT and post-release sample | Product/UX test                           |
 | Event consumer success rate          | >= 99 percent                                                                 | Ongoing                     | Audit-service metrics                     |
 | `RE_INIT` success rate               | Percentage of `RE_INIT` events followed by `CONNECTED` within 60 seconds      | First 30 days               | Account channel event log                 |
+| Redash dashboard continuity          | Existing `Whatsapp Session` widgets continue to populate after event-log rollout | First 30 days and release validation | Redash dashboard/query validation |
 
 ---
 
@@ -397,3 +448,76 @@ Rollback:
 | Disconnect/logout                                   | `DISCONNECTED` appears with reason and lifetime.                                                        |
 | Query timeline                                      | REST endpoint returns 200 with paginated data.                                                          |
 | Agent access                                        | API returns access denied and UI hides tab.                                                             |
+
+---
+
+## **20. Test Cases**
+
+### **20.1 Event Capture Test Cases**
+
+| TC ID       | Priority | Scenario                                     | Preconditions                                                                 | Steps                                                                                                              | Expected Result                                                                                                                                     |
+| ----------- | -------- | -------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-ACEL-001 | P0       | Capture `CREATED` event                      | Admin is authenticated and has permission to create WhatsApp account channel. | 1. Create a new WhatsApp Web account channel. 2. Open account event log.                                           | One `CREATED` event is stored with correct tenant, account, actor, and `occurred_at`.                                                               |
+| TC-ACEL-002 | P0       | Capture fresh `INIT` event                   | Account exists and has no ready session.                                      | 1. Admin starts connect flow that requires QR/pairing. 2. Open account event log.                                  | One `INIT` event is stored. No `SCAN` event is stored until scan/auth success is confirmed.                                                         |
+| TC-ACEL-003 | P0       | QR refresh does not create `SCAN`            | Account is in QR connect flow.                                                | 1. Open QR modal. 2. Wait for multiple QR auto-refresh cycles. 3. Query event log.                                 | QR refresh creates no `SCAN` events. Timeline contains `INIT` only until scan/auth success occurs.                                                  |
+| TC-ACEL-004 | P0       | Capture `SCAN` only when confirmed           | Reliable Baileys scan/auth success signal is available.                       | 1. Start fresh `INIT`. 2. Scan QR successfully. 3. Query event log.                                                | One `SCAN` event appears after confirmed scan/auth success, not before.                                                                             |
+| TC-ACEL-005 | P0       | Capture `CONNECTED` event                    | Account is initialized and Baileys emits `connection = open`.                 | 1. Complete connection flow. 2. Query event log.                                                                   | One `CONNECTED` event is stored with `connection_session_id`, `actor_type = system`, and correct idempotency key.                                   |
+| TC-ACEL-006 | P0       | Capture `DISCONNECTED` event                 | Account is connected.                                                         | 1. Trigger disconnect/logout/network close. 2. Query event log.                                                    | One `DISCONNECTED` event is stored with mapped reason, sanitized reason detail, matching `connection_session_id` when available, and `duration_ms`. |
+| TC-ACEL-007 | P0       | Capture `SUSPENDED` for disconnected account | Suspend action exists and account is not connected.                           | 1. Suspend account. 2. Query event log.                                                                            | One `SUSPENDED` event is stored. No forced `DISCONNECTED` is required because account was already not connected.                                    |
+| TC-ACEL-008 | P0       | Capture suspend while connected              | Suspend action exists and account is connected.                               | 1. Suspend connected account. 2. Query event log.                                                                  | System emits `DISCONNECTED` with `reason = AUTO_SUSPEND` first, calculates `duration_ms`, then emits `SUSPENDED`.                                   |
+| TC-ACEL-009 | P0       | Capture `RE_INIT` restore attempt            | Account has stored credentials/session data but current session is not ready. | 1. Trigger restore via service restart, auto-restore, scheduled reconnect, or Admin reconnect. 2. Query event log. | One `RE_INIT` event appears with `connectionMethod = credential_restore`. It does not create `connection_session_id`.                               |
+| TC-ACEL-010 | P0       | `RE_INIT` success flow                       | Stored credentials are valid.                                                 | 1. Trigger `RE_INIT`. 2. Wait until Baileys emits `connection = open`. 3. Query event log.                         | Timeline shows `RE_INIT` followed by `CONNECTED` within expected timeframe. Session is created only on `CONNECTED`.                                 |
+| TC-ACEL-011 | P1       | `RE_INIT` failure flow                       | Stored credentials are invalid or expired.                                    | 1. Trigger `RE_INIT`. 2. Wait for Baileys close/failure. 3. Query event log.                                       | Timeline shows `RE_INIT` followed by orphan `DISCONNECTED` without `duration_ms`. Admin can initiate fresh `INIT` with QR afterward.                |
+
+### **20.2 Lifetime and Session Test Cases**
+
+| TC ID       | Priority | Scenario                                       | Preconditions                                                                                             | Steps                                                                | Expected Result                                                                                                            |
+| ----------- | -------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| TC-ACEL-012 | P0       | Completed session lifetime                     | Account has `CONNECTED` and matching `DISCONNECTED`.                                                      | 1. Connect account. 2. Disconnect account. 3. Open event log.        | `DISCONNECTED.duration_ms` equals `DISCONNECTED.occurred_at - CONNECTED.occurred_at` for the same `connection_session_id`. |
+| TC-ACEL-013 | P0       | Active session lifetime                        | Account is currently connected.                                                                           | 1. Connect account. 2. Keep session active. 3. Open account detail.  | UI shows active lifetime as `now - CONNECTED.occurred_at`.                                                                 |
+| TC-ACEL-014 | P1       | No lifetime before first connect               | Account has only `CREATED` and/or `INIT`.                                                                 | 1. Open account detail. 2. Check lifetime area.                      | UI shows `Belum pernah connected` or equivalent empty state.                                                               |
+| TC-ACEL-015 | P1       | Multiple sessions display per-session lifetime | Account has multiple `CONNECTED -> DISCONNECTED` cycles.                                                  | 1. Connect and disconnect account twice. 2. Open event log.          | Each `DISCONNECTED` row shows its own per-session lifetime. Total accumulated lifetime is not required in Phase 1.         |
+| TC-ACEL-016 | P0       | Stale Redis session recovery                   | Redis contains stale `evt:session:{accountChannelId}` older than `ACCOUNT_CHANNEL_ACTIVE_SESSION_TTL_MS`. | 1. Trigger new `CONNECTED`. 2. Query event log.                      | System emits orphan `DISCONNECTED` for stale session, deletes stale key, then creates a new session and emits `CONNECTED`. |
+| TC-ACEL-017 | P1       | Missing Redis session key on disconnect        | Account disconnects but active Redis session key is missing.                                              | 1. Remove session key. 2. Trigger Baileys close. 3. Query event log. | `DISCONNECTED` is stored as orphan with `metadata.orphan = true` and no `duration_ms`; lifecycle flow does not crash.      |
+
+### **20.3 UI, Filter, and RBAC Test Cases**
+
+| TC ID       | Priority | Scenario                                | Preconditions                                                         | Steps                                                                      | Expected Result                                                                                                                       |
+| ----------- | -------- | --------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-ACEL-018 | P0       | Admin views event log timeline          | Admin has access to WA Web settings.                                  | 1. Open WhatsApp Web account detail. 2. Open `Log Aktivitas`.              | Timeline appears sorted by `occurred_at desc` and displays event type, timestamp, actor, reason, and lifetime when relevant.          |
+| TC-ACEL-019 | P1       | Filter by event type                    | Account has multiple event types.                                     | 1. Open log tab. 2. Filter by `DISCONNECTED`.                              | Only `DISCONNECTED` events are shown.                                                                                                 |
+| TC-ACEL-020 | P1       | Filter by date range                    | Account has events across multiple dates.                             | 1. Apply date range. 2. Query timeline.                                    | Only events within selected date range are shown.                                                                                     |
+| TC-ACEL-021 | P1       | Pagination or load more                 | Account has more events than first page limit.                        | 1. Open log tab. 2. Click load more or navigate page.                      | Next page loads distinct older events without duplicates.                                                                             |
+| TC-ACEL-022 | P0       | Agent cannot access event log           | User role is Agent.                                                   | 1. Open WA Web settings. 2. Call event log endpoint directly.              | `Log Aktivitas` tab is hidden and endpoint returns access denied.                                                                     |
+| TC-ACEL-023 | P0       | Supervisor scoped account access        | Supervisor has Team Inbox scope containing account.                   | 1. Login as Supervisor. 2. Open in-scope account log.                      | Event log loads successfully.                                                                                                         |
+| TC-ACEL-024 | P0       | Supervisor out-of-scope access denied   | Supervisor does not have Team Inbox scope for account.                | 1. Login as Supervisor. 2. Open out-of-scope account log or call endpoint. | API denies access or returns no scoped data according to convention. No data leakage.                                                 |
+| TC-ACEL-025 | P1       | Supervisor scope dependency unavailable | `channel-service` or `company-service` scope resolver is unavailable. | 1. Login as Supervisor. 2. Query event log.                                | API fails closed with `503-ACEL09` or uses fresh tenant-scoped cache up to 5 minutes. Audit logs are not queried without valid scope. |
+
+### **20.4 Security and Data Sanitization Test Cases**
+
+| TC ID       | Priority | Scenario                       | Preconditions                                                  | Steps                                                                    | Expected Result                                                                                                                                                 |
+| ----------- | -------- | ------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-ACEL-026 | P0       | Tenant isolation               | Account belongs to another company/organization.               | 1. Auth as user from different tenant. 2. Query account event log by ID. | API returns not found, access denied, or empty scoped result. No cross-tenant data is exposed.                                                                  |
+| TC-ACEL-027 | P0       | Sanitize `reason_detail`       | Baileys error contains stack trace or sensitive internal data. | 1. Trigger disconnect with raw error. 2. Inspect stored log.             | Stored `reason_detail` contains only sanitized code/message. No stack trace, credential, token, key, QR payload, pairing code, or raw session object is stored. |
+| TC-ACEL-028 | P1       | Metadata allowlist enforcement | Producer emits metadata with allowed and disallowed keys.      | 1. Emit event payload with extra metadata keys. 2. Inspect stored log.   | Only allowlisted metadata keys are stored. Disallowed keys are stripped by consumer.                                                                            |
+| TC-ACEL-029 | P1       | Append-only event log          | Authenticated Admin attempts update/delete path if available.  | 1. Attempt to update or delete event log through API.                    | No update/delete endpoint exists, or request is rejected. Event log remains immutable.                                                                          |
+
+### **20.5 Concurrency, Idempotency, and Resilience Test Cases**
+
+| TC ID       | Priority | Scenario                                       | Preconditions                                                         | Steps                                                                                           | Expected Result                                                                                       |
+| ----------- | -------- | ---------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| TC-ACEL-030 | P0       | Duplicate `DISCONNECTED` dedup                 | Account is connected and Baileys emits multiple close events rapidly. | 1. Emit 5 close events within `ACCOUNT_CHANNEL_DISCONNECT_DEDUP_WINDOW_MS`. 2. Query event log. | Only one visible `DISCONNECTED` event is stored. Dedup skip counter increments.                       |
+| TC-ACEL-031 | P0       | Duplicate `CONNECTED` pre-emit dedup           | Active Redis session key already exists.                              | 1. Baileys emits duplicate `connection = open`. 2. Query event log and producer metrics.        | Producer skips duplicate `CONNECTED` before RMQ emit. No duplicate storage is needed.                 |
+| TC-ACEL-032 | P0       | RabbitMQ consumer retry idempotency            | Same event payload is delivered more than once.                       | 1. Replay identical event payload with same `idempotency_key`. 2. Inspect stored logs.          | Only one document exists due to unique `idempotency_key`. Consumer retry is safe.                     |
+| TC-ACEL-033 | P1       | Concurrent Admin init attempts                 | Two Admin tabs trigger connect/init for same account.                 | 1. Trigger `INIT` from two tabs close together. 2. Query timeline.                              | Both `INIT` attempts may be logged if they have distinct request IDs. Connection state remains valid. |
+| TC-ACEL-034 | P1       | Service restart triggers many `RE_INIT` events | Multiple accounts have stored credentials and no ready session.       | 1. Restart whatsapp-service. 2. Observe event logs and RabbitMQ.                                | Each eligible account gets a `RE_INIT` event. System remains stable and event writes stay async.      |
+
+### **20.6 Regression and Smoke Test Cases**
+
+| TC ID       | Priority | Scenario                                        | Preconditions                                        | Steps                                                                          | Expected Result                                                                                                                      |
+| ----------- | -------- | ----------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| TC-ACEL-035 | P0       | Create flow unaffected by logging failure       | Event log producer/consumer is unavailable.          | 1. Disable event consumer or simulate RMQ emit failure. 2. Create account.     | Account creation succeeds. Error is logged internally and main flow is not blocked.                                                  |
+| TC-ACEL-036 | P0       | Init/connect flow unaffected by logging failure | Event log producer/consumer is unavailable.          | 1. Start connect flow. 2. Complete QR/connection if possible.                  | Connect flow remains functional. Event logging failure does not break Baileys lifecycle.                                             |
+| TC-ACEL-037 | P0       | Existing connection status UI remains working   | WA Web settings has connected/disconnected accounts. | 1. Open WA Web settings. 2. Trigger connection status changes.                 | Existing status cards/table/socket updates continue to work.                                                                         |
+| TC-ACEL-038 | P0       | Smoke test full happy path                      | Feature flag enabled and dependencies healthy.       | 1. Create account. 2. Init. 3. Scan/connect. 4. Disconnect. 5. Query timeline. | Timeline shows `CREATED`, `INIT`, optional `SCAN`, `CONNECTED`, `DISCONNECTED` with reason and lifetime.                             |
+| TC-ACEL-039 | P0       | Feature flag disabled                           | `ENABLE_ACCOUNT_CHANNEL_EVENT_LOG=false`.            | 1. Perform lifecycle operations. 2. Open UI and query endpoint.                | Producers skip event emission. UI hides tab or shows disabled/empty state according to implementation. Main flow remains unaffected. |
