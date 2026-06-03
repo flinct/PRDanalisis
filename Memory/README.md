@@ -126,20 +126,23 @@ README ini harus konsisten dengan aturan di `Rules/`:
   - Release gate recommendations
 - Pakai saat butuh referensi lengkap fitur yang belum developed + QA strategy
 
-### `fe-repo-memory.md`
+### `CLAUDE-fe.md`
 - Fungsi: canonical reference untuk FE repo `omnichannel-satuinbox-fe`
 - Isi utama:
-  - Tech stack (Next.js 14, Zustand, React Query, Tailwind, Socket.IO)
-  - Full directory tree dengan penjelasan
-  - Routing/navigation structure (URL mapping, 3-level nav)
-  - Data models: Conversation, SLA Metrics, Ticket, WA Web Account
-  - State management: 17 Zustand stores across 3 domains
-  - Service layer: 40+ React Query service files
-  - Component architecture (3-column conversation, drawer ticket, settings)
-  - Real-time socket provider mapping
-  - FE implementation status per V2 feature (3 domains)
-  - FE + BE alignment confirmation
-- Pakai saat butuh referensi struktur FE, component mapping, data model, atau status implementasi FE vs PRD
+  - Tech stack (Next.js `^16.0.10`, React 19, Zustand 5, TanStack Query 5, Tailwind CSS 4, Socket.IO 4, TypeScript 5.9.2)
+  - 2 aplikasi: `apps/omnichannel` (port 3002, agent dashboard) + `apps/widget` (port 3001, embeddable chat)
+  - Monorepo Turborepo — 6 shared packages (`@satuinbox/types`, `constants`, `helpers`, `i18n`, `react-query`, `ui`)
+  - Full directory tree `apps/omnichannel/` dengan penjelasan per folder
+  - Routing structure: `[locale]/(auth)/` + `[locale]/(main)/` + `[convoSection]` mapping (your-inbox, unassigned, all, starred, spam, junk, channel, team, group-chat)
+  - State management: Zustand stores per domain (conversation, ticket, broadcast, notification, WA Web, pending-socket-queue, dll)
+  - React Query pattern: `useQueryWithSession`, `useInfiniteQueryWithSession`, naming `use<Action><Resource>.service.ts`
+  - Axios/session flow: request interceptor (inject Bearer token), response interceptor (401 → refresh → retry, SESSION_INVALIDATED → force logout)
+  - Socket.IO namespaces: `/conversations`, `/tickets`, `/notifications` + provider/hook mapping per domain
+  - Component architecture: 3-column conversation (ChatList / ChatRoom / ChatDetails), drawer ticket, WhatsApp Web settings layout
+  - Backend API paths via API Gateway `:3000` (20+ resource paths)
+  - V2 implementation status per domain: Conversation (~85% V2), Ticket (~95% V2), WhatsApp Web (~70% V2)
+  - FE + BE alignment: no asymmetry confirmed — undeveloped features sama di kedua sisi
+- Pakai saat butuh referensi struktur FE, component mapping, state management, service hooks, data model, atau status implementasi FE vs PRD
 
 ### `impact-linked-chat-bubble-patch.md`
 - Fungsi: impact analysis untuk Ticketing Patch — Linked Chat Bubble Append, Remove, Navigation, and Reply-Based Sync
@@ -154,20 +157,23 @@ README ini harus konsisten dengan aturan di `Rules/`:
   - Recommended development sequence (4 phases)
 - Pakai saat butuh referensi implementasi patch linked chat bubble, test plan, impact estimation
 
-### `be-repo-memory.md`
+### `CLAUDE-be.md`
 - Fungsi: canonical reference untuk BE repo `omnichannel-satuinbox-be`
 - Isi utama:
-  - Tech stack (NestJS v11, gRPC, RabbitMQ, MongoDB, Redis, Baileys)
-  - Architecture diagram (API Gateway → gRPC → Microservices)
-  - 18 microservices mapping dengan gRPC proto
-  - Conversation service: full schema field list, SLA engine detail
-  - Ticket service: per-stage SLA state machine detail
-  - WhatsApp Web service: Baileys implementation status
-  - RabbitMQ pattern catalog
-  - Protobuf service definitions
-  - BE-side features NOT implemented (10 fitur)
-  - BE + FE alignment summary (no BE/FE asymmetry)
-- Pakai saat butuh referensi arsitektur BE, service boundaries, schema, atau untuk cross-check implementasi BE vs PRD
+  - Tech stack (NestJS `^11.0.0`, Node.js 22+, TypeScript `~5.9.2`, Nx monorepo `21.5.2`, gRPC, RabbitMQ, MongoDB/Mongoose `^8.18.1`, Redis, Socket.IO `^4.8.1`, Baileys)
+  - Architecture: API Gateway (HTTP `:3000` + WS `:3002`) → gRPC (sync, mTLS) → 20 microservices
+  - Service map: 20 services dengan GRPC_ENV key, gRPC port, MongoDB DB per service
+  - Directory layout: `apps/<service>/`, `libs/` (common, proto-types, cache, security), `proto/`
+  - Service internal layout: controllers, services, repositories, schemas, processors/workers
+  - Key constants: `PROTO`, `GRPC_ENV`, `MONGODB_URI_KEY`, infra defaults (ports, TTLs, limits)
+  - gRPC rules: proto-first contracts, ts-proto codegen, `@GrpcCacheable` decorator
+  - RabbitMQ patterns: known event patterns catalog (message.inbound.*, ticket.sla.breach.check, bulk-reply.job.*, dll)
+  - Schema & data modeling rules: BaseAuditSchema, ITenantEntity, compound indexes, denormalized snapshots
+  - Security: mTLS inter-service, JWT/API-key gateway auth, CASL RBAC, mongoose-encryption
+  - Domain implementation: Conversation SLA (FRT/TTC/RLT/Wait Time formulas + pause reasons), Ticket SLA (per-stage state machine, cycleId, delayed queues), WhatsApp Web (Baileys key files)
+  - BE-side features NOT implemented: Collaborator role, Snooze Conversation, Related Conversations, Related Tickets & Merge, WA Group Mention, Auto-reply, Import Modes, Anti-spam system, Room Reminder, Hold state
+  - BE + FE alignment: no asymmetry — undeveloped features sama di kedua sisi
+- Pakai saat butuh referensi arsitektur BE, service boundaries, schema, proto contracts, RabbitMQ patterns, atau cross-check implementasi BE vs PRD
 
 ## Agent Instructions
 

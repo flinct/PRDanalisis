@@ -96,6 +96,24 @@ Setelah rule terbaca, muat konteks:
 
 Gunakan `Memory/README.md` untuk navigasi cepat ke file yang tepat.
 
+### Kapan harus muat `Memory/CLAUDE-be.md`
+
+Muat jika tugas menyentuh salah satu dari:
+- Mengecek apakah fitur sudah diimplementasi di BE
+- Impact analysis yang perlu tahu service boundary, gRPC contract, atau RabbitMQ pattern
+- Bug fix yang butuh verifikasi schema, enum, atau data model BE
+- Feature dev yang perlu tahu service mana yang harus diubah / proto baru
+- Test case yang butuh cross-check BE endpoint atau event pattern
+
+### Kapan harus muat `Memory/CLAUDE-fe.md`
+
+Muat jika tugas menyentuh salah satu dari:
+- Mengecek apakah fitur sudah diimplementasi di FE
+- Impact analysis yang perlu tahu component tree, Zustand store, atau service hook
+- Bug fix yang butuh verifikasi routing, state management, atau socket event FE
+- Feature dev yang perlu tahu component mana yang harus diubah / hook baru
+- Test case yang butuh cross-check FE component mapping atau URL routing
+
 ---
 
 ## Step 4: Eksekusi
@@ -120,6 +138,8 @@ Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa dipe
 | Membuat test case | Merevisi analisa karena ada temuan baru | qa-analysis-rule.md |
 | Memperbaiki bug | Mengecek dampak ke modul lain | impact-analysis-rule.md |
 | Membandingkan PRD | Analisa interkoneksi | qa-analysis-rule.md |
+| Menganalisa PRD / bug / impact | Verifikasi status implementasi BE | Memory/CLAUDE-be.md |
+| Menganalisa PRD / bug / impact | Verifikasi status implementasi FE | Memory/CLAUDE-fe.md |
 
 **Setiap kali agent akan:**
 - Menganalisa sesuatu → baca `qa-analysis-rule.md`
@@ -128,6 +148,8 @@ Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa dipe
 - Membandingkan → baca `prd-comparison-rule.md`
 - Membuat test case → baca `test-case-rule.md`
 - Mengecek dampak → baca `impact-analysis-rule.md`
+- Verifikasi implementasi BE → baca `Memory/CLAUDE-be.md`
+- Verifikasi implementasi FE → baca `Memory/CLAUDE-fe.md`
 
 Tidak ada "saya sudah tahu, tidak perlu baca ulang". **Setiap tindakan = baca rule yang sesuai.**
 

@@ -376,4 +376,5 @@ Mode belum final — perlu keputusan PM/Engineering.
 - **Source of truth:** Ticket V2 (`PRD/ticketv2/`). V1 (`PRD/Ticket/`) deprecated.
 - **Source of truth:** WhatsApp Web V2 (`PRD/Whatsapp web v2/`). V1 (`PRD/Whatsapp web/`) deprecated.
 - V1 vs V2 comparisons: `Memory/conversation-v1-vs-v2-comparison.md`, `Memory/ticket-v1-vs-v2-comparison.md`, `Memory/whatsapp-web-v1-vs-v2-comparison.md`.
-- BE architecture & implementation: `Memory/be-repo-memory.md`.
+- BE architecture & implementation: `Memory/CLAUDE-be.md`.
+- FE architecture & implementation: `Memory/CLAUDE-fe.md`.
