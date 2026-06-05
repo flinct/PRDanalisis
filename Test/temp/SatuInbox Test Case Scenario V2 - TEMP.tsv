@@ -1,0 +1,35 @@
+total cases =			2							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			2	Need to test		0	Need to test	2		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		2	No Status	0		
+
+Test ID	SIX-Temp-001							Need to Test	Need to Test	Need to Test
+Create at					created by		Tester			
+Scenario			Sample Scenario		Pre-Condition	- Precondition 1
+- Precondition 2	DATE			
+Url					Description	Verify that the feature works correctly	ENV	DEV	Staging	Prod
+Steps		1	Open the feature page		test type	POSITIVE				
+		2	Perform the action							
+		3	Observe the result							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Feature loads successfully		Need to Test		Need to Test
+		6				Action completes without error		Need to Test		Need to Test
+		7				Result displayed correctly		Need to Test		Need to Test
+
+
+
+
+Test ID	SIX-Temp-002							Need to Test	Need to Test	Need to Test
+Create at					created by		Tester			
+Scenario			Sample Negative Scenario		Pre-Condition	- Precondition 1	DATE			
+Url					Description	Verify that the feature handles error correctly	ENV	DEV	Staging	Prod
+Steps		1	Open the feature page		test type	NEGATIVE				
+		2	Trigger the error condition							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Error message displayed		Need to Test		Need to Test
+		5				System does not crash		Need to Test		Need to Test
+
+

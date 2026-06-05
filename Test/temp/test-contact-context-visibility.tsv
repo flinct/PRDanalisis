@@ -1,0 +1,899 @@
+total cases =			53							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			53	Need to test		0	Need to test	53		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		53	No Status	0		
+
+Test ID	CCT-AREA-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Create Area Context on new contact creation		Pre-Condition	Admin role, workspace with at least one active Team Inbox.	DATE			
+Url					Description	TEST GROUP: CCT-AREA — Area Context Basic CRUD	ENV	DEV	Staging	Prod
+Steps		1	Login as Admin		test type	POSITIVE				
+		2	Open Contacts page							
+		3	"Click ""Buat kontak"""							
+		4	Fill all required fields (name, sourceChannel, sourceValue)							
+		5	Select Team Inbox from dropdown							
+		6	"Click ""Simpan"""							
+		7	Verify in DB: `contact` table							
+		8	Verify in DB: `contact_area_context` table							
+		9	Verify in DB: `contact_reference` table							
+		10			Status Response	Expected Result	Actual Result	Status		Status
+		11				Dashboard loaded		Need to Test		Need to Test
+		12				Contacts list shown		Need to Test		Need to Test
+		13				Create contact form opens		Need to Test		Need to Test
+		14				Fields valid		Need to Test		Need to Test
+		15				Team Inbox selected		Need to Test		Need to Test
+		16				Contact created		Need to Test		Need to Test
+		17				New row with contactId		Need to Test		Need to Test
+		18				Row exists with: contactId, area=operational, teamInboxId, status=active		Need to Test		Need to Test
+		19				Row exists with: sourceType=manual		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-AREA-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Create Area Context from Sales flow (via Leads)		Pre-Condition	Admin with Sales area role, Lead module enabled.	DATE			
+Url					Description	TEST GROUP: CCT-AREA — Area Context Basic CRUD	ENV	DEV	Staging	Prod
+Steps		1	Open Lead create form		test type	POSITIVE				
+		2	Click contact picker							
+		3	"Click ""Buat kontak baru"""							
+		4	Enter new unique phone number							
+		5	Save contact							
+		6	Verify DB: `contact_area_context`							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				Lead form displayed		Need to Test		Need to Test
+		9				Picker opens, shows Sales contacts only		Need to Test		Need to Test
+		10				Create contact form opens in Sales context		Need to Test		Need to Test
+		11				Field valid		Need to Test		Need to Test
+		12				Contact created		Need to Test		Need to Test
+		13				Row exists with area=sales, source=lead		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-AREA-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Multiple Area Contexts for one Global Contact		Pre-Condition	Existing contact with Operational Area Context only.	DATE			
+Url					Description	TEST GROUP: CCT-AREA — Area Context Basic CRUD	ENV	DEV	Staging	Prod
+Steps		1	Navigate to Lead create		test type	POSITIVE				
+		2	Enter identifier that matches existing Operational contact							
+		3	"Click ""Tambahkan ke Sales"""							
+		4	Verify DB: same contactId now has 2 rows in `contact_area_context`							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Lead form		Need to Test		Need to Test
+		7				Duplicate detected		Need to Test		Need to Test
+		8				Sales Area Context created		Need to Test		Need to Test
+		9				One operational, one sales, different teamInboxId		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-AREA-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Cannot create duplicate Area Context (same contact+area+team)		Pre-Condition	Contact already has active Area Context for Team Inbox A.	DATE			
+Url					Description	TEST GROUP: CCT-AREA — Area Context Basic CRUD	ENV	DEV	Staging	Prod
+Steps		1	Attempt to create same contact+area+teamInboxId combination		test type	NEGATIVE				
+		2	Verify error message							
+		3	Verify DB: no duplicate row created							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Operation rejected		Need to Test		Need to Test
+		6				"""Kontak sudah ada di area ini"" (EH-006)"		Need to Test		Need to Test
+		7				Single active context remains		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-AREA-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Deactivate Area Context		Pre-Condition	Contact has active Area Context.	DATE			
+Url					Description	TEST GROUP: CCT-AREA — Area Context Basic CRUD	ENV	DEV	Staging	Prod
+Steps		1	Deactivate Area Context via API or admin panel		test type	POSITIVE				
+		2	Login as user with scope that previously could see this contact							
+		3	Verify DB: status changed to inactive							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Context status set to inactive		Need to Test		Need to Test
+		6				Contact no longer visible in list		Need to Test		Need to Test
+		7				No hard delete		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-DUP-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Duplicate identifier in Sales flow — prompt and add to Sales		Pre-Condition	Existing contact in Operational context with phone number +628xx.	DATE			
+Url					Description	TEST GROUP: CCT-DUP — Duplicate Identifier Handling	ENV	DEV	Staging	Prod
+Steps		1	Navigate to Sales contact creation		test type	POSITIVE				
+		2	Enter phone number +628xx (already exists in Operational)							
+		3	Submit form							
+		4	"Verify prompt has action button ""Tambahkan ke Sales"""							
+		5	"Click ""Tambahkan ke Sales"""							
+		6	Verify DB: same contactId, new area_context with area=sales							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				Form displayed		Need to Test		Need to Test
+		9				Field valid		Need to Test		Need to Test
+		10				"Duplicate detected. Prompt appears: ""Kontak sudah tersedia"""		Need to Test		Need to Test
+		11				Button visible		Need to Test		Need to Test
+		12				Sales Area Context created. No new Global Contact.		Need to Test		Need to Test
+		13				Both contexts coexist		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-DUP-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Duplicate identifier in Operational flow — prompt and use existing		Pre-Condition	Existing contact in Sales context with phone number +628yy.	DATE			
+Url					Description	TEST GROUP: CCT-DUP — Duplicate Identifier Handling	ENV	DEV	Staging	Prod
+Steps		1	Open Operational contact create form		test type	POSITIVE				
+		2	Enter phone number +628yy (already exists in Sales)							
+		3	Submit form							
+		4	"Verify prompt has action ""Gunakan Kontak Ini"""							
+		5	"Click ""Gunakan Kontak Ini"""							
+		6			Status Response	Expected Result	Actual Result	Status		Status
+		7				Form displayed		Need to Test		Need to Test
+		8				Field valid		Need to Test		Need to Test
+		9				"Duplicate detected. Prompt: ""Kontak sudah tersedia"""		Need to Test		Need to Test
+		10				"Action visible, NOT ""Tambahkan ke Sales"""		Need to Test		Need to Test
+		11				Operational Area Context created for existing Global Contact		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-DUP-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Duplicate prompt with masked data (no full data permission)		Pre-Condition	"User without ""Can view Client Data"" permission. Existing contact has phone +628zz."	DATE			
+Url					Description	TEST GROUP: CCT-DUP — Duplicate Identifier Handling	ENV	DEV	Staging	Prod
+Steps		1	Open contact create form		test type	POSITIVE				
+		2	Enter phone +628zz							
+		3	Submit form							
+		4	Verify phone is masked (e.g., +628******89)							
+		5	Verify no area/history details exposed in prompt							
+		6			Status Response	Expected Result	Actual Result	Status		Status
+		7				Form displayed		Need to Test		Need to Test
+		8				Field valid		Need to Test		Need to Test
+		9				Duplicate detected. Prompt appears		Need to Test		Need to Test
+		10				Masked per FR-025		Need to Test		Need to Test
+		11				Only masked identifier shown		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-DUP-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Duplicate identifier with no permission to reuse		Pre-Condition	User role without Client Contacts access. Existing contact exists.	DATE			
+Url					Description	TEST GROUP: CCT-DUP — Duplicate Identifier Handling	ENV	DEV	Staging	Prod
+Steps		1	Attempt to create contact with existing identifier		test type	POSITIVE				
+		2	Verify error							
+		3	Contact creation blocked							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Duplicate detected		Need to Test		Need to Test
+		6				"""Kontak sudah tersedia, tetapi Anda tidak memiliki akses"" (EH-002)"		Need to Test		Need to Test
+		7				No new contact created		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Admin sees all contacts (Area Scope=all, Visibility=all)		Pre-Condition	Admin role with Area Scope=all, Visibility=all.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Verify count includes both Operational and Sales contacts							
+		3	Open contact detail for a contact with both areas							
+		4	Verify all references (conv, ticket, lead) visible							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				All contacts (Sales + Operational) visible		Need to Test		Need to Test
+		7				No filter applied		Need to Test		Need to Test
+		8				"Both area badges visible (""Sales"", ""Operasional"")"		Need to Test		Need to Test
+		9				Full history shown		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Supervisor Operational sees only Operational contacts		Pre-Condition	Supervisor role, Area Scope=operational, Visibility Scope=team. Team Inbox scope = Team A.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Search by phone of a Sales-only contact							
+		3	Attempt direct URL to Sales-only contact							
+		4	Open Operational contact							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Only Operational contacts in Team A shown		Need to Test		Need to Test
+		7				Contact not in results		Need to Test		Need to Test
+		8				"""Akses ditolak"""		Need to Test		Need to Test
+		9				Can view and edit		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Sales Agent sees only own and assigned Sales contacts		Pre-Condition	Sales Agent role, Area Scope=sales, Visibility Scope=own_and_assigned.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Sales contact list		test type	POSITIVE				
+		2	Another Sales Agent's contact							
+		3	Contact linked to a Lead assigned to this user							
+		4	Contact created by this user							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Only contacts created by this user OR linked to assigned Leads shown		Need to Test		Need to Test
+		7				Not visible		Need to Test		Need to Test
+		8				"Visible with reason label ""Assigned ke saya"""		Need to Test		Need to Test
+		9				"Visible with reason label ""Dibuat oleh saya"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Agent without Client Contacts enabled		Pre-Condition	Agent role, Client Contacts module disabled.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Attempt direct URL to any contact							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				"""Akses ditolak"" (preserves old behavior)"		Need to Test		Need to Test
+		5				"""Akses ditolak"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Agent with Client Contacts enabled (own_and_assigned)		Pre-Condition	Agent role, Client Contacts enabled, Area Scope=operational, Visibility Scope=own_and_assigned.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Verify only own/assigned contacts shown							
+		3	Contact not owned or assigned							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Contacts page loads (new behavior)		Need to Test		Need to Test
+		6				Filtered list		Need to Test		Need to Test
+		7				Not visible		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-006							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Contact outside Team Inbox scope		Pre-Condition	Supervisor with Team Inbox A scope. Contact only has Area Context for Team Inbox B.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Attempt direct URL to that contact							
+		3	Verify no hidden count or metadata exposed							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Contact does not appear		Need to Test		Need to Test
+		6				"""Akses ditolak"""		Need to Test		Need to Test
+		7				No indication the contact exists		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-RBAC-007							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Role configuration — Area Scope save and validation		Pre-Condition	Admin with role management access.	DATE			
+Url					Description	TEST GROUP: CCT-RBAC — Visibility Scope	ENV	DEV	Staging	Prod
+Steps		1	Open Role Detail		test type	POSITIVE				
+		2	Enable Client Contacts							
+		3	"Set Area Scope = ""Sales"", save"							
+		4	Login as user with that role							
+		5	Set Area Scope = invalid value (e.g., blank)							
+		6	Visibility Scope = blank for non-Admin							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				Role form displayed		Need to Test		Need to Test
+		9				Contact Area Scope + Contact Visibility Scope fields appear		Need to Test		Need to Test
+		10				Role saved successfully		Need to Test		Need to Test
+		11				Only Sales contacts visible		Need to Test		Need to Test
+		12				"Save blocked: ""Area kontak tidak valid"""		Need to Test		Need to Test
+		13				Auto-defaults to `own_and_assigned`		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Inbound conversation matches existing Global Contact		Pre-Condition	Existing contact with phone +628xx in workspace. Contact has Operational Area Context in Team Inbox A. Inbound conversation arrives for Team Inbox A.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Customer sends message from phone +628xx		test type	POSITIVE				
+		2	Verify the conversation sender resolusi							
+		3	Verify conversation.contactId is set to existing contactId							
+		4	Verify no new Global Contact created							
+		5	Verify Operational Area Context already exists (was created earlier)							
+		6	"Open Conversation Detail > ""Kontak"" section"							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				Inbound conversation created		Need to Test		Need to Test
+		9				System matches to existing Global Contact (contactId)		Need to Test		Need to Test
+		10				Contact linked		Need to Test		Need to Test
+		11				Single contact in DB		Need to Test		Need to Test
+		12				No duplicate context		Need to Test		Need to Test
+		13				Contact summary displayed with existing data		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Inbound conversation from new identifier (auto-create + Area Context)		Pre-Condition	No existing contact with this phone number. Inbound conversation arrives for Operational Team Inbox A.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Customer sends message from NEW phone number		test type	POSITIVE				
+		2	Verify system creates new Global Contact							
+		3	Verify `contact_area_context` created							
+		4	Verify `contact_reference` created							
+		5	Verify sourceChannel and sourceValue prefilled from sender identity							
+		6	"Open Conversation Detail > ""Kontak"" section"							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				Inbound conversation created		Need to Test		Need to Test
+		9				New contactId in `contact` table		Need to Test		Need to Test
+		10				Row with: area=operational, teamInboxId=Team A, source=inbound		Need to Test		Need to Test
+		11				Row with: sourceType=conversation, sourceId=conversationId		Need to Test		Need to Test
+		12				Contact has correct primary identifier		Need to Test		Need to Test
+		13				"Shows ""Hubungkan kontak"" (already auto-linked? Check FR-057: should resolve), actually since auto-matched, should show contact summary"		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Inbound conversation from Sales channel (Area Context = sales)		Pre-Condition	Sales Team Inbox configured. Inbound conversation arrives.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Customer sends message to Sales channel (e.g., Sales WhatsApp)		test type	POSITIVE				
+		2	Verify new contact created (if new identifier)							
+		3	Verify Area Context created with area=sales							
+		4	If identifier exists only in Operational, verify system does NOT create Sales Area Context automatically (EC-009 says move does not auto-create)							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Inbound conversation created		Need to Test		Need to Test
+		7				New Global Contact		Need to Test		Need to Test
+		8				Correct area assignment		Need to Test		Need to Test
+		9				Check: FR-019 auto-creates Operational context; FR-018 auto-creates Sales on Lead. Inbound to Sales channel should create Sales context per channel assignment		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation Detail contact section — Admin view		Pre-Condition	Admin role. Conversation linked to a contact.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Conversation Detail		test type	POSITIVE				
+		2	Verify contact summary displayed							
+		3	"Click ""Edit kontak"""							
+		4	"Edit name field, click ""Simpan"""							
+		5	Verify identifier fields not masked							
+		6			Status Response	Expected Result	Actual Result	Status		Status
+		7				"Right panel shows ""Kontak"" section"		Need to Test		Need to Test
+		8				Name, primary contact, area badge		Need to Test		Need to Test
+		9				Contact editor opens		Need to Test		Need to Test
+		10				Changes persist, reflected in Contacts page		Need to Test		Need to Test
+		11				Full value shown (Admin has data permission)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation Detail contact section — Agent view with masking		Pre-Condition	"Agent role, assigned to conversation. Agent does NOT have ""Can view Client Data"" permission."	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Open assigned Conversation Detail		test type	NEGATIVE				
+		2	Verify contact summary shows masked identifiers							
+		3	"Verify ""Edit kontak"" is hidden"							
+		4	"Verify ""Kirim pesan"" is hidden"							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				"""Kontak"" section visible"		Need to Test		Need to Test
+		7				Phone: +628******89		Need to Test		Need to Test
+		8				"""Tidak punya akses"" (FR-033, EH-003)"		Need to Test		Need to Test
+		9				Not visible (US-017 AC3)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-006							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation Detail — link existing contact when none linked		Pre-Condition	Conversation with no contactId. Existing contact available.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Conversation Detail with no contact		test type	POSITIVE				
+		2	"Click ""Hubungkan kontak"""							
+		3	Search by name or identifier							
+		4	Select an Operational contact							
+		5	Verify conversation.contactId set							
+		6	Verify Area Context exists for this area+teamInbox (created if missing)							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				"""Kontak"" section shows ""Hubungkan kontak"" and ""Buat kontak"""		Need to Test		Need to Test
+		9				Contact search picker opens		Need to Test		Need to Test
+		10				Results filtered by user's Area + Visibility scope		Need to Test		Need to Test
+		11				Confirm link		Need to Test		Need to Test
+		12				Contact linked		Need to Test		Need to Test
+		13				Context created if new teamInbox		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-007							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation Detail — create contact when none linked		Pre-Condition	Conversation with no contactId. Sender identity available (phone).	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Conversation Detail with no contact		test type	POSITIVE				
+		2	"Click ""Buat kontak"""							
+		3	Fill additional fields (name, office)							
+		4	"Click ""Simpan"""							
+		5	Verify Area Context created with area matching conversation's Team Inbox							
+		6	Verify conversation.contactId points to new contact							
+		7			Status Response	Expected Result	Actual Result	Status		Status
+		8				"""Hubungkan kontak"" and ""Buat kontak"" shown"		Need to Test		Need to Test
+		9				Create form prefilled with sender phone + channel		Need to Test		Need to Test
+		10				Valid form		Need to Test		Need to Test
+		11				New contact created		Need to Test		Need to Test
+		12				Context row exists		Need to Test		Need to Test
+		13				Linked		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-008							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation assigned to Agent who cannot see contact in centralized Contacts		Pre-Condition	Agent with Visibility Scope=own_and_assigned. Contact was created by another user. No Lead/conv/ticket assigned to this Agent links to this contact. But this Agent IS assigned to the conversation.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Assign conversation to Agent		test type	NEGATIVE				
+		2	Agent opens Conversation Detail							
+		3	Agent opens Contacts page							
+		4	Agent attempts to open full contact detail from conversation							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Agent receives assignment		Need to Test		Need to Test
+		7				Contact summary visible (FR-060: MAY see summary)		Need to Test		Need to Test
+		8				Contact NOT visible (not own/assigned)		Need to Test		Need to Test
+		9				"If no full data permission, ""Akses ditolak"" (FR-061)"		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-009							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Conversation moved between Team Inboxes		Pre-Condition	Existing Operational Area Context for Team Inbox A. Conversation is moved to Team Inbox B (also Operational).	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Move conversation from Team Inbox A to Team Inbox B		test type	POSITIVE				
+		2	Verify `contact_reference` captures teamInboxId=B (captures at time of reference, might be immutable per FR-013)							
+		3	Verify Area Context for Team Inbox A still active (not auto-deleted per EC-009)							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Move succeeds		Need to Test		Need to Test
+		6				Need clarity: FR-012 says teamInboxIdAtSourceTime — immutable after creation		Need to Test		Need to Test
+		7				No auto-change		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CONV-010							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Sender identity missing (no phone/email)		Pre-Condition	Inbound conversation arrives without identifiable sender data.	DATE			
+Url					Description	TEST GROUP: CCT-CONV — Conversation Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Conversation Detail		test type	POSITIVE				
+		2	"Click ""Buat kontak"""							
+		3	"Verify warning: ""Data pengirim tidak lengkap"""							
+		4	User can manually enter contact data							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				No contact linked		Need to Test		Need to Test
+		7				Form opens WITHOUT prefill (EC-002)		Need to Test		Need to Test
+		8				Message displayed		Need to Test		Need to Test
+		9				Manual entry works		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket with contactId — direct link		Pre-Condition	Existing contact. Ticket created with explicit contactId.	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	Create ticket with contactId = existing contact		test type	POSITIVE				
+		2	Open Ticket Detail							
+		3	Verify area badge matches ticket's Team Inbox area							
+		4	"Click ""Edit kontak"""							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Ticket created		Need to Test		Need to Test
+		7				"""Kontak"" section shows contact summary"		Need to Test		Need to Test
+		8				Badge displayed		Need to Test		Need to Test
+		9				Edit allowed for Admin/Supervisor		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket without contactId, derived from linked conversation		Pre-Condition	Ticket created from a conversation. Conversation has contactId linked.	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	Create ticket from conversation (conversation has contact)		test type	POSITIVE				
+		2	Verify ticket.contactId may be set, or derived from conversation.contactId							
+		3	Open Ticket Detail							
+		4	Verify any change to contact in ticket propagates							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Ticket created		Need to Test		Need to Test
+		7				Per FR-040: derived if ticket.contactId missing		Need to Test		Need to Test
+		8				Contact section shows same contact as conversation		Need to Test		Need to Test
+		9				"Note: FR-042 says update reflected across ""related conversations"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket without contact, no linked conversation		Pre-Condition	Standalone ticket (no conversation origin). No contactId.	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Ticket Detail with no contact		test type	POSITIVE				
+		2	"Click ""Hubungkan kontak"""							
+		3	Link existing contact							
+		4	"Click ""Buat kontak"" (alternative)"							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				"""Kontak"" section shows ""Hubungkan kontak"" and ""Buat kontak"""		Need to Test		Need to Test
+		7				Contact picker opens, filtered by user's Area + Visibility scope		Need to Test		Need to Test
+		8				Ticket.contactId set		Need to Test		Need to Test
+		9				Create form opens (no prefill since no sender)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket contact edit — admin		Pre-Condition	Admin role. Ticket with linked contact.	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	"Open Ticket Detail, click ""Edit kontak"""		test type	POSITIVE				
+		2	Edit name field							
+		3	Save							
+		4	Open same contact in Contacts page							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Contact editor opens		Need to Test		Need to Test
+		7				Field editable		Need to Test		Need to Test
+		8				Changes persist in contact table		Need to Test		Need to Test
+		9				Changes reflected		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket contact view — agent with masking		Pre-Condition	"Agent role assigned to ticket. No ""Can view Client Data"" permission."	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	Open assigned Ticket Detail		test type	POSITIVE				
+		2	Verify identifiers masked							
+		3	Verify edit controls hidden							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Contact section visible		Need to Test		Need to Test
+		6				Phone/email masked		Need to Test		Need to Test
+		7				"""Tidak punya akses"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-TKT-006							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Ticket contact derived from conversation — conversation contact is outside user's scope		Pre-Condition	User is assigned to ticket. Ticket derives contact from conversation. User does NOT have access to the conversation itself (different Team Inbox).	DATE			
+Url					Description	TEST GROUP: CCT-TKT — Ticket Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Ticket Detail		test type	NEGATIVE				
+		2	Try to click through to conversation from contact history							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Contact summary visible (assigned to ticket grants access per FR-060)		Need to Test		Need to Test
+		5				"If conversation outside scope, ""Percakapan tidak tersedia"" or ""Akses ditolak"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-BRD-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Broadcast recipient picker — Operational scope		Pre-Condition	User with Area Scope=operational, Visibility Scope=team.	DATE			
+Url					Description	TEST GROUP: CCT-BRD — Broadcast Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Broadcast create		test type	POSITIVE				
+		2	Open contact picker							
+		3	No Sales contacts appear							
+		4	Select Operational contact							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Recipient picker available		Need to Test		Need to Test
+		7				Only Operational contacts in Team Inbox scope shown		Need to Test		Need to Test
+		8				Filtered correctly		Need to Test		Need to Test
+		9				Contact added as recipient		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-BRD-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Broadcast recipient picker — Sales scope		Pre-Condition	User with Area Scope=sales, Visibility Scope=team.	DATE			
+Url					Description	TEST GROUP: CCT-BRD — Broadcast Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Broadcast create		test type	POSITIVE				
+		2	Open contact picker							
+		3	No Operational contacts appear							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Recipient picker available		Need to Test		Need to Test
+		6				Only Sales contacts in Team Inbox scope shown		Need to Test		Need to Test
+		7				Filtered correctly		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-BRD-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Broadcast recipient picker — Area Scope = all (area filter visible)		Pre-Condition	User with Area Scope=all.	DATE			
+Url					Description	TEST GROUP: CCT-BRD — Broadcast Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Broadcast create		test type	POSITIVE				
+		2	"Filter = ""Operasional"""							
+		3	"Filter = ""Sales"""							
+		4	"Filter = ""Semua"""							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Recipient picker with area filter		Need to Test		Need to Test
+		7				Only Operational contacts shown		Need to Test		Need to Test
+		8				Only Sales contacts shown		Need to Test		Need to Test
+		9				All contacts shown		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-BRD-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Broadcast send validates contact area at send time		Pre-Condition	Broadcast created with contacts, but before send, contact's area context changed or user's role changed.	DATE			
+Url					Description	TEST GROUP: CCT-BRD — Broadcast Integration	ENV	DEV	Staging	Prod
+Steps		1	Create broadcast with valid contacts		test type	POSITIVE				
+		2	Change user role to remove area access (Admin changes role)							
+		3	Attempt to send broadcast							
+		4	Review recipient list							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Draft saved		Need to Test		Need to Test
+		7				Permission updated		Need to Test		Need to Test
+		8				"Send validation rejects blocked recipients: ""Beberapa penerima tidak dapat digunakan"" (EC-016)"		Need to Test		Need to Test
+		9				Blocked contacts flagged		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-BRD-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			"""Kirim pesan"" from Contact Detail — blocked contact"		Pre-Condition	Contact with isBlocked=true.	DATE			
+Url					Description	TEST GROUP: CCT-BRD — Broadcast Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Contact Detail for blocked contact		test type	NEGATIVE				
+		2	Verify tooltip/title							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				"""Kirim pesan"" button is disabled"		Need to Test		Need to Test
+		5				"""Kontak diblokir"" (EH-007)"		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-LD-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Lead contact picker — Sales only		Pre-Condition	User with Sales scope.	DATE			
+Url					Description	TEST GROUP: CCT-LD — Leads Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Lead create form		test type	POSITIVE				
+		2	Click contact picker							
+		3	Search for Operational-only contact							
+		4	Select Sales contact							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Lead form displayed		Need to Test		Need to Test
+		7				Picker opens, shows Sales contacts only		Need to Test		Need to Test
+		8				Not found (US-009)		Need to Test		Need to Test
+		9				Contact linked to Lead		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-LD-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Lead creation with existing Operational-only contact		Pre-Condition	Existing contact has only Operational Area Context. Sales user creates Lead with that contact's phone.	DATE			
+Url					Description	TEST GROUP: CCT-LD — Leads Integration	ENV	DEV	Staging	Prod
+Steps		1	Enter existing Operational contact's phone in Lead form		test type	POSITIVE				
+		2	"Prompt appears: ""Kontak sudah tersedia"""							
+		3	"Click ""Tambahkan ke Sales"""							
+		4	Lead created with existing Global Contact							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Duplicate detected		Need to Test		Need to Test
+		7				Prompt shown		Need to Test		Need to Test
+		8				Sales Area Context created		Need to Test		Need to Test
+		9				No duplicate contact		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-LD-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Lead contact picker — no contacts available		Pre-Condition	No contacts with Sales Area Context in user's scope.	DATE			
+Url					Description	TEST GROUP: CCT-LD — Leads Integration	ENV	DEV	Staging	Prod
+Steps		1	Open Lead contact picker		test type	POSITIVE				
+		2	Verify empty state							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Picker opens		Need to Test		Need to Test
+		5				"""Tidak ada kontak sales"" (US-015)"		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-PRV-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Phone masking in Contacts list		Pre-Condition	"User without ""Can view Client Data"" permission. Contact has phone +6281234567890."	DATE			
+Url					Description	TEST GROUP: CCT-PRV — Data Privacy	ENV	DEV	Staging	Prod
+Steps		1	Open Contacts page		test type	POSITIVE				
+		2	Open Contact Detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Phone column shows masked value (e.g., +628******90)		Need to Test		Need to Test
+		5				Phone masked in detail view		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-PRV-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Identifier masking in Conversation Detail		Pre-Condition	Agent without data permission. Conversation has linked contact with phone and email.	DATE			
+Url					Description	TEST GROUP: CCT-PRV — Data Privacy	ENV	DEV	Staging	Prod
+Steps		1	"Open Conversation Detail > ""Kontak"" section"		test type	POSITIVE				
+		2	"Click ""Edit kontak"""							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Phone masked, email masked		Need to Test		Need to Test
+		5				"Not allowed: ""Tidak punya akses"""		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-PRV-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Identifier masking in duplicate prompt		Pre-Condition	User without data permission. Existing contact has phone.	DATE			
+Url					Description	TEST GROUP: CCT-PRV — Data Privacy	ENV	DEV	Staging	Prod
+Steps		1	Attempt create contact with existing phone		test type	POSITIVE				
+		2	Verify phone in prompt is masked							
+		3	Verify no area or history data exposed in prompt							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Duplicate prompt shown		Need to Test		Need to Test
+		6				Only masked value visible		Need to Test		Need to Test
+		7				Only safe summary		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-MIG-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Legacy contacts get Operational Area Context		Pre-Condition	Workspace has existing contacts with teamInboxIds populated.	DATE			
+Url					Description	TEST GROUP: CCT-MIG — Migration	ENV	DEV	Staging	Prod
+Steps		1	Run migration		test type	POSITIVE				
+		2	Verify for each legacy contact: contact_area_context created							
+		3	Verify no contact lost							
+		4	Verify no duplicate Global Contact created							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Migration completes successfully		Need to Test		Need to Test
+		7				Row with area=operational, teamInboxId from legacy data		Need to Test		Need to Test
+		8				All contactIds preserved		Need to Test		Need to Test
+		9				Zero new global contacts		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-MIG-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Legacy contacts without teamInboxIds		Pre-Condition	Workspace has contacts where teamInboxIds is empty (e.g., created by Admin before team inbox existed).	DATE			
+Url					Description	TEST GROUP: CCT-MIG — Migration	ENV	DEV	Staging	Prod
+Steps		1	Run migration		test type	POSITIVE				
+		2	Verify these contacts do NOT get Area Context							
+		3	Verify Admin can still access via review view							
+		4	Non-Admin user attempts to access							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Migration completes		Need to Test		Need to Test
+		7				No auto-created context		Need to Test		Need to Test
+		8				Admin-only review available (EC-015)		Need to Test		Need to Test
+		9				Not visible (no Area Context)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-MIG-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Migration idempotent		Pre-Condition	Migration already completed once.	DATE			
+Url					Description	TEST GROUP: CCT-MIG — Migration	ENV	DEV	Staging	Prod
+Steps		1	Run migration again		test type	POSITIVE				
+		2	Verify error handling							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				No duplicate Area Context created		Need to Test		Need to Test
+		5				Graceful skip or success with 0 changes		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-MIG-004							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Admin role gets Area Scope=all, Visibility=all after migration		Pre-Condition	Default Admin role before migration.	DATE			
+Url					Description	TEST GROUP: CCT-MIG — Migration	ENV	DEV	Staging	Prod
+Steps		1	Run migration		test type	POSITIVE				
+		2	Verify Contact Area Scope = all							
+		3	Verify Contact Visibility Scope = all							
+		4	Login as Admin							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Admin role updated (FR-069)		Need to Test		Need to Test
+		7				Set correctly		Need to Test		Need to Test
+		8				Set correctly		Need to Test		Need to Test
+		9				All contacts visible (no regression)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-MIG-005							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Agent role migration does not grant broader access		Pre-Condition	Agent role before migration had no Contacts access.	DATE			
+Url					Description	TEST GROUP: CCT-MIG — Migration	ENV	DEV	Staging	Prod
+Steps		1	Run migration		test type	POSITIVE				
+		2	Login as Agent							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent role keeps Client Contacts off (FR-072: no broader access)		Need to Test		Need to Test
+		5				Contacts page still blocked		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CNC-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Duplicate prompt race — two users same identifier		Pre-Condition	Two Admin users. No existing contact with identifier X.	DATE			
+Url					Description	TEST GROUP: CCT-CNC — Concurrency	ENV	DEV	Staging	Prod
+Steps		1	User A and User B simultaneously open create contact form		test type	POSITIVE				
+		2	Both enter same identifier X							
+		3	Both submit at approximately same time							
+		4	"User who gets prompt clicks ""Gunakan Kontak Ini"""							
+		5	Verify only ONE Global Contact exists							
+		6			Status Response	Expected Result	Actual Result	Status		Status
+		7				Both forms valid		Need to Test		Need to Test
+		8				Both submit		Need to Test		Need to Test
+		9				One succeeds, one gets duplicate prompt		Need to Test		Need to Test
+		10				Area Context created for user's team		Need to Test		Need to Test
+		11				Single contactId		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CNC-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Migration + admin role edit concurrently		Pre-Condition	Migration running. Admin concurrently edits role.	DATE			
+Url					Description	TEST GROUP: CCT-CNC — Concurrency	ENV	DEV	Staging	Prod
+Steps		1	Start migration		test type	POSITIVE				
+		2	Admin opens Role Detail and changes Contact Visibility Scope							
+		3	Verify system handles conflict							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Migration in progress		Need to Test		Need to Test
+		6				Save attempted		Need to Test		Need to Test
+		7				Either: queue edit until migration completes, or reject edit with retry message (EH-016)		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-CNC-003							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			Team Inbox membership changes while viewing Contacts		Pre-Condition	User viewing Contacts page. Admin removes user's Team Inbox membership.	DATE			
+Url					Description	TEST GROUP: CCT-CNC — Concurrency	ENV	DEV	Staging	Prod
+Steps		1	User opens Contacts page		test type	POSITIVE				
+		2	Admin removes user from Team Inbox A							
+		3	User performs any action (scroll, click, search)							
+		4	If user has dirty form and tries to save							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Contact list loaded		Need to Test		Need to Test
+		7				Membership changed		Need to Test		Need to Test
+		8				Next API request returns updated data (EC-013: contacts removed from view)		Need to Test		Need to Test
+		9				"""Data berubah. Muat ulang"" (EH-017)"		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-API-001							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			POST /api/v1/contacts — duplicate returns prompt, not error		Pre-Condition	Existing contact with identifier X.	DATE			
+Url					Description	TEST GROUP: CCT-API — API Contract (Breaking Changes)	ENV	DEV	Staging	Prod
+Steps		1	POST /contacts with existing identifier X		test type	NEGATIVE				
+		2	Response body contains prompt object							
+		3	Old API client expecting error							
+		4			Status Response	Expected Result	Actual Result	Status		Status
+		5				Status 200/209 (not 4xx)		Need to Test		Need to Test
+		6				"`{ status: ""duplicate"", prompt: { action: ""add_to_sales"" or ""use_existing"" }, contactId: existingId }`"		Need to Test		Need to Test
+		7				Client should handle new response shape		Need to Test		Need to Test
+
+
+
+
+Test ID	CCT-API-002							Need to Test		Need to Test
+Create at					created by		Tester			
+Scenario			GET /api/v1/contacts — new filter params		Pre-Condition	Multiple contacts with different areas.	DATE			
+Url					Description	TEST GROUP: CCT-API — API Contract (Breaking Changes)	ENV	DEV	Staging	Prod
+Steps		1	GET /contacts?area=sales		test type	POSITIVE				
+		2	GET /contacts?area=operational							
+		3	GET /contacts without area param							
+		4	Old API client expecting unfiltered list							
+		5			Status Response	Expected Result	Actual Result	Status		Status
+		6				Only Sales contacts returned		Need to Test		Need to Test
+		7				Only Operational contacts returned		Need to Test		Need to Test
+		8				Default: filtered by user's Area Scope		Need to Test		Need to Test
+		9				Response now filtered (breaking)		Need to Test		Need to Test
+
+

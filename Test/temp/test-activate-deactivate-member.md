@@ -2,415 +2,958 @@
 
 Source: `PRD/Auth/PRD Setting - activate-deactivate-member.md`
 
+Total test cases: **35**
+
+| ENV | Passed | Failed | On Test | Need to Test |
+|:----|-------:|-------:|--------:|-------------:|
+| DEV | 0 | 0 | 0 | 35 |
+| Staging | 0 | 0 | 0 | 35 |
+| Prod | 0 | 0 | 0 | 35 |
+
 ---
 
 ## TEST GROUP: ACT-AUTH — Auth Service & API Gateway
 
-### ACT-AUTH-001: Deactivate active member
+### ACT-AUTH-001 · Deactivate active member
 
-Prerequisites: Admin role with `member:update` permission. Target member is active (`isActive = true`) with at least one active session.
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin role with `member:update` permission. Target member is active (`isActive = true`) with at least one active session. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Login as Admin | Dashboard loaded |
-| 2 | Call `PATCH /auth/member/:id/toggle-active-status` with `{ "isActive": false }` | HTTP 200 returned |
-| 3 | Verify DB: Auth record `isActive` field | `isActive = false` |
-| 4 | Verify DB: session collection for that userId | All sessions deleted |
-| 5 | Verify DB: session invalidation reason | `MEMBER_DEACTIVATED` set |
+**Steps**
 
-### ACT-AUTH-002: Reactivate deactivated member
+1. Login as Admin
+2. Call `PATCH /auth/member/:id/toggle-active-status` with `{ "isActive": false }`
+3. Verify DB: Auth record `isActive` field
+4. Verify DB: session collection for that userId
+5. Verify DB: session invalidation reason
 
-Prerequisites: Admin role with `member:update` permission. Target member is deactivated (`isActive = false`).
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Dashboard loaded | | Need to Test | | Need to Test |
+| HTTP 200 returned | | Need to Test | | Need to Test |
+| `isActive = false` | | Need to Test | | Need to Test |
+| All sessions deleted | | Need to Test | | Need to Test |
+| `MEMBER_DEACTIVATED` set | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call `PATCH /auth/member/:id/toggle-active-status` with `{ "isActive": true }` | HTTP 200 returned |
-| 2 | Verify DB: Auth record `isActive` field | `isActive = true` |
-| 3 | Verify DB: session collection for that userId | No sessions deleted (no side effect on reactivation) |
+---
 
-### ACT-AUTH-003: Toggle to same state — idempotent
+### ACT-AUTH-002 · Reactivate deactivated member
 
-Prerequisites: Admin role. Target member is already deactivated.
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin role with `member:update` permission. Target member is deactivated (`isActive = false`). |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call toggle endpoint with `{ "isActive": false }` for already-deactivated member | HTTP 200 returned |
-| 2 | Verify DB: Auth record unchanged | `isActive` remains `false` |
-| 3 | Verify no duplicate session deletion triggered | Session service called 0 times |
+**Steps**
 
-### ACT-AUTH-004: Toggle non-existent user
+1. Call `PATCH /auth/member/:id/toggle-active-status` with `{ "isActive": true }`
+2. Verify DB: Auth record `isActive` field
+3. Verify DB: session collection for that userId
 
-Prerequisites: Admin role. Use an invalid or non-existent `userId`.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 returned | | Need to Test | | Need to Test |
+| `isActive = true` | | Need to Test | | Need to Test |
+| No sessions deleted (no side effect on reactivation) | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call toggle endpoint with invalid `userId` | HTTP 404 returned |
-| 2 | Verify response body | `{ "message": "Anggota tidak ditemukan" }` |
-| 3 | Verify no DB changes | Auth collection unchanged |
+---
 
-### ACT-AUTH-005: Unauthenticated request
+### ACT-AUTH-003 · Toggle to same state — idempotent
 
-Prerequisites: No JWT token in request header.
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin role. Target member is already deactivated. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call toggle endpoint without `Authorization` header | HTTP 401 returned |
-| 2 | Verify no DB changes | Auth collection unchanged |
+**Steps**
 
-### ACT-AUTH-006: Unauthorized request — missing permission
+1. Call toggle endpoint with `{ "isActive": false }` for already-deactivated member
+2. Verify DB: Auth record unchanged
+3. Verify no duplicate session deletion triggered
 
-Prerequisites: User authenticated but does NOT have `member:update` permission.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 returned | | Need to Test | | Need to Test |
+| `isActive` remains `false` | | Need to Test | | Need to Test |
+| Session service called 0 times | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Login as non-Admin user | Authenticated |
-| 2 | Call toggle endpoint | HTTP 403 returned |
-| 3 | Verify no DB changes | Auth collection unchanged |
+---
 
-### ACT-AUTH-007: Deactivated user tries to login
+### ACT-AUTH-004 · Toggle non-existent user
 
-Prerequisites: Member is deactivated (`isActive = false`). Member has valid credentials.
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin role. Use an invalid or non-existent `userId`. |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Attempt login with correct credentials | Login rejected |
-| 2 | Verify response | Error message "Akun dinonaktifkan. Silakan hubungi Admin." |
-| 3 | Verify no session created | Session collection unchanged |
+**Steps**
 
-### ACT-AUTH-008: Reactivated user tries to login
+1. Call toggle endpoint with invalid `userId`
+2. Verify response body
+3. Verify no DB changes
 
-Prerequisites: Member was deactivated and has just been reactivated.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 404 returned | | Need to Test | | Need to Test |
+| `{ "message": "Anggota tidak ditemukan" }` | | Need to Test | | Need to Test |
+| Auth collection unchanged | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Attempt login with correct credentials | Login succeeds |
-| 2 | Verify DB: new session created | Session record exists with new token |
+---
 
-### ACT-AUTH-009: Deactivated user tries to refresh token
+### ACT-AUTH-005 · Unauthenticated request
 
-Prerequisites: Member has a valid refresh token. Member is then deactivated.
+| | |
+|:--|:--|
+| **Pre-Condition** | No JWT token in request header. |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Deactivate the member | HTTP 200, member deactivated |
-| 2 | Use old refresh token to refresh session | HTTP 401 returned |
-| 3 | Verify response | "Akun dinonaktifkan" error |
+**Steps**
 
-### ACT-AUTH-010: Force logout — old token rejected after deactivation
+1. Call toggle endpoint without `Authorization` header
+2. Verify no DB changes
 
-Prerequisites: Member has an active session token. Admin deactivates the member.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 401 returned | | Need to Test | | Need to Test |
+| Auth collection unchanged | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Member makes API request with old token before deactivation | Request succeeds |
-| 2 | Admin calls toggle endpoint to deactivate | HTTP 200, sessions deleted |
-| 3 | Member makes any API request with same old token | HTTP 401 returned |
-| 4 | Verify FE behaviour | Session invalidation toast "Sesi Anda telah berakhir karena akun Anda dinonaktifkan." shown |
+---
+
+### ACT-AUTH-006 · Unauthorized request — missing permission
+
+| | |
+|:--|:--|
+| **Pre-Condition** | User authenticated but does NOT have `member:update` permission. |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Login as non-Admin user
+2. Call toggle endpoint
+3. Verify no DB changes
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Authenticated | | Need to Test | | Need to Test |
+| HTTP 403 returned | | Need to Test | | Need to Test |
+| Auth collection unchanged | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUTH-007 · Deactivated user tries to login
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member is deactivated (`isActive = false`). Member has valid credentials. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Attempt login with correct credentials
+2. Verify response
+3. Verify no session created
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Login rejected | | Need to Test | | Need to Test |
+| Error message "Akun dinonaktifkan. Silakan hubungi Admin." | | Need to Test | | Need to Test |
+| Session collection unchanged | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUTH-008 · Reactivated user tries to login
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member was deactivated and has just been reactivated. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Attempt login with correct credentials
+2. Verify DB: new session created
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Login succeeds | | Need to Test | | Need to Test |
+| Session record exists with new token | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUTH-009 · Deactivated user tries to refresh token
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member has a valid refresh token. Member is then deactivated. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Deactivate the member
+2. Use old refresh token to refresh session
+3. Verify response
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200, member deactivated | | Need to Test | | Need to Test |
+| HTTP 401 returned | | Need to Test | | Need to Test |
+| "Akun dinonaktifkan" error | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUTH-010 · Force logout — old token rejected after deactivation
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member has an active session token. Admin deactivates the member. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Member makes API request with old token before deactivation
+2. Admin calls toggle endpoint to deactivate
+3. Member makes any API request with same old token
+4. Verify FE behaviour
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Request succeeds | | Need to Test | | Need to Test |
+| HTTP 200, sessions deleted | | Need to Test | | Need to Test |
+| HTTP 401 returned | | Need to Test | | Need to Test |
+| Session invalidation toast "Sesi Anda telah berakhir karena akun Anda dinonaktifkan." shown | | Need to Test | | Need to Test |
 
 ---
 
 ## TEST GROUP: ACT-AUX — AUX & Round Robin
 
-### ACT-AUX-001: Deactivate member with open AUX interval
+### ACT-AUX-001 · Deactivate member with open AUX interval
 
-Prerequisites: Member status is AWAY (open AUX interval exists in `agentauxintervals` collection with `endAt = null`).
+| | |
+|:--|:--|
+| **Pre-Condition** | Member status is AWAY (open AUX interval exists in `agentauxintervals` collection with `endAt = null`). |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin deactivates the member | HTTP 200 |
-| 2 | Verify DB: `agentauxintervals` for that member | Open interval NOT closed — `endAt` remains `null` |
-| 3 | Verify no status transition event emitted | No AWAY→LOGOUT event in logs |
+**Steps**
 
-### ACT-AUX-002: Historical AUX data preserved after deactivation
+1. Admin deactivates the member
+2. Verify DB: `agentauxintervals` for that member
+3. Verify no status transition event emitted
 
-Prerequisites: Member has closed historical AUX intervals. Member is then deactivated.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 | | Need to Test | | Need to Test |
+| Open interval NOT closed — `endAt` remains `null` | | Need to Test | | Need to Test |
+| No AWAY→LOGOUT event in logs | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin deactivates the member | HTTP 200 |
-| 2 | Query AUX summary via `getAuxSummary()` for that member | Historical AUX data returned correctly |
-| 3 | Verify analytics figures unchanged | No data distortion |
+---
 
-### ACT-AUX-003: Round Robin excludes deactivated member
+### ACT-AUX-002 · Historical AUX data preserved after deactivation
 
-Prerequisites: Team with 2 agents — Agent A (active, AWAY) and Agent B (deactivated, READY in cache). Unassigned conversation exists in that team.
+| | |
+|:--|:--|
+| **Pre-Condition** | Member has closed historical AUX intervals. Member is then deactivated. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Trigger auto-pull (`autoPullConversation`) | Auto-pull executes |
-| 2 | Verify `isMemberAvailableForAutoPull()` for Agent B | Returns `false` (deactivated takes precedence over READY status) |
-| 3 | Verify conversation assignment | Conversation NOT assigned to Agent B |
-| 4 | Verify conversation state | Remains unassigned (Agent A is AWAY, Agent B excluded) |
+**Steps**
 
-### ACT-AUX-004: Reactivated member becomes eligible for Round Robin
+1. Admin deactivates the member
+2. Query AUX summary via `getAuxSummary()` for that member
+3. Verify analytics figures unchanged
 
-Prerequisites: Continue from ACT-AUX-003. Agent B has been reactivated and set to READY.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 | | Need to Test | | Need to Test |
+| Historical AUX data returned correctly | | Need to Test | | Need to Test |
+| No data distortion | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin reactivates Agent B | HTTP 200 |
-| 2 | Agent B sets status to READY | Status updated |
-| 3 | Trigger auto-pull again | Auto-pull executes |
-| 4 | Verify Agent B eligibility | `isMemberAvailableForAutoPull()` returns `true` |
-| 5 | Verify conversation assignment | Conversation assigned to Agent B |
+---
 
-### ACT-AUX-005: Conversations remain assigned after deactivation
+### ACT-AUX-003 · Round Robin excludes deactivated member
 
-Prerequisites: Member has 3 active assigned conversations.
+| | |
+|:--|:--|
+| **Pre-Condition** | Team with 2 agents — Agent A (active, AWAY) and Agent B (deactivated, READY in cache). Unassigned conversation exists in that team. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin deactivates the member | HTTP 200 |
-| 2 | Check participant list on each of the 3 conversations | Member still listed as participant on all 3 |
-| 3 | Verify no unassignment event fired | Conversation assignee field unchanged |
+**Steps**
 
-### ACT-AUX-006: maxConversation not affected by deactivation
+1. Trigger auto-pull (`autoPullConversation`)
+2. Verify `isMemberAvailableForAutoPull()` for Agent B
+3. Verify conversation assignment
+4. Verify conversation state
 
-Prerequisites: Member is at `maxConversation = 3` with 3 active assigned conversations.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Auto-pull executes | | Need to Test | | Need to Test |
+| Returns `false` (deactivated takes precedence over READY status) | | Need to Test | | Need to Test |
+| Conversation NOT assigned to Agent B | | Need to Test | | Need to Test |
+| Remains unassigned (Agent A is AWAY, Agent B excluded) | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin deactivates the member | HTTP 200 |
-| 2 | Check member's `maxConversation` field | Value unchanged |
-| 3 | Check conversation assignment | All 3 conversations remain assigned to the member |
+---
+
+### ACT-AUX-004 · Reactivated member becomes eligible for Round Robin
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Continue from ACT-AUX-003. Agent B has been reactivated and set to READY. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Admin reactivates Agent B
+2. Agent B sets status to READY
+3. Trigger auto-pull again
+4. Verify Agent B eligibility
+5. Verify conversation assignment
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 | | Need to Test | | Need to Test |
+| Status updated | | Need to Test | | Need to Test |
+| Auto-pull executes | | Need to Test | | Need to Test |
+| `isMemberAvailableForAutoPull()` returns `true` | | Need to Test | | Need to Test |
+| Conversation assigned to Agent B | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUX-005 · Conversations remain assigned after deactivation
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member has 3 active assigned conversations. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Admin deactivates the member
+2. Check participant list on each of the 3 conversations
+3. Verify no unassignment event fired
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 | | Need to Test | | Need to Test |
+| Member still listed as participant on all 3 | | Need to Test | | Need to Test |
+| Conversation assignee field unchanged | | Need to Test | | Need to Test |
+
+---
+
+### ACT-AUX-006 · maxConversation not affected by deactivation
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member is at `maxConversation = 3` with 3 active assigned conversations. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Admin deactivates the member
+2. Check member's `maxConversation` field
+3. Check conversation assignment
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 | | Need to Test | | Need to Test |
+| Value unchanged | | Need to Test | | Need to Test |
+| All 3 conversations remain assigned to the member | | Need to Test | | Need to Test |
 
 ---
 
 ## TEST GROUP: ACT-VIS — Member Visibility
 
-### ACT-VIS-001: Member list shows deactivated members
+### ACT-VIS-001 · Member list shows deactivated members
 
-Prerequisites: Member A is active (`auth.isActive=true`, `member.isActive=true`). Member B is deactivated (`auth.isActive=false`, `member.isActive=true`).
+| | |
+|:--|:--|
+| **Pre-Condition** | Member A is active (`auth.isActive=true`, `member.isActive=true`). Member B is deactivated (`auth.isActive=false`, `member.isActive=true`). |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin opens member settings page | Page loads |
-| 2 | Verify API call: `GET /member` (no `isActive` param) | Both Member A and Member B returned |
-| 3 | Verify Member A badge | "Aktif" badge shown |
-| 4 | Verify Member B badge | "Nonaktif" badge shown |
+**Steps**
 
-### ACT-VIS-002: Member list hides soft-deleted members
+1. Admin opens member settings page
+2. Verify API call: `GET /member` (no `isActive` param)
+3. Verify Member A badge
+4. Verify Member B badge
 
-Prerequisites: Member C is soft-deleted (`member.isDeleted=true`).
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Page loads | | Need to Test | | Need to Test |
+| Both Member A and Member B returned | | Need to Test | | Need to Test |
+| "Aktif" badge shown | | Need to Test | | Need to Test |
+| "Nonaktif" badge shown | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin calls `GET /member` without `isActive` param | Response returned |
-| 2 | Verify Member C in response | Member C NOT returned |
-| 3 | Verify only non-deleted members appear | Correct filtering by `isDeleted: { $ne: true }` |
+---
 
-### ACT-VIS-003: Assignable member list excludes deactivated
+### ACT-VIS-002 · Member list hides soft-deleted members
 
-Prerequisites: Member A (active), Member B (deactivated). Context: ticket assignee dropdown.
+| | |
+|:--|:--|
+| **Pre-Condition** | Member C is soft-deleted (`member.isDeleted=true`). |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call `GET /member?isActive=true` (ticket assignable context) | Response returned |
-| 2 | Verify Member A in response | Included |
-| 3 | Verify Member B in response | NOT included |
+**Steps**
 
-### ACT-VIS-004: findMembersByIds returns deactivated members
+1. Admin calls `GET /member` without `isActive` param
+2. Verify Member C in response
+3. Verify only non-deleted members appear
 
-Prerequisites: Member B is deactivated but NOT soft-deleted.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Response returned | | Need to Test | | Need to Test |
+| Member C NOT returned | | Need to Test | | Need to Test |
+| Correct filtering by `isDeleted: { $ne: true }` | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call `findMembersByIds` with Member B's ID | Response returned |
-| 2 | Verify Member B in response | Returned (not filtered by `isActive`) |
-| 3 | Verify filtering applied | Only `isDeleted: { $ne: true }` applied — no `isActive` filter |
+---
 
-### ACT-VIS-005: Search shows deactivated members in settings page
+### ACT-VIS-003 · Assignable member list excludes deactivated
 
-Prerequisites: Member B is deactivated, name contains "B". Admin searches from member settings page.
+| | |
+|:--|:--|
+| **Pre-Condition** | Member A (active), Member B (deactivated). Context: ticket assignee dropdown. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin types "B" in search field on member settings page | Search fires without `isActive` filter |
-| 2 | Verify Member B in results | Member B appears |
-| 3 | Verify Member B badge | "Nonaktif" badge shown |
+**Steps**
 
-### ACT-VIS-006: Search excludes deactivated in assignment context
+1. Call `GET /member?isActive=true` (ticket assignable context)
+2. Verify Member A in response
+3. Verify Member B in response
 
-Prerequisites: Member B is deactivated, name contains "B". User searches in ticket assignee dropdown.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Response returned | | Need to Test | | Need to Test |
+| Included | | Need to Test | | Need to Test |
+| NOT included | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | User types "B" in ticket assignee search | Search fires with `isActive=true` filter |
-| 2 | Verify Member B in results | Member B NOT returned |
+---
+
+### ACT-VIS-004 · findMembersByIds returns deactivated members
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member B is deactivated but NOT soft-deleted. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Call `findMembersByIds` with Member B's ID
+2. Verify Member B in response
+3. Verify filtering applied
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Response returned | | Need to Test | | Need to Test |
+| Returned (not filtered by `isActive`) | | Need to Test | | Need to Test |
+| Only `isDeleted: { $ne: true }` applied — no `isActive` filter | | Need to Test | | Need to Test |
+
+---
+
+### ACT-VIS-005 · Search shows deactivated members in settings page
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member B is deactivated, name contains "B". Admin searches from member settings page. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Admin types "B" in search field on member settings page
+2. Verify Member B in results
+3. Verify Member B badge
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Search fires without `isActive` filter | | Need to Test | | Need to Test |
+| Member B appears | | Need to Test | | Need to Test |
+| "Nonaktif" badge shown | | Need to Test | | Need to Test |
+
+---
+
+### ACT-VIS-006 · Search excludes deactivated in assignment context
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Member B is deactivated, name contains "B". User searches in ticket assignee dropdown. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. User types "B" in ticket assignee search
+2. Verify Member B in results
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Search fires with `isActive=true` filter | | Need to Test | | Need to Test |
+| Member B NOT returned | | Need to Test | | Need to Test |
 
 ---
 
 ## TEST GROUP: ACT-FE — Frontend Components
 
-### ACT-FE-001: Status badge shows correct state
+### ACT-FE-001 · Status badge shows correct state
 
-Prerequisites: Member list loaded with at least one active and one deactivated member.
+| | |
+|:--|:--|
+| **Pre-Condition** | Member list loaded with at least one active and one deactivated member. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Open member settings page | Member list renders |
-| 2 | Verify active member row | "Aktif" badge shown in green |
-| 3 | Verify deactivated member row | "Nonaktif" badge shown in gray/red |
+**Steps**
 
-### ACT-FE-002: Row menu shows correct toggle label
+1. Open member settings page
+2. Verify active member row
+3. Verify deactivated member row
 
-Prerequisites: Member list loaded with one active and one deactivated member.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Member list renders | | Need to Test | | Need to Test |
+| "Aktif" badge shown in green | | Need to Test | | Need to Test |
+| "Nonaktif" badge shown in gray/red | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Open row menu (three dots) for active member | Menu opens |
-| 2 | Verify toggle option label | "Nonaktifkan anggota" shown |
-| 3 | Open row menu for deactivated member | Menu opens |
-| 4 | Verify toggle option label | "Aktifkan anggota" shown |
+---
 
-### ACT-FE-003: Confirmation modal appears on toggle click
+### ACT-FE-002 · Row menu shows correct toggle label
 
-Prerequisites: Admin is on member settings page.
+| | |
+|:--|:--|
+| **Pre-Condition** | Member list loaded with one active and one deactivated member. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Click "Nonaktifkan anggota" from row menu | Confirmation modal opens |
-| 2 | Verify modal title | "Nonaktifkan anggota" |
-| 3 | Verify modal description in Bahasa Indonesia | Description text present |
-| 4 | Verify deactivation note | "Anggota tetap terdaftar di tim dan percakapan yang sedang berlangsung tidak terpengaruh." shown |
-| 5 | Click cancel | Modal closes, no action taken |
+**Steps**
 
-### ACT-FE-004: Successful toggle refreshes list
+1. Open row menu (three dots) for active member
+2. Verify toggle option label
+3. Open row menu for deactivated member
+4. Verify toggle option label
 
-Prerequisites: Admin confirms toggle in modal.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Menu opens | | Need to Test | | Need to Test |
+| "Nonaktifkan anggota" shown | | Need to Test | | Need to Test |
+| Menu opens | | Need to Test | | Need to Test |
+| "Aktifkan anggota" shown | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Click "Nonaktifkan anggota" and confirm in modal | API called |
-| 2 | Verify API response | HTTP 200 |
-| 3 | Verify toast notification | "Anggota berhasil dinonaktifkan" shown |
-| 4 | Verify table row | Badge updated to "Nonaktif" |
-| 5 | Verify list refetched | Updated data reflected without page reload |
+---
 
-### ACT-FE-005: Failed toggle shows error toast
+### ACT-FE-003 · Confirmation modal appears on toggle click
 
-Prerequisites: API returns error (e.g., network failure or 500).
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin is on member settings page. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Click toggle and confirm in modal | API called |
-| 2 | Simulate API error | 500 or network failure |
-| 3 | Verify error toast | "Gagal memperbarui status anggota. Silakan coba lagi." shown |
-| 4 | Verify modal state | Modal closes |
-| 5 | Verify table row | Badge unchanged (still original state) |
+**Steps**
 
-### ACT-FE-006: Reactivation modal shows correct description
+1. Click "Nonaktifkan anggota" from row menu
+2. Verify modal title
+3. Verify modal description in Bahasa Indonesia
+4. Verify deactivation note
+5. Click cancel
 
-Prerequisites: Admin opens row menu for deactivated member.
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Confirmation modal opens | | Need to Test | | Need to Test |
+| "Nonaktifkan anggota" | | Need to Test | | Need to Test |
+| Description text present | | Need to Test | | Need to Test |
+| "Anggota tetap terdaftar di tim dan percakapan yang sedang berlangsung tidak terpengaruh." shown | | Need to Test | | Need to Test |
+| Modal closes, no action taken | | Need to Test | | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Click "Aktifkan anggota" | Confirmation modal opens |
-| 2 | Verify modal title | "Aktifkan anggota" |
-| 3 | Verify modal description | "Anggota akan dapat masuk kembali setelah diaktifkan." shown |
-| 4 | Confirm action | Toast "Anggota berhasil diaktifkan" shown. Badge updated to "Aktif". |
+---
+
+### ACT-FE-004 · Successful toggle refreshes list
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin confirms toggle in modal. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Click "Nonaktifkan anggota" and confirm in modal
+2. Verify API response
+3. Verify toast notification
+4. Verify table row
+5. Verify list refetched
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| API called | | Need to Test | | Need to Test |
+| HTTP 200 | | Need to Test | | Need to Test |
+| "Anggota berhasil dinonaktifkan" shown | | Need to Test | | Need to Test |
+| Badge updated to "Nonaktif" | | Need to Test | | Need to Test |
+| Updated data reflected without page reload | | Need to Test | | Need to Test |
+
+---
+
+### ACT-FE-005 · Failed toggle shows error toast
+
+| | |
+|:--|:--|
+| **Pre-Condition** | API returns error (e.g., network failure or 500). |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Click toggle and confirm in modal
+2. Simulate API error
+3. Verify error toast
+4. Verify modal state
+5. Verify table row
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| API called | | Need to Test | | Need to Test |
+| 500 or network failure | | Need to Test | | Need to Test |
+| "Gagal memperbarui status anggota. Silakan coba lagi." shown | | Need to Test | | Need to Test |
+| Modal closes | | Need to Test | | Need to Test |
+| Badge unchanged (still original state) | | Need to Test | | Need to Test |
+
+---
+
+### ACT-FE-006 · Reactivation modal shows correct description
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin opens row menu for deactivated member. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Click "Aktifkan anggota"
+2. Verify modal title
+3. Verify modal description
+4. Confirm action
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Confirmation modal opens | | Need to Test | | Need to Test |
+| "Aktifkan anggota" | | Need to Test | | Need to Test |
+| "Anggota akan dapat masuk kembali setelah diaktifkan." shown | | Need to Test | | Need to Test |
+| Toast "Anggota berhasil diaktifkan" shown. Badge updated to "Aktif". | | Need to Test | | Need to Test |
 
 ---
 
 ## TEST GROUP: ACT-SEC — Security & Mobile
 
-### ACT-SEC-001: Admin deactivates their own account
+### ACT-SEC-001 · Admin deactivates their own account
 
-Prerequisites: Admin is logged in. Admin attempts to deactivate themselves.
+| | |
+|:--|:--|
+| **Pre-Condition** | Admin is logged in. Admin attempts to deactivate themselves. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin calls toggle endpoint with their own `userId`, `{ "isActive": false }` | HTTP 200 returned |
-| 2 | Verify DB: Admin's Auth `isActive` | Set to `false` |
-| 3 | Verify Admin's sessions | All sessions deleted |
-| 4 | Verify Admin's next request | Returns 401 (force-logged out) |
+**Steps**
 
-### ACT-SEC-002: Deactivate last active Admin
+1. Admin calls toggle endpoint with their own `userId`, `{ "isActive": false }`
+2. Verify DB: Admin's Auth `isActive`
+3. Verify Admin's sessions
+4. Verify Admin's next request
 
-Prerequisites: Only one active Admin in the workspace.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Deactivate the last active Admin | HTTP 200 returned (no guard blocks this) |
-| 2 | Verify Auth record | `isActive = false` |
-| 3 | Verify workspace state | No active Admin remains (workspace may be locked) |
-
-### ACT-SEC-003: Concurrent toggle from two Admins
-
-Prerequisites: Two Admin users. Same target member.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Admin A and Admin B simultaneously call toggle on same member | Both requests processed |
-| 2 | Verify both responses | Both return HTTP 200 |
-| 3 | Verify DB final state | Last write wins — `isActive` reflects last request |
-| 4 | Verify data integrity | No corruption, no partial state |
-
-### ACT-SEC-004: Mobile app self-deactivation on uninstall
-
-Prerequisites: Mobile user is logged in with valid JWT. Mobile app sends deactivation request using the user's own token.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Mobile app calls `PATCH /auth/member/:id/toggle-active-status` with own JWT, `{ "isActive": false }` | HTTP 200 returned |
-| 2 | Verify DB: `isActive = false` | Deactivation confirmed |
-| 3 | Verify sessions | All sessions deleted |
-| 4 | Verify mobile app subsequent request | Returns 401 (no further authenticated calls possible) |
-
-### ACT-SEC-005: Mobile app deactivation with invalid/expired token
-
-Prerequisites: Mobile app has expired or invalid JWT.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Mobile app calls toggle endpoint with invalid token | HTTP 401 returned |
-| 2 | Verify DB | No state change |
-
-### ACT-SEC-006: Mobile app deactivation for non-existent user
-
-Prerequisites: Mobile app calls deactivation with a non-existent or invalid `userId`.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Call toggle endpoint with invalid `userId` | HTTP 404 returned |
-| 2 | Verify response | No state change |
-
-### ACT-SEC-007: Mobile app re-registration after deactivation
-
-Prerequisites: Mobile user was deactivated. Admin has reactivated the user.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Mobile user attempts login from new device | Login succeeds |
-| 2 | Verify DB: new session created | Session record exists |
-| 3 | Verify mobile app state | Fully functional again |
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 returned | | Need to Test | | Need to Test |
+| Set to `false` | | Need to Test | | Need to Test |
+| All sessions deleted | | Need to Test | | Need to Test |
+| Returns 401 (force-logged out) | | Need to Test | | Need to Test |
 
 ---
 
-## REGRESSION TEST SCOPE
+### ACT-SEC-002 · Deactivate last active Admin
 
-These tests verify existing behaviors are NOT broken by this feature:
+| | |
+|:--|:--|
+| **Pre-Condition** | Only one active Admin in the workspace. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
 
-| ID | Existing Behavior | Test |
-|----|------------------|------|
-| REG-001 | Soft-deleted members not visible in member list | Member with `isDeleted=true` → not returned from `GET /member` |
-| REG-002 | Login with valid credentials succeeds for active member | Active member login → session created |
-| REG-003 | Token refresh works for active member | Active member refresh token → new access token issued |
-| REG-004 | Round Robin assigns to available active agent | Active READY agent → receives auto-pull conversation |
-| REG-005 | Member settings page loads correctly | Page renders member table without error |
-| REG-006 | Ticket assignee dropdown shows active members | `GET /member?isActive=true` → only active members returned |
-| REG-007 | Conversation assignee dropdown shows active members | Assignee search → deactivated members excluded |
+**Steps**
+
+1. Deactivate the last active Admin
+2. Verify Auth record
+3. Verify workspace state
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 returned (no guard blocks this) | | Need to Test | | Need to Test |
+| `isActive = false` | | Need to Test | | Need to Test |
+| No active Admin remains (workspace may be locked) | | Need to Test | | Need to Test |
 
 ---
 
-## TEST DATA REQUIREMENTS SUMMARY
+### ACT-SEC-003 · Concurrent toggle from two Admins
 
-| Entity | Minimum Data Needed |
-|--------|-------------------|
-| Workspace | 1 workspace with at least 1 active Team Inbox |
-| Users | Admin (with `member:update`), Agent (active), Agent (to be deactivated), non-Admin user (without permission) |
-| Auth records | Members with valid credentials, at least 1 with active session |
-| Sessions | At least 1 active session for deactivation test |
-| AUX intervals | 1 open AUX interval (AWAY state) for ACT-AUX-001 |
-| Conversations | 3+ conversations assigned to deactivation target for ACT-AUX-005 |
-| Team Inbox | 1 team with 2 agents (1 active AWAY, 1 to be deactivated READY) for Round Robin tests |
+| | |
+|:--|:--|
+| **Pre-Condition** | Two Admin users. Same target member. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Admin A and Admin B simultaneously call toggle on same member
+2. Verify both responses
+3. Verify DB final state
+4. Verify data integrity
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Both requests processed | | Need to Test | | Need to Test |
+| Both return HTTP 200 | | Need to Test | | Need to Test |
+| Last write wins — `isActive` reflects last request | | Need to Test | | Need to Test |
+| No corruption, no partial state | | Need to Test | | Need to Test |
+
+---
+
+### ACT-SEC-004 · Mobile app self-deactivation on uninstall
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Mobile user is logged in with valid JWT. Mobile app sends deactivation request using the user's own token. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Mobile app calls `PATCH /auth/member/:id/toggle-active-status` with own JWT, `{ "isActive": false }`
+2. Verify DB: `isActive = false`
+3. Verify sessions
+4. Verify mobile app subsequent request
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 200 returned | | Need to Test | | Need to Test |
+| Deactivation confirmed | | Need to Test | | Need to Test |
+| All sessions deleted | | Need to Test | | Need to Test |
+| Returns 401 (no further authenticated calls possible) | | Need to Test | | Need to Test |
+
+---
+
+### ACT-SEC-005 · Mobile app deactivation with invalid/expired token
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Mobile app has expired or invalid JWT. |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Mobile app calls toggle endpoint with invalid token
+2. Verify DB
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 401 returned | | Need to Test | | Need to Test |
+| No state change | | Need to Test | | Need to Test |
+
+---
+
+### ACT-SEC-006 · Mobile app deactivation for non-existent user
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Mobile app calls deactivation with a non-existent or invalid `userId`. |
+| **Test Type** | NEGATIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Call toggle endpoint with invalid `userId`
+2. Verify response
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| HTTP 404 returned | | Need to Test | | Need to Test |
+| No state change | | Need to Test | | Need to Test |
+
+---
+
+### ACT-SEC-007 · Mobile app re-registration after deactivation
+
+| | |
+|:--|:--|
+| **Pre-Condition** | Mobile user was deactivated. Admin has reactivated the user. |
+| **Test Type** | POSITIVE |
+| **Tester** | |
+| **Date** | |
+| **Status DEV** | Need to Test |
+| **Status Staging** | — |
+| **Status Prod** | Need to Test |
+
+**Steps**
+
+1. Mobile user attempts login from new device
+2. Verify DB: new session created
+3. Verify mobile app state
+
+| Expected Result | Actual Result | DEV | Staging | Prod |
+|:----------------|:--------------|:----|:--------|:-----|
+| Login succeeds | | Need to Test | | Need to Test |
+| Session record exists | | Need to Test | | Need to Test |
+| Fully functional again | | Need to Test | | Need to Test |
+
+---
