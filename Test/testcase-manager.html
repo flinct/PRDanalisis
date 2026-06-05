@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SatuInbox · Test Case Manager</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080c14; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    select option { background: #0f172a; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const STATUS_OPTIONS = ["Passed", "Failed", "On Test", "Need to Test", ""];
+    const ENV_OPTIONS = ["DEV", "Staging", "Prod"];
+    const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
+
+    const STATUS_COLORS = {
+      "Passed": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+      "Failed": "bg-red-500/20 text-red-300 border-red-500/40",
+      "On Test": "bg-blue-500/20 text-blue-300 border-blue-500/40",
+      "Need to Test": "bg-amber-500/20 text-amber-300 border-amber-500/40",
+      "": "bg-slate-500/20 text-slate-400 border-slate-500/40",
+    };
+
+    const EMPTY_ROW = {
+      id: "", module: "", title: "", preconditions: "", steps: "",
+      expectedResult: "",
+      actualResult: { DEV: "", Staging: "", Prod: "" },
+      status: { DEV: "", Staging: "", Prod: "" },
+      notes: "", priority: "Medium",
+    };
+
+    const STORAGE_KEY = "satinbox_testcases_v1";
+
+    const DEFAULT_DATA = [
+      { id: "SIX-Test-001", module: "Register", title: "Register with valid data", preconditions: "User not registered", steps: "1. Open register page\n2. Fill all fields with valid data\n3. Click Register", expectedResult: "Account created, email verification sent", actualResult: { DEV: "Account created successfully", Staging: "", Prod: "" }, status: { DEV: "Passed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "", priority: "High" },
+      { id: "SIX-Test-006", module: "Register", title: "Fullname with double spaces trimming", preconditions: "User not registered", steps: "1. Enter fullname with double spaces (e.g. 'John  Doe')\n2. Submit", expectedResult: "Double spaces trimmed to single space", actualResult: { DEV: "Spaces not trimmed", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "Bug: no email service", priority: "Medium" },
+      { id: "SIX-Test-018", module: "Register", title: "Username uppercase → auto-lowercase", preconditions: "User not registered", steps: "1. Enter username in uppercase (e.g. 'JOHNDOE')\n2. Submit", expectedResult: "Username auto-converted to lowercase", actualResult: { DEV: "System rejects instead of converting", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "", priority: "High" },
+      { id: "SIX-Test-035", module: "Register", title: "Password contains username", preconditions: "User not registered", steps: "1. Enter password that includes the username\n2. Submit", expectedResult: "Error: password cannot contain username", actualResult: { DEV: "System allows it", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "", priority: "High" },
+      { id: "SIX-Test-067", module: "Login", title: "Login with email", preconditions: "User registered", steps: "1. Enter registered email in identifier field\n2. Enter correct password\n3. Click Login", expectedResult: "Login successful", actualResult: { DEV: "Login via email not supported", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "", priority: "High" },
+      { id: "SIX-Test-073", module: "Login", title: "Login password < 8 chars error message", preconditions: "Login page open", steps: "1. Enter valid username\n2. Enter password with less than 8 chars\n3. Click Login", expectedResult: "Error: password must be at least 8 characters", actualResult: { DEV: "Shows '6 karakter' instead of '8 karakter'", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "UI copy bug", priority: "Medium" },
+      { id: "SIX-Test-074", module: "Login", title: "Access token expiry auto-refresh", preconditions: "User logged in", steps: "1. Login\n2. Wait 15 minutes (token expiry)\n3. Perform any action", expectedResult: "Token auto-refreshed, session continues", actualResult: { DEV: "Token not refreshed, user kicked out", Staging: "", Prod: "" }, status: { DEV: "Failed", Staging: "Need to Test", Prod: "Need to Test" }, notes: "", priority: "High" },
+    ];
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch(e) {}
+      return DEFAULT_DATA;
+    }
+
+    function saveData(rows) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); } catch(e) {}
+    }
+
+    function StatusBadge({ value, onChange }) {
+      return (
+        <select
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className={`text-xs font-semibold px-2 py-1 rounded-full border cursor-pointer bg-transparent outline-none ${STATUS_COLORS[value] || STATUS_COLORS[""]}`}
+        >
+          {STATUS_OPTIONS.map(s => (
+            <option key={s} value={s}>{s || "—"}</option>
+          ))}
+        </select>
+      );
+    }
+
+    function copyToTSV(rows) {
+      const headers = ["Test ID","Module","Title","Priority","Preconditions","Steps","Expected Result","Actual (DEV)","Status DEV","Actual (Staging)","Status Staging","Actual (Prod)","Status Prod","Notes"];
+      const lines = [headers.join("\t")];
+      rows.forEach(r => {
+        lines.push([
+          r.id, r.module, r.title, r.priority,
+          r.preconditions, r.steps, r.expectedResult,
+          r.actualResult.DEV, r.status.DEV,
+          r.actualResult.Staging, r.status.Staging,
+          r.actualResult.Prod, r.status.Prod,
+          r.notes
+        ].map(v => `"${(v||"").replace(/"/g,'""')}"`).join("\t"));
+      });
+      navigator.clipboard.writeText(lines.join("\n"));
+    }
+
+    function exportCSV(rows) {
+      const headers = ["Test ID","Module","Title","Priority","Preconditions","Steps","Expected Result","Actual (DEV)","Status DEV","Actual (Staging)","Status Staging","Actual (Prod)","Status Prod","Notes"];
+      const lines = [headers.join(",")];
+      rows.forEach(r => {
+        lines.push([
+          r.id, r.module, r.title, r.priority,
+          r.preconditions, r.steps, r.expectedResult,
+          r.actualResult.DEV, r.status.DEV,
+          r.actualResult.Staging, r.status.Staging,
+          r.actualResult.Prod, r.status.Prod,
+          r.notes
+        ].map(v => `"${(v||"").replace(/"/g,'""')}"`).join(","));
+      });
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "testcases.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function TestCaseManager() {
+      const [rows, setRows] = useState(loadData);
+      const [search, setSearch] = useState("");
+      const [filterModule, setFilterModule] = useState("All");
+      const [filterStatus, setFilterStatus] = useState("All");
+      const [filterEnv, setFilterEnv] = useState("DEV");
+      const [expandedRow, setExpandedRow] = useState(null);
+      const [copied, setCopied] = useState(false);
+      const [saveMsg, setSaveMsg] = useState("");
+
+      useEffect(() => { saveData(rows); }, [rows]);
+
+      const modules = ["All", ...Array.from(new Set(rows.map(r => r.module).filter(Boolean)))];
+
+      const filtered = rows.filter(r => {
+        const matchSearch = !search || r.id.toLowerCase().includes(search.toLowerCase()) || r.title.toLowerCase().includes(search.toLowerCase());
+        const matchModule = filterModule === "All" || r.module === filterModule;
+        const matchStatus = filterStatus === "All" || r.status[filterEnv] === filterStatus;
+        return matchSearch && matchModule && matchStatus;
+      });
+
+      const stats = {
+        Passed: rows.filter(r => r.status[filterEnv] === "Passed").length,
+        Failed: rows.filter(r => r.status[filterEnv] === "Failed").length,
+        "On Test": rows.filter(r => r.status[filterEnv] === "On Test").length,
+        "Need to Test": rows.filter(r => r.status[filterEnv] === "Need to Test").length,
+      };
+
+      function updateRow(idx, field, value) {
+        setRows(prev => prev.map((r, i) => {
+          if (i !== idx) return r;
+          if (field.includes(".")) {
+            const [parent, child] = field.split(".");
+            return { ...r, [parent]: { ...r[parent], [child]: value } };
+          }
+          return { ...r, [field]: value };
+        }));
+      }
+
+      function addRow() {
+        const maxNum = rows.reduce((max, r) => {
+          const m = r.id.match(/(\d+)$/);
+          return m ? Math.max(max, parseInt(m[1])) : max;
+        }, 0);
+        const newId = `SIX-Test-${String(maxNum + 1).padStart(3, "0")}`;
+        const newIdx = rows.length;
+        setRows(prev => [...prev, { ...EMPTY_ROW, id: newId }]);
+        setExpandedRow(newIdx);
+      }
+
+      function deleteRow(idx) {
+        if (!confirm("Hapus test case ini?")) return;
+        setRows(prev => prev.filter((_, i) => i !== idx));
+        setExpandedRow(null);
+      }
+
+      function handleCopy() {
+        copyToTSV(rows);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+
+      function handleExport() {
+        exportCSV(rows);
+        setSaveMsg("Downloaded!");
+        setTimeout(() => setSaveMsg(""), 2000);
+      }
+
+      function handleReset() {
+        if (!confirm("Reset ke data awal? Semua perubahan akan hilang.")) return;
+        setRows(DEFAULT_DATA);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+
+      const rowGlobalIdx = (filteredRow) => rows.indexOf(filteredRow);
+
+      return (
+        <div style={{ fontFamily: "'IBM Plex Mono', 'Fira Code', monospace", background: "#080c14", minHeight: "100vh", color: "#e2e8f0" }}>
+
+          {/* Header */}
+          <div style={{ borderBottom: "1px solid #1e293b", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", position: "sticky", top: 0, background: "#080c14", zIndex: 50 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, textTransform: "uppercase", marginBottom: 2 }}>SatuInbox · Auth Module</div>
+              <div style={{ fontSize: 17, fontWeight: 600, color: "#f1f5f9" }}>Test Case Manager</div>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {ENV_OPTIONS.map(e => (
+                <button key={e} onClick={() => setFilterEnv(e)}
+                  style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 6, border: "1px solid", cursor: "pointer",
+                    background: filterEnv === e ? "#3b82f6" : "transparent",
+                    borderColor: filterEnv === e ? "#3b82f6" : "#334155",
+                    color: filterEnv === e ? "#fff" : "#64748b" }}>
+                  {e}
+                </button>
+              ))}
+            </div>
+            <button onClick={handleCopy}
+              style={{ fontSize: 11, padding: "4px 12px", borderRadius: 6, border: "1px solid #334155", background: copied ? "#059669" : "#1e293b", color: copied ? "#fff" : "#94a3b8", cursor: "pointer" }}>
+              {copied ? "✓ Copied!" : "Copy TSV"}
+            </button>
+            <button onClick={handleExport}
+              style={{ fontSize: 11, padding: "4px 12px", borderRadius: 6, border: "1px solid #334155", background: saveMsg ? "#059669" : "#1e293b", color: saveMsg ? "#fff" : "#94a3b8", cursor: "pointer" }}>
+              {saveMsg || "↓ Export CSV"}
+            </button>
+            <button onClick={addRow}
+              style={{ fontSize: 11, fontWeight: 700, padding: "4px 14px", borderRadius: 6, border: "none", background: "#3b82f6", color: "#fff", cursor: "pointer" }}>
+              + Add Row
+            </button>
+          </div>
+
+          {/* Stats bar */}
+          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid #1e293b", fontSize: 11 }}>
+            {Object.entries(stats).map(([k, v]) => (
+              <button key={k} onClick={() => setFilterStatus(filterStatus === k ? "All" : k)}
+                style={{ flex: 1, padding: "10px 4px", textAlign: "center", cursor: "pointer", border: "none",
+                  background: filterStatus === k ? "#1e293b" : "transparent",
+                  borderBottom: filterStatus === k ? "2px solid #3b82f6" : "2px solid transparent" }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: k === "Passed" ? "#4ade80" : k === "Failed" ? "#f87171" : k === "On Test" ? "#60a5fa" : "#fbbf24" }}>{v}</div>
+                <div style={{ color: "#475569", marginTop: 1 }}>{k}</div>
+              </button>
+            ))}
+            <div style={{ flex: 1, padding: "10px 4px", textAlign: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>{rows.length}</div>
+              <div style={{ color: "#475569" }}>Total</div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div style={{ display: "flex", gap: 8, padding: "8px 16px", borderBottom: "1px solid #1e293b", alignItems: "center", flexWrap: "wrap" }}>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search ID or title..."
+              style={{ fontSize: 11, padding: "5px 10px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none", width: 200 }} />
+            <select value={filterModule} onChange={e => setFilterModule(e.target.value)}
+              style={{ fontSize: 11, padding: "5px 10px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none" }}>
+              {modules.map(m => <option key={m}>{m}</option>)}
+            </select>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              style={{ fontSize: 11, padding: "5px 10px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none" }}>
+              {["All", ...STATUS_OPTIONS.filter(Boolean)].map((s, i) => <option key={i} value={s}>{s}</option>)}
+            </select>
+            <span style={{ fontSize: 11, color: "#475569", marginLeft: "auto" }}>
+              {filtered.length} / {rows.length} test cases
+            </span>
+            <button onClick={handleReset}
+              style={{ fontSize: 10, padding: "3px 10px", borderRadius: 6, border: "1px solid #7f1d1d", background: "transparent", color: "#7f1d1d", cursor: "pointer" }}>
+              Reset
+            </button>
+          </div>
+
+          {/* Auto-save indicator */}
+          <div style={{ fontSize: 10, color: "#1e3a5f", padding: "3px 16px", background: "#080c14", textAlign: "right" }}>
+            ● auto-saved to browser
+          </div>
+
+          {/* Table header */}
+          <div style={{ display: "grid", gridTemplateColumns: "100px 90px 1fr 65px 1fr 1fr 130px 40px", gap: 0, fontSize: 10, fontWeight: 600, color: "#475569", letterSpacing: 1, textTransform: "uppercase", padding: "6px 16px", borderBottom: "1px solid #1e293b", background: "#0a0f1a" }}>
+            <div>Test ID</div><div>Module</div><div>Title</div><div>Priority</div>
+            <div>Expected</div><div>Actual ({filterEnv})</div><div>Status ({filterEnv})</div><div></div>
+          </div>
+
+          {/* Rows */}
+          <div>
+            {filtered.map((row) => {
+              const gIdx = rowGlobalIdx(row);
+              const isExpanded = expandedRow === gIdx;
+              return (
+                <div key={gIdx} style={{ borderBottom: "1px solid #0f172a" }}>
+                  <div
+                    onClick={() => setExpandedRow(isExpanded ? null : gIdx)}
+                    style={{ display: "grid", gridTemplateColumns: "100px 90px 1fr 65px 1fr 1fr 130px 40px", gap: 0, padding: "7px 16px", alignItems: "center", cursor: "pointer",
+                      background: isExpanded ? "#0f1a2e" : "transparent",
+                      borderLeft: isExpanded ? "2px solid #3b82f6" : "2px solid transparent" }}>
+                    <div style={{ fontSize: 11, color: "#60a5fa", fontWeight: 600 }}>{row.id || "—"}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>{row.module || "—"}</div>
+                    <div style={{ fontSize: 12, color: "#e2e8f0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.title || "—"}</div>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: row.priority === "High" ? "#f87171" : row.priority === "Medium" ? "#fbbf24" : "#4ade80" }}>{row.priority}</div>
+                    <div style={{ fontSize: 11, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.expectedResult || "—"}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.actualResult[filterEnv] || "—"}</div>
+                    <div onClick={e => e.stopPropagation()}>
+                      <StatusBadge value={row.status[filterEnv]} onChange={v => updateRow(gIdx, `status.${filterEnv}`, v)} />
+                    </div>
+                    <div style={{ fontSize: 12, color: "#475569", textAlign: "center" }}>{isExpanded ? "▲" : "▼"}</div>
+                  </div>
+
+                  {isExpanded && (
+                    <div style={{ background: "#0c1524", padding: "16px 20px", borderTop: "1px solid #1e2d45", borderLeft: "2px solid #3b82f6" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+                        {[["Test ID","id"],["Module","module"],["Priority","priority"],["Notes","notes"]].map(([label, field]) => (
+                          <div key={field}>
+                            <div style={{ fontSize: 10, color: "#475569", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
+                            {field === "priority" ? (
+                              <select value={row.priority} onChange={e => updateRow(gIdx, "priority", e.target.value)}
+                                style={{ width: "100%", fontSize: 12, padding: "5px 8px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none" }}>
+                                {PRIORITY_OPTIONS.map(p => <option key={p}>{p}</option>)}
+                              </select>
+                            ) : (
+                              <input value={row[field] || ""} onChange={e => updateRow(gIdx, field, e.target.value)}
+                                style={{ width: "100%", fontSize: 12, padding: "5px 8px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none" }} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+                        {[["Title","title"],["Preconditions","preconditions"],["Expected Result","expectedResult"]].map(([label,field]) => (
+                          <div key={field}>
+                            <div style={{ fontSize: 10, color: "#475569", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
+                            <textarea value={row[field] || ""} onChange={e => updateRow(gIdx, field, e.target.value)} rows={3}
+                              style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none", resize: "vertical", fontFamily: "inherit" }} />
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 10, color: "#475569", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>Steps</div>
+                        <textarea value={row.steps || ""} onChange={e => updateRow(gIdx, "steps", e.target.value)} rows={4}
+                          style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid #334155", background: "#0f172a", color: "#e2e8f0", outline: "none", resize: "vertical", fontFamily: "inherit" }} />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                        {ENV_OPTIONS.map(env => (
+                          <div key={env} style={{ background: "#0f172a", borderRadius: 8, padding: 12, border: `1px solid ${filterEnv === env ? "#3b82f6" : "#1e293b"}` }}>
+                            <div style={{ fontSize: 10, color: filterEnv === env ? "#60a5fa" : "#475569", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>{env}</div>
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>ACTUAL RESULT</div>
+                              <textarea value={row.actualResult[env] || ""} onChange={e => updateRow(gIdx, `actualResult.${env}`, e.target.value)} rows={2}
+                                style={{ width: "100%", fontSize: 12, padding: "5px 8px", borderRadius: 6, border: "1px solid #334155", background: "#080c14", color: "#e2e8f0", outline: "none", resize: "vertical", fontFamily: "inherit" }} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, color: "#475569", marginBottom: 3 }}>STATUS</div>
+                              <StatusBadge value={row.status[env]} onChange={v => updateRow(gIdx, `status.${env}`, v)} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+                        <button onClick={() => deleteRow(gIdx)}
+                          style={{ fontSize: 11, padding: "5px 14px", borderRadius: 6, border: "1px solid #7f1d1d", background: "#1c0a0a", color: "#f87171", cursor: "pointer" }}>
+                          Delete Row
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {filtered.length === 0 && (
+            <div style={{ padding: 48, textAlign: "center", color: "#334155", fontSize: 13 }}>No test cases found.</div>
+          )}
+
+          {/* Footer */}
+          <div style={{ padding: "12px 16px", borderTop: "1px solid #1e293b", display: "flex", gap: 8, justifyContent: "flex-end", background: "#080c14" }}>
+            <button onClick={handleCopy}
+              style={{ fontSize: 11, padding: "6px 16px", borderRadius: 6, border: "1px solid #334155", background: "#1e293b", color: "#94a3b8", cursor: "pointer" }}>
+              {copied ? "✓ Copied!" : "📋 Copy as TSV (paste to Sheets)"}
+            </button>
+            <button onClick={handleExport}
+              style={{ fontSize: 11, padding: "6px 16px", borderRadius: 6, border: "1px solid #334155", background: "#1e293b", color: "#94a3b8", cursor: "pointer" }}>
+              ↓ Download CSV
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<TestCaseManager />);
+  </script>
+</body>
+</html>

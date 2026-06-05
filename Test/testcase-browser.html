@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Case Browser</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+    body { background: #080c14; font-family: 'IBM Plex Mono', monospace; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #06090f; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    select option { background: #0f172a; color: #e2e8f0; }
+    textarea, input { font-family: 'IBM Plex Mono', monospace; }
+    .md h1 { font-size: 20px; color: #f1f5f9; margin: 20px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
+    .md h2 { font-size: 16px; color: #e2e8f0; margin: 16px 0 8px; }
+    .md h3 { font-size: 13px; color: #cbd5e1; margin: 14px 0 6px; }
+    .md p  { font-size: 13px; color: #94a3b8; line-height: 1.7; margin: 6px 0; }
+    .md ul, .md ol { padding-left: 20px; color: #94a3b8; font-size: 13px; line-height: 1.7; }
+    .md li { margin: 3px 0; }
+    .md code { background: #1e293b; color: #60a5fa; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: inherit; }
+    .md pre  { background: #0a0f1a; border: 1px solid #1e293b; padding: 14px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
+    .md pre code { background: none; padding: 0; color: #94a3b8; }
+    .md a    { color: #60a5fa; }
+    .md blockquote { border-left: 2px solid #334155; padding-left: 12px; color: #64748b; margin: 8px 0; }
+    .md table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 12px; }
+    .md th   { background: #0a0f1a; padding: 6px 10px; text-align: left; color: #475569; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #1e293b; }
+    .md td   { padding: 6px 10px; color: #94a3b8; border-bottom: 1px solid #0f172a; }
+    .md strong { color: #e2e8f0; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useCallback, useRef } = React;
+
+  // ─────────────────────────────────────────
+  // CONSTANTS
+  // ─────────────────────────────────────────
+  const STATUS_OPTIONS = ['Passed', 'Failed', 'On Test', 'Need to Test', ''];
+  const ENV = ['DEV', 'Staging', 'Prod'];
+
+  const STATUS_STYLE = {
+    'passed':       { bg: '#052e16', fg: '#4ade80', bd: '#166534' },
+    'failed':       { bg: '#2d0e0e', fg: '#f87171', bd: '#7f1d1d' },
+    'on test':      { bg: '#0c1a3a', fg: '#60a5fa', bd: '#1e3a5f' },
+    'need to test': { bg: '#2a1a04', fg: '#fbbf24', bd: '#713f12' },
+  };
+
+  function sStyle(val = '') {
+    const s = STATUS_STYLE[val.toLowerCase().trim()] || { bg: '#0f172a', fg: '#334155', bd: '#1e293b' };
+    return { background: s.bg, color: s.fg, border: `1px solid ${s.bd}`, padding: '2px 9px', borderRadius: 20, fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-block' };
+  }
+
+  const EMPTY_TC = () => ({
+    id: '', scenario: '', precondition: '', description: '', url: '',
+    testType: 'POSITIVE', blockNote: '', tester: '', createdBy: '', createDate: '',
+    status: { DEV: '', Staging: '', Prod: '' },
+    steps: [''],
+    results: [{ expected: '', actual: '', status: { DEV: '', Staging: '', Prod: '' } }],
+  });
+
+  // ─────────────────────────────────────────
+  // PARSERS
+  // ─────────────────────────────────────────
+  function parseLine(line, sep = '\t') {
+    const out = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+      else if (ch === sep && !inQ) { out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out;
+  }
+
+  function isCardFmt(lines) { return lines.slice(0,30).some(l => l[0] === 'Test ID'); }
+
+  function parseBlock(rows) {
+    const tc = EMPTY_TC();
+    let inResults = false;
+    tc.results = [];
+    tc.steps = [];
+    for (const c of rows) {
+      while (c.length < 11) c.push('');
+      if (!c.some(x => x.trim())) continue;
+      switch (c[0]) {
+        case 'Test ID':
+          tc.id = c[1]||'';
+          tc.blockNote = c[5]==='Note:' ? (c[6]||'') : '';
+          tc.status.DEV = c[8]||''; tc.status.Staging = c[9]||''; tc.status.Prod = c[10]||'';
+          break;
+        case 'Create at':
+          tc.createDate = c[3]||''; tc.createdBy = c[6]||''; tc.tester = c[8]||'';
+          break;
+        case 'Scenario':
+          tc.scenario = c[3]||''; tc.precondition = c[6]||'';
+          break;
+        case 'Url':
+          tc.url = c[3]||''; tc.description = c[6]||'';
+          break;
+        case 'Steps':
+          tc.testType = c[6]||'';
+          if (c[3]) tc.steps.push(c[3]);
+          break;
+        default:
+          if (!c[0]) {
+            if (c[5] === 'Status Response') { inResults = true; }
+            else if (!inResults && c[2] && c[3]) { tc.steps.push(c[3]); }
+            else if (inResults && c[6]) {
+              tc.results.push({ expected: c[6]||'', actual: c[7]||'', status: { DEV: c[8]||'', Staging: c[9]||'', Prod: c[10]||'' } });
+            }
+          }
+      }
+    }
+    if (tc.steps.length === 0) tc.steps = [''];
+    if (tc.results.length === 0) tc.results = [{ expected: '', actual: '', status: { DEV: '', Staging: '', Prod: '' } }];
+    return tc;
+  }
+
+  function parseCardFormat(lines) {
+    const cases = [];
+    let i = 0;
+    while (i < lines.length) {
+      if (lines[i][0] === 'Test ID') {
+        let j = i + 1;
+        while (j < lines.length && lines[j][0] !== 'Test ID') j++;
+        cases.push(parseBlock(lines.slice(i, j)));
+        i = j;
+      } else i++;
+    }
+    return cases;
+  }
+
+  function parseFlatFormat(lines) {
+    const ne = lines.filter(l => l.some(c => c.trim()));
+    return ne.length ? { headers: ne[0], rows: ne.slice(1) } : { headers: [], rows: [] };
+  }
+
+  function parseFile(text, ext) {
+    const sep = ext === 'csv' ? ',' : '\t';
+    const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').map(l => parseLine(l, sep));
+    const ne = lines.filter(l => l.some(c => c.trim()));
+    if (!ne.length) return { type: 'empty' };
+    if (isCardFmt(ne)) return { type: 'card', cases: parseCardFormat(ne) };
+    return { type: 'flat', ...parseFlatFormat(ne) };
+  }
+
+  // ─────────────────────────────────────────
+  // SERIALIZER (card → TSV)
+  // ─────────────────────────────────────────
+  function q(v) { const s = (v||'').replace(/"/g,'""'); return s.includes('\t')||s.includes('\n')||s.includes('"') ? `"${s}"` : s; }
+  function row(...cols) { return cols.map(q).join('\t'); }
+
+  function serializeCardToTSV(cases) {
+    const lines = [];
+    const total  = cases.length;
+    const devCnt = s => cases.filter(c => (c.status.DEV||'').toLowerCase() === s.toLowerCase()).length;
+    lines.push(row('total cases =','','',String(total),'','','','','','',''));
+    lines.push(row('DEV','','','','STAGGING','','','PROD','','',''));
+    lines.push(row('Passed','','',String(devCnt('Passed')),'Passed','','0','Passed','0','',''));
+    lines.push(row('Failed','','',String(devCnt('Failed')),'Failed','','0','Failed','0','',''));
+    lines.push(row('Need to test','','',String(devCnt('Need to Test')),'Need to test','','0','Need to test','0','',''));
+    lines.push(row('On test','','',String(devCnt('On Test')),'On test','','0','On test','0','',''));
+    lines.push(row('No Status','','','0','No Status','','0','No Status','0','',''));
+
+    for (const tc of cases) {
+      lines.push('');
+      const steps = tc.steps.filter(s => s.trim());
+      lines.push(row('Test ID', tc.id,'','','', tc.blockNote?'Note:':'', tc.blockNote||'','', tc.status.DEV, tc.status.Staging, tc.status.Prod));
+      lines.push(row('Create at','','', tc.createDate||'','','created by', tc.createdBy||'','Tester', tc.tester||'','',''));
+      lines.push(row('Scenario','','', tc.scenario||'','','Pre-Condition', tc.precondition||'','DATE', tc.createDate||'','',''));
+      lines.push(row('Url','','', tc.url||'','','Description', tc.description||'','ENV','DEV','Staging','Prod'));
+
+      if (steps.length > 0) {
+        lines.push(row('Steps','','1', steps[0],'','test type', tc.testType||'','','','',''));
+        for (let i = 1; i < steps.length; i++) lines.push(row('','',String(i+1), steps[i],'','','','','','',''));
+      }
+
+      const baseN = steps.length + 1;
+      lines.push(row('','',String(baseN),'','','Status Response','Expected Result','Actual Result','Status','','Status'));
+      tc.results.forEach((r, i) => {
+        lines.push(row('','',String(baseN+1+i),'','','', r.expected, r.actual, r.status.DEV, r.status.Staging, r.status.Prod));
+      });
+      lines.push(''); lines.push(''); lines.push('');
+    }
+    return lines.join('\n');
+  }
+
+  // ─────────────────────────────────────────
+  // FILE SYSTEM + INDEXEDDB
+  // ─────────────────────────────────────────
+  const SUPPORTED_EXT = /\.(tsv|csv|md|txt)$/i;
+
+  async function scanDir(handle, base = '') {
+    const entries = [];
+    for await (const [name, entry] of handle.entries()) {
+      const path = base ? `${base}/${name}` : name;
+      if (entry.kind === 'directory') {
+        entries.push({ kind: 'dir', name, path, handle: entry, children: await scanDir(entry, path) });
+      } else if (SUPPORTED_EXT.test(name)) {
+        entries.push({ kind: 'file', name, path, handle: entry, ext: name.split('.').pop().toLowerCase() });
+      }
+    }
+    return entries.sort((a,b) => { if (a.kind!==b.kind) return a.kind==='dir'?-1:1; return a.name.localeCompare(b.name); });
+  }
+
+  function openIDB() {
+    return new Promise((res,rej) => {
+      const r = indexedDB.open('tcbrowser',1);
+      r.onupgradeneeded = e => e.target.result.createObjectStore('handles');
+      r.onsuccess = e => res(e.target.result);
+      r.onerror = e => rej(e.target.error);
+    });
+  }
+  async function saveHandleIDB(h) { try { const db = await openIDB(); db.transaction('handles','readwrite').objectStore('handles').put(h,'root'); } catch(e){} }
+  async function loadHandleIDB() {
+    try { const db = await openIDB(); return new Promise(res => { const r = db.transaction('handles','readonly').objectStore('handles').get('root'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
+    catch(e) { return null; }
+  }
+
+  async function writeFile(fileHandle, text) {
+    const w = await fileHandle.createWritable();
+    await w.write(text); await w.close();
+  }
+
+  // ─────────────────────────────────────────
+  // UI PRIMITIVES
+  // ─────────────────────────────────────────
+  function Btn({ onClick, children, color='#334155', bg='transparent', title }) {
+    return (
+      <button onClick={onClick} title={title}
+        style={{ fontSize: 11, padding: '4px 12px', borderRadius: 6, border: `1px solid ${color}`, background: bg, color: bg!=='transparent'?'#fff':color, cursor:'pointer', whiteSpace:'nowrap' }}>
+        {children}
+      </button>
+    );
+  }
+
+  function StatusSelect({ value, onChange }) {
+    const s = STATUS_STYLE[(value||'').toLowerCase().trim()] || { bg:'#0f172a', fg:'#334155', bd:'#1e293b' };
+    return (
+      <select value={value} onChange={e=>onChange(e.target.value)}
+        style={{ fontSize:10, fontWeight:700, padding:'2px 6px', borderRadius:20, border:`1px solid ${s.bd}`, background:s.bg, color:s.fg, cursor:'pointer', outline:'none' }}>
+        {STATUS_OPTIONS.map(o => <option key={o} value={o}>{o||'—'}</option>)}
+      </select>
+    );
+  }
+
+  function Field({ label, children }) {
+    return (
+      <div>
+        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</div>
+        {children}
+      </div>
+    );
+  }
+
+  function TInput({ value, onChange, placeholder }) {
+    return <input value={value||''} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
+      style={{ width:'100%', fontSize:12, padding:'5px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none' }} />;
+  }
+
+  function TArea({ value, onChange, rows=3, placeholder }) {
+    return <textarea value={value||''} onChange={e=>onChange(e.target.value)} rows={rows} placeholder={placeholder}
+      style={{ width:'100%', fontSize:12, padding:'6px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', resize:'vertical', fontFamily:'inherit' }} />;
+  }
+
+  // ─────────────────────────────────────────
+  // FILE NODE (Sidebar)
+  // ─────────────────────────────────────────
+  function FileNode({ node, depth=0, selected, onSelect }) {
+    const [open, setOpen] = useState(depth===0);
+    const pl = 10 + depth * 14;
+    if (node.kind === 'dir') return (
+      <div>
+        <div onClick={()=>setOpen(o=>!o)} style={{ padding:`4px 8px 4px ${pl}px`, cursor:'pointer', fontSize:11, color:'#64748b', display:'flex', alignItems:'center', gap:6, userSelect:'none', borderLeft:'2px solid transparent' }}>
+          <span style={{ fontSize:8 }}>{open?'▼':'▶'}</span>
+          <span>{open?'📂':'📁'}</span>
+          <span style={{ color:open?'#94a3b8':'#64748b' }}>{node.name}</span>
+          <span style={{ fontSize:9, color:'#334155' }}>({node.children.filter(c=>c.kind==='file').length})</span>
+        </div>
+        {open && node.children.map(c => <FileNode key={c.path} node={c} depth={depth+1} selected={selected} onSelect={onSelect}/>)}
+      </div>
+    );
+    const active = selected===node.path;
+    return (
+      <div onClick={()=>onSelect(node)} style={{ padding:`4px 8px 4px ${pl}px`, cursor:'pointer', fontSize:11, background:active?'#0f1a2e':'transparent', borderLeft:active?'2px solid #3b82f6':'2px solid transparent', color:active?'#e2e8f0':'#64748b', display:'flex', alignItems:'center', gap:6, userSelect:'none' }}>
+        <span>{node.ext==='md'||node.ext==='txt'?'📝':'📊'}</span>
+        <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1 }}>{node.name}</span>
+        <span style={{ fontSize:9, color:'#334155', flexShrink:0 }}>.{node.ext}</span>
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────
+  // CARD EDITOR
+  // ─────────────────────────────────────────
+  function CardEditor({ cases: initCases, fileHandle, onSaved }) {
+    const [cases, setCases] = useState(initCases);
+    const [expanded, setExpanded] = useState(null);
+    const [search, setSearch]   = useState('');
+    const [fStatus, setFStatus] = useState('All');
+    const [env, setEnv]         = useState('DEV');
+    const [dirty, setDirty]     = useState(false);
+    const [saving, setSaving]   = useState(false);
+    const [saveMsg, setSaveMsg] = useState('');
+
+    useEffect(() => { setCases(initCases); setDirty(false); setExpanded(null); }, [initCases]);
+
+    function upd(i, fn) { setCases(p => { const n=[...p]; n[i]=fn({...n[i]}); return n; }); setDirty(true); }
+    function updField(i, field, val) { upd(i, tc => { tc[field]=val; return tc; }); }
+    function updStatus(i, e, val) { upd(i, tc => { tc.status={...tc.status,[e]:val}; return tc; }); }
+    function updResult(i, ri, field, val) {
+      upd(i, tc => {
+        const rs = tc.results.map((r,j) => j!==ri ? r : field.includes('.') ? {...r, status:{...r.status,[field.split('.')[1]]:val}} : {...r,[field]:val});
+        return {...tc, results:rs};
+      });
+    }
+    function addResult(i) { upd(i, tc => ({...tc, results:[...tc.results,{expected:'',actual:'',status:{DEV:'',Staging:'',Prod:''}}]})); }
+    function delResult(i, ri) { upd(i, tc => ({...tc, results:tc.results.filter((_,j)=>j!==ri)})); }
+    function updStep(i, si, val) { upd(i, tc => { const s=[...tc.steps]; s[si]=val; return {...tc,steps:s}; }); }
+    function addStep(i) { upd(i, tc => ({...tc, steps:[...tc.steps,'']})); }
+    function delStep(i, si) { upd(i, tc => ({...tc, steps:tc.steps.filter((_,j)=>j!==si)})); }
+    function addCase() {
+      const n = cases.length;
+      const maxNum = cases.reduce((m,c) => { const x=c.id.match(/(\d+)$/); return x?Math.max(m,parseInt(x[1])):m; },0);
+      const newId = cases.length > 0 ? `${cases[0].id.replace(/-\d+$/,`-${String(maxNum+1).padStart(3,'0')}`)}` : `TC-${String(n+1).padStart(3,'0')}`;
+      setCases(p => [...p,{...EMPTY_TC(),id:newId}]); setDirty(true); setExpanded(n);
+    }
+    function delCase(i) { if(!confirm('Hapus test case ini?')) return; setCases(p=>p.filter((_,j)=>j!==i)); setDirty(true); setExpanded(null); }
+
+    async function save() {
+      setSaving(true);
+      try {
+        const text = serializeCardToTSV(cases);
+        await writeFile(fileHandle, text);
+        setDirty(false); setSaveMsg('Saved ✓'); setTimeout(()=>setSaveMsg(''),2000);
+        if (onSaved) onSaved();
+      } catch(e) { setSaveMsg('Error: '+e.message); }
+      setSaving(false);
+    }
+
+    function copyTSV() {
+      navigator.clipboard.writeText(serializeCardToTSV(cases));
+      setSaveMsg('Copied!'); setTimeout(()=>setSaveMsg(''),2000);
+    }
+
+    const counts = STATUS_OPTIONS.filter(Boolean).reduce((acc,s)=>({...acc,[s]:cases.filter(c=>c.status[env]===s).length}),{});
+    const filtered = cases.filter((c,i) => {
+      if (search) { const q=search.toLowerCase(); if (!c.id.toLowerCase().includes(q)&&!c.scenario.toLowerCase().includes(q)) return false; }
+      if (fStatus!=='All'&&c.status[env]!==fStatus) return false;
+      return true;
+    });
+
+    return (
+      <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+
+        {/* Toolbar */}
+        <div style={{ padding:'8px 14px', borderBottom:'1px solid #1e293b', background:'#06090f', display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', flexShrink:0 }}>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search ID / scenario..."
+            style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', width:200 }} />
+          <div style={{ display:'flex', gap:3 }}>
+            {['All','Passed','Failed','Need to Test','On Test'].map(s=>(
+              <button key={s} onClick={()=>setFStatus(s===fStatus?'All':s)}
+                style={{ fontSize:10, padding:'3px 9px', borderRadius:12, border:'1px solid', cursor:'pointer', background:fStatus===s?'#3b82f6':'transparent', borderColor:fStatus===s?'#3b82f6':'#1e293b', color:fStatus===s?'#fff':'#475569' }}>
+                {s}{s!=='All'?` ${counts[s]||0}`:` ${cases.length}`}
+              </button>
+            ))}
+          </div>
+          <div style={{ display:'flex', gap:3 }}>
+            {ENV.map(e=>(
+              <button key={e} onClick={()=>setEnv(e)}
+                style={{ fontSize:10, padding:'3px 9px', borderRadius:12, border:'1px solid', cursor:'pointer', background:env===e?'#7c3aed':'transparent', borderColor:env===e?'#7c3aed':'#1e293b', color:env===e?'#fff':'#475569' }}>
+                {e}
+              </button>
+            ))}
+          </div>
+          <span style={{ fontSize:10, color:'#334155' }}>{filtered.length}/{cases.length}</span>
+          <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+            {saveMsg && <span style={{ fontSize:11, color: saveMsg.startsWith('Error')?'#f87171':'#4ade80' }}>{saveMsg}</span>}
+            <Btn onClick={copyTSV} color='#334155'>📋 Copy TSV</Btn>
+            {fileHandle && (
+              <Btn onClick={save} bg={dirty?'#3b82f6':'#1e293b'} color={dirty?'#3b82f6':'#334155'}>
+                {saving ? 'Saving…' : dirty ? '💾 Save' : '✓ Saved'}
+              </Btn>
+            )}
+            <Btn onClick={addCase} bg='#059669' color='#059669'>+ Add Case</Btn>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display:'flex', gap:0, borderBottom:'1px solid #0f172a', flexShrink:0 }}>
+          {[['Passed','#4ade80'],['Failed','#f87171'],['On Test','#60a5fa'],['Need to Test','#fbbf24']].map(([k,c])=>(
+            <div key={k} style={{ flex:1, padding:'7px 4px', textAlign:'center' }}>
+              <div style={{ fontSize:16, fontWeight:700, color:c }}>{counts[k]||0}</div>
+              <div style={{ fontSize:9, color:'#334155' }}>{k}</div>
+            </div>
+          ))}
+          <div style={{ flex:1, padding:'7px 4px', textAlign:'center' }}>
+            <div style={{ fontSize:16, fontWeight:700, color:'#e2e8f0' }}>{cases.length}</div>
+            <div style={{ fontSize:9, color:'#334155' }}>Total</div>
+          </div>
+        </div>
+
+        {/* Table header */}
+        <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 36px', padding:'5px 14px', fontSize:10, color:'#334155', textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid #1e293b', background:'#0a0f1a', flexShrink:0 }}>
+          <div>Test ID</div><div>Scenario</div><div>Status ({env})</div><div></div>
+        </div>
+
+        {/* Rows */}
+        <div style={{ flex:1, overflowY:'auto' }}>
+          {filtered.map((tc) => {
+            const gi = cases.indexOf(tc);
+            const isOpen = expanded === gi;
+            return (
+              <div key={gi} style={{ borderBottom:'1px solid #0a0f1a' }}>
+                {/* Compact row */}
+                <div onClick={()=>setExpanded(isOpen?null:gi)}
+                  style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 36px', padding:'7px 14px', alignItems:'center', cursor:'pointer',
+                    background:isOpen?'#0d1b30':'transparent', borderLeft:isOpen?'2px solid #3b82f6':'2px solid transparent' }}>
+                  <div style={{ fontSize:11, color:'#60a5fa', fontWeight:600 }}>{tc.id||'—'}</div>
+                  <div style={{ fontSize:12, color:'#e2e8f0', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:12 }}>
+                    {tc.scenario||tc.description||'—'}
+                    {tc.blockNote && <span style={{ fontSize:10, color:'#fbbf24', marginLeft:8 }}>⚠ {tc.blockNote}</span>}
+                  </div>
+                  <div onClick={e=>e.stopPropagation()}>
+                    <StatusSelect value={tc.status[env]} onChange={v=>updStatus(gi,env,v)} />
+                  </div>
+                  <div style={{ fontSize:11, color:'#334155', textAlign:'center', userSelect:'none' }}>{isOpen?'▲':'▼'}</div>
+                </div>
+
+                {/* Expanded editor */}
+                {isOpen && (
+                  <div style={{ background:'#0c1524', padding:'16px 18px', borderLeft:'2px solid #3b82f6', borderTop:'1px solid #1e2d45' }}>
+
+                    {/* Row 1: id / testType / tester / date */}
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:12, marginBottom:12 }}>
+                      <Field label="Test ID"><TInput value={tc.id} onChange={v=>updField(gi,'id',v)} /></Field>
+                      <Field label="Test Type"><TInput value={tc.testType} onChange={v=>updField(gi,'testType',v)} /></Field>
+                      <Field label="Tester"><TInput value={tc.tester} onChange={v=>updField(gi,'tester',v)} /></Field>
+                      <Field label="Date"><TInput value={tc.createDate} onChange={v=>updField(gi,'createDate',v)} /></Field>
+                    </div>
+
+                    {/* Row 2: scenario / precondition / description */}
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12, marginBottom:12 }}>
+                      <Field label="Scenario"><TArea value={tc.scenario} onChange={v=>updField(gi,'scenario',v)} rows={2}/></Field>
+                      <Field label="Pre-Condition"><TArea value={tc.precondition} onChange={v=>updField(gi,'precondition',v)} rows={2}/></Field>
+                      <Field label="Description"><TArea value={tc.description} onChange={v=>updField(gi,'description',v)} rows={2}/></Field>
+                    </div>
+
+                    {/* Steps */}
+                    <div style={{ marginBottom:12 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>Steps</div>
+                        <button onClick={()=>addStep(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Step</button>
+                      </div>
+                      {tc.steps.map((s,si)=>(
+                        <div key={si} style={{ display:'flex', gap:6, alignItems:'center', marginBottom:4 }}>
+                          <span style={{ fontSize:10, color:'#334155', width:18, flexShrink:0 }}>{si+1}.</span>
+                          <input value={s} onChange={e=>updStep(gi,si,e.target.value)}
+                            style={{ flex:1, fontSize:12, padding:'4px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none' }}/>
+                          <button onClick={()=>delStep(gi,si)} style={{ fontSize:12, background:'none', border:'none', color:'#7f1d1d', cursor:'pointer' }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Results */}
+                    <div style={{ marginBottom:14 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>Expected Results & Status</div>
+                        <button onClick={()=>addResult(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Row</button>
+                      </div>
+                      <div style={{ border:'1px solid #1e293b', borderRadius:6, overflow:'hidden' }}>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 160px 100px 100px 100px 24px', padding:'5px 10px', background:'#0a0f1a', fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1, gap:6 }}>
+                          <div>Expected</div><div>Actual / Bug Link</div><div>DEV</div><div>Staging</div><div>Prod</div><div></div>
+                        </div>
+                        {tc.results.map((r,ri)=>(
+                          <div key={ri} style={{ display:'grid', gridTemplateColumns:'1fr 160px 100px 100px 100px 24px', padding:'5px 10px', borderTop:'1px solid #0a0f1a', gap:6, alignItems:'center' }}>
+                            <input value={r.expected} onChange={e=>updResult(gi,ri,'expected',e.target.value)}
+                              style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid #1e293b', background:'#080c14', color:'#e2e8f0', outline:'none', width:'100%' }}/>
+                            <input value={r.actual} onChange={e=>updResult(gi,ri,'actual',e.target.value)}
+                              placeholder="actual / url"
+                              style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid #1e293b', background:'#080c14', color: r.actual?.startsWith('http')?'#60a5fa':'#e2e8f0', outline:'none', width:'100%' }}/>
+                            {ENV.map(e=>(
+                              <StatusSelect key={e} value={r.status[e]} onChange={v=>updResult(gi,ri,`status.${e}`,v)} />
+                            ))}
+                            <button onClick={()=>delResult(gi,ri)} style={{ fontSize:12, background:'none', border:'none', color:'#7f1d1d', cursor:'pointer', padding:'0 2px' }}>✕</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Overall status per env */}
+                    <div style={{ display:'flex', gap:12, marginBottom:14, padding:'10px 12px', background:'#080c14', borderRadius:6, border:'1px solid #1e293b' }}>
+                      <div style={{ fontSize:10, color:'#334155', marginRight:4, alignSelf:'center' }}>Overall:</div>
+                      {ENV.map(e=>(
+                        <div key={e} style={{ display:'flex', alignItems:'center', gap:6 }}>
+                          <span style={{ fontSize:10, color:'#475569' }}>{e}</span>
+                          <StatusSelect value={tc.status[e]} onChange={v=>updStatus(gi,e,v)} />
+                        </div>
+                      ))}
+                      {tc.blockNote !== undefined && (
+                        <div style={{ marginLeft:'auto', flex:1 }}>
+                          <input value={tc.blockNote||''} onChange={e=>updField(gi,'blockNote',e.target.value)} placeholder="Note (optional)"
+                            style={{ width:'100%', fontSize:11, padding:'3px 8px', borderRadius:6, border:'1px solid #1e293b', background:'transparent', color:'#fbbf24', outline:'none' }}/>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display:'flex', justifyContent:'flex-end' }}>
+                      <button onClick={()=>delCase(gi)} style={{ fontSize:11, padding:'4px 14px', borderRadius:6, border:'1px solid #7f1d1d', background:'#1c0a0a', color:'#f87171', cursor:'pointer' }}>Delete Case</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {filtered.length===0 && <div style={{ padding:40, textAlign:'center', color:'#1e293b', fontSize:13 }}>No test cases found.</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────
+  // FLAT TABLE VIEWER (read-only)
+  // ─────────────────────────────────────────
+  function FlatViewer({ headers, rows }) {
+    const [search, setSearch] = useState('');
+    const filtered = rows.filter(r=>!search||r.some(c=>c.toLowerCase().includes(search.toLowerCase())));
+    return (
+      <div>
+        <div style={{ padding:'8px 14px', borderBottom:'1px solid #1e293b', background:'#06090f' }}>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', width:240 }}/>
+          <span style={{ fontSize:10, color:'#334155', marginLeft:12 }}>{filtered.length} rows</span>
+        </div>
+        <div style={{ overflowX:'auto' }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+            <thead><tr>{headers.map((h,i)=><th key={i} style={{ padding:'6px 12px', textAlign:'left', fontSize:10, color:'#475569', fontWeight:600, textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid #1e293b', background:'#0a0f1a', whiteSpace:'nowrap' }}>{h}</th>)}</tr></thead>
+            <tbody>{filtered.map((row,ri)=>(
+              <tr key={ri} style={{ borderBottom:'1px solid #0a0f1a', background:ri%2===0?'transparent':'#06090f' }}>
+                {headers.map((_,ci)=>{ const v=row[ci]||''; const isSt=/^(passed|failed|on test|need to test)$/i.test(v.trim()); return <td key={ci} style={{ padding:'5px 12px', color:'#94a3b8', whiteSpace:'pre-wrap', verticalAlign:'top' }}>{isSt?<span style={sStyle(v)}>{v}</span>:v}</td>; })}
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  function MarkdownViewer({ content }) {
+    return <div className="md" style={{ padding:'24px 32px', maxWidth:860 }} dangerouslySetInnerHTML={{ __html: marked.parse(content) }} />;
+  }
+
+  // ─────────────────────────────────────────
+  // MAIN APP
+  // ─────────────────────────────────────────
+  function App() {
+    const [tree, setTree]             = useState(null);
+    const [dirName, setDirName]       = useState('');
+    const [selected, setSelected]     = useState(null);
+    const [fileData, setFileData]     = useState(null);
+    const [loading, setLoading]       = useState(false);
+    const [error, setError]           = useState(null);
+    const [savedHandle, setSavedHandle] = useState(null);
+    const supported = 'showDirectoryPicker' in window;
+
+    useEffect(()=>{
+      if (!supported) return;
+      (async()=>{
+        const h = await loadHandleIDB();
+        if (!h) return;
+        try {
+          const perm = await h.queryPermission({ mode:'readwrite' });
+          if (perm === 'granted') { setDirName(h.name); setLoading(true); setTree(await scanDir(h)); setLoading(false); }
+          else setSavedHandle(h);
+        } catch(e){}
+      })();
+    },[]);
+
+    async function doOpen(handle) {
+      await saveHandleIDB(handle);
+      setSavedHandle(null);
+      setDirName(handle.name);
+      setLoading(true);
+      setTree(await scanDir(handle));
+      setSelected(null); setFileData(null);
+      setLoading(false);
+    }
+
+    async function openFolder() {
+      if (!supported) { setError('Gunakan Chrome atau Edge versi terbaru.'); return; }
+      try { await doOpen(await window.showDirectoryPicker({ mode:'readwrite' })); }
+      catch(e) { if (e.name!=='AbortError') setError(e.message); setLoading(false); }
+    }
+
+    async function restoreFolder() {
+      try {
+        const perm = await savedHandle.requestPermission({ mode:'readwrite' });
+        if (perm==='granted') await doOpen(savedHandle);
+      } catch(e) { if (e.name!=='AbortError') setError(e.message); }
+    }
+
+    async function openFile(node) {
+      setSelected(node); setFileData(null); setLoading(true);
+      try {
+        const text = await (await node.handle.getFile()).text();
+        if (node.ext==='md'||node.ext==='txt') setFileData({ type:'md', content:text });
+        else setFileData(parseFile(text, node.ext));
+      } catch(e) { setError(e.message); }
+      setLoading(false);
+    }
+
+    async function refreshTree() {
+      if (!tree) return;
+      const h = await loadHandleIDB();
+      if (h) setTree(await scanDir(h));
+    }
+
+    return (
+      <div style={{ display:'flex', flexDirection:'column', height:'100vh', color:'#e2e8f0', background:'#080c14' }}>
+
+        {/* Header */}
+        <div style={{ borderBottom:'1px solid #1e293b', padding:'10px 18px', display:'flex', alignItems:'center', gap:10, background:'#080c14', flexShrink:0, zIndex:10 }}>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:10, color:'#334155', letterSpacing:2, textTransform:'uppercase' }}>SatuInbox</div>
+            <div style={{ fontSize:16, fontWeight:600, color:'#f1f5f9' }}>
+              Test Case Browser
+              {dirName && <span style={{ fontSize:11, color:'#334155', fontWeight:400, marginLeft:10 }}>/ {dirName}</span>}
+              {selected && <span style={{ fontSize:11, color:'#475569', fontWeight:400, marginLeft:6 }}>/ {selected.path}</span>}
+            </div>
+          </div>
+          {savedHandle && !tree && (
+            <button onClick={restoreFolder} style={{ fontSize:11, fontWeight:600, padding:'5px 14px', borderRadius:6, border:'1px solid #7c3aed', background:'#1e0b3a', color:'#a78bfa', cursor:'pointer' }}>
+              🔑 Restore: /{savedHandle.name}
+            </button>
+          )}
+          <button onClick={openFolder} style={{ fontSize:11, fontWeight:600, padding:'5px 14px', borderRadius:6, border:'1px solid', cursor:'pointer', background:tree?'transparent':'#3b82f6', borderColor:tree?'#334155':'#3b82f6', color:tree?'#64748b':'#fff' }}>
+            {tree ? '📂 Change Folder' : '📂 Open Folder'}
+          </button>
+        </div>
+
+        <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
+
+          {/* Sidebar */}
+          <div style={{ width:230, borderRight:'1px solid #1e293b', overflowY:'auto', flexShrink:0, background:'#06090f' }}>
+            {!tree && !loading && (
+              <div style={{ padding:'32px 16px', textAlign:'center', color:'#1e293b' }}>
+                <div style={{ fontSize:32, marginBottom:10 }}>📁</div>
+                {savedHandle
+                  ? <div style={{ fontSize:11, color:'#475569' }}>Klik <strong style={{ color:'#a78bfa' }}>Restore</strong> di atas</div>
+                  : <div style={{ fontSize:11 }}>Klik <strong>Open Folder</strong><br/>pilih folder Test</div>
+                }
+                {!supported && <div style={{ marginTop:10, color:'#7f1d1d', fontSize:10 }}>Butuh Chrome / Edge</div>}
+              </div>
+            )}
+            {loading && !tree && <div style={{ padding:24, textAlign:'center', color:'#334155', fontSize:11 }}>Scanning…</div>}
+            {tree && (
+              <div style={{ padding:'6px 0' }}>
+                {tree.length===0 && <div style={{ padding:16, fontSize:11, color:'#334155' }}>Tidak ada file ditemukan.</div>}
+                {tree.map(n=><FileNode key={n.path} node={n} selected={selected?.path} onSelect={openFile}/>)}
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+            {error && (
+              <div style={{ margin:12, padding:10, background:'#2d0e0e', border:'1px solid #7f1d1d', borderRadius:6, fontSize:11, color:'#f87171', display:'flex', gap:8, flexShrink:0 }}>
+                <span style={{ flex:1 }}>⚠ {error}</span>
+                <button onClick={()=>setError(null)} style={{ background:'none', border:'none', color:'#f87171', cursor:'pointer' }}>✕</button>
+              </div>
+            )}
+
+            {!selected && !loading && !error && (
+              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', color:'#1e293b' }}>
+                <div style={{ fontSize:48, marginBottom:12 }}>📄</div>
+                <div style={{ fontSize:14, color:'#334155' }}>Pilih file dari sidebar</div>
+                <div style={{ fontSize:11, marginTop:4 }}>Support .tsv .csv .md .txt</div>
+              </div>
+            )}
+
+            {selected && loading && <div style={{ padding:32, textAlign:'center', color:'#334155', fontSize:11 }}>Loading {selected.name}…</div>}
+
+            {selected && fileData && !loading && (
+              <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+                {/* Breadcrumb */}
+                <div style={{ padding:'6px 14px', borderBottom:'1px solid #1e293b', background:'#06090f', display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                  <span style={{ fontSize:11, color:'#60a5fa', fontWeight:600 }}>{selected.name}</span>
+                  {fileData.type==='card' && <span style={{ fontSize:10, color:'#334155' }}>{fileData.cases.length} test cases · editable</span>}
+                  {fileData.type==='flat' && <span style={{ fontSize:10, color:'#334155' }}>{fileData.rows.length} rows</span>}
+                  {fileData.type==='md'   && <span style={{ fontSize:10, color:'#334155' }}>markdown</span>}
+                </div>
+
+                <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+                  {fileData.type==='card' && <CardEditor cases={fileData.cases} fileHandle={selected.handle} onSaved={refreshTree}/>}
+                  {fileData.type==='flat' && <div style={{ overflowY:'auto', flex:1 }}><FlatViewer headers={fileData.headers} rows={fileData.rows}/></div>}
+                  {fileData.type==='md'   && <div style={{ overflowY:'auto', flex:1 }}><MarkdownViewer content={fileData.content}/></div>}
+                  {fileData.type==='empty'&& <div style={{ padding:40, textAlign:'center', color:'#334155', fontSize:13 }}>File kosong.</div>}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
