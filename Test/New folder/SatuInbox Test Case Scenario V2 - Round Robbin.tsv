@@ -1,0 +1,612 @@
+total cases =			37							
+DEV				STAGGING			PROD		created at	03/03/2026
+Passed			0	Passed		0	Passed	0	update by	
+Failed			0	Failed		0	Failed	0	update at	
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			37	No Status		37	No Status	37		
+Test ID	RoundRobbin-001									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Team Inbox Membership		Pre-Condition	Agent A terdaftar di Team X	DATE			
+Url					Description	Agent dengan akses team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk ke Team X		test type	POSITIVE				
+		2	Sistem filter eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A masuk eligible list				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-002									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Team Inbox Membership		Pre-Condition	Agent C terdaftar di Team X dan Y	DATE			
+Url					Description	Agent dengan multiple team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk ke Team X		test type	POSITIVE				
+		2	Sistem filter eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent C masuk eligible list Team X				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-003									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Team Inbox Membership		Pre-Condition	Agent B tidak terdaftar di Team X	DATE			
+Url					Description	Agent TANPA akses team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk ke Team X		test type	POSITIVE				
+		2	Sistem filter eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent B TIDAK masuk eligible list				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-004									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Team Inbox Membership		Pre-Condition	Agent D baru keluar dari Team X	DATE			
+Url					Description	Agent pindah team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk ke Team X		test type	POSITIVE				
+		2	Sistem filter eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent D TIDAK masuk eligible list				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-005					HOLD				
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Team Inbox Membership		Pre-Condition	Agent E tidak punya team inbox	DATE			
+Url					Description	Agent tanpa team inbox - GLOBAL	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk ke GLOBAL channel		test type	POSITIVE				
+		2	Sistem filter eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent E masuk eligible list GLOBAL 				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-006									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Online/Offline Status		Pre-Condition	Agent A online, last heartbeat < 10 menit	DATE			
+Url					Description	Agent online	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A eligible				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-007									
+Create at			03/03/2026		created by	Danny	Tester			
+Scenario			Online/Offline Status		Pre-Condition	Agent B offline 5 menit yang lalu	DATE			
+Url					Description	Agent offline	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent B tidak eligible				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-008									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Online/Offline Status		Pre-Condition	Agent D offline 8 menit, lalu online	DATE			
+Url					Description	Agent reconnect dalam 9 menit	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent D eligible (status online)				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-009									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Office Hour & Toggle		Pre-Condition	Agent A shift 09:00-17:00, sekarang jam 10:00	DATE			
+Url					Description	Agent dalam shift	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A eligible				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-010									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Office Hour & Toggle		Pre-Condition	Agent B shift 09:00-17:00, sekarang jam 20:00, toggle OFF	DATE			
+Url					Description	Agent di luar shift, toggle OFF	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent B TIDAK eligible				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-011									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Office Hour & Toggle		Pre-Condition	Agent C shift 09:00-17:00, sekarang jam 20:00, toggle ON	DATE			
+Url					Description	Agent di luar shift, toggle ON	ENV	DEV	STAGGING	PROD
+Steps		1	 Chat masuk		test type	POSITIVE				
+		2	Cek eligibility							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent C eligible				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-012									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Office Hour & Toggle		Pre-Condition	Agent E toggle ON, lalu offline	DATE			
+Url					Description	Toggle ON lalu offline	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk di 08:59:59		test type	POSITIVE				
+		2	 Detik berikutnya shift masuk							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				agent tidak eligible				
+		5				toggle otomatis d set off				
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-013									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Basic Round Robin		Pre-Condition	Agent A, B, C eligible, semua kuota kosong	DATE			
+Url					Description	Round robin dengan 3 agent eligible	ENV	DEV	STAGGING	PROD
+Steps		1	Chat 1 masuk		test type	POSITIVE				
+		2	Chat 2 masuk							
+		3	Chat 3 masuk		Status Response	Expected Result	Actual Result	Status		Status
+		4	Chat 4 masuk			Chat1→A, Chat2→B, Chat3→C, Chat4→A (kembali ke A)				
+		5								
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-014									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Basic Round Robin		Pre-Condition	Agent A team X agent B team Y	DATE			
+Url					Description	round robbin per team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk Team X		test type	POSITIVE				
+		2	Chat masuk Team Y							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				chat from team X masuk ke agent A				
+		5				chat from team Y masuk ke agent B				
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-015									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Basic Round Robin		Pre-Condition	Agent A team X agent B global channel	DATE			
+Url					Description	round robbin per team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	Chat global masuk		test type	POSITIVE				
+		2	Chat masuk Team X							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				chat from team X masuk ke agent A				
+		5				chat from global masuk ke agent B				
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-016									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			1 Chat per Agent per Putaran		Pre-Condition	A:2 slot, B:2 slot, C:1 slot	DATE			
+Url					Description	Queue 6 chat, 3 agent dengan kuota berbeda	ENV	DEV	STAGGING	PROD
+Steps		1	Proses Queue 6 chat		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Putaran 1: A(1),B(1),C(1)				
+		5				Putaran 2: A(2),B(2),C skip				
+		6				Putaran 3: stop (semua penuh)				
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-017									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			1 Chat per Agent per Putaran		Pre-Condition	A:3 slot, B:3 slot	DATE			
+Url					Description	Queue 4 chat, 2 agent kuota sama	ENV	DEV	STAGGING	PROD
+Steps		1	Proses Queue 4 chat		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Putaran 1: A(1),B(1)				
+		5				Putaran 2: A(2),B(2)				
+		6				Selesai, sisa slot A(1),B(1)				
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-018									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			1 Chat per Agent per Putaran		Pre-Condition	A:3 slot, B:1 slot, C:3 slot, Queue:7 chat	DATE			
+Url					Description	Queue panjang, agent dengan kuota kecil	ENV	DEV	STAGGING	PROD
+Steps		1	Proses Queue 7 chat		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				P1: A,B,C				
+		5				P2: A,C				
+		6				P3: A,C				
+		7				P4: A (penuh)				
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-019									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			1 Chat per Agent per Putaran		Pre-Condition	3 agent eligible, Queue 3 chat	DATE			
+Url					Description	Verifikasi tidak ada agent dapat 2x di putaran sama	ENV	DEV	STAGGING	PROD
+Steps		1	Proses 3 chat pertama		test type	POSITIVE				
+		2	Cek distribusi							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Masing-masing agent dapat 1, tidak ada yang dapat 2				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-020									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Skip Agent Tidak Eligible		Pre-Condition	Giliran A, tapi A offline	DATE			
+Url					Description	Agent di-skip karena offline	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk		test type	POSITIVE				
+		2	Round robin pilih							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Skip A, langsung ke B (jika eligible)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-021									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Skip Agent Tidak Eligible		Pre-Condition	Giliran C, tapi C penuh kuota	DATE			
+Url					Description	Agent di-skip karena penuh	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk		test type	POSITIVE				
+		2	Round robin pilih							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Skip C, lanjut ke agent berikutnya				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-022									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Skip Agent Tidak Eligible		Pre-Condition	Semua agent penuh/offline	DATE			
+Url					Description	Semua agent skip	ENV	DEV	STAGGING	PROD
+Steps		1	Chat masuk		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Chat masuk QUEUE, tidak terassign				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-023									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			Skip Agent Tidak Eligible		Pre-Condition	A offline, B dan C eligible, pointer di A	DATE			
+Url					Description	Agent jadi eligible di tengah putaran	ENV	DEV	STAGGING	PROD
+Steps		1	Queue mulai proses		test type	POSITIVE				
+		2	 A online di tengah proses							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				A tidak kebagian di putaran ini, next putaran				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-024									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			MULTI-ASSIGN & MANUAL ASSIGN		Pre-Condition	Chat primary di A, A tambah B	DATE			
+Url					Description	Multi-assign tambah agent lain	ENV	DEV	STAGGING	PROD
+Steps		1	A melakukan multi-assign ke B		test type	POSITIVE				
+		2	Cek kuota B							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Kuota B bertambah 1				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-025									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			MULTI-ASSIGN & MANUAL ASSIGN		Pre-Condition	B sudah penuh kuota	DATE			
+Url					Description	Multi-assign ke agent penuh	ENV	DEV	STAGGING	PROD
+Steps		1	A coba multi-assign ke B		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				failed assign to agent B				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-026									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			MULTI-ASSIGN & MANUAL ASSIGN		Pre-Condition	Supervisor assign chat ke C	DATE			
+Url					Description	Manual assign supervisor	ENV	DEV	STAGGING	PROD
+Steps		1	Manual assign ke C		test type	POSITIVE				
+		2	Cek kuota C							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Kuota C +1				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-027									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			MULTI-ASSIGN & MANUAL ASSIGN		Pre-Condition	D offline, supervisor assign	DATE			
+Url					Description	Manual assign ke agent offline	ENV	DEV	STAGGING	PROD
+Steps		1	Manual assign ke D		test type	POSITIVE				
+		2	Cek status chat							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Chat terassign ke D (supervisor override)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-028									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			MULTI-ASSIGN & MANUAL ASSIGN		Pre-Condition	E away, supervisor assign	DATE			
+Url					Description	Manual assign ke agent away	ENV	DEV	STAGGING	PROD
+Steps		1	Manual assign ke E		test type	POSITIVE				
+		2	Cek status chat							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Chat terassign ke E (supervisor override)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-029									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			EDGE CASES & RACE CONDITIONS		Pre-Condition	2 chat masuk simultan ke team yang sama	DATE			
+Url					Description	Double assign - 2 chat bersamaan	ENV	DEV	STAGGING	PROD
+Steps		1	Proses kedua chat		test type	POSITIVE				
+		2	Cek assignee							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				kedua chat assign ke kedua agent				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-030									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			EDGE CASES & RACE CONDITIONS		Pre-Condition	Giliran A, tapi A jadi away tepat sebelum commit	DATE			
+Url					Description	Agent berubah status saat diproses	ENV	DEV	STAGGING	PROD
+Steps		1	Proses assignment		test type	POSITIVE				
+		2	cek hasil							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Sistem mendeteksi perubahan, skip A, pilih B				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-031									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			EDGE CASES & RACE CONDITIONS		Pre-Condition	Giliran B, di tengah proses ada chat selesai	DATE			
+Url					Description	Kuota berubah saat diproses	ENV	DEV	STAGGING	PROD
+Steps		1	Proses assignment		test type	POSITIVE				
+		2	cek hasil							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Assignment tetap konsisten, gagal jika kuota terpenuhi				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-032									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			EDGE CASES & RACE CONDITIONS		Pre-Condition	Load test dengan 100 chat simultan	DATE			
+Url					Description	100 chat masuk bersamaan	ENV	DEV	STAGGING	PROD
+Steps		1	Proses semua chat		test type	POSITIVE				
+		2	Verifikasi distribusi							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Tidak ada error, distribusi sesuai round robin 				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	RoundRobbin-033									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			TIMEOUT & TOGGLE		Pre-Condition	Agent A online+active, jam 20:00 (shift 09:00-17:00)	DATE			
+Url					Description	Banner muncul di luar shift	ENV	DEV	STAGGING	PROD
+Steps		1	A login		test type	POSITIVE				
+		2	Cek UI							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Banner "Terima chat di luar jam kerja?" + toggle muncul				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-034									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			TIMEOUT & TOGGLE		Pre-Condition	Agent B online+active, jam 10:00 (dalam shift)	DATE			
+Url					Description	Banner tidak muncul dalam shift	ENV	DEV	STAGGING	PROD
+Steps		1	B login		test type	POSITIVE				
+		2	Cek UI							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Banner TIDAK muncul				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-035									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			TIMEOUT & TOGGLE		Pre-Condition	A di luar shift, toggle OFF → ON	DATE			
+Url					Description	Toggle ON - jadi eligible	ENV	DEV	STAGGING	PROD
+Steps		1	Ubah toggle ke ON		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				A jadi eligible				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-036									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			TIMEOUT & TOGGLE		Pre-Condition	A di luar shift, toggle ON → OFF	DATE			
+Url					Description	Toggle OFF - tidak eligible	ENV	DEV	STAGGING	PROD
+Steps		1	Ubah toggle ke OFF		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				A tidak eligible				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	RoundRobbin-037									
+Create at			03/03/2026		created by	danny	Tester			
+Scenario			TIMEOUT & TOGGLE		Pre-Condition	A toggle ON di luar shift, lalu masuk shift	DATE			
+Url					Description	Toggle persist saat ganti shift	ENV	DEV	STAGGING	PROD
+Steps		1	Masuk shift		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Toggle tetap ON (tapi tidak relevan karena sudah dalam shift)				
+		5								
+		6								
+		7								
+		8								
+		9								

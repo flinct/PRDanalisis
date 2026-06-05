@@ -1,0 +1,948 @@
+total cases =			59							
+DEV				STAGGING			PROD			
+Passed			2	Passed		0	Passed	0		
+Failed			3	Failed		0	Failed	0		
+Need to test			4	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			50	No Status		59	No Status	59		
+Test ID	SIX-Widget-001									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Verify widget can be embedded with a single <script>	ENV	DEV	STAGGING	PROD
+Steps		1	Add <script src="https://cdn.widget.com/widget.v1.js"></script> to host page.		test type	POSITIVE				
+		2	Load the page in browser.							
+		3	Observe if the script loads without blocking the main content.		Status Response	Expected Result	Actual Result	Status		Status
+		4				Script loads asynchronously (no blocking main page rendering).				
+		5				No console errors.				
+		6				Widget global object (window.widget) becomes available.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-002									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Verify script loads asynchronously	ENV	DEV	STAGGING	PROD
+Steps		1	Open browser Developer Tools → Network tab.		test type	POSITIVE				
+		2	Reload page.							
+		3	Check if widget script request has the async attribute or loads after DOMContentLoaded.		Status Response	Expected Result	Actual Result	Status		Status
+		4				Script executes asynchronously.				
+		5				DOM rendering is not blocked.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-003									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Validate domain whitelisting	ENV	DEV	STAGGING	PROD
+Steps		1	Embed widget on a whitelisted domain.		test type	POSITIVE				
+		2	Observe console and widget behavior.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Widget initializes successfully.				
+		5				No domain-related console errors.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-004									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Validate blocked or non-whitelisted domain	ENV	DEV	STAGGING	PROD
+Steps		1	Embed widget on a non-whitelisted domain.		test type	NEGATIVE				
+		2	Observe console log.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Widget does not initialize.				
+		5				Console log displays: "error: network error or blocked domain".				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-005									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Handle network error gracefully	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate network disconnection before widget script loads.		test type	NEGATIVE				
+		2	Reload host page.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Widget fails to load.				
+		5				Console displays: "error: network error or blocked domain".				
+		6				Page remains functional.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-006									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Verify iFrame auto-injection after initialization	ENV	DEV	STAGGING	PROD
+Steps		1	Call widget.init().		test type	POSITIVE				
+		2	Open DevTools → Elements tab.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				iFrame auto-injected into <body>.				
+		5				iFrame attributes: src → points to widget URL.				
+		6				iFrame attributes: sandbox → according to policy.				
+		7				iFrame attributes: allow → includes camera, microphone, storage, etc.				
+		8				iFrame appears				
+		9								
+										
+										
+										
+Test ID	SIX-Widget-007									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Widget Embed & Initialization		Pre-Condition		DATE	12/12/2025		
+Url					Description	Prevent duplicate iFrame injection	ENV	DEV	STAGGING	PROD
+Steps		1	Call widget.init() twice in a row.		test type	POSITIVE				
+		2	Inspect DOM.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Only one iFrame exists in DOM.				
+		5				Console shows log or warning: “Widget already initialized.”				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-008									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition		DATE	12/12/2025		
+Url					Description	Verify widget.init()	ENV	DEV	STAGGING	PROD
+Steps		1	Ensure widget script is loaded.		test type	POSITIVE				
+		2	Call widget.init().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Each command executes successfully.				
+		5				Each command triggers a callback event (onWidgetLoaded, etc.).				
+		6				widget.destroy() removes iframe + clears session.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-009									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition		DATE	12/12/2025		
+Url					Description	Ensure callback hooks work and trigger correctly.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetOpened', fn).		test type	POSITIVE				
+		2	Perform widget.show().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Callback fn executes after widget is shown.				
+		5				Console logs confirm event triggered.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-010									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition		DATE	12/12/2025		
+Url					Description	Ensure widget.hide() hides the widget button and triggers the correct callback hooks.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetClosed', fn).		test type	POSITIVE				
+		2	Perform widget.hide().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget button hidden				
+		5				Callback fn executes after widget is hidden.				
+		6				Console logs confirm event triggered.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-011									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition	widget window closed	DATE	12/12/2025		
+Url					Description	Ensure widget.toggle to open triggers the correct callback hooks.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetShown', fn).		test type	POSITIVE				
+		2	Perform widget.toggle().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window opens				
+		5				Callback fn executes after widget is opens.				
+		6				Console logs confirm event triggered.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-012									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition	widget window opened	DATE	12/12/2025		
+Url					Description	Ensure widget.toggle to close triggers the correct callback hooks.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetHidden', fn).		test type	POSITIVE				
+		2	Perform widget.toggle().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window closes				
+		5				Callback fn executes after widget is closes.				
+		6				Console logs confirm event triggered.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-013									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Command Logic (JavaScript API)		Pre-Condition	have session	DATE	12/12/2025		
+Url					Description	Ensure widget.destroy remove session and widget and triggers the correct callback hooks.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetHidden', fn).		test type	POSITIVE				
+		2	Perform widget.destroy().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				session and widget element removed from DOM				
+		5				resets all widget global variablte				
+		6				Callback fn executes after widget is closes.				
+		7				Console logs confirm event triggered.				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-014									
+Create at			12/12/2025		created by	danny	Tester			
+Scenario			Session Handling		Pre-Condition		DATE	12/12/2025		
+Url					Description	Ensure chat persists across page reloads.	ENV	DEV	STAGGING	PROD
+Steps		1	Bind callback using window.widget.on('onWidgetOpened', fn).		test type	POSITIVE				
+		2	Perform widget.show().							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Callback fn executes after widget is shown.				
+		5				Console logs confirm event triggered.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-015							NEED TO TEST		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Session Handling		Pre-Condition	have session	DATE	12/12/2025		
+Url					Description	Ensure chat persists across page reloads.	ENV	DEV	STAGGING	PROD
+Steps		1	start chat session		test type	POSITIVE				
+		2	send messages " "							
+		3	refresh page		Status Response	Expected Result	Actual Result	Status		Status
+		4	open widget window			chat session stored in LocalStorage/sessionStorage				
+		5				session persists and chat histoory reappears				
+		6				widget automatically re-initializes from session data				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-016							NEED TO TEST		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Session Handling		Pre-Condition	have session	DATE	12/12/2025		
+Url					Description	Ensure session automatically expires if no actifity for X minutes	ENV	DEV	STAGGING	PROD
+Steps		1	start chat session		test type	POSITIVE				
+		2	send messages " "							
+		3	stay in chat page for X minutes		Status Response	Expected Result	Actual Result	Status		Status
+		4				widget shows welcome page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-017							NEED TO TEST		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Session Handling		Pre-Condition	have session	DATE	12/12/2025		
+Url					Description	Ensure still have session if no actifity for X minutes	ENV	DEV	STAGGING	PROD
+Steps		1	start chat session		test type	NEGATIVE				
+		2	send messages " "							
+		3	stay in chat page for X minutes		Status Response	Expected Result	Actual Result	Status		Status
+		4				stay in chat page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-018							NEED TO TEST		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Session Handling		Pre-Condition	login to host site and have session	DATE	12/12/2025		
+Url					Description	Ensure session removed when log out from host site	ENV	DEV	STAGGING	PROD
+Steps		1	start chat session		test type	POSITIVE				
+		2	send messages " "							
+		3	log out		Status Response	Expected Result	Actual Result	Status		Status
+		4	open widget			host calls widget.destroy() or widget.resetSession()				
+		5				all widget data ( chat, profile, session ) deleted				
+		6				widget returns to welcome page				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-019							FAILED		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Responsive layout		Pre-Condition	open host site	DATE			
+Url					Description	browser desktop layout fullsize/maximize	ENV		STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	maximize browser							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window size displayed 400px680p with  40p wrapper		Passed		
+		5				all elements are displayed with the appropriate layout		Passed		
+		6				buttons can be click		Passed		
+		7				widget button visible	widget button disappears	Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-020							PASSED		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Responsive layout		Pre-Condition	open host site	DATE			
+Url					Description	browser desktop layout minimize to 500p x 210p	ENV		STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	minimize browser							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window size displayed 400p wide with 40p wrapper		Passed		
+		5				all elements are displayed with a customized layout		Passed		
+		6				buttons can be click		Passed		
+		7				widget button disappeared		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-021							FAILED		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Responsive layout		Pre-Condition	open host site	DATE			
+Url					Description	tablet layout 768p x 1024p	ENV		STAGGING	PROD
+Steps		1	open website on tablet layout 768p x 1024p		test type	POSITIVE				
+		2	open widget							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window size displayed 400p x 680p with 40p wrapper		Passed		
+		5				all elements are displayed with a customized layout		Passed		
+		6				buttons can be click		Passed		
+		7				widget button visible	widget button disappears	Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-022							FAILED		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Responsive layout		Pre-Condition	open host site	DATE			
+Url					Description	mobile layout 414p x 896p	ENV		STAGGING	PROD
+Steps		1	open website on mobile layout 414p x 896p		test type	POSITIVE				
+		2	open widget							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget window size adjust the layout size to full screen	not full screen, have 40p wrapper(except left side) 	Failed		
+		5				all elements are displayed with a customized layout		Failed		
+		6				buttons can be click		Passed		
+		7				side bar change to burger button	side bar disappears	Failed		
+		8				widget button disappeared		Passed		
+		9								
+										
+										
+										
+Test ID	SIX-Widget-023							PASSED		
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			Language localization		Pre-Condition	open host site	DATE			
+Url					Description	widget non-customizable element text use english	ENV		STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				displayed all widget non-customizable element text remain in english		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-024									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			welcome page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	no active session	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				displays configurable greeting message				
+		5				dsplay "chat now" button				
+		6				display username				
+		7				display customizable content				
+		8				animation transition				
+		9								
+										
+										
+										
+Test ID	SIX-Widget-025									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			welcome page		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	not logged in to the host site	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				displays configurable greeting message				
+		5				dsplay "chat now" button				
+		6				display customizable content				
+		7				animation transition				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-026									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			welcome page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	active session	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				direct to chat page				
+		5				animation transition				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-027									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	real time conversation. locale indonesia	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text " "		Status Response	Expected Result	Actual Result	Status		Status
+		4	send messages by click enter			message instantly sent 				
+		5								
+		6				display text 				
+		7				display us(alligned right) and them(alligned left) messages in bubble format				
+		8				display timestamp per message(based user locale) 00-23				
+		9								
+										
+										
+										
+Test ID	SIX-Widget-028									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	real time conversation. locale United States	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text " "		Status Response	Expected Result	Actual Result	Status		Status
+		4	send message			message instantly sent 				
+		5				can received text instantly				
+		6				display text				
+		7				display us(alligned right) and them(alligned left) messages in bubble format				
+		8				display timestamp per message(based user locale) AM/PM				
+		9								
+										
+										
+										
+Test ID	SIX-Widget-029									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	auto scrolling conversation 1 rendered page, received short text	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	scroll up 1 rendered page		Status Response	Expected Result	Actual Result	Status		Status
+		4	click FAB with counter			received 1 short text				
+		5				page not scrolled down				
+		6				shows FAB with counter agent new messages				
+		7				on click scrolls down to bottom				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-030									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	auto scrolling conversation 1 rendered page, received long text(2 page long)	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	scroll up 1 rendered page		Status Response	Expected Result	Actual Result	Status		Status
+		4	click FAB with counter			received few long texts				
+		5				page not scrolled down				
+		6				shows FAB with counter agent new messages				
+		7				on click scrolls down to first new messages				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-031									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	auto scrolling conversation 1 rendered page, sent message.	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	scroll up 1 rendered page		Status Response	Expected Result	Actual Result	Status		Status
+		4	input text ""			auto scroll to bottom				
+		5	sent message							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-032									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	typing indicator. user chat page	ENV	DEV	STAGGING	PROD
+Steps		1	agent open livechat		test type	POSITIVE				
+		2	open chat page							
+		3	typing long text		Status Response	Expected Result	Actual Result	Status		Status
+		4	stop typing			typing indicator displayed				
+		5				typing indicator disappears when agent stop typing				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-033									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload img < 20mb. jpg	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			file explorer opened				
+		5	sent < 20mb size img			img sent				
+		6				displayed img in chat page				
+		7				agent received img				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-034									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload video > 20mb. mp4	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			file explorer opened				
+		5	sent < 20mb size video			video sent				
+		6				displayed video in chat page				
+		7				agent received video				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-035									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload video < 20mb. mp4	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	NEGATIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			video rejected				
+		5	sent > 20mb size video			display error messages in modal. "file is larger than 20mb"				
+		6				agent not receive video				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-036									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload webm	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	NEGATIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			file rejected				
+		5	sent webm file			display error messages in modal. "invalid file format"				
+		6				agent not receive file				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-037									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload document < 20mb. pdf	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			file explorer opened				
+		5	sent > 20mb size video			video sent				
+		6				displayed video in chat page				
+		7				agent received img				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-038									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	upload document < 20mb	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click attach button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click "photo & video" button			file explorer opened				
+		5	sent > 20mb size video			video sent				
+		6				displayed video in chat page				
+		7				agent received img				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-039									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site, copy img	DATE	12/12/2025		
+Url					Description	preview after paste	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	ctrl + v to paste 		Status Response	Expected Result	Actual Result	Status		Status
+		4				display img preview				
+		5				img not sent				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-040									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site, copy img	DATE	12/12/2025		
+Url					Description	can add quoted message / reply message, action button	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	hover message to display action button		Status Response	Expected Result	Actual Result	Status		Status
+		4	click reply			display quoted message above message input				
+		5	input text ""			After the message is sent, display the quoted message above the sent message.				
+		6	send message							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-041									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	emoji picker	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click emoji button		Status Response	Expected Result	Actual Result	Status		Status
+		4	pick emoji			display emoji picker				
+		5	send message			on click, add selected emoji to message input				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-042									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. agent offline	DATE	12/12/2025		
+Url					Description	read receipts. sent	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text " "		Status Response	Expected Result	Actual Result	Status		Status
+		4	send message			display single grey check next to the sent message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-043									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. agent online	DATE	12/12/2025		
+Url					Description	read receipts. deliverd	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text " "		Status Response	Expected Result	Actual Result	Status		Status
+		4	send message			display double grey checks next to the sent message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-044									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. agent in chat page	DATE	12/12/2025		
+Url					Description	read receipts. read	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text " "		Status Response	Expected Result	Actual Result	Status		Status
+		4	send message			display double green checks next to the sent message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-045									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. have access to internet	DATE	12/12/2025		
+Url					Description	reconnection. show alert when lost connection	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	turn off wi-fi or disconnect from the internet.		Status Response	Expected Result	Actual Result	Status		Status
+		4				display alert message "Connection lost,. Try to reconnect"				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-046									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. have access to internet	DATE	12/12/2025		
+Url					Description	reconnection. auto reconnect. success	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	turn off wi-fi or disconnect from the internet for 20 seconds		Status Response	Expected Result	Actual Result	Status		Status
+		4				display alert message "Connection lost,. Try to reconnect"				
+		5				reconnected after 30 seconds				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-047									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site. have access to internet	DATE	12/12/2025		
+Url					Description	reconnection. auto reconnect. failed	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	NEGATIVE				
+		2	open chat page							
+		3	turn off wi-fi or disconnect from the internet for 50 seconds		Status Response	Expected Result	Actual Result	Status		Status
+		4				display alert message "Connection lost,. Try to reconnect"				
+		5				not reconnected				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-048									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site.	DATE	12/12/2025		
+Url					Description	accessibility. newline on desktop	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text ""		Status Response	Expected Result	Actual Result	Status		Status
+		4	shift + enter 2 times			newline created				
+		5	input text ""			A new line appears between the first and second line of text in the sent message.				
+		6	send message							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-049									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site.	DATE	12/12/2025		
+Url					Description	accessibility. newline on mobile	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	input text ""		Status Response	Expected Result	Actual Result	Status		Status
+		4	click enter 2 times			newline created				
+		5	input text ""			A new line appears between the first and second line of text in the sent message.				
+		6	send message							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-050									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			ticket page		Pre-Condition	logged in to the host site.	DATE	12/12/2025		
+Url					Description	ticket list from customer data	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open ticket page							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				display ticket list 				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-051									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	smooth animation open & close widget	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	click (X) button							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				displays widget window with smooth transition				
+		5				hides widget window with smooth transition				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-052									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	close widget with esc button	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	esc button to close							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				hides widget window with smooth transition				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-053									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	back button to welcome page. chat page	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open chat page							
+		3	click back button		Status Response	Expected Result	Actual Result	Status		Status
+		4				user directed to welcome page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-054									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	back button to welcome page. ticket page	ENV	DEV	STAGGING	PROD
+Steps		1	open widget		test type	POSITIVE				
+		2	open ticket page							
+		3	click back button		Status Response	Expected Result	Actual Result	Status		Status
+		4				user directed to welcome page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-055									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	verify last active state saved in session storage	ENV	DEV	STAGGING	PROD
+Steps		1	login to host site		test type	POSITIVE				
+		2	inspect application/session storage							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				last active state saved in session storage				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-056									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			navigation & interaction		Pre-Condition	open host site	DATE	12/12/2025		
+Url					Description	verify last active state saved in session storage	ENV	DEV	STAGGING	PROD
+Steps		1	login to host site		test type	POSITIVE				
+		2	inspect application/session storage							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				last active state saved in session storage				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-057									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	auto scrolling conversation 1 rendered page, received short text. agent	ENV	DEV	STAGGING	PROD
+Steps		1	open livechat		test type	POSITIVE				
+		2	open chat page							
+		3	scroll up 1 rendered page		Status Response	Expected Result	Actual Result	Status		Status
+		4				received 1 short text				
+		5				page scrolled down to last messages				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-058									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	auto scrolling conversation 1 rendered page, received long text(2 page long). agent	ENV	DEV	STAGGING	PROD
+Steps		1	open livechat		test type	POSITIVE				
+		2	open chat page							
+		3	scroll up 1 rendered page		Status Response	Expected Result	Actual Result	Status		Status
+		4				received few long texts				
+		5				page scrolled down to last messages				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Widget-059									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			chat page		Pre-Condition	logged in to the host site	DATE	12/12/2025		
+Url					Description	typing indicator. agent livechat	ENV	DEV	STAGGING	PROD
+Steps		1	user open widget		test type	POSITIVE				
+		2	open chat page							
+		3	typing long text		Status Response	Expected Result	Actual Result	Status		Status
+		4	stop typing			typing indicator displayed				
+		5				typing indicator disappears when user stop typing				
+		6								
+		7								
+		8								
+		9								

@@ -1,0 +1,553 @@
+									total cases =	37
+Test ID	SIX-Group-001				Tester	Aka			passed	0
+Scenario			verify group page		Pre-Condition	have access to dashboard			failed	0
+Url					Description	display group chat page			need to test	0
+Steps		1	login		test type	POSITIVE			on test	0
+		2	inbox page							0
+		3	channels -> WA Web Group		Status Response	Expected Result	Actual Result	Status		
+		4				group chat panel displayed - search bar  - sort & filter - group list(group icon and name, last message sender, delivery status, limited content, timestamp, labels and counter, typing indicator, mention indicator, unread messages counter) - empty state conversation section				
+		5				display empty state group conversation and details panel				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-002				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page				
+Url					Description	display group conversation				
+Steps		1	select group list		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				group conversation panel display  - group icon and name - conversation( home and guest bubble chat, name&/number, content, timestamp, delivery status)  - message section(message input, attachment button, emoji button, disable state button)				
+		5				group details panel display - conversation assignee section - conversation attributes accordion - linked tickets accordion - group member accordion - client tags accordion - notes accordion - pinned messages accordion - media accordion - files accordion - conversation events accordion - screenshot accordion				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-003				Tester	Aka				
+Scenario			verify wa web account		Pre-Condition	have access to wa web page				
+Url					Description	wa web account validation. add new wa web account for group admin. success				
+Steps		1	login		test type	POSITIVE				
+		2	open settings							
+		3	open channels/whatsapp web		Status Response	Expected Result	Actual Result	Status		
+		4	click add account button			display add account modal				
+		5	input account name ""			new account added in account list (not connected)				
+		6	input phone number ""			display steps and qr code in login modal				
+		7	click login in new account			new account status change to active				
+		8	open whatsapp in linked number mobile device							
+		9	scan qr code in linked device							
+										
+										
+										
+Test ID	SIX-Group-004				Tester	Aka				
+Scenario			verify group list		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group list				
+Steps		1	create group in group admin linked number mobile device		test type	POSITIVE				
+		2	and send message from home, or wait message from guest							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				new group will display in group list				
+		5				 is displayed in the group chat of all agent				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-005				Tester	Aka				
+Scenario			verify group member		Pre-Condition	accessed group page. linked device a number				
+Url					Description	group member validation				
+Steps		1	open group member accordion in selected group details		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				all group member name and number should be displayed				
+		5				group admin and members should be separated in group member accordion				
+		6				group member that are connected with satuinbox have connection status				
+		7				see all link button( redirect to ... page)				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-006				Tester	Aka				
+Scenario			verify group member		Pre-Condition	accessed group page. linked device a number				
+Url					Description	group member validation. add new group member				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open group details							
+		3	add member		Status Response	Expected Result	Actual Result	Status		
+		4				new group member should be added in group member accordion				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-007				Tester	Aka				
+Scenario			verify group member		Pre-Condition	accessed group page. linked device a number				
+Url					Description	group member validation. delete group member				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open group details							
+		3	remove member from group		Status Response	Expected Result	Actual Result	Status		
+		4				deleted group member should be remove from group member accordion				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-008				Tester	Aka				
+Scenario			verify group member		Pre-Condition	accessed group page. linked device a number				
+Url					Description	group member validation. all member disconnected				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open linked device							
+		3	disconnect from satuinbox		Status Response	Expected Result	Actual Result	Status		
+		4				member connection status display as "not connected" in group member accordion				
+		5				input message display "no connected number" message and link button to settings/channels/wa web				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-009				Tester	Aka				
+Scenario			verify linked tickets		Pre-Condition	accessed group page. linked device a number				
+Url					Description	linked ticket validation.				
+Steps		1	open linked tickets accordion in group details		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				ticket counter				
+		5				all linked tickets to the group displays with ticket title, ticket creator, and ticket status				
+		6				see all link button(redirect to ticket page)				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-010				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin send&receive number				
+Steps		1	use admin group number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket		Status Response	Expected Result	Actual Result	Status		
+		4	confirm			display alert message "this number will be used for send message"				
+		5				message send and receive with admin number				
+		6				group member receive message				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-011				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & member switch send&receive function. after send message from group admin				
+Steps		1	use group admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket		Status Response	Expected Result	Actual Result	Status		
+		4	confirm			display alert message "this number will be used for send message"				
+		5	use group member number			message send and receive with admin number				
+		6	connect to satuinbox			switch send and receive function to member number				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-012				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & member switch send&receive function. before send message from group amin				
+Steps		1	use group admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	use group member number		Status Response	Expected Result	Actual Result	Status		
+		4	connect to satuinbox			send and receive function to member number				
+		5	create ticket							
+		6	confirm							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-013				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & 2 member switch send&receive function. switch send and receive function to 2nd member				
+Steps		1	use group admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 1st member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with admin number				
+		6	send message ""			switch send and receive function to 1st member number				
+		7	use group 2nd member number			message send and receive with 1st member number				
+		8	connect to satuinbox			switch send and receive function to 2nd member number				
+		9								
+										
+										
+										
+Test ID	SIX-Group-014				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & member switch send&receive function. made member as admin				
+Steps		1	use group admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with admin number				
+		6	made member as admin			switch send and receive function to member number				
+		7				send and receive function use last registered number (former member admin)				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-015				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & 2 member switch send&receive function. switch send and receive function to 2nd admin				
+Steps		1	use group 1st admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 2nd member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with admin number				
+		6				switch send and receive function to 2nd admin number				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-016				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group admin conversation. group admin & 2 member switch send&receive function. switch send and receive function to 2nd admin, change to member again				
+Steps		1	use group 1st admin number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 2nd member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with admin number				
+		6	made 2nd admin as member			switch send and receive function to 2nd admin number				
+		7				send and receive function use last registered number (former 2nd admin member)				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-017				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group member send & receive function				
+Steps		1	use group member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display alert message "this number will be used for send message"				
+		5				message send and receive with member number				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-018				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group member & admin switch send & receive function. create ticket then change to admin number				
+Steps		1	use group member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket		Status Response	Expected Result	Actual Result	Status		
+		4	use group admin number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with member number				
+		6				keep send & receive function with member number				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-019				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group member & admin switch send & receive function then create ticket				
+Steps		1	use group member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	use group admin number		Status Response	Expected Result	Actual Result	Status		
+		4	connect to satuinbox			send & receive function with member number				
+		5	create ticket and confirm							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-020				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group members switch send & receive function. create ticket before changet to 2nd member				
+Steps		1	use group 1st member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 2nd member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with 1st member number				
+		6				keep send & receive function with 1st member number				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-021				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group members switch send & receive function. create ticket before changet to 2nd member and admin				
+Steps		1	use group 1st member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 2nd member number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with 1st member number				
+		6	use group admin number			keep send & receive function with 1st member number. after 2nd member				
+		7	connect to satuinbox			keep send & receive function with 1st member number. after admin				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-022				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group 1st member & admin then 2nd member switch send & receive function. create ticket then change to admin number, then change to 2nd member				
+Steps		1	use group 1st member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group admin number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with 1st member number				
+		6	use group 2nd member number			keep send & receive function with 1st member number. after 2nd member				
+		7	connect to satuinbox			keep send & receive function with 1st member number. after admin				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-023				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group member conversation. group member & 2 admins switch send & receive function. create ticket then change to admin number				
+Steps		1	use group 1st member number		test type	POSITIVE				
+		2	connect to satuinbox							
+		3	create ticket and confirm		Status Response	Expected Result	Actual Result	Status		
+		4	use group 1st admin number			display alert message "this number will be used for send message"				
+		5	connect to satuinbox			message send and receive with member number				
+		6	use group 2nd admin number			keep send & receive function with member number				
+		7	connect to satuinbox			keep send & receive function with member number.				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-024				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. linked number mobile device				
+Steps		1	open whatsapp on linked number mobile device		test type	POSITIVE				
+		2	send message							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				bubble chat appears after < 1s				
+		5				bubble chat apears as home, with agent name, content, timestamp and delivery status				
+		6				 is displayed in the group chat of all agent				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-025				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. enter				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	input ''" in message input							
+		3	cllick enter		Status Response	Expected Result	Actual Result	Status		
+		4				buble chat appears after ≈ 3s in the group chat of all group members				
+		5				bubble chat apears as home, with agent name, content, timestamp and delivery status				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-026				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. send button. success				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	input ''" in message input							
+		3	cllick send button		Status Response	Expected Result	Actual Result	Status		
+		4				buble chat appears after ≈ 3s in the group chat of all group members				
+		5				bubble chat apears as home, with agent name, content, timestamp and delivery status				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-027				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. send button. empty				
+Steps		1	select group conversation in group list		test type	NEGATIVE				
+		2	cllick send button							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				not sending any message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-028				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. emoji				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	click emoji button							
+		3	select emoji		Status Response	Expected Result	Actual Result	Status		
+		4	send button/enter			emoji display in message input				
+		5				emoji bubble chat display in group conversation				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-029				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. attachment, file				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	click attachment button							
+		3	click files button		Status Response	Expected Result	Actual Result	Status		
+		4	select file			displays file explorer to select file				
+		5	click send			display preview in message input and can input message				
+		6				file display in conversation bubble chat				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-030				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. attachment, img				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	click attachment button							
+		3	click photo&video button		Status Response	Expected Result	Actual Result	Status		
+		4	select img			displays file explorer to select img				
+		5	click send			display preview in message input and can input message				
+		6				img display in conversation bubble chat				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-031				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	display group conversation. satuinbox app. attachment, img				
+Steps		1	select group conversation in group list		test type	POSITIVE				
+		2	click attachment button							
+		3	click photo&video button		Status Response	Expected Result	Actual Result	Status		
+		4	select video			displays file explorer to select video				
+		5	click send			display preview in message input and can input message				
+		6				video display in conversation bubble chat				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-032				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	delete bubble chat. linked number mobile device				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open satuinbox connected group chat							
+		3	delete home bubble chat for everyone		Status Response	Expected Result	Actual Result	Status		
+		4				bubble chat in satuinbox group conversation not deleted				
+		5				indicator that bubble chat is deleted				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-033				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	have access to linked number mobile device				
+Url					Description	pin bubble chat. linked number mobile device				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open satuinbox connected group chat							
+		3	pin bubble chat for everyone		Status Response	.	Actual Result	Status		
+		4				bubble chat pinned, at top of the conversation room				
+		5				pinned chat display for every agent in the group				
+		6				added to pinned messages accordion in group details				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-034				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	pin bubble chat. satuinbox app				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open satuinbox connected group chat							
+		3	pin bubble chat for everyone		Status Response	Expected Result	Actual Result	Status		
+		4				bubble chat pinned, at top of the conversation room				
+		5				pinned chat display for every agent in the group				
+		6				added to pinned messages accordion in group details				
+		7				indicator message is pinned in bubble chat				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-035				Tester	Aka				
+Scenario			verify group conversation		Pre-Condition	accessed group page. linked device a number				
+Url					Description	delete group				
+Steps		1	open whatsapp in linked number mobile device		test type	POSITIVE				
+		2	open satuinbox connected group chat							
+		3	delete group chat		Status Response	Expected Result	Actual Result	Status		
+		4				indicator group deleted				
+		5				disable state input message				
+		6				conversation still visible				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-036				Tester	Danny				
+Scenario			Confirm that session status is active or non-active based on user access to satuinbox		Pre-Condition					
+Url					Description	confirm status active at device when user login to satuinbox				
+Steps		1	login to satuinbox		test type	POSITIVE				
+		2	check on whatsapp app is status changed to active							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				status active				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-037				Tester	Danny				
+Scenario			Confirm that session status is active or non-active based on user access to satuinbox		Pre-Condition	user has login				
+Url					Description	confirm status non-active at device when user logout from satuinbox				
+Steps		1	logout from satuinbox		test type	POSITIVE				
+		2	check on whatsapp app is status changed to active							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				status non-active				
+		5				timestamp inactive is present				
+		6								
+		7								
+		8								
+		9								

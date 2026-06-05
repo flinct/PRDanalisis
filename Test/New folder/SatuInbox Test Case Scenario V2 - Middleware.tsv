@@ -1,0 +1,163 @@
+									total cases =	11
+Test ID	SIX-Test-001				Tester	Aka		PASSED	passed	9
+Scenario			verify path to conversation/your-inbox page		Pre-Condition				failed	2
+Url			dev-v2.satuinbox.com		Description	access from login page			need to test	0
+Steps		1	open login page		test type	POSITIVE			on test	0
+		2	input "testaka", " Testaka@12"							11
+		3	click login		Status Response	Expected Result	Actual Result	Status		
+		4				login successfull		Passed		
+		5				direct user to dashboard conversation/your-inbox page https://dev-v2.satuinbox.com/id/conversation/your-inbox		Passed		
+		6				status code 200 OK		Passed		
+		7				dashboard page open		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-002				Tester	Aka		PASSED		
+Scenario			verify path to conversation/your-inbox page		Pre-Condition	accessed ticketing page				
+Url			dev-v2.satuinbox.com		Description	access from ticketing page				
+Steps		1	click inbox button on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to dashboard conversation/your-inbox page https://dev-v2.satuinbox.com/id/conversation/your-inbox		Passed		
+		5				status code 200 OK		Passed		
+		6				conversaton/your-inbox page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-003				Tester	Aka		FAILED		
+Scenario			verify path to conversation/your-inbox page		Pre-Condition	accessed ticketing page				
+Url			dev-v2.satuinbox.com		Description	access from ticketing page				
+Steps		1	click satuinbox icon on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to dashboard conversation/your-inbox page https://dev-v2.satuinbox.com/id/conversation/your-inbox		Failed		
+		5				status code 200 OK		Failed		
+		6				conversaton/your-inbox page open		Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-004				Tester	Aka		PASSED		
+Scenario			verify path to ticketing page		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	access from conversation page				
+Steps		1	click ticketing button on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to ticketing page https://dev-v2.satuinbox.com/id/ticketing		Passed		
+		5				status code 200 OK		Passed		
+		6				ticketing page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-005				Tester	Aka		PASSED		
+Scenario			verify path to broadcast page		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	access from conversation page				
+Steps		1	click broadcasst button on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to boadcast page https://dev-v2.satuinbox.com/id/broadcast		Passed		
+		5				status code 200 OK		Passed		
+		6				broadcast page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-006				Tester	Aka		PASSED		
+Scenario			verify path to statistic page		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	access from conversation page				
+Steps		1	click statistic button on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to statistic page https://dev-v2.satuinbox.com/id/statistic		Passed		
+		5				status code 200 OK		Passed		
+		6				statistic page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-007				Tester	Aka		PASSED		
+Scenario			verify path to contacts page		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	access from conversation page				
+Steps		1	click contacts button on sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to contacts page https://dev-v2.satuinbox.com/id/contacts		Passed		
+		5				status code 200 OK		Passed		
+		6				contacts page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-008				Tester	Aka		PASSED		
+Scenario			verify path to settings page		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	access from conversation page				
+Steps		1	click settings button on bottom sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to settings page https://dev-v2.satuinbox.com/id/settings		Passed		
+		5				status code 200 OK		Passed		
+		6				settings page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-009				Tester	Aka		PASSED		
+Scenario			verify path to log out		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	open dropdown menu				
+Steps		1	click account button on bottom sidebar 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				dropdown menu open (user name & logout button)		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-010				Tester	Aka		PASSED		
+Scenario			verify path to log out		Pre-Condition	accessed conversation page				
+Url			dev-v2.satuinbox.com		Description	open dropdown menu				
+Steps		1	click account button on bottom sidebar 		test type	POSITIVE				
+		2	click logout button							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				direct user to settings page https://dev-v2.satuinbox.com/id/login		Passed		
+		5				status code 200 OK		Passed		
+		6				login page open		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-011				Tester	Danny		FAILED		
+Scenario			Navigate conversation		Pre-Condition					
+Url					Description	accessing channel section from inbox section				
+Steps		1	access conversation - your inbox		test type	POSITIVE				
+		2	click exist channel							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				chat list re-displayed based on selected channel	chat list re-displayed as all conversation, need click action twice	Failed		
+		5				channel selected is highlighted	need click action twice	Failed		
+		6								
+		7								
+		8								
+		9								

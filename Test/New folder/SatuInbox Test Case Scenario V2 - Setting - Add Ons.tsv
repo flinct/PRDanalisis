@@ -1,0 +1,1075 @@
+									total cases =	72
+Test ID	SIX-Test-001				Tester	Aka			passed	0
+Scenario			verify add ons channel page when no channels are activated		Pre-Condition	login to dashboard			failed	0
+Url					Description	Ensure Add-ons Channel page is accessible and displays all required elements when no channel is active			need to test	0
+Steps		1	open dashboard page		test type	POSITIVE			on test	0
+		2	click settings button on sidebar							0
+		3	open channels/add-ons		Status Response	Expected Result	Actual Result	Status		
+		4				display page header and description				
+		5				display learn add ons button				
+		6				display total Rp0 on billing summary				
+		7				billing summary description has link to billing page				
+		8				system displays the available channels in a fixed order: WhatsApp → Instagram → Facebook → Telegram → Email. (channels icon and name, pricing/account/month, and activate channel button)				
+		9								
+										
+										
+										
+Test ID	SIX-Test-002				Tester	Aka				
+Scenario			verify learn add ons modal displayed correctly		Pre-Condition	have access to add ons page				
+Url					Description	Ensure Learn Add-ons modal displayed and closed with (X) button				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	cllick learn add ons button							
+		3	click (X) button		Status Response	Expected Result	Actual Result	Status		
+		4				display learn add ons modal				
+		5				modal display description, add-ons pricing overview table, billing information, and close button				
+		6				modal closes/disappears after (X) button clicked				
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-Test-003				Tester	Aka				
+Scenario			verify learn add ons modal closed correctly		Pre-Condition	open add ons page				
+Url					Description	Ensure Learn Add-ons closed with close button				
+Steps		1	open learn add ons modal		test type	POSITIVE				
+		2	click close button							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				modal closes/disappears after close button clicked				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-004				Tester	Aka				
+Scenario			verify learn add ons modal closed correctly		Pre-Condition	open add ons page				
+Url					Description	Ensure Learn Add-ons not closed by clicking outside the modal				
+Steps		1	open learn add ons modal		test type	NEGATIVE				
+		2	click outside the modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				modal not closed				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-005				Tester	Aka				
+Scenario			verify billing summary when no channels are activated		Pre-Condition	open add ons page				
+Url					Description	check billing summary and test link on the billing summary description when no channels are activated				
+Steps		1	open add ons page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display "Total: Rp0"				
+		5				redirect user to billing page new tab				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-006				Tester	Aka				
+Scenario			verify activasion channel modal when no channels are activated		Pre-Condition	open add ons page				
+Url					Description	activating telegram channel				
+Steps		1	click activate button for telegram		test type	POSITIVE				
+		2	ticked checkbox							
+		3	click activate telegram channel		Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				telegram channel activated				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-007				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	close modal by (X) button when checkbox ticked (instagram)				
+Steps		1	click activate button for instagram		test type	POSITIVE				
+		2	ticked checkbox							
+		3	click (X) button		Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal closed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-008				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	close modal by cancel button when checkbox ticked (instagram)				
+Steps		1	click activate button for instagram		test type	POSITIVE				
+		2	ticked checkbox							
+		3	click cancel button		Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal closed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-009				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	not close modal by clicking outside the modal when checkbox ticked (instagram)				
+Steps		1	click activate button for instagram		test type	NEGATIVE				
+		2	ticked checkbox							
+		3	click outside the button		Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal not close				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-010				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	close modal by (X) button when checkbox not ticked (instagram)				
+Steps		1	click activate button for instagram		test type	POSITIVE				
+		2	click (X) button							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal closed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-011				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	close modal by cancel button when checkbox not ticked (instagram)				
+Steps		1	click activate button for instagram		test type	POSITIVE				
+		2	click cancel button							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal closed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-012				Tester	Aka				
+Scenario			verify closing activasion channel modal		Pre-Condition	open add ons page				
+Url					Description	not close modal by clicking outside the modal when checkbox not ticked (instagram)				
+Steps		1	click activate button for instagram		test type	NEGATIVE				
+		2	click outside the modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				modal not close				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-013				Tester	Aka				
+Scenario			verify channel list (1 activated)		Pre-Condition	telegram activated				
+Url					Description	activation channel not confirmed				
+Steps		1	open add ons page		test type	NEGATIVE				
+		2	click activate button for telegram							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				disable activate button				
+		5				modal not displayed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-014				Tester	Aka				
+Scenario			verify channel list (1 activated)		Pre-Condition	telegram activated				
+Url					Description	activation channel confirmed with 0 connected account and expand collapse action accordion				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button to expand							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				telegram channel changed to have an accordion				
+		5				telegram channel display channel icon and name, channel status(0 connected), accordion button, billing counter, connect channel account button				
+		6				empty state accordion				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-015				Tester	Aka				
+Scenario			verify connect channel account onboarding modal		Pre-Condition	telegram activated				
+Url					Description	confirmation connect telegram account modal, checkbox not ticked				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	confirm connect on modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display confirmation modal				
+		5				display connect telegram bot modal				
+		6								
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-Test-016				Tester	Aka				
+Scenario			verify closing connect channel account onboarding modal		Pre-Condition	telegram activated				
+Url					Description	closing confirmation connect telegram account modal with (X) button, checkbox not ticked				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	cllick (X) button on modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				modal closed				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-Test-017				Tester	Aka				
+Scenario			verify closing connect channel account onboarding modal		Pre-Condition	telegram activated				
+Url					Description	closing confirmation connect telegram account modal with cancel button, checkbox not ticked				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	cllick cancel button on modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				modal closed				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-018				Tester	Aka				
+Scenario			verify closing connect channel account onboarding modal		Pre-Condition	telegram activated				
+Url					Description	by clicking outside the modal, modal will not closed. checkbox not ticked				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	cllick cancel button on modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				modal not closed				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-019				Tester	Aka				
+Scenario			verify connect channel account modal		Pre-Condition	telegram activated				
+Url					Description	valid input. confirmation modal checkbox not ticked, account added				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	confirm connect on onboarding modal							
+		3	input bot token ""		Status Response	Expected Result	Actual Result	Status		
+		4	input telegram name ""			display telegram bot form input				
+		5	click connect button 			user back to add ons page				
+		6				account/bot added to telegram channel accordion table				
+		7				added successfully toast notification				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-020				Tester	Aka				
+Scenario			verify connect channel account modal		Pre-Condition	telegram activated				
+Url					Description	valid input. confirmation modal checkbox not ticked, account not added				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	confirm connect on onboarding modal							
+		3	input bot token ""		Status Response	Expected Result	Actual Result	Status		
+		4	input telegram name ""			user back to add ons page				
+		5	click connect button 			account/bot not added to telegram channel accordion table				
+		6				failed to add toast notification				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-021				Tester	Aka				
+Scenario			verify closing connect channel account modal		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	not filled, close by (X) button				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	cllick (X) button on modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				user back to add ons page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-022				Tester	Aka				
+Scenario			verify confirmation closing connect channel account modal		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	not filled, close by cancel button, leave setup				
+Steps		1	click connect telegram account on channel list		test type	POSITIVE				
+		2	click cancel button on modal							
+		3	click leave setup button on warning modal		Status Response	Expected Result	Actual Result	Status		
+		4				user back to add ons page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-023				Tester	Aka				
+Scenario			verify confirmation closing connect channel account modal		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	not filled, close by cancel button, continue setup				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	click cancel button on modal							
+		3	click continue setup button on warning modal		Status Response	Expected Result	Actual Result	Status		
+		4				user back to telegram bot form input				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-024				Tester	Aka				
+Scenario			verify closing connect channel account modal		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	not filled, clicking outside the modal will not close the modal				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	cllick outside the modal							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				user stay on telegram bot form input				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-025				Tester	Aka				
+Scenario			verify connect channel account modal		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	not filled, click disabled connect button				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	cllick connect 							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				user stay on telegram bot form input				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-026				Tester	Aka				
+Scenario			verify telegram bot form validation		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	input invalid bot token and name				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	input bot token ""							
+		3	input telegram name ""		Status Response	Expected Result	Actual Result	Status		
+		4	click connect 			failed to add bot				
+		5				user stay on telegram bot form modal				
+		6				System will display Error: “Cannot find this token, please try again later.” on bot token input				
+		7				System will display Error: “This Telegram name is already in use. Please choose another name.” on bot token input				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-027				Tester	Aka				
+Scenario			verify telegram bot form validation		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	input invalid token				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	input bot token ""							
+		3	input telegram name ""		Status Response	Expected Result	Actual Result	Status		
+		4	click connect 			failed to add bot				
+		5				user stay on telegram bot form modal				
+		6				System will display Error: “Cannot find this token, please try again later.” on bot token input				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-028				Tester	Aka				
+Scenario			verify telegram bot form validation		Pre-Condition	telegram activated, confirmation modal checkbox ticked				
+Url					Description	input invalid name				
+Steps		1	click connect telegram account on channel list		test type	NEGATIVE				
+		2	confirm connect on onboarding modal							
+		3	input bot token ""		Status Response	Expected Result	Actual Result	Status		
+		4	input telegram name ""			failed to add bot				
+		5	click connect 			user stay on telegram bot form modal				
+		6				System will display Error: “This Telegram name is already in use. Please choose another name.” on bot token input				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-029				Tester	Aka				
+Scenario			verify telegram channel list and billing summary		Pre-Condition	2 telegram bot added				
+Url					Description	collapse accordion, prorated ... days				
+Steps		1	open add ons page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				display billing summary based on how many account connected and prorated how many days				
+		5				display 2 connected on telegram channel				
+		6				display 2 account x Rp100.000 = Rp200.000=/mo on telegram channel				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-030				Tester	Aka				
+Scenario			verify telegram accordion		Pre-Condition	2 telegram bot added				
+Url					Description	expanded accordion				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on telegram channel							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				accordion display table(telegram name, view qr code button, rename button, delete button)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-031				Tester	Aka				
+Scenario			verify whatsapp channel activation		Pre-Condition	open add ons page				
+Url					Description	activating whatsapp channel				
+Steps		1	click activate button on whatsapp channel		test type	POSITIVE				
+		2	ticked checkbox							
+		3	click activate whatsapp channel button 		Status Response	Expected Result	Actual Result	Status		
+		4				display prorated billing this month and monthly price				
+		5				whatsapp channel activated				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-032				Tester	Aka				
+Scenario			verify link on whatsapp onboarding		Pre-Condition	open add ons page, whatsapp activation confirmed by admin				
+Url					Description	link on onboarding modal				
+Steps		1	click connect button on whatsapp channel		test type	POSITIVE				
+		2	click "see instruction" link							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				user redirected to https://www.facebook.com/business/help/1095661473946872?id=180505742745347 (new tab)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-033				Tester	Aka				
+Scenario			verify Whatsapp oauth		Pre-Condition	whatsapp channel activated				
+Url					Description	connect whatsapp number, onboarding modal checkbox ticked				
+Steps		1	click connect button on whatsapp channel		test type	POSITIVE				
+		2	ticked checkbox on onboarding modal							
+		3	click connect whatsapp number		Status Response	Expected Result	Actual Result	Status		
+		4	fill form in whatsapp oauth			redirect user to whatsapp oauth				
+		5	click confirm			added successfully toast notification				
+		6				account/number add to accordion table				
+		7				next time want to connect whatsapp number straight from channel list to whatsapp oauth				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-034				Tester	Aka				
+Scenario			verify Whatsapp channel accordion and billing counter		Pre-Condition	whatsapp account added, 3 account connected				
+Url					Description	whatsapp channel accordion expanded, billing counter based on how many connected account				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on whatsapp channel							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				accordion display table(whatsapp name, phone number, connection status, delete button)				
+		5				whatsapp billing display "3 account x Rp250.000  = Rp750.000=/mo"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-035				Tester	Aka				
+Scenario			verify reconnecting whatsapp account		Pre-Condition	whatsapp account added,1connected account and 1 disconnected account				
+Url					Description	reconnecting disconnected whatsapp account success				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on whatsapp channel							
+		3	click reconnected for disconnected account		Status Response	Expected Result	Actual Result	Status		
+		4				whatsapp channel status "action required"				
+		5				whatsapp account reconnected				
+		6				toast ? / stay ?				
+		7				status changed to "2 connected"				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-036				Tester	Aka				
+Scenario			verify reconnecting whatsapp account		Pre-Condition	whatsapp account added, disconnected account				
+Url					Description	reconnecting disconnected whatsapp account failed				
+Steps		1	open add ons page		test type	NEGATIVE				
+		2	click accordion button on whatsapp channel							
+		3	click reconnected for disconnected account		Status Response	Expected Result	Actual Result	Status		
+		4				whatsapp account not reconnected				
+		5				toast ? / stay ?				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-037				Tester	Aka				
+Scenario			verify deleting whatsapp account		Pre-Condition	whatsapp account added				
+Url					Description	deleting whatsapp account success				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on whatsapp channel							
+		3	click delete/remove button		Status Response	Expected Result	Actual Result	Status		
+		4	click continue			displayed confirmation to delete modal 				
+		5				account removed from table				
+		6				toast ?				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-038				Tester	Aka				
+Scenario			verify deleting whatsapp account		Pre-Condition	whatsapp account added				
+Url					Description	deleting whatsapp account cancelled				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on whatsapp channel							
+		3	click delete/remove button		Status Response	Expected Result	Actual Result	Status		
+		4	click cancel			displayed confirmation to delete modal 				
+		5				account not removed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-039				Tester	Aka				
+Scenario			verify deleting whatsapp account		Pre-Condition	whatsapp account added				
+Url					Description	deleting whatsapp account failed				
+Steps		1	open add ons page		test type	NEGATIVE				
+		2	click accordion button on whatsapp channel							
+		3	click delete/remove button		Status Response	Expected Result	Actual Result	Status		
+		4	click continue			displayed confirmation to delete modal 				
+		5				account not removed from table				
+		6				toast ?				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-040				Tester	Aka				
+Scenario			verify all disconnected status		Pre-Condition	whatsapp account added, 1 disconnected account				
+Url					Description	deleting whatsapp account failed				
+Steps		1	open add ons page		test type	NEGATIVE				
+		2	click accordion button on whatsapp channel							
+		3	click delete/remove button		Status Response	Expected Result	Actual Result	Status		
+		4	click continue			whatsapp channel status "all disconnected"				
+		5				displayed confirmation to delete modal 				
+		6				account not removed from table				
+		7				toast ?				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-041				Tester	Aka				
+Scenario			verify deleting whatsapp channel		Pre-Condition	whatsapp channel activated				
+Url					Description	deleting whatsapp channel success				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click delete/remove button							
+		3	click continue		Status Response	Expected Result	Actual Result	Status		
+		4				displayed confirmation to delete modal 				
+		5				channel deactivated				
+		6				toast ?				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-042				Tester	Aka				
+Scenario			verify deleting whatsapp channel		Pre-Condition	whatsapp channel activated				
+Url					Description	deleting whatsapp channel cancelled				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click delete/remove button							
+		3	click cancel		Status Response	Expected Result	Actual Result	Status		
+		4				displayed confirmation to delete modal 				
+		5				channel not removed/deactivate				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-043				Tester	Aka				
+Scenario			verify deleting whatsapp channel		Pre-Condition	whatsapp channel activated				
+Url					Description	deleting whatsapp channel failed				
+Steps		1	open add ons page		test type	NEGATIVE				
+		2	click delete/remove button							
+		3	click continue		Status Response	Expected Result	Actual Result	Status		
+		4				displayed confirmation to delete modal 				
+		5				channel still active				
+		6				toast ?				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-044				Tester	Aka				
+Scenario			verify link on instagram onboarding		Pre-Condition	open add ons page, instagram activation confirmed by admin				
+Url					Description	link on onboarding modal				
+Steps		1	click connect button on instagram channel		test type	POSITIVE				
+		2	click "Insragram Business account" link							
+		3	click "See how to link them" link		Status Response	Expected Result	Actual Result	Status		
+		4	click "Allow access to messages" link			user redirected to Insragram Business account (new tab)				
+		5	click "Log in to the Facebook account" link			user redirected to See how to link them (new tab)				
+		6				user redirected to Allow acess to messages (new tab)				
+		7				user redirected to Log in to the Facebook account (new tab)				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-045				Tester	Aka				
+Scenario			verify Instagram channel accordion		Pre-Condition	instagram account added				
+Url					Description	instagram channel accordion expanded				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on instagram channel							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				accordion display table(instagram name, connection status, delete button)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-046				Tester	Aka				
+Scenario			verify facebook channel accordion		Pre-Condition	facebook account added				
+Url					Description	facebook channel accordion expanded				
+Steps		1	open add ons page		test type	POSITIVE				
+		2	click accordion button on facebook channel							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				accordion display table(facebook name, connection status, delete button)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-047				Tester	Aka				
+Scenario			verify connect email domain form		Pre-Condition	email channel activated				
+Url					Description	with valid input				
+Steps		1	click connect button on email channel		test type	POSITIVE				
+		2	ticked checkbox on onboarding modal							
+		3	click connect email domain		Status Response	Expected Result	Actual Result	Status		
+		4	fill form with valid input			displayed connect email domain form modal				
+		5	input email name textbox " " input uuid(email username) textbox " " input smtp host textbox " " (domain) input smtp username textbox " " input smtp auth type textbox " " input smtp port textbox " " input smtp password textbox " " input smtp email from textbox " "			redirect user to connect email form modal				
+		6	save & integrate			added successfully toast notification				
+		7				account/number add to accordion table				
+		8				next time want to connect email straight from channel list to connect email form modal				
+		9								
+										
+										
+										
+Test ID	SIX-Test-048				Tester	Aka				
+Scenario			verify connect email domain form		Pre-Condition	email channel activated				
+Url					Description	not filled				
+Steps		1	click connect button on email channel		test type	NEGATIVE				
+		2	click connect email domain							
+		3	save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				redirect user to connect email form modal				
+		5				account/number not add to accordion table				
+		6				stay on connect email form modal				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-049				Tester	Aka				
+Scenario			verify email name		Pre-Condition	connect email domain modal opened				
+Url					Description	input with leading & trailing spaces				
+Steps		1	input email name " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				redirect to email edit page				
+		5				added successfully toast notification				
+		6				email added to accordion table				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-050				Tester	Aka				
+Scenario			verify email name		Pre-Condition	connect email domain modal opened				
+Url					Description	input < 3 characters				
+Steps		1	input email name " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "email name must be at least 3 characters"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-051				Tester	Aka				
+Scenario			verify email name		Pre-Condition	connect email domain modal opened				
+Url					Description	input > 30 characters				
+Steps		1	input email name " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "email name must not exceed 30 characters"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-052				Tester	Aka				
+Scenario			verify email name		Pre-Condition	connect email domain modal opened				
+Url					Description	input invalid characters				
+Steps		1	input email name " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "Email name contains invalid characters"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-053				Tester	Aka				
+Scenario			verify email name		Pre-Condition	connect email domain modal opened				
+Url					Description	input duplicate name				
+Steps		1	input email name " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "Email name already exist"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-054				Tester	Aka				
+Scenario			verify UUID (Email Username)		Pre-Condition	connect email domain modal opened				
+Url					Description	input with leading & trailing spaces				
+Steps		1	input UUID (Email Username) " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				redirect to email edit page				
+		5				added successfully toast notification				
+		6				email added to accordion table				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-055				Tester	Aka				
+Scenario			verify UUID (Email Username)		Pre-Condition	connect email domain modal opened				
+Url					Description	input with uppercase				
+Steps		1	input UUID (Email Username) " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				input converted to lowercase				
+		5				redirect to email edit page				
+		6				added successfully toast notification				
+		7				email added to accordion table				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-056				Tester	Aka				
+Scenario			verify UUID (Email Username)		Pre-Condition	connect email domain modal opened				
+Url					Description	input invalid format				
+Steps		1	input UUID (Email Username) " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "invalid email format"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-057				Tester	Aka				
+Scenario			verify UUID (Email Username)		Pre-Condition	connect email domain modal opened				
+Url					Description	input duplicate username				
+Steps		1	input UUID (Email Username) " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "email username already used"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-058				Tester	Aka				
+Scenario			verify SMTP Host		Pre-Condition	connect email domain modal opened				
+Url					Description	input with IP address				
+Steps		1	input SMTP Host " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				redirect to email edit page				
+		5				added successfully toast notification				
+		6				email added to accordion table				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-059				Tester	Aka				
+Scenario			verify SMTP Host		Pre-Condition	connect email domain modal opened				
+Url					Description	input with uppercase				
+Steps		1	input SMTP Host " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				input converted to lowercase				
+		5				redirect to email edit page				
+		6				added successfully toast notification				
+		7				email added to accordion table				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-060				Tester	Aka				
+Scenario			verify SMTP Host		Pre-Condition	connect email domain modal opened				
+Url					Description	input invalid host format				
+Steps		1	input SMTP Host " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages "Invalid host format"				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-061				Tester	Aka				
+Scenario			verify SMTP Host		Pre-Condition	connect email domain modal opened				
+Url					Description	input > 100 characters				
+Steps		1	input SMTP Host " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “host must not exceed 100 characters”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-062				Tester	Aka				
+Scenario			verify SMTP Username		Pre-Condition	connect email domain modal opened				
+Url					Description	input with leading & trailing spaces				
+Steps		1	input SMTP Username " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				redirect to email edit page				
+		5				added successfully toast notification				
+		6				email added to accordion table				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-063				Tester	Aka				
+Scenario			verify SMTP Username		Pre-Condition	connect email domain modal opened				
+Url					Description	input with uppercase				
+Steps		1	input SMTP Username " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				input converted to lowercase				
+		5				redirect to email edit page				
+		6				added successfully toast notification				
+		7				email added to accordion table				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-064				Tester	Aka				
+Scenario			verify SMTP Username		Pre-Condition	connect email domain modal opened				
+Url					Description	input invalid email format				
+Steps		1	input SMTP Username " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “invalid email format”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-065				Tester	Aka				
+Scenario			verify SMTP Port		Pre-Condition	connect email domain modal opened				
+Url					Description	input < 1				
+Steps		1	input SMTP Port " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “port must be between 1 and 65535”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-066				Tester	Aka				
+Scenario			verify SMTP Port		Pre-Condition	connect email domain modal opened				
+Url					Description	input > 65535				
+Steps		1	input SMTP Port " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “port must be between 1 and 65535”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-067				Tester	Aka				
+Scenario			verify SMTP Port		Pre-Condition	connect email domain modal opened				
+Url					Description	input with non-numeric				
+Steps		1	input SMTP Port " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “port must be numeric”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-068				Tester	Aka				
+Scenario			verify SMTP Password		Pre-Condition	connect email domain modal opened				
+Url					Description	input < 6 characters				
+Steps		1	input SMTP Password " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “Password must be at least 6 characters long”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-069				Tester	Aka				
+Scenario			verify SMTP Password		Pre-Condition	connect email domain modal opened				
+Url					Description	input > 100 characters				
+Steps		1	input SMTP Password " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “Password must not exceed 100 characters long”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-070				Tester	Aka				
+Scenario			verify SMTP Email From		Pre-Condition	connect email domain modal opened				
+Url					Description	input with uppercase				
+Steps		1	input SMTP Email From " "		test type	POSITIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				input converted to lowercase				
+		5				redirect to email edit page				
+		6				added successfully toast notification				
+		7				email added to accordion table				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-071				Tester	Aka				
+Scenario			verify SMTP Email From		Pre-Condition	connect email domain modal opened				
+Url					Description	input invalid email format				
+Steps		1	input SMTP Email From " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “invalid email format”				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-072				Tester	Aka				
+Scenario			verify SMTP Email From		Pre-Condition	connect email domain modal opened				
+Url					Description	input domain mismatch				
+Steps		1	input SMTP Email From " "		test type	NEGATIVE				
+		2	Input other field with valid criteria							
+		3	Click save & integrate		Status Response	Expected Result	Actual Result	Status		
+		4				email not added to accordion table				
+		5				stay on connect email form modal				
+		6				system will displayed error messages “email domain does not match smtp host”				
+		7								
+		8								
+		9								

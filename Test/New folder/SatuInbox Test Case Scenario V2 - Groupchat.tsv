@@ -1,0 +1,1380 @@
+total cases =			85							
+DEV				STAGGING			PROD			
+Passed			85	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		85	No Status	85		
+Test ID	SIX-Group-001							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			load groupchat room		Pre-Condition		DATE	12/12/2025		
+Url					Description	scan number, then create new group chat	ENV	DEV	STAGGING	PROD
+Steps		1	add new number to satuinbox		test type	POSITIVE				
+		2	scan the number							
+		3	create new groupchat with 2 participant		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	send a message to the group from registered number			room created		Passed		
+		5				message displayed		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-002							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			load groupchat room		Pre-Condition		DATE	12/12/2025		
+Url					Description	validate inbound outbound messages	ENV	DEV	STAGGING	PROD
+Steps		1	access conversaton		test type	POSITIVE				
+		2	select Wa Web Group							
+		3	send a message to the group from registered number		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	send a message from member 			message from registered number displayed		Passed		
+		5				message from member displayed		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-003							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			load groupchat room		Pre-Condition		DATE	12/12/2025		
+Url					Description	validate member name	ENV	DEV	STAGGING	PROD
+Steps		1	access conversaton		test type	POSITIVE				
+		2	select Wa Web Group							
+		3	send a message to the group from registered number		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	send a message from member 			message from registered number displayed with correct name and number		Passed		
+		5				message from member displayed with correct member name and number 		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-004							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			load groupchat room		Pre-Condition		DATE	12/12/2025		
+Url					Description	invite new member, validate member name	ENV	DEV	STAGGING	PROD
+Steps		1	access conversaton		test type	POSITIVE				
+		2	select Wa Web Group							
+		3	send a message to the group from registered number		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	send a message from member ( B )			message from registered number displayed with correct name and number		Passed		
+		5	invite new member			message from member ( B ) displayed with correct member name and number 		Passed		
+		6	new member ( C ) join to the group			message from member ( C ) displayed with correct member name and number 		Passed		
+		7	member C send new message							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-005							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition		DATE	12/12/2025		
+Url					Description	Receive and display text message	ENV	DEV	STAGGING	PROD
+Steps		1	Send text from WA group 		test type	POSITIVE				
+		2	Observe SatuInbox UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message persisted; appears in UI ordered, latency <1s.		Passed		
+		5				Verify messageId stored.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-006							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition		DATE	12/12/2025		
+Url					Description	Receive and display image message	ENV	DEV	STAGGING	PROD
+Steps		1	Send image from WA group 		test type	POSITIVE				
+		2	Observe SatuInbox UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message persisted		Passed		
+		5				appears in UI ordered		Passed		
+		6				latency <1s.		Passed		
+		7				Verify storage path in DB.				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-007							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition		DATE	12/12/2025		
+Url					Description	Receive and display document (pdf)	ENV	DEV	STAGGING	PROD
+Steps		1	Send image from WA group 		test type	POSITIVE				
+		2	Observe SatuInbox UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				File icon, name, size appear; 		Passed		
+		5				download opens with native app.		Passed		
+		6				File size <= 20MB.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-008							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Many messages sent in quick succession with known timestamps	DATE	12/12/2025		
+Url					Description	Preserve ordering from timestamps	ENV	DEV	STAGGING	PROD
+Steps		1	Send 5 messages with timestamps T1..T5 possibly out-of-order delivery		test type	POSITIVE				
+		2	Observe SatuInbox UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Messages sorted by messageTimestamp ascending.		Passed		
+		5				Inject out-of-order events to simulate network reorder.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-009							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition		DATE	12/12/2025		
+Url					Description	no duplication messageId	ENV	DEV	STAGGING	PROD
+Steps		1	Send same message twice		test type	NEGATIVE				
+		2	validate no same messageId							
+		3	Observe SatuInbox UI.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				two identical message displayed		Passed		
+		5				Check DB unique index on messageId.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-010							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	lastMessageTimestamp tracked; simulated gap > 3 min	DATE	12/12/2025		
+Url					Description	Missing messages detection (gap) triggers backfill	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate gap by not delivering messages for >3 min.		test type	POSITIVE				
+		2	Trigger reconnection or scheduled check.							
+		3	send or receive message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				System calls loadMessages and backfills missing messages. ( if any )		Passed		
+		5				Check job logs for backfill triggered.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-011							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	loadMessages returns transient error	DATE	12/12/2025		
+Url					Description	Backfill failure → retry enqueued	ENV	DEV	STAGGING	PROD
+Steps		1	Cause loadMessages to fail transiently.		test type	NEGATIVE				
+		2	Verify retry behavior.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Backfill job placed in retry queue with configured delays		Passed		
+		5				 		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-012							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Group metadata change	DATE	12/12/2025		
+Url					Description	System message types persisted (join/leave/name change)	ENV	DEV	STAGGING	PROD
+Steps		1	Change group name or add member via mobile.		test type	POSITIVE				
+		2	Observe system message.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				System message appears with appropriate text & timestamp		Passed		
+		5				 		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-013							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Normal load	DATE	12/12/2025		
+Url					Description	Inbound latency under 1s (happy path)	ENV	DEV	STAGGING	PROD
+Steps		1	send message		test type	POSITIVE				
+		2	measure time from webhook arrival to UI render							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				End-to-end <1s.		Passed		
+		5				 		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-014							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Burst of messages (100/s)	DATE	12/12/2025		
+Url					Description	Inbound processing under high load remains correct	ENV	DEV	STAGGING	PROD
+Steps		1	Flood group with 100 msgs/sec. 		test type	POSITIVE				
+		2	Check ordering, dedupe, and no missing.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No message loss; 		Passed		
+		5				ordering preserved; 		Passed		
+		6				latency may increase but system stable.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-015							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Multi-media incoming	DATE	12/12/2025		
+Url					Description	Save multi-media message metadata correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Send message with text+image+file		test type	POSITIVE				
+		2	Inspect DB.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				All attachments linked to message record with correct metadata.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-016							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Ephemeral msg type arrives	DATE	12/12/2025		
+Url					Description	Ephemeral message handling	ENV	DEV	STAGGING	PROD
+Steps		1	Send ephemeral message.		test type	POSITIVE				
+		2	Observe UI & DB treatment.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display privacy note; if unsupported, show "view on phone" message.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-017							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Missing timestamp scenario	DATE	12/12/2025		
+Url					Description	System handles message with missing timestamp gracefully	ENV	DEV	STAGGING	PROD
+Steps		1	Deliver a message with null timestamp.		test type	EDGE				
+		2	Observe behavior.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Use server ingestion time; store with warning flag; ensure no crash.		Passed		
+		5				Log incident		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-018							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Attempt duplicates in DB	DATE	12/12/2025		
+Url					Description	Message persisted unique index enforcement	ENV	DEV	STAGGING	PROD
+Steps		1	Try to insert same messageId twice via API test		test type	EDGE				
+		2	Observe DB.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Second insert rejected; system logs duplicate attempt.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-019							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Corrupt payload causes processing error	DATE	12/12/2025		
+Url					Description	Message with corrupted payload is retried and then DLQ	ENV	DEV	STAGGING	PROD
+Steps		1	Send corrupt payload that fails processing.		test type	NEGATIVE				
+		2	Observe retries & DLQ.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Retries per policy then DLQ; UI shows placeholder error if necessary.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-020							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	Sender in different timezone	DATE	12/12/2025		
+Url					Description	Message timestamp timezone correctness	ENV	DEV	STAGGING	PROD
+Steps		1	Send message from device with timezone tzX.		test type	POSITIVE				
+		2	Confirm displayed time formatting.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Stored timestamp in UTC; UI displays formatted per user locale.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-021							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MESSAGE SYNCHRONIZATION (Inbound) Given a WhatsApp group and an active Baileys session connected to SatuInbox When WhatsApp sends inbound messages of various types to the group Then SatuInbox stores each message, sorts by timestamp, displays on UI within target latency, and does not duplicate messages 		Pre-Condition	DB transient fails once	DATE	12/12/2025		
+Url					Description	Message processing recovers after DB transient error	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate DB transient failure during write.		test type	EDGE				
+		2	Check retry flow.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Worker retries per policy; on success message appears once.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-022							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition	Group exists; Baileys receives group-participants.update add	DATE	12/12/2025		
+Url					Description	Member added via mobile reflected in SatuInbox	ENV	DEV	STAGGING	PROD
+Steps		1	Add member via WA mobile.		test type	POSITIVE				
+		2	Observe SatuInbox member list.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member added, marked joinedAt, system message “X joined”.		Passed		
+		5				Latency ≤1s.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-023							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	added new Member 	ENV	DEV	STAGGING	PROD
+Steps		1	New number sends message to group.		test type	POSITIVE				
+		2	Observe member							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member auto-added to DB with joinedAt ≈ message time.		Passed		
+		5				Verify auto-discovery.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-024							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Member leave via mobile reflected	ENV	DEV	STAGGING	PROD
+Steps		1	Member leaves.		test type	POSITIVE				
+		2	Observe member status.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member marked left		Passed		
+		5				system message “X left”		Passed		
+		6				Input disabled per rule for that number.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-025							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Member removed via mobile by admin	ENV	DEV	STAGGING	PROD
+Steps		1	admin remove member from mobile device		test type	POSITIVE				
+		2	Observe member status.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member marked left		Passed		
+		5				system message “X left”		Passed		
+		6				Input disabled per rule for that number.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-026							PASSED		
+							Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Promote to admin reflected	ENV	DEV	STAGGING	PROD
+Steps		1	Promote a member via mobile		test type	POSITIVE				
+		2	Observe member status.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member role updated to admin		Passed		
+		5				optional system message.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-027							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Demote from admin reflected	ENV	DEV	STAGGING	PROD
+Steps		1	demote a member via mobile		test type	POSITIVE				
+		2	Observe member status.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member role updated to member		Passed		
+		5				optional system message.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-028							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition	Simulate inconsistency (some members missing in DB)	DATE	12/12/2025		
+Url					Description	groupMetadata self-healing repairs missing members	ENV	DEV	STAGGING	PROD
+Steps		1	simulate network error by throttling or disconnecting inter		test type	POSITIVE				
+		2	add or remove member							
+		3	reconnect again 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	observe DB and member list			Missing members re-added or corrected.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-029							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition	Very large group (500+ members)	DATE	12/12/2025		
+Url					Description	Member list pagination performance	ENV	DEV	STAGGING	PROD
+Steps		1	Open group members UI ( conversaton detail )		test type	POSITIVE				
+		2	Scroll or load all list  member							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Members are lazy-loaded		Passed		
+		5				no UI hang or glitch		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-030							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition	Leave then quick add	DATE	12/12/2025		
+Url					Description	Leave followed by immediate re-add handled gracefully	ENV	DEV	STAGGING	PROD
+Steps		1	Member leaves then is re-added		test type	EDGE				
+		2	Observe state.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member status toggles to left then joined		Passed		
+		5				history preserved.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-031							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Member without name shows phone only	ENV	DEV	STAGGING	PROD
+Steps		1	Member sends msg with no pushName		test type	POSITIVE				
+		2	UI shows phone only							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Phone displays as fallback.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-032							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Member add during Baileys reconnect handled	ENV	DEV	STAGGING	PROD
+Steps		1	econnect session		test type	POSITIVE				
+		2	Verify member list after sync							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				New members present after metadata sync/backfill.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-033							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MEMBER SYNC & GROUP EVENTS Given a WhatsApp group with active SatuInbox metadata sync When members are added, removed, promoted, demoted, or group metadata changes from mobile or API Then SatuInbox updates member list within ≤1 second, emits system message, and applies role updates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Group photo/name update sync	ENV	DEV	STAGGING	PROD
+Steps		1	Change group name/photo on mobile		test type	POSITIVE				
+		2	Observe UI after event							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Name/photo updated in UI		Passed		
+		5				system message optionally shown.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-034							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Agent logged in; division has WA number joined	DATE	12/12/2025		
+Url					Description	Agent can send text message when permitted	ENV	DEV	STAGGING	PROD
+Steps		1	Compose text and send		test type	POSITIVE				
+		2	Observe queue & UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message enqueued		Passed		
+		5				worker sends		Passed		
+		6				message appears as pending→sent on UI.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-035							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Agent logged in; division has WA number joined	DATE	12/12/2025		
+Url					Description	Attach image -> upload to S3 -> send	ENV	DEV	STAGGING	PROD
+Steps		1	Attach image		test type	POSITIVE				
+		2	Upload completes							
+		3	Send message.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				File stored in S3; message sent with attachment link; preview shows in group.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-036							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Agent logged in; division has WA number joined	DATE	12/12/2025		
+Url					Description	Send file larger than limit rejected	ENV	DEV	STAGGING	PROD
+Steps		1	Attach >20MB file		test type	POSITIVE				
+		2	Send message.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI rejects with error "file size too big".		Passed		
+		5				Validate front-end + back-end enforce		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-037							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Worker fails after send call	DATE	12/12/2025		
+Url					Description	Outbound message idempotency on worker retry	ENV	DEV	STAGGING	PROD
+Steps		1	Worker attempts send, times out.		test type	EDGE				
+		2	Job retried							
+		3	Check duplicates.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Only one message delivered; subsequent retries detect and skip duplication.		Passed		
+		5				Validate front-end + back-end enforce		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-038							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Worker fails after send call	DATE	12/12/2025		
+Url					Description	Delivery status updates (delivered/read)	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate messages.update delivered/read		test type	POSITIVE				
+		2	Observe UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI updates message status accordingly.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-039							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Delivery status updates (delivered/read)	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate messages.update delivered/read		test type	POSITIVE				
+		2	Observe UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI updates message status accordingly.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-040							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Failed outbound retried then DLQ	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate permanent failure.		test type	NEGATIVE				
+		2	Observe retries and DLQ.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Retries per policy then job moved to DLQ; agent shown failed state with retry option.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-041							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound with multiple attachments	ENV	DEV	STAGGING	PROD
+Steps		1	Attach 3 files		test type	POSITIVE				
+		2	send message							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				All attachments uploaded; message references them; UI shows carousel/preview.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-042							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Simulate Baileys temporarily disconnected	DATE	12/12/2025		
+Url					Description	Send during Baileys reconnect queued for later	ENV	DEV	STAGGING	PROD
+Steps		1	Attempt to send message		test type	NEGATIVE				
+		2	observe queue behavior							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message enqueued and remains pending; sent once connection resumes		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-043							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition	Outbound previously failed	DATE	12/12/2025		
+Url					Description	Agent retry failed message from UI	ENV	DEV	STAGGING	PROD
+Steps		1	Agent clicks retry on failed message		test type	POSITIVE				
+		2	Observe send flow.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message re-queued; on success status updates.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-044							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound message stored with correct sender metadata	ENV	DEV	STAGGING	PROD
+Steps		1	Send message		test type	POSITIVE				
+		2	Inspect DB record.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				DB includes sender number, agentId, divisionId, messageId, timestamp.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-045							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Sending when room inactive ( group dismissed from mobile )	ENV	DEV	STAGGING	PROD
+Steps		1	Attempt to send		test type	NEGATIVE				
+		2	Observe UI							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Sending blocked		Passed		
+		5				show "Room inactive" message		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-046							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound message with invalid attachment removed	ENV	DEV	STAGGING	PROD
+Steps		1	Send message referencing missing file		test type	EDGE				
+		2	Observe processing.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Message failed; logged; agent shown error; job moved to DLQ if cannot recover.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-047							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound batch sending retains original order	ENV	DEV	STAGGING	PROD
+Steps		1	Send 10 messages quickly		test type	POSITIVE				
+		2	Observe delivery order.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Messages delivered in send-order		Passed		
+		5				preserve sequence.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-048							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound worker scales on queue backlog	ENV	DEV	STAGGING	PROD
+Steps		1	Queue 1000 outbound jobs		test type	POSITIVE				
+		2	Observe autoscaling.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Messages delivered in send-order		Passed		
+		5				preserve sequence.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-049							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			OUTBOUND MESSAGE Given an agent assigned to a division that owns WA number X and is permitted to send to the group When agent composes and sends a message (text/media/file) to the group Then the message is queued, sent via Baileys, delivery state tracked, and UI updated accordingly		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound messages update read status when available	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate read event		test type	POSITIVE				
+		2	Observe UI							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI toggles to read state; DB updated.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-050							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MULTI-COMPANY & ACCESS CONTROL Given a global group with members from multiple companies and SatuInbox enforcing division access When agents from different companies view the group or attempt to send messages Then SatuInbox must present the single shared room, enforce data isolation, and allow send only for permitted divisions		Pre-Condition	Group exists and is joined by multiple session numbers	DATE	12/12/2025		
+Url					Description	Single room ( same groupchat data ) visible to multiple companies	ENV	DEV	STAGGING	PROD
+Steps		1	Login as Agent A (Company A)		test type	POSITIVE				
+		2	View room							
+		3	Login as Agent B (Company B)		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	View same room.			Both see same room (same message history).		Passed		
+		5				Ensure no per-company duplication		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-051							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MULTI-COMPANY & ACCESS CONTROL Given a global group with members from multiple companies and SatuInbox enforcing division access When agents from different companies view the group or attempt to send messages Then SatuInbox must present the single shared room, enforce data isolation, and allow send only for permitted divisions		Pre-Condition	Group exists and is joined by multiple session numbers	DATE	12/12/2025		
+Url					Description	member group data info	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A,  inspects a member from group chat		test type	POSITIVE				
+		2	satuinbox display member data							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				member data shown as in whatsapp		Passed		
+		5				show number member		Passed		
+		6				show name member ( if setted )		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-052							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MULTI-COMPANY & ACCESS CONTROL Given a global group with members from multiple companies and SatuInbox enforcing division access When agents from different companies view the group or attempt to send messages Then SatuInbox must present the single shared room, enforce data isolation, and allow send only for permitted divisions		Pre-Condition	Group exists and is joined by multiple session numbers	DATE	12/12/2025		
+Url					Description	Multi-number per company treated as distinct identities	ENV	DEV	STAGGING	PROD
+Steps		1	Both numbers are present; send from each		test type	POSITIVE				
+		2	Observe identity in UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Displays both numbers distinctly		Passed		
+		5				DB records distinct senderNumber.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-053							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			MULTI-COMPANY & ACCESS CONTROL Given a global group with members from multiple companies and SatuInbox enforcing division access When agents from different companies view the group or attempt to send messages Then SatuInbox must present the single shared room, enforce data isolation, and allow send only for permitted divisions		Pre-Condition	Group exists and is joined by multiple session numbers	DATE	12/12/2025		
+Url					Description	Conflicting permissions across teams handled	ENV	DEV	STAGGING	PROD
+Steps		1	Agent from Team1 (permitted)		test type	POSITIVE				
+		2	Team2 (not permitted) attempt send.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Only permitted team can send.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-054							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Outbound message enqueued on send request	ENV	DEV	STAGGING	PROD
+Steps		1	Send message via UI.		test type	POSITIVE				
+		2	Check outbound.queue.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Job created with proper payload.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-055							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Retry policy exponential backoff	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate / Force worker error.		test type	EDGE				
+		2	Observe retry times.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Retries at 1s, 3s, 10s (or configured).		Passed		
+		5				Validate timing.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-056							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Move to DLQ after max retries	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate / orce hard failure beyond retries.		test type	EDGE				
+		2	Inspect DLQ.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Job moved to DLQ; operator alert created.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-057							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Worker idempotency on reprocessing inbound	ENV	DEV	STAGGING	PROD
+Steps		1	Re-enqueue the same inbound message		test type	EDGE				
+		2	Worker processes							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No duplicate in DB.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-058							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Autoscaling triggered by queue backlog	ENV	DEV	STAGGING	PROD
+Steps		1	Push many jobs rapidly.		test type	POSITIVE				
+		2	Observe worker pool.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Autoscaler increases worker instances.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-059							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Autoscaling triggered by queue backlog	ENV	DEV	STAGGING	PROD
+Steps		1	Push many jobs rapidly.		test type	POSITIVE				
+		2	Observe worker pool.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Autoscaler increases worker instances.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-060							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition		DATE	12/12/2025		
+Url					Description	Batch DB write handled by worker	ENV	DEV	STAGGING	PROD
+Steps		1	Insert high-volume messages.		test type	POSITIVE				
+		2	Check DB write patterns.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Writes occur in batches ~100		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-061							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			QUEUEING, RETRY & DLQ Given RabbitMQ queues for inbound/outbound and workers implementing retry policy When a processing step fails transiently or permanently Then jobs are retried with exponential backoff, and eventually moved to DLQ if unrecoverable		Pre-Condition	Worker restart during processing	DATE	12/12/2025		
+Url					Description	In-flight message ack/nack semantics persisted on restart	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate / Kill worker mid-job.		test type	EDGE				
+		2	Restart worker.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Job re-queued or reprocessed as per ack/nack; no loss.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-062							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Sustained 200 req/s processing	ENV	DEV	STAGGING	PROD
+Steps		1	Generate sustained 200 req/s inbound for 10 min. 		test type	POSITIVE				
+		2	Observe system							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No message loss; average latency < target.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-063							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Burst 1000 req/s short window	ENV	DEV	STAGGING	PROD
+Steps		1	Send 1000 req/s for 30s		test type	POSITIVE				
+		2	bserve queue, worker scale							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No message loss; average latency < target.		Passed		
+		5				Backlog created but no loss; workers scale; ordering preserved after processing.		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-064							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	DB batch writes under burst	ENV	DEV	STAGGING	PROD
+Steps		1	Monitor DB writes		test type	POSITIVE				
+		2	Observe batch sizes							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Bulk writes ≈ configured batch size (100) and throughput maintained.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-065							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	UI stream maintains responsiveness under load	ENV	DEV	STAGGING	PROD
+Steps		1	During burst, observe UI behavior.		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI shows incremental updates without freeze.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-066							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Message latency percentiles measured	ENV	DEV	STAGGING	PROD
+Steps		1	Measure p50/p95/p99 latencies.		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				p50 < target		Passed		
+		5				p95 acceptable		Passed		
+		6				p99 within SLA or documented.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-067							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Backpressure applied when system saturated	ENV	DEV	STAGGING	PROD
+Steps		1	Overload till backlog > threshold.		test type	EDGE				
+		2	Observe backpressure.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				System refuses new connections or throttle clients gracefully.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-068							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Worker restart impact under load	ENV	DEV	STAGGING	PROD
+Steps		1	Restart one worker during burst.		test type	EDGE				
+		2	Observe throughput.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No data loss; brief performance dip; recovery quick.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-069							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Message ordering preserved after batch writes	ENV	DEV	STAGGING	PROD
+Steps		1	end messages with assigned order. 		test type	POSITIVE				
+		2	Confirm DB ordering.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Ordering preserved when re-streamed to UI.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-070							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			HIGH-THROUGHPUT / PERFORMANCE Given the system with scalable workers and batch DB writes When a burst of messages (100–1000/s) is sent to a group Then the system handles the burst without data loss, with acceptable latency and correct ordering		Pre-Condition		DATE	12/12/2025		
+Url					Description	Scaling test for outbound sends	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate 100 agents sending concurrently.		test type	POSITIVE				
+		2	Observe outbound queue							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Outbound workers scale and send; message rate sustained.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-071							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Reconnect triggers metadata refresh	ENV	DEV	STAGGING	PROD
+Steps		1	Disconnect Baileys.		test type	POSITIVE				
+		2	Reconnect. 							
+		3	Observe metadata calls.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				groupMetadata called; member list reconciled.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-072							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Reconnect triggers loadMessages backfill for gaps	ENV	DEV	STAGGING	PROD
+Steps		1	Reconnect after gap. 		test type	POSITIVE				
+		2	Verify loadMessages used.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Backfill occurs; missing messages present.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-073							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Duplicate events during reconnect deduped	ENV	DEV	STAGGING	PROD
+Steps		1	Emit duplicate events.		test type	POSITIVE				
+		2	Observe DB.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Dedupe prevents duplicate messages/storage.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-074							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Session logout handled gracefully	ENV	DEV	STAGGING	PROD
+Steps		1	Trigger session logout. 		test type	POSITIVE				
+		2	Observe system.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Mark connection invalid; notify operators; prevent sends.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-075							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Reconnect while outbound messages pending	ENV	DEV	STAGGING	PROD
+Steps		1	Disconnect then reconnect with queued outbound.		test type	POSITIVE				
+		2	Observe sending.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Queued outbound sent after reconnect, idempotent.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-076							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Reconnect load does not overwhelm workers	ENV	DEV	STAGGING	PROD
+Steps		1	Reconnect causing many backfills.		test type	POSITIVE				
+		2	Observe job schedule.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Backfill jobs rate-limited; worker pool scales; no downstream overload.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-077							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			BAILEYS SESSION & RECONNECT Given Baileys session connecting to WhatsApp and SatuInbox When the Baileys session disconnects then reconnects or experiences duplicate events Then SatuInbox performs metadata refresh, backfill, dedupe, and avoids duplicates		Pre-Condition		DATE	12/12/2025		
+Url					Description	Reconnect recovers message order	ENV	DEV	STAGGING	PROD
+Steps		1	Send pre-reconnect messages and post-reconnect.		test type	POSITIVE				
+		2	Check order.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Order preserved after backfill and merge.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-078							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			UI / UX BEHAVIOR Given SatuInbox UI connected to message stream When messages and events arrive or agent performs actions Then UI must update in near real-time, show correct indicators, avoid flicker/duplicate renders and provide clear error states		Pre-Condition		DATE	12/12/2025		
+Url					Description	No flicker when dedupe prevents duplicate render	ENV	DEV	STAGGING	PROD
+Steps		1	Send duplicate event.		test type	POSITIVE				
+		2	Observe UI.							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				UI does not flash or duplicate message.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-079							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			UI / UX BEHAVIOR Given SatuInbox UI connected to message stream When messages and events arrive or agent performs actions Then UI must update in near real-time, show correct indicators, avoid flicker/duplicate renders and provide clear error states		Pre-Condition		DATE	12/12/2025		
+Url					Description	System message displayed for joins/leaves	ENV	DEV	STAGGING	PROD
+Steps		1	Member joins/leaves. 		test type	POSITIVE				
+		2	Observe UI							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				System messages clear and timestamped.		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-080							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			UI / UX BEHAVIOR Given SatuInbox UI connected to message stream When messages and events arrive or agent performs actions Then UI must update in near real-time, show correct indicators, avoid flicker/duplicate renders and provide clear error states		Pre-Condition		DATE	12/12/2025		
+Url					Description	Typing indicators for multiple agents	ENV	DEV	STAGGING	PROD
+Steps		1	Simulate typing events from multiple agents.		test type	POSITIVE				
+		2	Observe UI							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				A, B, and N more are typing" format as spec		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Group-081							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			EDGE CASES & RECOVERY Given intermittent external failures (DB, Baileys, network) When these failures occur then recover Then the system should buffer, retry, backfill, and guarantee no data loss or duplication		Pre-Condition		DATE	12/12/2025		
+Url					Description	Member uninstalls but messages remain	ENV	DEV	STAGGING	PROD
+Steps		1	Member uninstalls WA		test type	EDGE				
+		2	previous message exist							
+		3	inspect UI		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Member remains in list marked as left/unreachable; messages preserved.		Passed		
+		5				member cannot send or receive any message		Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-082							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			EDGE CASES & RECOVERY Given intermittent external failures (DB, Baileys, network) When these failures occur then recover Then the system should buffer, retry, backfill, and guarantee no data loss or duplication		Pre-Condition		DATE	12/12/2025		
+Url					Description	Group archived on WhatsApp	ENV	DEV	STAGGING	PROD
+Steps		1	Archive group on mobile		test type	EDGE				
+		2	observe satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				room inactive ?		Passed		
+		5				outbound disabled ?		Passed		
+		6				inbound disabled ?		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-083							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			EDGE CASES & RECOVERY Given intermittent external failures (DB, Baileys, network) When these failures occur then recover Then the system should buffer, retry, backfill, and guarantee no data loss or duplication		Pre-Condition		DATE	12/12/2025		
+Url					Description	Group archived on WhatsApp	ENV	DEV	STAGGING	PROD
+Steps		1	Archive group on mobile		test type	EDGE				
+		2	observe satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				room inactive ?		Passed		
+		5				outbound disabled ?		Passed		
+		6				inbound disabled ?		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-084							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			EDGE CASES & RECOVERY Given intermittent external failures (DB, Baileys, network) When these failures occur then recover Then the system should buffer, retry, backfill, and guarantee no data loss or duplication		Pre-Condition		DATE	12/12/2025		
+Url					Description	Restart during inbound burst	ENV	DEV	STAGGING	PROD
+Steps		1	restart service		test type	EDGE				
+		2	observe satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				no lost message		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Group-085							PASSED		
+Create at			12/12/2025		created by	Danny	Tester	Danny		
+Scenario			EDGE CASES & RECOVERY Given intermittent external failures (DB, Baileys, network) When these failures occur then recover Then the system should buffer, retry, backfill, and guarantee no data loss or duplication		Pre-Condition		DATE	12/12/2025		
+Url					Description	Restart during outbound burst	ENV	DEV	STAGGING	PROD
+Steps		1	restart service		test type	EDGE				
+		2	observe satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				outbound resume		Passed		
+		5						Passed		
+		6						Passed		
+		7								
+		8								
+		9								

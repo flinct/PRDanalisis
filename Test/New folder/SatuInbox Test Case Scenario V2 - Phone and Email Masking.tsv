@@ -1,0 +1,359 @@
+total cases =			22							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			22	Need to test		22	Need to test	22		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+										
+										
+										
+Test ID	SIX-PhEmMasking-001							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Owner can set whether each role sees Full or Masked values for phone and email 		Pre-Condition	Open Dasboard as Owner	DATE			
+Url					Description	owner can configure each role.	ENV	DEV	STAGGING	PROD
+Steps		1	Login as owner		test type	POSITIVE				
+		2	Click Setting							
+		3	change setting Phone and Email to masked 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Phone and email follow the saved policy.				
+		5				Changes are active on all dashboard surfaces.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasking-002							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Admin change policy role		Pre-Condition	Open Dasboard as Admin	DATE			
+Url					Description	admin can change policy role member	ENV	DEV	STAGGING	PROD
+Steps		1	Login as admin		test type	POSITIVE				
+		2	Click Setting							
+		3	Click "Anggota"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click context menu in one member			display member is change role				
+		5	Click "Ganti Peran"			dropdown role in pop up "ganti peran"				
+		6	Choose "peran"							
+		7	Click button "Ubah peran"							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-003							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Supervisor can see full phone or email 		Pre-Condition	Open Dasboard	DATE			
+Url					Description	View Phone and Email	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2								
+		3	See Primary Contact in contact list		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display full phone and email for client				
+		5				Contact, conversation, and ticket data is displayed without any masking.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-004							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Supervisor can search full email and phone 		Pre-Condition	Open Dasboard	DATE			
+Url					Description	Search Email and Phone	ENV	DEV	STAGGING	PROD
+Steps		1	input full email or phone in search bar 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Display the full phone number and  email when searched.				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-005							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Supervisor can see full phone or email 		Pre-Condition	Open Dasboard, Contact Detail	DATE			
+Url					Description	View Phone and Email in contact detail	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	Click one of the registered client							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display full phone and email				
+		5				Contact and conversation is displayed without any masking.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-006							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Supervisor can see full phone or email 		Pre-Condition	Open Dasboard, Ticket list	DATE			
+Url					Description	View Phone and Email	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	Open Ticket list							
+		3	See Primary Contact in contact list		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display full phone and email for client				
+		5				Contact, conversation, and ticket data is displayed without any masking.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-007							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Supervisor can search full email and phone and refresh		Pre-Condition	Open Dasboard	DATE			
+Url					Description	Search Email and Phone	ENV	DEV	STAGGING	PROD
+Steps		1	input full email or phone in search bar 		test type	POSITIVE				
+		2	refresh web satuinbox							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Display the full phone number and  email when searched is gone				
+		5				Search text is cleared automatically.				
+		6				Return to the view table before searching.				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-008							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent for see masking phone and email 		Pre-Condition	open dasboard	DATE			
+Url					Description	View Phone and Email	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	See Primary Contact in contact list							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display 4 digits phone				
+		5				display first 3 local character and domain email				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-009							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent for see masking phone and email 		Pre-Condition	open dasboard, contact detail	DATE			
+Url					Description	View Phone and Email in contact detail	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	Click one of the registered client							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display 4 digits phone				
+		5				display first 3 local character and domain email				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-010							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent for see masking phone and email 		Pre-Condition	open dasboard, Ticket List	DATE			
+Url					Description	View Phone and Email in Ticket List	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	Open Ticket List							
+		3	See Primary Contact in contact list		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display 4 digits phone for cient 				
+		5				display first 3 local character and domain email for client				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-011							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent search number phone 		Pre-Condition	open dasboard	DATE			
+Url					Description	Search by the last 4 digits of the phone number.	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	click search							
+		3	input 4 digit registred number phone 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				enter exactly 4 digits, matching results will show,  but the phone numbers will stay hidden.				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-012							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent search number phone 		Pre-Condition	open dasboard	DATE			
+Url					Description	Search by full digits of the phone number.	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	NEGATIVE				
+		2	click search							
+		3	input full digit registred number phone 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Searches using anything other than the last 4 digits will not match phone numbers.				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-013							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent search email		Pre-Condition	open dasboard	DATE			
+Url					Description	Search first 3 local character and domain email	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	click search							
+		3	input first 3 local character or domain email		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				enter exactly first 3 local character or domain  email,  matching results will show,  but the email will stay masking.				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-014							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent search email		Pre-Condition	open dasboard	DATE			
+Url					Description	Search by full email	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	NEGATIVE				
+		2	click search							
+		3	Input the complete registered email.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Searches using anything other than the first 3 local characters or the email domain will not return matching emails because it is not supported				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-015							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent for see masking phone and email 		Pre-Condition	Ticket List, Ticket Detail	DATE			
+Url					Description	View Phone and Email in ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	Open ticket list		test type	POSITIVE				
+		2	Click one of the registered ticket							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display 4 digits phone in Contct Ticket Detail 				
+		5				display first 3 local character and domain email Contct Ticket Detail 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-016							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent search number phone with space		Pre-Condition	open dasboard	DATE			
+Url					Description	Search by the last 4 digits of the phone number with space	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	click search							
+		3	input 4 digit registred number phone and space 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				sistem trim input				
+		5				Searching keep it running				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-017							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify agent Search with less or more than 4 digits		Pre-Condition	open dasboard	DATE			
+Url					Description	Search by the last 4 digits of the phone number with less or more than 4 digits	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	click search							
+		3	input registred number phone with less or more than 4 digit		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No matching phone numbers are found				
+		5				No fallback to partial or full match search				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-018							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify raw phone/email in contact		Pre-Condition	open dasboard	DATE			
+Url					Description	Check URL does not contain raw phone/email in contact	ENV	DEV	STAGGING	PROD
+Steps		1	Open Contact		test type	POSITIVE				
+		2	Check URL & query params							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				No raw phone/email in URL				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-019							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify message contains phone and email		Pre-Condition	open dasboard, Contact detail, Chat history	DATE			
+Url					Description	Text message contains phone/emails	ENV	DEV	STAGGING	PROD
+Steps		1	Click one of the registered ticket		test type	POSITIVE				
+		2	Click Chat history							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				As Admin phone and email display full in message 				
+		5				as agent phone and email masked in message 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-020							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify Change Policy active member		Pre-Condition	open satuinbox	DATE			
+Url					Description	Policy Change when the session is active	ENV	DEV	STAGGING	PROD
+Steps		1	Login as agent 		test type	POSITIVE				
+		2	Admin change policy							
+		3	Refresh data		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				The new policy takes effect on the next fetch.				
+		5				No old raw cache.				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-021							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-PhEmMasing-022							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								

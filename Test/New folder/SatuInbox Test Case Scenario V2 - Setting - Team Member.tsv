@@ -1,0 +1,869 @@
+total cases =			54							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			54	No Status		54	No Status	54		
+Test ID	SIX-Test-001									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify team member Organization page 		Pre-Condition	login to dashboard. as admin/owner	DATE			
+Url					Description	Ensure team member organization page is accessible and displays all required elements. member tabs	ENV	DEV	STAGGING	PROD
+Steps		1	open dashboard page		test type	POSITIVE				
+		2	click settings button on sidebar							
+		3	open organization/team member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display page header				
+		5				display add member dropdown button				
+		6				display tabs(member=active)				
+		7				display search bar and filter				
+		8				team member table display name, presence, role, team inbox, and ellipsis. total data/member and pagination				
+		9								
+										
+										
+										
+Test ID	SIX-Test-002									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify team member Organization page 		Pre-Condition	login to dashboard. as admin/owner	DATE			
+Url					Description	Ensure team member organization page is accessible and displays all required elements. invited tabs(empty state)	ENV	DEV	STAGGING	PROD
+Steps		1	open dashboard page		test type	POSITIVE				
+		2	click settings button on sidebar							
+		3	open organization/team member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click invited tabs			display page header				
+		5				display add member dropdown button				
+		6				display tabs(invited=active)				
+		7				display search bar and filter				
+		8				empty state/hidden table				
+		9								
+										
+										
+										
+Test ID	SIX-Test-003									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 1 valid email 	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input email ""							
+		3	select role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click send invitation button			display add member modal				
+		5				success to add potential new member email in the text area				
+		6				invitation link via email sent to potential new member email				
+		7				redirect user to invited tabs				
+		8				potential new member information(name, invite expiry, role), resend and copy link buttons, and ellipsis to change role or revoke invitation displayed in invited tabs table				
+		9				toast success appears				
+										
+										
+										
+Test ID	SIX-Test-004									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 2 valid email separate each with comma	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input 1st email ""							
+		3	input ","		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 2nd email ""			display add member modal				
+		5	select role			success to add 2 potential new members email in the text area				
+		6	click send invitation button			invitation link via email sent to potential new members email				
+		7				redirect user to invited tabs				
+		8				potential new members information displayed in invited tabs table				
+		9				toast success appears				
+										
+										
+										
+Test ID	SIX-Test-005									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. multiple valid email	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input 1st email ""							
+		3	input 2nd email ""		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 3rd email ""			display add member modal				
+		5	select role			success to add 3 potential new members email in the text area				
+		6	click send invitation button			invitation link via email sent to potential new members email				
+		7				redirect user to invited tabs				
+		8				potential new members information displayed in invited tabs table				
+		9				toast success appears				
+										
+										
+										
+Test ID	SIX-Test-006									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 2 valid email separate each with space	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input 1st email ""							
+		3	hit click space bar		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 2nd email ""			display add member modal				
+		5	select role			success to add 2 potential new members email in the text area				
+		6	click send invitation button			invitation link via email sent to potential new members email				
+		7				redirect user to invited tabs				
+		8				potential new members information displayed in invited tabs table				
+		9				toast success appears				
+										
+										
+										
+Test ID	SIX-Test-007									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 2 valid email separate each with dot	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	NEGATIVE				
+		2	input 1st email ""							
+		3	input "."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 2nd email ""			display add member modal				
+		5	select role			failed to add 2nd potential new members email in the text area				
+		6	click send invitation button			send invitation button on disable state 				
+		7				stay on add member modal				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-008									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 2 valid email and remove 1	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input 1st email ""							
+		3	click space bar		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 2nd email ""			display add member modal				
+		5	click (x) button on 1 of the 2 valid email			success to add 2 potential new members email in the text area				
+		6	select role			success to remove 1 of the 2 valid email				
+		7	click send invitation button			invitation link via email sent to potential new member email				
+		8				redirect user to invited tabs				
+		9				potential new members information displayed in invited tabs table				
+						toast success appears				
+										
+										
+										
+Test ID	SIX-Test-009									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	max text area 400px. all valid email	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input many emails to stretch the text area							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display add member modal				
+		5				success to add many emails potential new members email in the text area				
+		6				auto strech text area				
+		7				The text area should display a vertical scroll bar when its content height exceeds 400px.				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-010									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	cancel to add new member	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	POSITIVE				
+		2	input email ""							
+		3	select role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click cancel			display add member modal				
+		5	confirm			success to add potential new member email in the text area				
+		6				display confirmation modal to cancel				
+		7				toast failed appears				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-011									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. 1 valid email and 1 invalid email	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	NEGATIVE				
+		2	input 1st valid email ""							
+		3	input "."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 2nd invalid email ""			display add member modal				
+		5	select role			error highlight on 2nd email				
+		6	click send invitation button			display error message "Invalid email format. Please use a valid email(e.g., name@example.com)."				
+		7				send invitation button on disable state 				
+		8				stay on add member modal				
+		9								
+										
+										
+										
+Test ID	SIX-Test-012									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify add new team member		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can add new member. empty field	ENV	DEV	STAGGING	PROD
+Steps		1	click add member button		test type	NEGATIVE				
+		2	click send invitation button							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display add member modal				
+		5				display error message "Invalid email format. Please use a valid email(e.g., name@example.com)."				
+		6				send invitation button on disable state 				
+		7				stay on add member modal				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-013									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify search bar (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can search member in the table. by name	ENV	DEV	STAGGING	PROD
+Steps		1	click search bar		test type	POSITIVE				
+		2	input name ""							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display table content based on search bar automatically				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-014									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify search bar (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can search member in the table. by aliases	ENV	DEV	STAGGING	PROD
+Steps		1	click search bar		test type	POSITIVE				
+		2	input aliases ""							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display table content based on search bar automatically				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-015									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify search bar (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can search member in the table. by email	ENV	DEV	STAGGING	PROD
+Steps		1	click search bar		test type	POSITIVE				
+		2	input email ""							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display table content based on search bar automatically				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-016									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify filter table content (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can filter table content. by presence, active	ENV	DEV	STAGGING	PROD
+Steps		1	click all presence button		test type	POSITIVE				
+		2	set to active							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display active member in table content				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-017									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify filter table content (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can filter table content. by presence and role, away and supervisor	ENV	DEV	STAGGING	PROD
+Steps		1	click all presence button		test type	POSITIVE				
+		2	set to away							
+		3	click all role button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	set to supervisor			display away and supervisor member in table content				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-018									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify filter table content (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can filter table content. by team inbox, group inbox	ENV	DEV	STAGGING	PROD
+Steps		1	click all team inbox		test type	POSITIVE				
+		2	tick "group inbox"							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display assigned members in the group inbox				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-019									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify sorting table content (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can sort table content. by name, presence, role, and team inbox	ENV	DEV	STAGGING	PROD
+Steps		1	click sort button in name column		test type	POSITIVE				
+		2	click again							
+		3	click sort button in presence column		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click again			first click to sort ascending				
+		5	click sort button in role column			second click to sort descending				
+		6	click again							
+		7	click sort button in team inbox column							
+		8	click again							
+		9								
+										
+										
+										
+Test ID	SIX-Test-020									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member role. supervisor to admin	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click change role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select "admin" on "change role to" combobox selection			selected member role change to admin				
+		5	click change role button			member now have the same access as admin/owner				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-021									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can access manage roles page from change role modal	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click change role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	cllick "manage roles" link			user redirect to manage roles page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-022									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can cancel change member role.	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click change role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select "admin" on "change role to" combobox selection			modal closed				
+		5	click cancel button			user back to team member page				
+		6	confirm							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-023									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member role. empty field	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click change role		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change role button			stay on modal				
+		5				member role not changed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-024									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member password (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member password. valid input	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click change password		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input valid password ""			password changed				
+		5	input re-enter password ""			active member will logged out automatically				
+		6	click change password button							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-025									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member password (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member password. same value as current password	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click change password		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input password "" (current password)			password not changed				
+		5	input re-enter password ""			dispay error message "New password must not be the same as the current password."				
+		6	click change password button							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-026									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member password (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member password. < 8 characters	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click change password		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input 6 characters password "" 			password not changed				
+		5	input re-enter password ""			dispay error message "Your password must contain at least 8 characters"				
+		6	click change password button							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-027									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member password (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member password. re-enter password not matched	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click change password		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input valid password "" 			password not changed				
+		5	input invalid re-enter password ""			dispay error message "Password do not match"				
+		6	click change password button							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-028									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member password (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member password. empty field	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click change password		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change password button			password not changed				
+		5				dispay error message "This field is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-029									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify remove member (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can remove member. success	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click remove member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	tick checkbox			member remove from organization				
+		5	click remove member button							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-030									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify remove member (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can remove member. canceled	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click remove member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	tick checkbox			member not remove from organization				
+		5	click cancel button			display cancel confirmation modal				
+		6	confirm							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-031									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify remove member (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can remove member. failed	ENV	DEV	STAGGING	PROD
+Steps		1	select member		test type	NEGATIVE				
+		2	click ellipsis button							
+		3	click remove member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click remove member button			member not remove from organization				
+		5				stay on modal				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-032									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total member data on table, and use pagination. 1st to 2nd by arrow button (have 8 page)	ENV	DEV	STAGGING	PROD
+Steps		1	open page 1 member tabs table		test type	POSITIVE				
+		2	click right arrow on pagination							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 member data per page				
+		5				table page successfully change to page 2				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-033									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total member data on table, and use pagination. 5th to 3rd by number button (have 13 page)	ENV	DEV	STAGGING	PROD
+Steps		1	open page 5 member tabs table		test type	POSITIVE				
+		2	click 3 button on pagination							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 member data per page				
+		5				table page successfully change to page 3				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-034									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total member data on table, and use pagination. 13th to 12th by arrow button (have 13 page)	ENV	DEV	STAGGING	PROD
+Steps		1	open last page member tabs table		test type	POSITIVE				
+		2	click left arrow button on pagination							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 member data per page				
+		5				table page successfully change to page 12				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-035									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total member data on table, and use pagination. left arrow from first page.	ENV	DEV	STAGGING	PROD
+Steps		1	open page 1 member tabs table		test type	NEGATIVE				
+		2	click left arrow on pagination							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				page not change				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-036									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (member tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total member data on table, and use pagination. right arrow from last page.	ENV	DEV	STAGGING	PROD
+Steps		1	open last page member tabs table		test type	NEGATIVE				
+		2	click right arrow on pagination							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				page not change				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-037									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify team member Organization page 		Pre-Condition	login to dashboard. as admin/owner	DATE			
+Url					Description	Ensure team member organization page is accessible and displays all required elements. invited tabs	ENV	DEV	STAGGING	PROD
+Steps		1	open dashboard page		test type	POSITIVE				
+		2	click settings button on sidebar							
+		3	open organization/team member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click invited tabs			display page header				
+		5				display add member dropdown button				
+		6				display tabs(invited=active)				
+		7				display search bar and filter				
+		8				team new member table display name, invite expiry, role, resend link button, copy link button, and ellipsis. total data/member and pagination				
+		9								
+										
+										
+										
+Test ID	SIX-Test-038									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify search bar (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can search member in the table. by name	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	click search bar							
+		3	input name ""		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display table content based on search bar automatically				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-039									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify search bar (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can search member in the table. by email	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	NEGATIVE				
+		2	click search bar							
+		3	input email ""		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display table content based on search bar automatically				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-040									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify sorting table content (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can sort table content. by name	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	click sort button in name column							
+		3	click again		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				first click to sort ascending				
+		5				second click to sort descending				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-041									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify link button on new member table (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can resend invitation link via email	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	click resend link button on selected member							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				resend link invitation to potential new member email				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-042									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify link button on new member table (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can copy invitation link	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	click copy link button on selected member							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				admin success copy invitation link to clipboard				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-043									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member role. supervisor to admin	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change role			selected new member role change to admin				
+		5	select "admin" on "change role to" combobox selection							
+		6	click change role button							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-044									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can access manage roles page from change role modal	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change role			user redirect to manage roles page				
+		5	cllick "manage roles" link							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-045									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can cancel change member role.	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change role			modal closed				
+		5	select "admin" on "change role to" combobox selection			user back to team member page invited tabs				
+		6	click cancel button							
+		7	confirm							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-046									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify changing member role (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can change member role. empty field	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	NEGATIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click change role			stay on modal				
+		5	click change role button			member role not changed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-047									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify revoke invitation new member (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can revoke new member invitation. success	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click revoke invitation			revoke new member invitation				
+		5	click revoke invitation button							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-048									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify revoke invitation new member (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can revoke new member invitation. canceled	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	select member							
+		3	click ellipsis button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click revoke invitation			new member invitation not revoke				
+		5	click cancel button			display cancel confirmation modal				
+		6	confirm							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-049									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total new member data on table, and use pagination. 1st to 2nd by arrow button (have 8 page)	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	open page 1 invited tabs table							
+		3	click right arrow on pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 new member data per page				
+		5				table page successfully change to page 2				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-050									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total new member data on table, and use pagination. 5th to 3rd by number button (have 13 page)	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	open page 5 invited tabs table							
+		3	click 3 button on pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 new member data per page				
+		5				table page successfully change to page 3				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-051									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total new member data on table, and use pagination. 13th to 12th by arrow button (have 13 page)	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	POSITIVE				
+		2	open last page invited tabs table							
+		3	click left arrow button on pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				table content contains 25 new member data per page				
+		5				table page successfully change to page 12				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-052									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total new member data on table, and use pagination. left arrow from first page.	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	NEGATIVE				
+		2	open page 1 invited tabs table							
+		3	click left arrow on pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				page not change				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-053									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify pagination (invited tabs)		Pre-Condition	open team member page. as admin/owner	DATE			
+Url					Description	Ensure organization admin/owner can see total new member data on table, and use pagination. right arrow from last page.	ENV	DEV	STAGGING	PROD
+Steps		1	click invited tabs		test type	NEGATIVE				
+		2	open last page invited tabs table							
+		3	click right arrow on pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				page not change				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Test-054									
+Create at			12/12/2025		created by	Aka	Tester			
+Scenario			verify team member Organization page 		Pre-Condition	login to dashboard. as supervisor	DATE			
+Url					Description	Ensure team member organization page is accessible and displays all required elements. member tabs	ENV	DEV	STAGGING	PROD
+Steps		1	open dashboard page		test type	POSITIVE				
+		2	click settings button on sidebar							
+		3	open organization/team member		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display page header				
+		5				display add member dropdown button(disable state)				
+		6				display tabs(member=active). invited tabs(disable state)				
+		7				display search bar and filter				
+		8				team member table display name, presence, role, team inbox in view-only access. total data/member and pagination				
+		9								

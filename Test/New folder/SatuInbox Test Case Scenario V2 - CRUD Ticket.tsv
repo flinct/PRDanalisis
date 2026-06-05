@@ -1,0 +1,1033 @@
+total cases =			64							
+DEV				STAGGING			PROD			
+Passed			2	Passed		0	Passed	40		
+Failed			1	Failed		0	Failed	20		
+Need to test			61	Need to test		64	Need to test	4		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+										
+Test ID	SIX-Ticket-001				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Kholik
+Scenario			Verify create ticket from conversation		Pre-Condition	login, have access to conversation room	DATE			18/12/2025
+Url					Description	create ticket from this conversation modal. display	ENV	DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	open your inbox							
+		3	select conversation		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create ticket button			display create ticket from this conversation modal	success make ticket and in signature with red in bubble chat and in detail added https://jam.dev/c/b86f1867-4325-4442-8e35-8f6e2e7b0416			Passed
+		5				modal display title, search bar, manage ticket types link button, selectable list, cancel button, disable state convert to ticket button				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-002				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. success	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	POSITIVE				
+		2	select ticket type							
+		3	click convert to ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display create ticket from conversation panel replacing conversation details panel				Passed
+		5				panel display customer icon and name, selected ticket type icon and name, form submission based on selected ticket type, cancel button, create ticket button				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-003							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. search bar	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	POSITIVE				
+		2	input "" on search bar							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display searched ticket type				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-004							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. search bar, not found	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	POSITIVE				
+		2	input "" on search bar							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display empty state selectable list	https://jam.dev/c/caeac620-6a68-4fdf-943e-2707aaf128a5			Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-005							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. manage ticket types link button	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	POSITIVE				
+		2	click manage ticket types button							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				redirect user to ticket types page				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-006							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. cancel button	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	POSITIVE				
+		2	click cancel button							
+		3	confirm		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				modal closed				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-007							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq 18/12/2025	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed conversation room	DATE			18/12/2025
+Url					Description	create ticket form this conversation modal. disabled convert to ticket button	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	NEGATIVE				
+		2	click convert to ticket button							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				not display create ticket from conversation panel	still show modal list ticket			Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-008							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. success	ENV	DEV	STAGGING	PROD
+Steps		1	input ticket title ""		test type	POSITIVE				
+		2	input description ""							
+		3	fill form with valid input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create ticket button			ticket created				Passed
+		5				display conversation details panel replacing create ticket from conversation panel				Passed
+		6				ticket link accrodion displays between top section and conversation accordion in conversation details panel				Passed
+		7				toast success appears				Passed
+		8				converted to ticket indicator?				
+		9								
+										
+										
+										
+										
+Test ID	SIX-Ticket-009							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click cancel button		test type	POSITIVE				
+		2	confirm							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display confirmation to cancel modal				Passed
+		5				ticket not created				Passed
+		6				closes create ticket from conversation panel				Passed
+		7				failed toast appears				Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-010							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. empty field	ENV	DEV	STAGGING	PROD
+Steps		1	click create ticket button		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created				Passed
+		5				stay on create ticket from conversation panel				Passed
+		6				disabled create ticket button 				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-011							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. ticket title validation, alphanumeric & spacing	ENV	DEV	STAGGING	PROD
+Steps		1	input "" ticket title		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-012							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. ticket title validation, special characters	ENV	DEV	STAGGING	PROD
+Steps		1	input "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	Ticket success created, https://jam.dev/c/4d706ffe-5a46-4e3c-a14b-b6b078a68d28			Failed
+		5				display error message "only alphabet and number"	no message error			Failed
+		6				stay on create ticket from conversation panel	close on create ticket from conversation panel			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-013							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. ticket title validation, > 50 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 50 "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket created. https://jam.dev/c/6bd29f83-7075-4cb3-b381-84fe8abe3cba			Failed
+		5				display error message "must not exceed 50 characters"	tittle ticket can use > 50 characters			Failed
+		6				stay on create ticket from conversation panel	success toast appears			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-014							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. ticket title validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket created. because minimal 1 character. https://jam.dev/c/40c77197-391e-4d79-9749-af3573e6d298			Failed
+		5				display error message "must be at least 5 characters"	not error message			Failed
+		6				stay on create ticket from conversation panel	close from create ticket and to back conversation panel			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-015							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. description validation, alphanumeric & spacing & special characters (250 characters)	ENV	DEV	STAGGING	PROD
+Steps		1	input "" description		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				description text area expanded				Passed
+		5				ticket created				Passed
+		6				success toast appears				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-016							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. description validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" description		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	Error message in descripsion ticket "Description must be at least 10 characters  ", 			Passed
+		5				display error message "must be at least 5 characters"	ticket not created			Passed
+		6				stay on create ticket from conversation panel	Toast success not appear			Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-017							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. description validation, > 250 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 250 "" description		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket created because > 10 karakter, https://jam.dev/c/f277ef88-3ba1-40be-85e2-ca33bb004182			Failed
+		5				display error message "must not exceed 250 characters"	not display error message			Failed
+		6				stay on create ticket from conversation panel	Toast success appear			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-Ticket-018							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, alphanumeric & spacing	ENV	DEV	STAGGING	PROD
+Steps		1	input "" text field attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-Ticket-019							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, optional	ENV	DEV	STAGGING	PROD
+Steps		1	empty text field attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-020							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	 Syafiq 18/12/2025	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, Required	ENV	DEV	STAGGING	PROD
+Steps		1	empty text field attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created				Passed
+		5				display error message "The text field attribute is required."				Passed
+		6				stay on create ticket from conversation panel				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-021							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, special characters	ENV	DEV	STAGGING	PROD
+Steps		1	input "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	success created ticket, https://jam.dev/c/a45135c6-5233-46f4-9234-450203a99ef9			Failed
+		5				display error message "only alphabet and number"	not get error message			Failed
+		6				stay on create ticket from conversation panel	go back to conversation panel, because success created ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-022							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, > 50 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 50 "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	success created ticket, https://jam.dev/c/cda0124a-dc91-494c-8095-c5a397750934			Failed
+		5				display error message "must not exceed 50 characters"	not get error message			Failed
+		6				stay on create ticket from conversation panel	go back to conversation panel, because success created ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-023							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. text field attribute validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket sucess create, https://jam.dev/c/5940cdd7-e42f-442b-8617-ef7900e16c97			Failed
+		5				display error message "must be at least 5 characters"	No error messsage			Failed
+		6				stay on create ticket from conversation panel	go back to conversation panel, because success created ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-024							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. list option attribute validation,  select one, required	ENV	DEV	STAGGING	PROD
+Steps		1	select "" list option attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created	success created. https://jam.dev/c/4633a72a-6c00-42bb-b5ab-074fe96628a0			Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-025							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. list option attribute validation,  select one, optional	ENV	DEV	STAGGING	PROD
+Steps		1	dont select list option attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created	success created. https://jam.dev/c/27ea09ad-1655-43b6-98bc-174176170066			Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-026							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. list option attribute validation,  select one, required	ENV	DEV	STAGGING	PROD
+Steps		1	dont select list option attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	 https://jam.dev/c/10e6b2ac-d26a-4158-b789-b1af1bc4ce26			Passed
+		5				stay on create ticket from conversation panel				Passed
+		6				disabled create ticket button 				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-027				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. date picker attribute validation,  5 year from today	ENV	DEV	STAGGING	PROD
+Steps		1	pick date 5 later from today 		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created	ticket success https://jam.dev/c/5e08e30d-856d-4922-8e89-c571fbc5e111			Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-028				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			18/12/2025
+Url					Description	create ticket from conversation panel. date picker attribute validation,  a week before today	ENV	DEV	STAGGING	PROD
+Steps		1	pick date 1 week before today 		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket success https://jam.dev/c/a593049e-c4cb-4a5b-886b-49694eff05c0			Failed
+		5				stay on create ticket from conversation panel	close modal create new ticket			Failed
+		6				disabled create ticket button 				Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-029				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			19/12/2025
+Url					Description	create ticket from conversation panel. image uploader attribute validation,  .png < 2mb	ENV	DEV	STAGGING	PROD
+Steps		1	upload .png < 2mb 		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created	ticket success created			Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-030							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from conversation		Pre-Condition	accessed create ticket from conversation panel. ticket type ""	DATE			19/12/2025
+Url					Description	create ticket from conversation panel. image uploader attribute validation,  .jpg > 2mb	ENV	DEV	STAGGING	PROD
+Steps		1	upload .jpg > 2mb 		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticked created. https://jam.dev/c/305fb6a1-5830-4b7e-87c5-33d228fd1eee			Failed
+		5				stay on create ticket from conversation panel	back to conversation panel			Failed
+		6				disabled create ticket button 				Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-031							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	login, have access to conversation room	DATE			19/12/2025
+Url					Description	create bubble chat ticket as one modal. display	ENV	DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	open your inbox							
+		3	select conversation		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select one bubble chat			display create bubble chat ticket as one modal				Passed
+		5	click create ticket button			modal display title, selected chat, search bar, manage ticket types link button, selectable list, cancel button, disabled create ticket button				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-032							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed conversation room	DATE			19/12/2025
+Url					Description	create bubble chat ticket as one modal. success	ENV	DEV	STAGGING	PROD
+Steps		1	select one bubble chat		test type	POSITIVE				
+		2	click create ticket button							
+		3	select ticket type		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create ticket button			display preview selected bubble chat panel replacing main conversation room				Passed
+		5				preview selected bubble chat panel display customer initial icon and name, bubble chat content, bubble chat creation time and delivery status, and agent name above agent bubble chat				Passed
+		6				display create ticket from bubble chat panel replacing conversation details panel				Passed
+		7				create ticket from bubble chat panel display customer icon and name, selected ticket type icon and name, ticket title text field, description text field, custom attributes field based on selected ticket type, cancel button, create ticket button				Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-033							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed conversation room	DATE			19/12/2025
+Url					Description	create bubble chat ticket as one modal. search bar	ENV	DEV	STAGGING	PROD
+Steps		1	select one bubble chat		test type	POSITIVE				
+		2	click create ticket button							
+		3	input "" on search bar		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display searched ticket type				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-034							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed conversation room	DATE			19/12/2025
+Url					Description	create bubble chat ticket as one modal. manage ticket types link button	ENV	DEV	STAGGING	PROD
+Steps		1	select one bubble chat		test type	POSITIVE				
+		2	click create ticket button							
+		3	click manage ticket types button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				redirect user to ticket types page				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-035							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed conversation room	DATE			19/12/2025
+Url					Description	create bubble chat ticket as one modal. cancel	ENV	DEV	STAGGING	PROD
+Steps		1	select one bubble chat		test type	POSITIVE				
+		2	click create ticket button							
+		3	select ticket type		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click cancel button			modal closes				Passed
+		5	confirm							
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-036							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed create ticket from bubble chat panel. ticket type ""	DATE			19/12/2025
+Url					Description	create ticket from bubble chat panel. success	ENV	DEV	STAGGING	PROD
+Steps		1	input ticket title ""		test type	POSITIVE				
+		2	input description ""							
+		3	fill form with valid input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create ticket button			ticket created	Accordion Expected 			Passed
+		5				display conversation details panel replacing create ticket from conversation panel	Accordion Expected 			Passed
+		6				ticket link accrodion displays below assignee section in conversation details panel	Accordion Expected 			Passed
+		7				toast success appears	Accordion Expected 			Passed
+		8				ticketed bubble chat should be pinke highlighted and have see ticket button inside	Accordion Expected 			Passed
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-037							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from bubble chat (single)		Pre-Condition	accessed conversation room. ticket bubble chat success	DATE			19/12/2025
+Url					Description	conversation room. ticketed bubble chat, see tickets button	ENV	DEV	STAGGING	PROD
+Steps		1	click selected ticket in ticketed bubble chat		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				redirect user to ticket detail in tickets page	Accordion Expected 			Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-038							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE			19/12/2025
+Url					Description	create new ticket modal. success	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	POSITIVE				
+		2	select ticket type							
+		3	select member or team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	fill form with valid input			display create new ticket modal display select ticket type combobox, manage ticket types link button, assign to combobox, cancel button, disable create new ticket button	Accordion Expected 			Passed
+		5	click create new ticket button			after select ticket type, display form submmision based on selected ticket type	Accordion Expected 			Passed
+		6				success toast appears	Accordion Expected 			Passed
+		7				ticket created	Accordion Expected 			Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-039							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE			19/12/2025
+Url					Description	create new ticket modal. ticket type combobox, not found	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	POSITIVE				
+		2	search ticket type ""							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display empty state combobox	show list combobox ticket type if search "atik" , https://jam.dev/c/2a431e4f-c1df-497a-9c77-a850bc045e12			Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-040							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE			19/12/2025
+Url					Description	create new ticket modal. assignee combobox, not found	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	POSITIVE				
+		2	search assign to ""							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display empty state combobox	if search fullname in search combobox can see username member			Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-041				Updated by	Aka | 11/02/2026		FAILED	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester	Aka		Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE	11/02/2026		19/12/2025
+Url					Description	create new ticket modal. cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	POSITIVE				
+		2	select ticket type							
+		3	select member or team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	fill form			ticket not created	Accordion Expected 	Passed		Passed
+		5	click cancel button			modal create new ticket not close, but must choose ticket type again	model creted ticket not close, but in model must choosing a return ticket	Passed		Failed
+		6	confirm			failed toast appears	Accordion Expected 			Passed
+		7				clear ticket type selection	dev : still select the canceled ticket type, but ticket type form is closed	Failed		
+		8				ticket type form close		Passed		
+		9				member or team selection not clear		Passed		
+										
+										
+										
+Test ID	SIX-Ticket-042							PASSED	NEED TO TEST	NEED TO TEST
+Create At			11/02/2026		Created by	Aka	Tester	Aka		
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE	11/02/2026		
+Url					Description	create new ticket modal. (X) button	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	POSITIVE				
+		2	select ticket type							
+		3	select member or team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	fill form			ticket not created		Passed		
+		5	click (X) button			modal closes		Passed		
+		6	confirm							
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-043							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page	DATE			19/12/2025
+Url					Description	create new ticket modal. empty	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	NEGATIVE				
+		2	click create new ticket button							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				create new ticket modal not closed	Accordion Expected 			Passed
+		5				ticket not created	Accordion Expected 			Passed
+		6				disable create new ticket button	Accordion Expected 			Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-044							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create ticket from ticket list		Pre-Condition	accessed ticket list page. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. 1 empty field	ENV	DEV	STAGGING	PROD
+Steps		1	click new ticket button		test type	NEGATIVE				
+		2	select ticket type							
+		3	fill form except 1		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create new ticket button			create new ticket modal not closed	Accordion Expected 			Passed
+		5				ticket not created	Accordion Expected 			Passed
+		6				disable create new ticket button	Accordion Expected 			Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-045							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. ticket title validation, alphanumeric & spacing	ENV	DEV	STAGGING	PROD
+Steps		1	input "" ticket title		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-046							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. ticket title validation, special characters	ENV	DEV	STAGGING	PROD
+Steps		1	input "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket success created. https://jam.dev/c/9afab463-55f1-4793-8474-3b017f0bbf8e			Failed
+		5				display error message "only alphabet and number"	no message  "only alphabet and number"			Failed
+		6				stay on create new ticket modal	close from create ticket modal			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-047							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. ticket title validation, > 50 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 50 "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket success created, https://jam.dev/c/5d680fa7-9b57-4e38-8e4e-772ebf735e09			Failed
+		5				display error message "must not exceed 50 characters"	no message "must not exceed 50 characters" but if input > 100 karakter message "maximum title 100 characters"			Failed
+		6				stay on create new ticket modal	close from create ticket modal			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-048							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. ticket title validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" ticket title		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket success created, https://jam.dev/c/0bcdd191-ae6b-4e1c-afe1-5c48bcd42a84			Failed
+		5				display error message "must be at least 5 characters"	no message "must not exceed 50 characters", but if input < 1 karakter message "title minimum 1 character"			Failed
+		6				stay on create new ticket modal	close from create ticket modal			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-049							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. description validation, alphanumeric & spacing & special characters (250 characters)	ENV	DEV	STAGGING	PROD
+Steps		1	input "" description		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				description text area expanded				Passed
+		5				ticket created				Passed
+		6				success toast appears				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-050							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. description validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" description		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created				Passed
+		5				display error message "must be at least 5 characters"	error message "must be at least 10 charakter " https://jam.dev/c/f999d6d2-d2a3-44a9-bb77-b9e9ec159eeb, but if input < 10 karakter message "title minimum 10 character"			Passed
+		6				stay on create new ticket modal				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-051							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. description validation, > 250 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 250 "" description		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	ticket success created, https://jam.dev/c/320b561f-2015-46ef-b3e8-46ba498577f9			Failed
+		5				display error message "must not exceed 250 characters"	not error messag, but if input >500 karakter message "maximum title 500 characters"			Failed
+		6				stay on create new ticket modal	close new ticket modal			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-052							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. text field attribute validation, alphanumeric & spacing	ENV	DEV	STAGGING	PROD
+Steps		1	input "" text field attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-053							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. text field attribute validation, optional	ENV	DEV	STAGGING	PROD
+Steps		1	empty text field attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-054							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. text field attribute validation, special characters	ENV	DEV	STAGGING	PROD
+Steps		1	input "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	Ticket success created, https://jam.dev/c/72cdcbf7-6960-432a-bb76-d450ddd512c0			Failed
+		5				display error message "only alphabet and number"	no error message			Failed
+		6				stay on create new ticket modal	close create new ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-055							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. text field attribute validation, > 50 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input > 50 "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	Ticket success created,https://jam.dev/c/8d708867-63ba-4a6a-a6fd-17421a0c8b60			Failed
+		5				display error message "must not exceed 50 characters"	no error message			Failed
+		6				stay on create new ticket modal	close create new ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-056							NEED TO TEST	NEED TO TEST	FAILED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. text field attribute validation, < 5 characters	ENV	DEV	STAGGING	PROD
+Steps		1	input < 5 "" text field attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	Ticket success created. https://jam.dev/c/5cb80904-4abe-4102-b920-020d06e9f068			Failed
+		5				display error message "must be at least 5 characters"	no error message			Failed
+		6				stay on create new ticket modal	close create new ticket			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-Ticket-057							NEED TO TEST	NEED TO TEST	PASSED
+Create At					Created by	Aka	Tester			Syafiq
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. list option attribute validation,  select one, required	ENV	DEV	STAGGING	PROD
+Steps		1	select "" list option attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-058							NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester			Syafiq
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			18/12/2025
+Url					Description	create new ticket modal. list option attribute validation,  select one, optional		DEV	STAGGING	PROD
+Steps		1	dont select list option attribute		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-059							NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester			Syafiq
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. list option attribute validation,  select one, required		DEV	STAGGING	PROD
+Steps		1	dont select list option attribute		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created				Passed
+		5				stay on create new ticket modal				Passed
+		6				disabled create new ticket button 				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-060							NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester			Syafiq
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			19/12/2025
+Url					Description	create new ticket modal. date picker attribute validation,  5 year from today		DEV	STAGGING	PROD
+Steps		1	pick date 5 later from today 		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-061							NEED TO TEST	NEED TO TEST	FAILED
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester			Syafiq
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			18/12/2025
+Url					Description	create new ticket modal. date picker attribute validation,  a week before today		DEV	STAGGING	PROD
+Steps		1	pick date 1 week before today 		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	success created ticket, https://jam.dev/c/bb464e44-c6c3-4da0-8237-caf214f26564			Failed
+		5				stay on create new ticket modal	close create new ticket			Failed
+		6				disabled create new ticket button 	success toast appears			Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-062				Updated by	Aka | 11/02/2026		PASSED	NEED TO TEST	NEED TO TEST
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester	Aka		
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE	11/02/2026		
+Url					Description	create new ticket modal. date picker attribute validation,  a week before today		DEV	STAGGING	PROD
+Steps		1	pick date 1 week before today 		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created		Passed		
+		5				success toast appear		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-063							NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify create new ticket from ticket list		Created By	Aka	Tester			Syafiq
+					Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			18/12/2025
+Url					Description	create new ticket modal. image uploader attribute validation,  .png < 2mb		DEV	STAGGING	PROD
+Steps		1	upload .png < 2mb 		test type	POSITIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket created				Passed
+		5				success toast appears				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Ticket-064							NEED TO TEST	NEED TO TEST	FAILED
+Create at					created by	Aka	Tester			
+Scenario			Verify create new ticket from ticket list		Pre-Condition	accessed create new ticket modal. ticket type ""	DATE			
+Url					Description	create new ticket modal. image uploader attribute validation,  .jpg > 2mb	ENV	DEV	STAGGING	PROD
+Steps		1	upload .jpg > 2mb 		test type	NEGATIVE				
+		2	fill other field with valid input							
+		3	click create new ticket button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket not created	success created ticket. https://jam.dev/c/a4123508-3f38-4901-9744-f7dc25e268eb			Failed
+		5				stay on create new ticket modal	close on create new ticket modal			Failed
+		6				disabled create new ticket button 	success toast appears			Failed
+		7								
+		8								
+		9								

@@ -1,0 +1,793 @@
+									total cases =	53
+Test ID	SIX-Platform-001				Tester	Danny			passed	0
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition				failed	0
+Url			/api/platform		Description	Retrieve all platforms successfully			need to test	0
+Steps		1	Send GET /api/platform		test type	POSITIVE			on test	0
+		2	No params or body required							0
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				Response code 200 OK				
+		5				Response body contains an array				
+		6				Each object has properties: id, name, code, logo, isAddOns, billing				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-002				Tester	Danny				
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition					
+Url			/api/platform		Description	Empty result set				
+Steps		1	Ensure DB is empty		test type	POSITIVE				
+		2	Send GET /api/platform							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				Response code 200 OK				
+		5				Response body = []				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-003				Tester	Danny				
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition					
+Url			/api/platform		Description	Unauthorized request				
+Steps		1	Omit auth token		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				401 Unauthorized				
+		5				message "missing or invalid token"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-004				Tester	Danny				
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition					
+Url			/api/platform		Description	Invalid token				
+Steps		1	Send malformed token		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				403 Forbidden				
+		5				message "invalid or expired token"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-005				Tester	Danny				
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition					
+Url			/api/platform		Description	Invalid token				
+Steps		1	Simulated server error		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				500 Internal Server Error				
+		5				no crash				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-006				Tester	Danny				
+Scenario			Testing platform endpoint METHOD GET		Pre-Condition					
+Url			/api/platform		Description	Invalid query params				
+Steps		1	Send /api/platform?limit=abc		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				message "invalid query parameter" (if pagination supported)				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-007				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Create platform successfully				
+Steps		1	Send valid JSON body		test type	POSITIVE				
+		2								
+		3	{   "name": "Whatsapp",   "code": "WA",   "logo": "https://images.unsplash.com/photo-1752432138370-b2114a7971ac",   "isAddOns": false,   "billing": {     "perAccount": {       "currencyCode": "IDR",       "nanos": 500000000,       "units": 10000     }   } }		Status Response	Expected Result	Actual Result	Status		
+		4				201 Created				
+		5				response includes id				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-008				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Create platform successfully				
+Steps		1	Send valid JSON body		test type	POSITIVE				
+		2								
+		3	{   "name": "Whatsapp",   "code": "WA",   "logo": "https://images.unsplash.com/photo-1752432138370-b2114a7971ac",   "isAddOns": false,   "billing": {     "perAccount": {       "currencyCode": "IDR",       "nanos": 500000000,       "units": 10000     }   } }		Status Response	Expected Result	Actual Result	Status		
+		4				201 Created				
+		5				response includes id				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-009				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Missing required field name				
+Steps		1	Remove "name" from body		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"name is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-010				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Missing required field code				
+Steps		1	Remove "code" from body		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"code is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-011				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	validate exsisting code in DB				
+Steps		1	input already existing code in DB		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				409 Conflict				
+		5				"code already exists"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-012				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	invalid url logo				
+Steps		1	try input invalid url logo		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid url format"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-013				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	isAddOns input non boolean				
+Steps		1	Set "isAddOns": "false"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"isAddOns ust be boolean"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-014				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Invalid billing type				
+Steps		1	Set "billing": "string"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid billing structure"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-015				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Missing billing.perAccount.units				
+Steps		1	Set "billing", but remove units		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-016				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Negative units value				
+Steps		1	Set "billing", "units": -5000		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units must be positive"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-017				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Negative units value				
+Steps		1	Set "billing", "units": "ten thousand"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units must be number"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-018				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Invalid JSON format				
+Steps		1	Send malformed JSON		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid JSON body"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-019				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	Invalid JSON format				
+Steps		1	Send null JSON {}		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"no data provided"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-020				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	unsupported media type				
+Steps		1	Use text/plain instead of application/json		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				415 Unsupported Media Type				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-021				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	XSS attempt in string fields				
+Steps		1	try input "name": "<script>alert(1)</script>"		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid input"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-022				Tester	Danny				
+Scenario			Testing platform METHOD POST		Pre-Condition					
+Url			/api/platform		Description	SQL/NoSQL injection attempt				
+Steps		1	try input "name": { "code": { "$ne": null } }		test type	NEGATIVE				
+		2	try input "name": "' UNION SELECT NULL -- "							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid input"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-023				Tester	Danny				
+Scenario			Testing platform METHOD GET by ID		Pre-Condition					
+Url			/api/platform		Description	Retrieve by valid ID				
+Steps		1	create new platform		test type	POSITIVE				
+		2	GET by returned ID							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				200 OK				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-024				Tester	Danny				
+Scenario			Testing platform METHOD GET by ID		Pre-Condition					
+Url			/api/platform		Description	non existent ID				
+Steps		1	input ID /api/platform/999999		test type	NEGATIVE				
+		2	GET by returned ID							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				404 Not Found				
+		5				"platform not found"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-025				Tester	Danny				
+Scenario			Testing platform METHOD GET by ID		Pre-Condition					
+Url			/api/platform		Description	invalid format ID				
+Steps		1	input ID /api/platform/bd2@3(		test type	NEGATIVE				
+		2	GET by returned ID							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				404 Not Found				
+		5				"invalid ID format"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-026				Tester	Danny				
+Scenario			Testing platform METHOD GET by ID		Pre-Condition					
+Url			/api/platform		Description	database down simulation				
+Steps		1	input valid ID		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				500 internal server error				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-027				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	partial update success				
+Steps		1	send partial patch		test type	POSITIVE				
+		2	{   "name": "WhatsApp Business",   "isAddOns": true }							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				200 OK				
+		5				updated values visible				
+		6				unchanged field persist				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-028				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Full update success				
+Steps		1	send partial patch		test type	POSITIVE				
+		2	{   "name": "Whatsapp",   "logo": "https://images.unsplash.com/photo-1752432138370-b2114a7971ac?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",   "isAddOns": false,   "billing": {     "perAccount": {       "currencyCode": "IDR",       "nanos": 500000000,       "units": 10000     }   } }							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				200 OK				
+		5				updated values visible				
+		6				unchanged field persist				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-029				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Full update success				
+Steps		1	send partial patch		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				200 OK				
+		5				updated values visible				
+		6				unchanged field persist				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-030				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Missing required field name				
+Steps		1	Remove "name" from body		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"name is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-031				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Missing required field code				
+Steps		1	Remove "code" from body		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"code is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-032				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	validate exsisting code in DB				
+Steps		1	input already existing code in DB		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				409 Conflict				
+		5				"code already exists"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-033				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	invalid url logo				
+Steps		1	try input invalid url logo		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid url format"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-034				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	isAddOns input non boolean				
+Steps		1	Set "isAddOns": "false"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"isAddOns ust be boolean"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-035				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Invalid billing type				
+Steps		1	Set "billing": "string"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid billing structure"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-036				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Missing billing.perAccount.units				
+Steps		1	Set "billing", but remove units		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units is required"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-037				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Negative units value				
+Steps		1	Set "billing", "units": -5000		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units must be positive"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-038				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Negative units value				
+Steps		1	Set "billing", "units": "ten thousand"		test type	NEGATIVE				
+		2	fill other field with valid criteria							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"units must be number"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-039				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Invalid JSON format				
+Steps		1	Send malformed JSON		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid JSON body"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-040				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	Invalid JSON format				
+Steps		1	Send null JSON {}		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"no data provided"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-041				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	unsupported media type				
+Steps		1	Use text/plain instead of application/json		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				415 Unsupported Media Type				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-042				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	XSS attempt in string fields				
+Steps		1	try input "name": "<script>alert(1)</script>"		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid input"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-043				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	SQL/NoSQL injection attempt				
+Steps		1	try input "name": { "code": { "$ne": null } }		test type	NEGATIVE				
+		2	try input "name": "' UNION SELECT NULL -- "							
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid input"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-044				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	try patch non exsisting ID				
+Steps		1	Update non-existent ID /999999		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				404 Not Found				
+		5				"platform not found"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-045				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	try patch with invalid ID format				
+Steps		1	Update invalid format ID /asd@#(999		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"invalid ID format"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-046				Tester	Danny				
+Scenario			Testing platform METHOD PATCH by ID		Pre-Condition					
+Url			/api/platform		Description	try patch ID field				
+Steps		1	Try to modify "id" field		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5				"cannot modify ID"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-047				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	Delete existing platform				
+Steps		1	create new platform		test type	POSITIVE				
+		2	delete platform							
+		3	verify with GET by ID		Status Response	Expected Result	Actual Result	Status		
+		4				204 no content				
+		5				delete successfull				
+		6				get by id show no data or invalid ID				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-048				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	idempotent delete				
+Steps		1	delete same ID twice		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				first deleteion successfull				
+		5				second deleteion 404 not found				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-049				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	invalid ID format				
+Steps		1	/api/platform/xyz		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 Bad Request				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-050				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	non exsiting ID 				
+Steps		1	try input non exist ID		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				404 Bad Request				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-051				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	missing ID				
+Steps		1	/api/platform/		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				404 Bad Request				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-052				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	Database constraint				
+Steps		1	attempt to delete linked platorm		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				409 conflict				
+		5				"platform in user"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Platform-053				Tester	Danny				
+Scenario			Testing platform METHOD DELETE by ID		Pre-Condition					
+Url			/api/platform		Description	invalid method				
+Steps		1	send delete with body		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		
+		4				400 bad request				
+		5				"body not allowed"				
+		6								
+		7								
+		8								
+		9								

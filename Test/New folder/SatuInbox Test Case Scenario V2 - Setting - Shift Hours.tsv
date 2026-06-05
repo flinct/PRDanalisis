@@ -1,0 +1,1048 @@
+total cases =			65							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			65	No Status		65	No Status	65		
+Test ID	SIX-Settings_Nav-001									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Load Shift General Page		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	navigate to settings > organization > shift hours		test type	POSITIVE				
+		2	ensure shift general tab is active							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift general page loads successfully				
+		5				weekly days (mon-sun) are displayed				
+		6				default toggle state is visible for each				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-002									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Enable a Weekday Shift		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	toggle monday to ON		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				monday switch turns ON				
+		5				time segment configuration becomes visible or editable				
+		6				no validation error appears				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-003									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Disable a Weekday Shift		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	toggle saturday to OFF		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				saturday switch turns OFF				
+		5				time segments for saturday are hidden or disabled				
+		6				saturday is excluded from active shifts days				
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-Settings_Nav-004									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Configure a Single Time Segment For a Day		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	enable tuesday		test type	POSITIVE				
+		2	set time segment							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				time range is accespted				
+		5				no validation error appears				
+		6				segment is saved correctly				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-005									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Configure a Multiple Time Segment On One Day		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	enable wednesday		test type	POSITIVE				
+		2	add segment 1: 08:00 - 12:00							
+		3	add segment 2 : 13:00 - 17:00		Status Response	Expected Result	Actual Result	Status		Status
+		4				multiple segments can be added				
+		5				segments are displayed in correct order				
+		6				no overlap occurs				
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-Settings_Nav-006									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Prevent Overlapping Time Segments		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	add segment 1 : 08:00 - 12:00		test type	POSITIVE				
+		2	add segment 2 : 11:00 - 15:00							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error message displayed: "segmen shift tumpang tindih"				
+		5				overlapping segment is not saved				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-007									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Validate end time must be greater than start time		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	set segment time 14:00 - 14:00		test type	POSITIVE				
+		2	set segment time 16:00 - 15:00							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error message displayed : "Jam selesai harus lebih besar dari jam mulai"				
+		5				invalid segment is rejected				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-008									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Save Shift General Configuration		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	configure multiple weekdays and segments		test type	POSITIVE				
+		2	click update / save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				success notification is shown				
+		5				configuration is persisted				
+		6				data remains after page refresh				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-009									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Persist Shift General data after refresh		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	save shift general settings		test type	POSITIVE				
+		2	refresh browser							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all enabled days remain enabled				
+		5				all time segments remain unchanger				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-010									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Navigate from Shift General to Shift Members tab		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	click shift members tab		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift members page is opened				
+		5				shift general changes are not lost				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-011									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Disable all days in Shift General		Pre-Condition		DATE			
+Url					Description	Shift General	ENV	DEV	STAGGING	PROD
+Steps		1	Turn OFF all weekday toggles		test type	POSITIVE				
+		2	save configutation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				System allows saving with no active days OR				
+		5				System shows validation message (based on business rule)				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Settings_Nav-012									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Open Shift List page successfully		Pre-Condition	User is logged in, User has access to Settings	DATE			
+Url					Description	Shift Members (Page Load & Initial State)	ENV	DEV	STAGGING	PROD
+Steps		1	Navigate to Settings → Shift		test type	POSITIVE				
+		2	Open Shift Anggota tab							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Shift Anggota page loads without error				
+		5				Shift list container is visible				
+		6				No unrelated configuration (e.g., Shift Umum settings) is displayed				
+		7				Page layout matches UI design				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-013									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Default page state on first load		Pre-Condition		DATE			
+Url					Description	Shift Members (Page Load & Initial State)	ENV	DEV	STAGGING	PROD
+Steps		1	Open Shift Anggota page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Search input is visible and empty				
+		5				“+ Jam shift baru” button is visible and enabled				
+		6				Shift list shows existing data or empty state				
+		7				No validation or error messages shown by default				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-014									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Display shift list with existing data		Pre-Condition		DATE			
+Url					Description	Shift Members (Page Load & Initial State)	ENV	DEV	STAGGING	PROD
+Steps		1	At least one shift exists		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift name 				
+		5				configured working days				
+		6				corresponding time ranges				
+		7				data is readable and not truncated				
+		8				no duplicated rows display				
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-015									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Display shifts with multiple working days		Pre-Condition		DATE			
+Url					Description	Shift Members (Page Load & Initial State)	ENV	DEV	STAGGING	PROD
+Steps		1	Shift configured for more than one day		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				All selected days are displayed correctly				
+		5				day order is logical (mon-sun)				
+		6				no missing or extra days shown				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-016									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Display empty state when no shift exists		Pre-Condition		DATE			
+Url					Description	Shift Members (Empty State Handling)	ENV	DEV	STAGGING	PROD
+Steps		1	No shift data available		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				empty state message is displayed				
+		5				shift list table is not shown				
+		6				"+jam shift baru" button remains accessible				
+		7				no broken UI or console error				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-017									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			search shift by full name		Pre-Condition		DATE			
+Url					Description	Shift Members (Search & Filtering)	ENV	DEV	STAGGING	PROD
+Steps		1	enter full shift name in search input		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				matching shifts displayed				
+		5				non matching shifts hidden				
+		6				no page reload				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-018									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			search shift by partial keyword		Pre-Condition		DATE			
+Url					Description	Shift Members (Search& Filtering)	ENV	DEV	STAGGING	PROD
+Steps		1	enter partial keyword of shift name		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shifts containing keyword are displayed				
+		5				search works with partial match				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-019									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			case insensitive search		Pre-Condition		DATE			
+Url					Description	Shift Members (Search & Filtering)	ENV	DEV	STAGGING	PROD
+Steps		1	search using uppercase/lowercase variation		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				search result remains consistent				
+		5				case does not affect filtering				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-020									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			search with no matcing result		Pre-Condition		DATE			
+Url					Description	Shift Members (Search & Filtering)	ENV	DEV	STAGGING	PROD
+Steps		1	enter non existing keyword		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				empty result state shown				
+		5				no error message				
+		6				search input remains editable				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-021									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			clear search input		Pre-Condition		DATE			
+Url					Description	Shift Members (Search & Filtering)	ENV	DEV	STAGGING	PROD
+Steps		1	remove keyword from search input		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				full shift is displayed again				
+		5				no manual refresh required				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-022									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			navigate to create shift page		Pre-Condition		DATE			
+Url					Description	Shift Members (Navigate Create)	ENV	DEV	STAGGING	PROD
+Steps		1	click + Jam shift baru		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				redirected to create shift page				
+		5				URL changes correctly				
+		6				shift list page state is exited				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-023									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			return to shift list from create page		Pre-Condition		DATE			
+Url					Description	Shift Members (Navigate Create)	ENV	DEV	STAGGING	PROD
+Steps		1	navigate back from create shift page 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift list page loads correctly				
+		5				previously existing data remains unchanged				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-024									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			data persistence after page refresh		Pre-Condition		DATE			
+Url					Description	Shift Members (Data Consistency & Stability)	ENV	DEV	STAGGING	PROD
+Steps		1	refresh browser on shift list page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift list data remains intact				
+		5				no duplicate or missing entries				
+		6				search input resets to default state				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-025									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			shift list stability under repeated navigation		Pre-Condition		DATE			
+Url			switch tabs (general shift ><member shift) multiple times		Description	Shift Members (Data Consistency & Stability)	ENV	DEV	STAGGING	PROD
+Steps		1			test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift list reloads correctly each time				
+		5				no UI glitch or incorrect data displayed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Settings_Nav-026									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			user is on member shift page		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	click + new member shift		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is redirected to create shift page				
+		5				URL updates correctly				
+		6				page loads without error				
+		7				no previous shift data is pre-filled				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-027									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			default form state on initial load		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	open create shift page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift name input is empty 				
+		5				all days are inactive by default				
+		6				time input fields are disabled or hidden until day is enabled				
+		7				save button is disabled or inactive until required fields are filled				
+		8				cancel button is visible				
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-028									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			input valid shift name		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	enter a valid shift name		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				input accepts text				
+		5				no validation eror shown				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-029									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			shift name exceed allowed length		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	enter shift name longer than allowed limit		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				input is restricted OR validation error is shown				
+		5				user cannot save invalid data				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-030									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			shift name is empty		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	leave shift name empty		test type	POSITIVE				
+		2	fill other required fields							
+		3	click save		Status Response	Expected Result	Actual Result	Status		Status
+		4				validation message displayed				
+		5				shift is not saved				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-031									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			enable a working day		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	toggle a day (e.g, monday)		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				selected day becomed active				
+		5				time input fields for that ay are enabled				
+		6				other days remain unchanged				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-032									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			enable multiple working days		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	toggle more than one day		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all selected days becomes active				
+		5				each day shows its own time configuration				
+		6				no automatic duplication unless designed				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-033									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			disable a previously enabled day		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	do not enable any day		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				time inputs for that day are cleared				
+		5				day returns to inactive state				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-034									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			no working day selected		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	do not enable any day		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed 				
+		5				shift is not saved				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-035									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			input valid working time		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	enable a day		test type	POSITIVE				
+		2	eset valid start time							
+		3	set valid end time		Status Response	Expected Result	Actual Result	Status		Status
+		4				time valued are accepted				
+		5				no validation error				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-036									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			end time earlier than start time		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	set ent time earlier than start time		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation eror displayed				
+		5				save blocked				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-037									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			end time equals start time		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	set same start and end time		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed				
+		5				invalid time range rejected				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-038									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			clear working time 		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	remove start or end time		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation triggered on save				
+		5				shift cannot be saved				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-039									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			save shift with valid configuration		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	fill shift name		test type	POSITIVE				
+		2	select at least one working day							
+		3	configure valid time range		Status Response	Expected Result	Actual Result	Status		Status
+		4	click save			shift saved successfully 				
+		5				redirected to shift list page				
+		6				newly created shift appears in list				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-040									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			cancel shift creation		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	click cancel		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user returned to shift list page				
+		5				no new shift created				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-041									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			browser back navigation		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	enter data on create shift page		test type	POSITIVE				
+		2	use browser back button							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user returned to shift list page				
+		5				unsaved data is discarded				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-042									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page refresh during shift creation		Pre-Condition		DATE			
+Url					Description	Shift Members (Create Shift Pag)	ENV	DEV	STAGGING	PROD
+Steps		1	refresh browser on create shift page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				page reloads cleanly				
+		5				form resets to default state				
+		6				no partial data saved				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-043									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			open edit shifts page from shift list		Pre-Condition	at least one shift exists in list member shift 	DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	open shift member page		test type	POSITIVE				
+		2	click action context menu on a shift row							
+		3	select edit		Status Response	Expected Result	Actual Result	Status		Status
+		4				user is redirected to edit shift page				
+		5				URL reflets edit route				
+		6				page loads without error				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-044									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			edit page data pre-filled correctly		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	open edit shift page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift name is pre-filled with existing value				
+		5				previously selected working days are are active				
+		6				each active day displays saved start & end time				
+		7				no extra or missing data shown				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-045									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			update shift name with valid value		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	change shift name		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift updated successfully				
+		5				redirected to shift list page				
+		6				updated name displayed				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-046									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			clear shift name		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	remove shift name value		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed				
+		5				update is blocked				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-047									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			add new working day		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	enable an inactive day		test type	POSITIVE				
+		2	configure valid time range							
+		3	click save		Status Response	Expected Result	Actual Result	Status		Status
+		4				new day added to shift				
+		5				change reflected in shift list				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-048									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			remove existng working day		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	disable an active day		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				day removed from shift 				
+		5				removed day no longer displayed in shift list				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-049									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			remove all working days		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	disable all active days		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed				
+		5				shift update blocked				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-050									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Update working time with valid range		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	Modify start and/or end time		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Shift updated successfully				
+		5				Updated time displayed correctly				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-051									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Set end time earlier than start time		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	set invalid time range		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed				
+		5				invalid update rejected				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-052									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Clear time value on active day		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	remove start or end time		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error displayed 				
+		5				update blocked				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-053									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			save edted shift		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	make valid changes		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				success feedback shown				
+		5				redirected to shift list				
+		6				changes persisted				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-054									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			cancel editing shift		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	modify any field		test type	POSITIVE				
+		2	click cancel							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				returned to shift list page				
+		5				no changes saved				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-055									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			browser back during edit		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	modify shift data		test type	POSITIVE				
+		2	use browser back							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				returned to shift list page				
+		5				unsaved changes discarded				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-056									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page refresh during edit		Pre-Condition		DATE			
+Url					Description	Shift Members (Edit Shift Page)	ENV	DEV	STAGGING	PROD
+Steps		1	refresh page on edit shift		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				page reloads with last saved data				
+		5				unsaved changes lost				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Settings_Nav-057									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Shift list page load performance		Pre-Condition	Shift list contains multiple records (e.g., ≥50 shifts)	DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	Navigate to Settings → Shift → Shift Anggota		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Page loads within acceptable time (≤ 2 seconds)				
+		5				No visible UI freeze or incomplete rendering				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-058									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			create shift save respons time		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	create a shift with valid data		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save action completes within acceptable response time				
+		5				user receives feecback without noticeable delay				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-059									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			edit shift save performance		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	edit an existing shift 		test type	POSITIVE				
+		2	slick save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				update processed smoothly 				
+		5				no lag or repeated submission required				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-060									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			search performance on shift list		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	enter keyword in search input		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift list diltered instantly or within short delay				
+		5				no full page reload				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-061									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			button state feedback		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1			test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				disable buttons appear visually inactive				
+		5				hover and click states behave consistently				
+		6				no misleading active state				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-062									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			repeated navigation stability 		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	switch between general shift and member shift releatedly		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				no UI crash or inconsistent state				
+		5				data reloads correctly each time				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-063									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page refresh resilience		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	refresh page during shift list/create/edit		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				page reloads gracefully				
+		5				no broken layout or partial rendering				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-064									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			screen resolution responsiveness		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	resize browser window		test type	POSITIVE				
+		2	test common resolutions							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				UI remains usable				
+		5				no overlapping elements or hidden controls				
+		6								
+		7								
+		8								
+		9								
+										
+							   			
+										
+Test ID	SIX-Settings_Nav-065									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			network interruption during save		Pre-Condition		DATE			
+Url					Description	Shift Members - Performance	ENV	DEV	STAGGING	PROD
+Steps		1	disable network		test type	POSITIVE				
+		2	click save during create/edit/shift							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error feedback shown to user				
+		5				shift is not partially saved				
+		6								
+		7								
+		8								
+		9								

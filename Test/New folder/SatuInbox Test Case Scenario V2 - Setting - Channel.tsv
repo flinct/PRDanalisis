@@ -1,0 +1,254 @@
+									total cases =	17
+Test ID	SIX-Channel-001				Tester	Aka		PASSED	passed	6
+Scenario			verify wa web account		Pre-Condition	have access to wa web page			failed	11
+Url					Description	wa web account validation. add new wa web account for group. success			need to test	0
+Steps		1	login		test type	POSITIVE			on test	0
+		2	open settings							17
+		3	open channels/whatsapp web		Status Response	Expected Result	Actual Result	Status		
+		4	click add account button			display add account modal		Passed		
+		5	input account name "hp 191"			success toast appears		Passed		
+		6	input phone number "+6285198965708"			new account added in account list (disconnect)		Passed		
+		7	click add account button on modal			display steps and qr code in login modal		Passed		
+		8	click connect button in new account			new account status change to connected		Passed		
+		9	open whatsapp in linked number mobile device							
+		10	scan qr code in linked device							
+										
+										
+										
+Test ID	SIX-Channel-001				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. same value				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "hp 191"							
+		3	input phone number "+6285198965708"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "account name already used"	didnt display any error message	Failed		
+		5				display error "phone number already used"	didnt display any error message	Failed		
+		6				failed toast appears		Passed		
+		7				stay on modal	modal closed	Failed		
+		8				account failed to add		Passed		
+		9								
+										
+										
+										
+Test ID	SIX-Channel-002				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. same name 				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "hp 191"							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "account name already used"	didnt display any error message	Failed		
+		5				failed toast appears	success toast appears	Failed		
+		6				stay on modal	modal closed	Failed		
+		7				account failed to add	account successfully added	Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-003				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. same number				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "tes"							
+		3	input phone number "+6285198965708"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "phone number already used"	didnt display any error message	Failed		
+		5				failed toast appears		Passed		
+		6				stay on modal	modal closed	Failed		
+		7				account failed to add		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-004				Tester	Aka		PASSED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. success. delete account				
+Steps		1	select account "+6285921240822"		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click delete account button		Status Response	Expected Result	Actual Result	Status		
+		4				account remove from account list		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-005				Tester	Aka		PASSED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. success. disconnect account from ellipsis				
+Steps		1	select account		test type	POSITIVE				
+		2	click ellipsis button							
+		3	click disconnect account button		Status Response	Expected Result	Actual Result	Status		
+		4				account disconnect from mobile device		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-006				Tester	Aka		PASSED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add deleted wa web account for group. success				
+Steps		1	click add account button		test type	POSITIVE				
+		2	input account name "hp 2"							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			success toast appears	failed toast appears	Failed		
+		5				new account added in account list (disconnect)	account not add to list	Failed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-007				Tester	Aka		PASSED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. empty				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name ""							
+		3	input phone number ""		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Please fill out this field"		Passed		
+		5				stay on modal		Passed		
+		6				account failed to add		Passed		
+		7				disable state add account button on modal	not in disable state	Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-008				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. account name <3 characters				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "a"							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nama akun minimal 3 karakter"	"Nama lengkap minimal 3 karakter"	Failed		
+		5				stay on modal		Passed		
+		6				account failed to add		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-009				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. full name > 35 characters				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "Lorem ipsum dolor sit amet cras amet"							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nama akun maksimal 35 karakter"	"Nama lengkap maximal 35 karakter"	Failed		
+		5				stay on modal		Passed		
+		6				account failed to add		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-010				Tester	Aka		PASSED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. full name with special characters				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "Lorem."							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nama lengkap hanya dapat berisi huruf angka dan spasi"		Passed		
+		5				stay on modal		Passed		
+		6				account failed to add		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-011				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. success. full name with leading/trailing spaces				
+Steps		1	click add account button		test type	POSITIVE				
+		2	input account name " Lorem "							
+		3	input phone number "+6285921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			new account added in account list (disconnect)	account failed to add	Failed		
+		5				success toast appears	failed toast appears	Failed		
+		6				system trim leading&trailing spaces	system not trim leading/trailing spaces	Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-012				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. success. phone number with leading/trailing spaces				
+Steps		1	click add account button		test type	POSITIVE				
+		2	input account name "Lorem"							
+		3	input phone number " +6285921240822 "		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			new account added in account list (disconnect)	account failed to add	Failed		
+		5				success toast appears	failed toast appears	Failed		
+		6				system trim leading&trailing spaces	system not trim leading/trailing spaces	Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-013				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. success. phone number start with 0				
+Steps		1	click add account button		test type	POSITIVE				
+		2	input account name "Lorem"							
+		3	input phone number "085921240822"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			new account added in account list (disconnect)	account failed to add	Failed		
+		5				success toast appears	failed toast appears	Failed		
+		6				system trim leading&trailing spaces	system not trim leading/trailing spaces	Failed		
+		7				not display error message	display error "Nomor whatsapp harus dimulai dengan 0 atau +62 dan hanya berisi angka"	Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-014				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. phone number start with +62				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "Lorem"							
+		3	input phone number "+62"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nomor telepon harus terdiri dari 10 hingga 12 digit setelah 0/+62"	display error "Nomor whatsapp harus dimulai dengan 0 atau +62 dan hanya berisi angka"	Failed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-015				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. phone number start with +0				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "Lorem"							
+		3	input phone number "+0123456789012"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nomor whatsapp harus dimulai dengan 0 atau +62 dan hanya berisi angka"		Failed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Channel-016				Tester	Aka		FAILED		
+Scenario			verify wa web account		Pre-Condition	accessed channels/wa web page				
+Url					Description	wa web account validation. add new wa web account for group. failed. phone number start with +62, 14 digits after +62				
+Steps		1	click add account button		test type	NEGATIVE				
+		2	input account name "Lorem"							
+		3	input phone number "+6212345678901234"		Status Response	Expected Result	Actual Result	Status		
+		4	click connect button on modal			display error "Nomor telepon harus terdiri dari 10 hingga 12 digit setelah 0/+62"		Failed		
+		5								
+		6								
+		7								
+		8								
+		9								

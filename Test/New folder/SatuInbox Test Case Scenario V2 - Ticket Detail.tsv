@@ -1,0 +1,1089 @@
+total cases =			67							
+DEV				STAGGING			PROD			
+Passed			35	Passed		0	Passed	32		
+Failed			20	Failed		0	Failed	21		
+Need to test			12	Need to test		67	Need to test	14		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+										
+			Header Ticket Detail							
+										
+Test ID	SIX-TicketDetail-001							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open ticket detail		Pre-Condition	login, have access to ticket list	DATE			
+Url					Description	open ticket detail from ticket list	ENV	DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	open your ticket list							
+		3	select ticket in ticket list		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click ticket			display header, description area, conversation, composer, and sidebar sections.		Passed		Passed
+		5				Conversation Message list is ordered from oldest at top to newest at bottom.		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-002							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify change ticket status		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	change ticket status from ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button status ticket		test type	POSITIVE				
+		2	select ticket status from dropdown							
+		3	click status ticket from dropdown status ticket		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display dropdown status ticket.		Passed		Passed
+		5				ticket status changed		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-003							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify close ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	close an open ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button close ticket		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket becomes closed and composer becomes disabled. 		Failed		Failed
+		5				cant access update status ticket		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-004							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify reopen ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	reopen an close ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	Click "reopen" button when the ticket is closed.		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket becomes open and composer becomes enabled. . 		Passed		Passed
+		5				can access status ticket		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-005							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify create submission date ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	create submission date that has been made in the ticket details, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click button submission date		test type	POSITIVE				
+		2	Select date in submission date pop-up							
+		3	click button "atur pengingat"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	 			submission date created		Passed		Passed
+		5				pop up submission date automatically closes and back ticket detail		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-006							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify create submission date ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	Create submission date that has been made in the ticket details, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click button submission date		test type	POSITIVE				
+		2	Select date in submission date pop-up							
+		3	click button "Batal"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	 			submission date dont update		Passed		Passed
+		5				pop up submission date automatically closes and back ticket detail		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-007							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update submission date ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	update submission date that has been made in the ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	click button submission date		test type	POSITIVE				
+		2	Select date in submission date pop-up							
+		3	click button "Atur Pengingat"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	 			display submission date next to the last activity information has changed.		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-008							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify delete a tag 		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	delete ticket tag to ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	click button "x" from existing tags		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display a tag ticket detail disappear . 		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-009							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify add a tag 		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	add ticket tag to ticket details, add	ENV	DEV	STAGGING	PROD
+Steps		1	click button "+" in tag ticket detail		test type	POSITIVE				
+		2	Click dropdown							
+		3	click tag in dropdown		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add			display pop up to enter tag name . 		Passed		Passed
+		5				display dropdown tag name		Passed		Passed
+		6				success add tag ticket detail		Passed		Passed
+		7				close from pop up tag		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-010							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify add duplicate tag from header detail ticket		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	add duplicate ticket tag to ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	click button "+" in tag ticket detail		test type	NEGATIVE				
+		2	click tag in dropdown							
+		3	Click the same tag		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add			Doesnt display the selected same tag. 		Passed		Passed
+		5				Cant add tag		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-011							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify cancel add a tag 		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	add ticket tag to ticket details, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click button "+" in tag ticket detail		test type	POSITIVE				
+		2	click cancel							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display dropdown enter tag name . 		Passed		Passed
+		5				dropdown tag close		Passed		Passed
+		6				back to ticket detail		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-012							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open edit description tiket detail with Click		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	open edit description with Click from ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	enter edit mode by click on the description area 		test type	POSITIVE				
+		2	input "" description ticket detail							
+		3	click on ticket detail		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display description for edit. 		Passed		Passed
+		5				success edit description ticket detail		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-013							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open edit description tiket detail with hover		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	open edit description with hover from ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	hover cursor in description ticket detail and click button pencil		test type	POSITIVE				
+		2	input "" description ticket detail							
+		3	click edit or enter		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display icon pencil in top right corner 		Failed		Failed
+		5				display description for edit. 		Failed		Failed
+		6				success edit description ticket detail		Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-TicketDetail-014							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open edit description tiket detail with Click		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	open edit description with Click from ticket details, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	enter edit mode by clicking on the description area		test type	POSITIVE				
+		2	input "" description ticket detail							
+		3	click escape or on blur		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display the previous description 		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-TicketDetail-015							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify edit description tiket detail 		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	edit description ticket detail to ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	click in description ticket detail 		test type	NEGATIVE				
+		2	input > 1000 "" description ticket detail							
+		3	click edit		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				descripton not change		Failed		Failed
+		5				display error message "must not exceed 1000 characters"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+			Conversation room chat Ticket Detail							
+										
+Test ID	SIX-TicketDetail-016							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify reply to customer in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	respond to customer messages	ENV	DEV	STAGGING	PROD
+Steps		1	click "reply to customer" in composer		test type	POSITIVE				
+		2	click enter message							
+		3	input "" in Composer in message box		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click send			message successfully sent to customer		Passed		Passed
+		5				messages are displayed at the bottom of the conversation		Passed		Passed
+		6				display reply to customer information on the chat bubble		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-017							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify internal note in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	respond to customer messages	ENV	DEV	STAGGING	PROD
+Steps		1	click "internal note" in composer		test type	POSITIVE				
+		2	click enter message							
+		3	input "" in Composer		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click send			the message is stored as internal and styled as internal in the thread.		Passed		Passed
+		5				messages are displayed at the bottom of the conversation		Passed		Passed
+		6				display internal note information on the chat bubble		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-018							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send message to customer in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send messages to customers of > 4000 characters from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click enter message		test type	NEGATIVE				
+		2	input 4000 character message"" in Composer							
+		3	click send		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message cant send 		Failed		Failed
+		5				display error message "must not exceed 4000 characters for message"		Failed		Failed
+		6				keep draft text		Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-019							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment file in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	file send attribute validation from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	POSITIVE				
+		2	input file							
+		3	click send		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message successfully sent to customer		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-020							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment media in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	media send attribute validation from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	POSITIVE				
+		2	input media							
+		3	click send		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message successfully sent to customer		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-021							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	Image send attribute validation from composer ticket detail, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	POSITIVE				
+		2	input file or media							
+		3	click "x" media or file in message box		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message cant send		Passed		Passed
+		5				files and media disappeared from message boss composer		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-022							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	Image send attribute validation,> 25mb from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	NEGATIVE				
+		2	input image > 25 MB							
+		3	click send		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message not sent 		Passed		Passed
+		5				display error message "must not exceed 25MB for image"		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-023							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment in conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	Image send attribute validation,> 10 image from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	NEGATIVE				
+		2	send > 10 images at once							
+		3	click send		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message not sent 		Failed		Failed
+		5				display error message "must not exceed 10 images at once for message"		Failed		Failed
+		6				Composer active and Allow remove failed file.		Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-024							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify send attachment in conversation ticket detai		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	Image send attribute validation from composer ticket detail, refresh	ENV	DEV	STAGGING	PROD
+Steps		1	click button attachment 		test type	POSITIVE				
+		2	input file or media							
+		3	refresh website		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message cant send		Passed		Passed
+		5				close ticket detail		Passed		Passed
+		6				attechment otomaticly delete from box message				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-025							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify save pinned message conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	Image send attribute validation from composer ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	hover bubble chat		test type	POSITIVE				
+		2	click more options							
+		3	click pinned message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				pin message successfully save 		Failed		Failed
+		5				display message in pinned message sidebar ticket detail		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-026							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify delete pinned message conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	delete message from penned message ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	Hover over saved chat bubble		test type	POSITIVE				
+		2	click more options							
+		3	click pinned message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				pin message successfully delete		Failed		Failed
+		5				display message not in pinned message sidebar ticket detail		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-027							PASSED	NEED TO TEST	PASSED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify send message input emoji conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send emoji message validation	ENV	DEV	STAGGING	PROD
+Steps		1	open selected conversation room ticket detail		test type	POSITIVE				
+		2	click emoji button							
+		3	click selected emoji		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click send			display emoji preview on message input		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-028							FAILED	NEED TO TEST	FAILED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify send message with user mention conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send message with user mention validation	ENV	DEV	STAGGING	PROD
+Steps		1	Click internal note		test type	POSITIVE				
+		2	Click composer message box 							
+		3	input "@"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select a registered member			display list member internal		Failed		Failed
+		5	Click Send			Success send message		Failed		Failed
+		6				display name member in bubble chat		Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-029							FAILED	NEED TO TEST	FAILED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify send message with user mention conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send message with user mention validation > member	ENV	DEV	STAGGING	PROD
+Steps		1	Click internal note		test type	NEGATIVE				
+		2	Click composer message box 							
+		3	input "@"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select > 4  registered member			display pop up prohibition		Failed		Failed
+		5				display message "mencapat limit mention"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-030							FAILED	NEED TO TEST	FAILED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify send message with user mention conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send message with user mention validation, failed load	ENV	DEV	STAGGING	PROD
+Steps		1	Click internal note		test type	NEGATIVE				
+		2	Click composer message box 							
+		3	input "@"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display pop up failed load		Failed		Failed
+		5				display message "gagal memuat daftar member"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-031							FAILED	NEED TO TEST	FAILED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify send message with user mention conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	send message with user mention validation, error	ENV	DEV	STAGGING	PROD
+Steps		1	Click Reply to customer		test type	NEGATIVE				
+		2	Click composer message box 							
+		3	input "@"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display pop up prohibition		Failed		Failed
+		5				display message "tidak dapat melakukan mention"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-032							PASSED	NEED TO TEST	PASSED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify more options bubble chat  conversation ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail	DATE			
+Url					Description	open more options bubble chat	ENV	DEV	STAGGING	PROD
+Steps		1	Hover bubble chat		test type	POSITIVE				
+		2	Click button more option							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display pop up more options		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-TicketDetail-033							PASSED	NEED TO TEST	PASSED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify Edit message bubble chat conversation from ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail, more options	DATE			
+Url					Description	Edit message bubble chat	ENV	DEV	STAGGING	PROD
+Steps		1	Click edit message		test type	POSITIVE				
+		2	input new message							
+		3	click simpan		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display mode edit in bottom chat		Passed		Passed
+		5				dsplay text "Edited" beside in time bubble chat 		Passed		Passed
+		6				success edited message		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-034							PASSED	NEED TO TEST	PASSED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify Edit message bubble chat conversation from ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail, more options	DATE			
+Url					Description	Edit message bubble chat, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	Click edit message		test type	POSITIVE				
+		2	input new message							
+		3	click batal		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display mode edit in bubble chat		Passed		Passed
+		5				 back to previous state		Passed		Passed
+		6				message not change		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-035							PASSED	NEED TO TEST	FAILED
+Created at					Created by	Syafiq	Tester			
+Scenario			verify delete message bubble chat conversation from ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail, more options	DATE			
+Url					Description	unsend message bubble chat	ENV	DEV	STAGGING	PROD
+Steps		1	Chover bubble chat 		test type	POSITIVE				
+		2	Click more options							
+		3	click button delete message in box message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click delete			display pop up more options		Passed		Failed
+		5				display checklist box		Passed		Failed
+		6				dislay information bubble chat  "you deleted this message"		Passed		Failed
+		7				dislay information bubble chat other "message delete by author"		Passed		Failed
+		8				success delete message		Passed		Failed
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-036							PASSED	NEED TO TEST	NEED TO TEST
+Created at					Created by	Syafiq	Tester			
+Scenario			verify unsend message bubble chat conversation from ticket detail		Pre-Condition	accessed ticket detail, conversation ticket detail, more options	DATE			
+Url					Description	unsend message bubble chat, cancel	ENV	DEV	STAGGING	PROD
+Steps		1	Chover bubble chat 		test type	POSITIVE				
+		2	Click more options							
+		3	click button delete message in box message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click cancel			 back to previous state		Passed		Passed
+		5				bubble chat not delete		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-037							PASSED	NEED TO TEST	NEED TO TEST
+Created at					Created by	Syafiq	Tester			
+Scenario			verify type message in composer box message		Pre-Condition	accessed ticket detail, conversation ticket detail, more options	DATE			
+Url					Description	type message and refresh	ENV	DEV	STAGGING	PROD
+Steps		1	Input message or sticker		test type	POSITIVE				
+		2	refresh website							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				close from ticket detail		Passed		Passed
+		5				message or sticker in box message otomaticly  delete		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+			Sidebar Ticket Detail							
+										
+Test ID	SIX-TicketDetail-038							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update team inbox from ticket detail		Pre-Condition	accessed ticket detail, ticket assisgnee	DATE			
+Url					Description	team inbox updates in the form of a dropdown	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket assignee in sidebar ticket detail		test type	POSITIVE				
+		2	click coloms inbox team 							
+		3	click agent in pop up from team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display name team inbox change.		Passed		Passed
+		5				display pop up team inbox		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-039							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update assignee from ticket detail		Pre-Condition	accessed ticket detail, ticket assisgnee	DATE			
+Url					Description	team inbox updates in the form of a dropdown	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket assignee in sidebar ticket detail		test type	POSITIVE				
+		2	click coloms assignee							
+		3	click agent in pop up from assignee		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display name assignee change.		Passed		Passed
+		5				display pop up registered assignee		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-040							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update assignee from ticket detail		Pre-Condition	accessed ticket detail, ticket assisgnee	DATE			
+Url					Description	team inbox updates in the form of a dropdown	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket assignee in sidebar ticket detail		test type	NEGATIVE				
+		2	click coloms assignee							
+		3	click > 20 agent in dropdown from assignee		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display name assignee not change.				
+		5				keep control openable				
+		6				message "Gagal memperbarui penugasan. Coba lagi."				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-041							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view ticket SLA time		Pre-Condition	accessed ticket detail, SLA	DATE			
+Url					Description	view SLA time ticket from ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	click SLA in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display FRA and Resolve time in colapse SLA		Passed		Passed
+		5				display SLA Ticket detail in the form of not started, active and resolved times		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-TicketDetail-042							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view ticket atribut from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	view attributes available on the ticket details	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket detail in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display attributes of ticket details consisting of ticket type, ticket category, and custom attributes		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-TicketDetail-043							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	update custom message ticket atribute	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	POSITIVE				
+		2	input "" custom message							
+		3	click on the ticket detail layout section		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display custom message from ticket attribute  change		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-044							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	update custom message ticket atribute > 50 character	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	NEGATIVE				
+		2	input > 50 "" custom message							
+		3	click on the ticket detail layout section		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				custom message not change		Failed		Failed
+		5				display error message "must not exceed 50 characters"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-045							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	update custom message ticket atribute < 5 character	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	NEGATIVE				
+		2	input < 5 "" custom message							
+		3	click on the ticket detail layout section		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				custom message not change		Failed		Failed
+		5				display error message "must be at least 5 characters"		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-046							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	update custom option ticket attribute	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	POSITIVE				
+		2	click field in custom options ticket attribute							
+		3	click opsion from dropdown custom option		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display custom options from ticket attribute  change		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-047							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	update custom date ticket attribute	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	POSITIVE				
+		2	click field in custom date  ticket attribute							
+		3	pick date is different from the one listed		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display custom date from ticket attribute  change		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-048							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	replace image from custom image ticket attribute < 2 mb	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	POSITIVE				
+		2	click button replace in custom image							
+		3	pick a different image from the existing one < 2mb		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display custom image from ticket attribute change		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-049							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify update ticket attributes from ticket detail		Pre-Condition	accessed ticket detail, ticket attribute	DATE			
+Url					Description	replace image from custom image ticket attribute > 2 mb	ENV	DEV	STAGGING	PROD
+Steps		1	click ticket attribute in sidebar ticket detail		test type	NEGATIVE				
+		2	click button replace in custom image							
+		3	pick a different image from the existing one > 2mb		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display custom image from ticket attribute not change		Failed		Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-TicketDetail-050							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view client data in sidebar ticket detail 		Pre-Condition	accessed ticket detail, client data	DATE			
+Url					Description	view client data in the form of name, email, phone, and tags	ENV	DEV	STAGGING	PROD
+Steps		1	click client data in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display client data in ticket details		Passed		Passed
+		5				display Name, Email, Phone as read-only plain text and tag client 		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-051							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify add tag client data in sidebar ticket detail 		Pre-Condition	accessed ticket detail, client data	DATE			
+Url					Description	add client tag to client data, add	ENV	DEV	STAGGING	PROD
+Steps		1	click client data in sidebar ticket detail		test type	POSITIVE				
+		2	Click button "+" on the client data tags							
+		3	click tag in dropdown		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add			display dropdown to enter tag name . 		Failed		Failed
+		5				success add tag client 		Failed		Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-052							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify add tag client data in sidebar ticket detail 		Pre-Condition	accessed ticket detail, client data	DATE			
+Url					Description	add client tag to client data, add, > 50 tag	ENV	DEV	STAGGING	PROD
+Steps		1	click client data in sidebar ticket detail		test type	NEGATIVE				
+		2	Click button "+" on the client data tags							
+		3	input > 50 Tag		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				tag not created				
+		5				display error message "cannot exceed 50 tags"				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-053							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify add tag client data in sidebar ticket detail 		Pre-Condition	accessed ticket detail, client data	DATE			
+Url					Description	add client tag to client data, close	ENV	DEV	STAGGING	PROD
+Steps		1	click client data in sidebar ticket detail		test type	POSITIVE				
+		2	Click button "+" on the client data tags							
+		3	click cancel		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display pop up to enter tag name . 		Failed		Failed
+		5				pop up add tag client data close		Failed		Failed
+		6				back to client data		Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-054							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify delete tag client data in sidebar ticket detail 		Pre-Condition	accessed ticket detail, client data	DATE			
+Url					Description	detele client tag to client data	ENV	DEV	STAGGING	PROD
+Steps		1	click client data in sidebar ticket detail		test type	POSITIVE				
+		2	Click button "x" on the tag that already exists in the client data							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				does not display deleted client tags		Failed		Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-055							PASSED	NEED TO TEST	PASSED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view linked conversation from icket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	View link coversation that has been entered in the conversation process	ENV	DEV	STAGGING	PROD
+Steps		1	click linked conversation in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Display selected linked conversations for the ticket in the Conversation panel		Passed		Passed
+		5				Display the conversation name, last message  snippet, and relative time		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-056							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view pinned message from ticket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	View pinned messages in messages that have been sent	ENV	DEV	STAGGING	PROD
+Steps		1	click Pinned Messages in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display 5 message that has been pinned		Failed		Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-057							FAILED	NEED TO TEST	FAILED
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view more pinned message from ticket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	View more 5 pinned messages in messages that have been sent	ENV	DEV	STAGGING	PROD
+Steps		1	click Pinned Messages in sidebar ticket detail		test type	POSITIVE				
+		2	click see all for see more pinned message							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display more than 5 pinned messages		Failed		Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-058							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view media in media ticket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	View media that has been entered in the conversation process	ENV	DEV	STAGGING	PROD
+Steps		1	click media in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display existing media 				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-059							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view media in media ticket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	View media that has been entered in the conversation process	ENV	DEV	STAGGING	PROD
+Steps		1	click media in sidebar ticket detail		test type	POSITIVE				
+		2	click button see all for see more media in media sidebar							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display more existing media 				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-060							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open media from bubble chat ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	Open media in bubble chat which has existed	ENV	DEV	STAGGING	PROD
+Steps		1	Click on the media that is already in the chat bubble		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display media that has been sent				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-061							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open media from media sidebar ticket detail		Pre-Condition	accessed ticket detail, media	DATE			
+Url					Description	open media which has existed in media sidebar ticket detail	ENV	DEV	STAGGING	PROD
+Steps		1	Click media in sidebar ticket detail		test type	POSITIVE				
+		2	Click on one of the media or anything in the media sidebar  ticket details							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display media in the media sidebar ticket detail				Passed
+		5				display media that has been sent				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-062							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view file from ticket detail		Pre-Condition	accessed ticket detail, file	DATE			
+Url					Description	View file that has been entered in the conversation process	ENV	DEV	STAGGING	PROD
+Steps		1	click file in sidebar ticket detail		test type	POSITIVE				
+		2	click view more for see more file							
+		3	click see all for see more files		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display existing file				Failed
+		5								Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-063							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify view more file from  ticket detail		Pre-Condition	accessed ticket detail, file	DATE			
+Url					Description	View more file that has been entered in the conversation process	ENV	DEV	STAGGING	PROD
+Steps		1	click file in sidebar ticket detail		test type	POSITIVE				
+		2	click see all for see more file							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display more existing file				Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-064							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open file from bubble chat ticket detail		Pre-Condition	accessed ticket detail	DATE			
+Url					Description	Open file in bubble chat which has existed	ENV	DEV	STAGGING	PROD
+Steps		1	Click on the file that is already in the chat bubble		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display file that has been sent				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-065							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify open file from media sidebar ticket detail		Pre-Condition	accessed ticket detail, file	DATE			
+Url					Description	Open file which has existed in files sidebar ticket detail 	ENV	DEV	STAGGING	PROD
+Steps		1	Click files in sidebar ticket detail		test type	POSITIVE				
+		2	Click on one of the file or anything in the files sidebar  ticket details							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display file in the files sidebar ticket detail				Passed
+		5				display file that has been sent				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-066							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify activity list is done on the ticket details		Pre-Condition	accessed ticket detail, ticket events	DATE			
+Url					Description	shows the activity log	ENV	DEV	STAGGING	PROD
+Steps		1	click Ticket Events in sidebar ticket detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display compact activity list with latest 5 items by default.				Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketDetail-067							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create At					Created by	Syafiq	Tester			
+Scenario			Verify activity list is done on the ticket details exceeding 5		Pre-Condition	accessed ticket detail, ticket events	DATE			
+Url					Description	View more 5  activity log	ENV	DEV	STAGGING	PROD
+Steps		1	click Ticket Events in sidebar ticket detail		test type	POSITIVE				
+		2	click see all for see more activities							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display more 5 activities that have been done				Failed
+		5								
+		6								
+		7								
+		8								
+		9								

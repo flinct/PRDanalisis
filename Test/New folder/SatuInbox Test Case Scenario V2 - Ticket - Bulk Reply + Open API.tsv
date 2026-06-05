@@ -1,0 +1,2140 @@
+total cases =			133							
+DEV				STAGGING			PROD			
+Passed			59	Passed		0	Passed	50		
+Failed			1	Failed		0	Failed	1		
+Need to test			6	Need to test		0	Need to test	2		
+On test			0	On test		0	On test	0		
+No Status			67	No Status		133	No Status	80		
+Test ID	SIX-Bulk_Reply-001							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			default ticket type when opened from all tab		Pre-Condition	user is on all tab	DATE	30/01/26		05/02/2026
+Url					Description	Ticket Type Selection	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk reply 		test type	POSITIVE				
+		2	modal is opened							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				ticket type is automatically to set all		Passed		Passed
+		5				Ticket type is now selectable in the All tab modal		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-002							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			ticket type auto filled from specific ticket type tab		Pre-Condition	user is on a specific ticket type tab (e.g complaint, payment)	DATE	30/01/26		05/02/2026
+Url					Description	Ticket Type Selection	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk reply from the tab		test type	POSITIVE				
+		2	modal is opened							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				ticket type is auto-filled on the active tab		Passed		Passed
+		5				value matches the selected tab		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-003							PASSED		FAILED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			ticket type reset when switching tabs		Pre-Condition	bulk reply modal has been opened before	DATE	30/01/26		05/02/2026
+Url					Description	Ticket Type Selection	ENV	DEV	STAGGING	PROD
+Steps		1	close the modal		test type	POSITIVE				
+		2	wsitch to another tab							
+		3	open bulk reply again		Status Response	Expected Result	Actual Result	Status		Status
+		4				ticket type is reset according to the currently active tab	field type ticket is not match with current tab	Passed		Failed
+		5				previous state is not retained		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-004							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			default identifier is ticket ID		Pre-Condition	bulk reply modal is opened	DATE	30/01/26		05/02/2026
+Url					Description	identifier configuration	ENV	DEV	STAGGING	PROD
+Steps		1	observe the identifier field		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				default identifier is ticket ID		Passed		Passed
+		5				identifier dropdown is enabled		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-005							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	syafiq		rizal
+Scenario			available identifier types		Pre-Condition		DATE	06/02/2026		05/02/2026
+Url					Description	identifier configuration	ENV	DEV	STAGGING	PROD
+Steps		1	open identifier dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				available options : ticket id, costum field.		Passed		Passed
+		5				If there is no custom ID on the ticket, it will only display the ticket ID.		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-006							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			identifier locked to ticket ID 		Pre-Condition	ticket type = all	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = all	ENV	DEV	STAGGING	PROD
+Steps		1	observe identifier dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier is locked to ticket id		Passed		Passed
+		5				custom field option is hidden or disable		Passed		Passed
+		6								
+		7								
+		8								
+		9				    				
+										
+										
+										
+Test ID	SIX-Bulk_Reply-007							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			helper message shown for all ticket type 		Pre-Condition	ticket type = all	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = all	ENV	DEV	STAGGING	PROD
+Steps		1	Check helper information below Identifier field		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Helper message is displayed		Passed		Passed
+		5				Message explains that only Ticket ID is supported for ALL ticket type		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-008							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			Custom Field option unavailable in ALL tab		Pre-Condition	ticket type = all	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = all	ENV	DEV	STAGGING	PROD
+Steps		1	Open Identifier dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Custom Field option is not selectable		Passed		Passed
+		5				User cannot choose Custom Field		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-009							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			Custom Field selectable		Pre-Condition	Ticket Type = specific ticket type (not ALL)	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = specific type	ENV	DEV	STAGGING	PROD
+Steps		1	Open Identifier dropdown		test type	POSITIVE				
+		2	Select Custom Field							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Custom Field can be selected		Passed		Passed
+		5				Custom Field selector appears		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-010							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			Custom Field selector appears after selection		Pre-Condition	Identifier = Custom Field	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = specific type	ENV	DEV	STAGGING	PROD
+Steps		1	Select Custom Field as Identifier		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Custom Field selector dropdown is displayed	highlight active to another items 	Passed		Passed
+		5				Field selection is required		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-011							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			Custom Field list filtered by Ticket Type		Pre-Condition	Ticket Type = specific ticket type	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = specific type	ENV	DEV	STAGGING	PROD
+Steps		1	Open Custom Field selector		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Field list is populated based on selected ticket type only		Passed		Passed
+		5				Fields from other ticket types are not displayed		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-012							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			valid costum field types only		Pre-Condition	custom field selector is opened 	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = specific type	ENV	DEV	STAGGING	PROD
+Steps		1	review available field types		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only fields with types: text, options (single select)		Passed		Passed
+		5				fields with types: calendar, image. are not displayed		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-013							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			custom field selection is mandatry		Pre-Condition	identifier = custom field	DATE	30/01/26		05/02/2026
+Url					Description	behavior when ticket type = specific type	ENV	DEV	STAGGING	PROD
+Steps		1	leave custom field selector empty		test type	POSITIVE				
+		2	click submit							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is not visible		Passed		Passed
+		5				submit cant be clicked		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-014							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		Atik
+Scenario			template structure follows ticket type		Pre-Condition	ticket type is selected	DATE	30/01/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	click download template		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				downloaded template structure matches the selected ticket type		Passed		Passed
+		5				identfier column aligns with configuration		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-015							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		Atik
+Scenario			template structure shanges based on identifier 		Pre-Condition	different identifier values are selected	DATE	30/01/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	change identifier (ticket ID > custom field)		test type	POSITIVE				
+		2	download template again							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				template structure updates based on selected identifier		Passed		Passed
+		5				identifier column matches user selection		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-016							NEED TO TEST		
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			download generic template (no selected ticket, tab all)		Pre-Condition	user opens bulk reply modal, no ticket selected, active tab = all	DATE	30/01/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	click download template button 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				file .xlsx is downloaded		Passed		Passed
+		5				file contains header only		Passed		Passed
+		6				columns (identifier, reply) 		Passed		Passed
+		7				identifier represents Ticket ID		Passed		Passed
+		8				no ticket specific data included		Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-017							PASSED		NEED TO TEST
+Create at			30/01/2026		created by	Rizal	Tester	rizal		
+Scenario			download generic template (no selected ticket, specific ticket type)		Pre-Condition	bulk reply modal opened, no ticket selected, active tab = specific ticket type	DATE	30/01/26		
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	select identifier = ticket id		test type	POSITIVE				
+		2	click download template							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				.xlsx file downloaded				
+		5				header only				
+		6				identifier column mapped to ticket ID				
+		7				no costum field included				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-018							NEED TO TEST		
+Create at			30/01/2026		created by	Rizal	Tester	rizal		
+Scenario			downloaded generic template with custom fielid identifier (no selected ticket)		Pre-Condition	bulk reply modal opened , no ticket selected, active tab = specific ticket type	DATE	30/01/26		
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	select identifier = costum field		test type	POSITIVE				
+		2	select a valid costum field							
+		3	cllick download template		Status Response	Expected Result	Actual Result	Status		Status
+		4				.xlsx file downloaded 				
+		5				header only				
+		6				identifier column maps to selected custom field				
+		7				columns (identifier, reply)				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-019							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			download template with selected tickets (identifier = Ticket ID)		Pre-Condition	one or more tickets selected, bulk reply modal is opened, identifier = ticket id	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	click download template		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				.xlsx file downloaded 		Passed		Passed
+		5				template contains (header row, rows populated based on selected ticket)		Passed		Passed
+		6				Identifier column contains Ticket ID values from selected tickets		Passed		Passed
+		7				Reply column is empty		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-020							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			download template with selected tickets (identifier = custom field)		Pre-Condition	ticket is selected, identifier = costum field	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	click download template		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				.xlsx file downloaded		Passed		Passed
+		5				header only		Passed		Passed
+		6				identifier column maps to selected custom field		Passed		Passed
+		7				no ticket id column included		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-021							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			consistency between selected ticket toolbar and main toolbar		Pre-Condition	tickets are selected, identifier configured	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	download template from bulk toolbar		test type	POSITIVE				
+		2	downloaf template froom bulk toolbar under selected ticket list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				both downloaded files have identical structure 		Passed		Passed
+		5				same identifier column 		Passed		Passed
+		6				same header format		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-022							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			identifier change updates template structure		Pre-Condition	bulk reply modal opened, tickets selected	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	selected identifier = Ticket ID		test type	POSITIVE				
+		2	download template							
+		3	change identifer = custom field		Status Response	Expected Result	Actual Result	Status		Status
+		4	select a costum field			first template uses Ticket ID 		Passed		Passed
+		5	download template again			second template uses custom field		Passed		Passed
+		6				no mixed identifier columns		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-023							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			tab switch resets template context 		Pre-Condition	actice tab =specific ticket type	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	switch tab to all		test type	POSITIVE				
+		2	click downloaded template							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier locked to Ticket ID		Passed		Passed
+		5				template uses ticket ID only		Passed		Passed
+		6				custom field not included		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-024							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			download button always enabled		Pre-Condition		DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	observe donwload template button		test type	POSITIVE				
+		2	hover over the button							
+		3	click the button without selecting identifier or tickets		Status Response	Expected Result	Actual Result	Status		Status
+		4				button is enabled		Passed		Passed
+		5				cursor changes to pointer on hover		Passed		Passed
+		6				hover color is applied		Passed		Passed
+		7				download triggered successfully		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-025							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			hover state UI validation		Pre-Condition		DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	hover cursor over download template button 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				cursor changes to pointer 		Passed		Passed
+		5				button color or icon color changes		Passed		Passed
+		6				hover state matches design system		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-026							NEED TO TEST		
+Create at			30/01/2026		created by	Rizal	Tester	rizal		
+Scenario			template does included sample data		Pre-Condition	template downloaded	DATE	30/01/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open downloaded .xlsx file		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				header row exists		Passed		Passed
+		5				identifier and reply sample is shown		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-027							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			template structure matches upload validation		Pre-Condition	template downloaded	DATE	03/02/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	compare template headers with upload validation rules		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				required columns present (identifier, reply)		Passed		Passed
+		5				no extra or unsupported columns		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-028							PASSED		PASSED
+Create at			30/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			multiple tikets selected, same identifier output		Pre-Condition	multiple tickets selected, identifier configured	DATE	30/01/26		06/02/2026
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	click download template		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				single template generated		Passed		Passed
+		5				identifier column is consistent across all rows		Passed		Passed
+		6				no duplication or missing headers		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-029							NEED TO TEST		
+Create at			30/01/2026		created by	Rizal	Tester	rizal		
+Scenario			re open modal opened and closed		Pre-Condition		DATE	30/01/26		
+Url					Description	template & download behavior	ENV	DEV	STAGGING	PROD
+Steps		1	change ticket tab or identifier		test type	POSITIVE				
+		2	re open bulk reply modal							
+		3	download template		Status Response	Expected Result	Actual Result	Status		Status
+		4				template reflects current state				
+		5				no cached or outdated structure				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-030							PASSED		PASSED
+Create at			29/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			modal state reset on reopen 		Pre-Condition		DATE	30/01/26		06/02/2026
+Url					Description	dtate reset and concictency	ENV	DEV	STAGGING	PROD
+Steps		1	open bulk reply modal		test type	POSITIVE				
+		2	change identifier							
+		3	close modal		Status Response	Expected Result	Actual Result	Status		Status
+		4	reopen bulk reply modal			modal state is reset		Passed		Passed
+		5				default identifier is ticket id		Passed		Passed
+		6				ticket type follows the active tab		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-031							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Agent can access Bulk Reply UI from Ticket List		Pre-Condition		DATE	26/01/26		06/02/2026
+Url					Description	Bulk Reply UI	ENV	DEV	STAGGING	PROD
+Steps		1	navigate to the ticket list page		test type	POSITIVE				
+		2	click bulk reply							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal bulk reply UI is displayed		Passed		Passed
+		5				no error message is shown		Passed		Passed
+		6				user can proceed to configure a bulk job		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-032							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Bulk Reply modal opens from All Tickets tab		Pre-Condition		DATE	26/01/26		06/02/2026
+Url					Description	Bulk Reply UI	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk reply 		test type	POSITIVE				
+		2	observe the opened modal							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				bulk reply modal is displayed 		Passed		Passed
+		5				modal context is all ticket		Passed		Passed
+		6				no ticket type restriction is applied		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-033							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		
+Scenario			Bulk Reply modal opens from selected Tickets  on tab the all		Pre-Condition	ticket list is on all tab	DATE	26/01/26		
+Url					Description	Bulk Reply UI	ENV	DEV	STAGGING	PROD
+Steps		1	trigger bulk reply via toolbar		test type	POSITIVE				atik
+		2	observe modal behavior							06/02/2026
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				bulk reply modal opens successfully		Passed		Passed
+		5				context remains all tickets		Passed		Passed
+		6				modal state is clead no leftover configuration		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-034							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		Atik
+Scenario			Bulk Reply modal opens with specific ticket type context		Pre-Condition	ticket list is on a specific ticket tab (e.g. complaint)	DATE	03/02/26		
+Url					Description	Bulk Reply UI	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk reply		test type	POSITIVE				
+		2	obsevre modal configuration							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal opens with specific ticket type scope		Passed		Passed
+		5				ticket context is preserved		Passed		Passed
+		6				job creation will aply only to this ticket type				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-035							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		
+Scenario			Bulk Reply UI shows required fields on initial load		Pre-Condition	bulk reply is open (any context)	DATE	03/02/26		
+Url					Description	Default UI State	ENV	DEV	STAGGING	PROD
+Steps		1	observe the bulk reply form		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier selector is visible 		Passed		Passed
+		5				visibility option (send to costumer) is visible		Passed		Passed
+		6				XLSX file upload area is visible		Passed		Passed
+		7				no validation error is shown initially		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-036							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	atik		atik
+Scenario			Default configuration is applied on modal load		Pre-Condition	bulk reply modal is open	DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1	observe default field values 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier defaults to ticket number		Passed		Passed
+		5				visibility defaults based on user role		Passed		Passed
+		6				no custom field selector is shown unless required		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-037							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Display UI input file on modal		Pre-Condition	bulk reply modal is open, identifier configuration is valid	DATE	26/01/26		
+Url					Description	UI Level Validation	ENV	DEV	STAGGING	PROD
+Steps		1	click file upload area		test type	POSITIVE				
+		2	select a valid .xlsx file							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				file is accepted		Passed		Passed
+		5				file name is displayed		Passed		Passed
+		6				no error massage is shown		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-038							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			try changing the existing file in the form		Pre-Condition	bulk reply modal is open, identifier configuration is valid	DATE	26/01/26		
+Url					Description	UI Level Validation	ENV	DEV	STAGGING	PROD
+Steps		1	click change file		test type	POSITIVE				
+		2	select a valid .xlsx file							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				file is accepted		Passed		Passed
+		5				file name is change		Passed		Passed
+		6				no error massage is shown		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-039							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			UI rejects non-XLSX file format		Pre-Condition		DATE	26/01/26		
+Url					Description	UI Level Validation	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to upload a non .xlsx file		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				file upload is rejected		Passed		Passed
+		5				error messgae explains valid file format		Passed		Passed
+		6								
+										
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-040							NEED TO TEST		
+Create at			14/01/2026		created by	Rizal	Tester			
+Scenario			Job creation is blocked if required fields are incomplete		Pre-Condition	bulk reply modal is open	DATE			
+Url					Description	Default Identifier Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	upload a valid xlsx file		test type	POSITIVE				
+		2	leave required configuration incomplete							
+		3	attempt to submit		Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked				
+		5				validation message explains missing configuration				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-041							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	rizal		
+Scenario			Job creation is blocked if XLSX lacks required columns		Pre-Condition		DATE	26/01/26		
+Url					Description	Column Validation	ENV	DEV	STAGGING	PROD
+Steps		1	upload xlsx missing identifier or reply		test type	NEGATIVE				
+		2	attempt to proceed							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked		Passed		Passed
+		5				error message explains missing columns	 additional: display warning "required column is missing"	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-042							PASSED		PASSED
+Create at			14/01/2026		created by	Rizal	Tester	atik		atik
+Scenario			Bulk job is created successfully from UI upload		Pre-Condition	all requires fields are valid, valid xlsx file uploaded	DATE			
+Url					Description	Successful Job Creation	ENV	DEV	STAGGING	PROD
+Steps		1	submit the bulk reply form		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				bulk job is created		Passed		Passed
+		5				job status view is dislplayed		Passed		Passed
+		6				initital status is queued or processing		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-043							NEED TO TEST		NEED TO TEST
+Create at			14/01/2026		created by	Rizal	Tester			
+Scenario			Client user can create bulk job with enforced public visibility		Pre-Condition		DATE			
+Url					Description	Client User Creation Rules	ENV	DEV	STAGGING	PROD
+Steps		1	observe visibility configuration		test type	POSITIVE				
+		2	opload valid xlsx							
+		3	submit the form		Status Response	Expected Result	Actual Result	Status		Status
+		4				visibility is locked to send to costumer				
+		5				internal note option is not available				
+		6				bulk job is created succesfully				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-044									
+Create at			14/01/2026		created by	Rizal	Tester			
+Scenario			Client user cannot submit bulk job with internal visibility		Pre-Condition		DATE			
+Url					Description	Client User Creation Rules	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to disable send to customer 		test type	NEGATIVE				
+		2	attempt to submit							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				action is bloked				
+		5				UI explains visibility restriction 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-045									
+Create at			14/01/2026		created by	Rizal	Tester			
+Scenario			UI displays error when bulk job creation fails		Pre-Condition		DATE			
+Url					Description	valid xlsx is uploaded 	ENV	DEV	STAGGING	PROD
+Steps		1	submit the form		test type	NEGATIVE				
+		2	simulate backend failure							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error state is shown 				
+		5				error message is actionable				
+		6				user can retry submission				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-046							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	atik		
+Scenario			user submits bulk reply form with all required configurations filled correctly		Pre-Condition	valid xlsx file is uploaded	DATE			
+Url					Description	Create Bulk Job With Valid Configuration	ENV	DEV	STAGGING	PROD
+Steps		1	select identifier type = ticket number		test type	POSITIVE				
+		2	ensure "send to costumer" visibility is set							
+		3	upload a valid xlsx file containing identifier and reply columns		Status Response	Expected Result	Actual Result	Status		Status
+		4	click submit/create bulk job 			bulk job is created successfully		Passed		Passed
+		5				user is redirected to job status view		Passed		Passed
+		6				job initital status is queued or processing		Passed		Passed
+		7				no validation or error message is shown		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-047									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user attempts to create a bulk job without completing required configuration		Pre-Condition		DATE			
+Url					Description	Create Job is Blocked when required fields are incomplete	ENV	DEV	STAGGING	PROD
+Steps		1	upload a valid xlsx file		test type	NEGATIVE				
+		2	leave identifier configuration incomplete (e.g. costum filed without field key)							
+		3	click submit		Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked				
+		5				inline validation message is shown				
+		6				user remains on bulk reply modal				
+		7				no bulk job is created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-048							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	atik		atik
+Scenario			user uploads an xlsx file without required columns		Pre-Condition		DATE			
+Url					Description	Job Creation fails when xlsx file is missing required column	ENV	DEV	STAGGING	PROD
+Steps		1	upload an xlsx file missing identifier or reply column		test type	NEGATIVE				
+		2	click submit							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked 		Passed		Passed
+		5				error message explains missing required columns		Passed		Passed
+		6				file is rejected		Passed		Passed
+		7				no job is created		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-049									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system enforces maximum row limit		Pre-Condition		DATE			
+Url					Description	Bulk Reply Job XLSX exceeding row limit	ENV	DEV	STAGGING	PROD
+Steps		1	upload xlsx with more than allowed rows		test type	NEGATIVE				
+		2	attempt to submit job							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked				
+		5				error message indicates row limit exceeded				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-050									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			client user creates a bulk job		Pre-Condition	user is logged in as client, bulk reply modal is open.	DATE			
+Url					Description	Client User can create bulk job with enforced public visibility	ENV	DEV	STAGGING	PROD
+Steps		1	observe visibility option		test type	POSITIVE				
+		2	upload a valid xlsx file							
+		3	click submit		Status Response	Expected Result	Actual Result	Status		Status
+		4				 				
+		5				internal note option is disabled 				
+		6				bulk job is created successfully				
+		7				job status view is displayed				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-051									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			client user attempts to disable public visibility		Pre-Condition	user is logged in as client, bulk reply modal is open.	DATE			
+Url					Description	Client User Cannot Create bulk job with internal visibility	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to disable "send to costumer"		test type	NEGATIVE				
+		2	attempt to submit bulk job							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				action is blocked 		Passed		
+		5				UI shows explanation that client users can only send public message				
+		6				job is not created		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-052							PASSED		PASSED
+Create at			20/01/2026		created by	Rizal	Tester	atik		atik
+Scenario			User creates a Bulk Reply job after selecting specific tickets		Pre-Condition		DATE			
+Url					Description	Create Bulk Reply Job Using Selected Tickets Only	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket List page		test type	POSITIVE				
+		2	Select 2 tickets using checkbox							
+		3	Click Bulk Reply action		Status Response	Expected Result	Actual Result	Status		Status
+		4	Upload valid XLSX file			bulk reply job is successfully created		Passed		Passed
+		5	Submit Bulk Reply job			job scope contains only the selected tickets		Passed		Passed
+		6				tickets not selected are excluded from processing		Passed		Passed
+		7				job status starts as queued or processing		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-053									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			User attempts to create Bulk Reply without selecting any ticket		Pre-Condition	no ticket is selected	DATE			
+Url					Description	Bulk Reply action disabled when no ticket is selected	ENV	DEV	STAGGING	PROD
+Steps		1	open ticket on list page		test type	NEGATIVE				
+		2	ensure no ticket checkbox is selected							
+		3	observe bulk reply action		Status Response	Expected Result	Actual Result	Status		Status
+		4				bulk reply action is disabled OR				
+		5				user is prompted to select at least one ticket				
+		6				bulk reply modal is not opened				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-054							PASSED		
+Create at			20/01/2026		created by	Rizal	Tester	atik		atik
+Scenario			user opens bulk reply modal after selecting tickets from ticket list		Pre-Condition	user selected multiple tickets from ticket list	DATE			
+Url					Description	Selected Tickets Context Persists When Opening Bulk Reply Modal	ENV	DEV	STAGGING	PROD
+Steps		1	select multiple tickets		test type	POSITIVE				
+		2	click bulk reply							
+		3	observe bulk reply modal		Status Response	Expected Result	Actual Result	Status		Status
+		4				modal opens successfully 		Passed		Passed
+		5				selected ticket count is preserved internally		Passed		Passed
+		6				no additional tickets are added implicitly		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-055									PASSED
+Create at			20/01/2026		created by	Rizal	Tester			atik
+Scenario			user select tickets from different pages before creating bulk reply job		Pre-Condition	ticket list has multiple pages, user can select tickets across pages	DATE			
+Url					Description	Selected Ticket Scope is Not Affected By Pagination	ENV	DEV	STAGGING	PROD
+Steps		1	select ticket on page 1		test type	POSITIVE				
+		2	navigate to page 2 							
+		3	select another ticket		Status Response	Expected Result	Actual Result	Status		Status
+		4	click bulk reply			all selected tickets across pages are included				Passed
+		5	submit job			pagination does not reset selection				Passed
+		6				job processes all selected tickets				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-056									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user applies sorting / filter after selecting tickets		Pre-Condition	ticket list supports sorting or filtering	DATE			
+Url					Description	Selected Tickets Scope is Preserved  After Sorting or Filtering	ENV	DEV	STAGGING	PROD
+Steps		1	select one or more tickets		test type	POSITIVE				
+		2	select spesifict ticket type							
+		3	click bulk reply 		Status Response	Expected Result	Actual Result	Status		Status
+		4	submit job			previously selected tickets remain selected				
+		5				job scope matches originallu selected tickets				
+		6				sorting / filtering does not alter job target				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-057									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user upload xlsx with identifier outside selected scope		Pre-Condition	selected tickets exist, xlsx file contains identifiers of both selected tickets	DATE			
+Url					Description	Job Processes Only Selected Tickets even if XLSX contains identifiers	ENV	DEV	STAGGING	PROD
+Steps		1	select specific tickets		test type	EDGE CASE				
+		2	upload xlsx containing :  identifier for selected ticket identifier for non-selected ticket							
+		3	submit job		Status Response	Expected Result	Actual Result	Status		Status
+		4				replies are created only for selected tickets				
+		5				rows referencing unselected tickets are skipped or marked failed				
+		6				job does not affect unselected tickets				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-058									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user attempts to change selected tickets after job submission		Pre-Condition	bulk reply job is successfully created	DATE			
+Url					Description	selected ticket scope cannot be modified after job creation	ENV	DEV	STAGGING	PROD
+Steps		1	create bulk reply job from selected tickets		test type	NEGATIVE				
+		2	refresh page or revisit job detail							
+		3	observe job configuration		Status Response	Expected Result	Actual Result	Status		Status
+		4				selected ticket scope is immutable				
+		5				no option to add / remove tickets				
+		6				job detail is read only				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-059									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user creates bulk reply job from selected tickets in a specific tab		Pre-Condition	ticket list is filtered by a specific tab (e.g. client)	DATE			
+Url					Description	Bulk Reply From Selected Tickets Does Not Affect Tickets Outside Current Tab Context 	ENV	DEV	STAGGING	PROD
+Steps		1	open a specific ticket tab		test type	POSITIVE				
+		2	select tickets within the tab							
+		3	create bulk reply job		Status Response	Expected Result	Actual Result	Status		Status
+		4				job scope includes only selected tickets from that tab 				
+		5				tickets outside the tab are excluded				
+		6				no cross tab ticket processing occurs				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-060							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	Atik		Atik
+Scenario			user opens bulk reply modal after selecting tickets		Pre-Condition	user has selected tickets	DATE			
+Url					Description	Bulk Reply Modal Reflects Selected Ticket Context Accurately	ENV	DEV	STAGGING	PROD
+Steps		1	select tickets 		test type	POSITIVE				
+		2	open bulk reply modal							
+		3	observe UI context		Status Response	Expected Result	Actual Result	Status		Status
+		4				UI reflects that reply is scoped to selected tickets		Passed		Passed
+		5				no misleading indication of global / all-ticket processing		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-061									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			selected tickets are deleted or archived before job processing		Pre-Condition	tickets are selected, job is created but not fully processed	DATE			
+Url					Description	Bulk Reply Job Fails Gracefully If Selected Tickets Are Deleted Before Processing	ENV	DEV	STAGGING	PROD
+Steps		1	select tickets		test type	EDGE CASE				
+		2	create bulk reply job							
+		3	delete or archive selected ticket before processing completes		Status Response	Expected Result	Actual Result	Status		Status
+		4				job continues processing remaining valid tickets 				
+		5				deleted tickets are marked as failed in result report				
+		6				job does not crash or fail entirely				
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Bulk_Reply-062									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system displays initial job status after bulk job creation		Pre-Condition		DATE			
+Url					Description	Bulk Job Status & Progres Tracking (initial job status is displayed as queued after job creation)		DEV	STAGGING	PROD
+Steps		1	create a bulk reply job with valid configuration		test type	POSITIVE				
+		2	observe the job status immediately after redirection							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job status is displayed as queued or processing				
+		5				job ID is visible				
+		6				progress counters are initialized				
+		7				no error message is shown				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-063									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system updates job status when processing starts		Pre-Condition	bulk job exists with status queued	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (job status transitions from queued to processing	ENV	DEV	STAGGING	PROD
+Steps		1	open job status view		test type	POSITIVE				
+		2	wait until processing begins							
+		3	observe status change		Status Response	Expected Result	Actual Result	Status		Status
+		4				job status changes from queued to processing				
+		5				UI reflects the updates status without page error				
+		6				progress counters become active				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-064									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user views progress counters while job is running		Pre-Condition		DATE			
+Url					Description	Bulk Job Status & Progres Tracking (progress counters are displayed during job processing 	ENV	DEV	STAGGING	PROD
+Steps		1	open job status view for an active job		test type	POSITIVE				
+		2	observe progress information							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				total, processed, siccess, and failed counters are visible				
+		5				counters are numeric and readable				
+		6				total count matches number of rows in uploaded xlsx				
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-065									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system updates progress counters incrementally		Pre-Condition	bulk job is processing, xlsx contains multiple rows.	DATE			
+Url					Description	 Bulk Job Status & Progres Tracking (progress counter increase correctly as rows are processed)	ENV	DEV	STAGGING	PROD
+Steps		1	monitor job status view during processing		test type	POSITIVE				
+		2	obserce changes in processed, success, and failed counters							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				processed counter increases over time				
+		5				success + failed equals processed				
+		6				counter never decrease				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-066									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system marks job as completed after processing finishes		Pre-Condition	bulk job is processing, all rows have been handled	DATE			
+Url					Description	 Bulk Job Status & Progres Tracking (job status changes to completed when all rows are processed)	ENV	DEV	STAGGING	PROD
+Steps		1	wait until all rows are processed		test type	POSITIVE				
+		2	observe final job status							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job status changes to completed				
+		5				processed equals total				
+		6				no pending rows remain				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-067									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system distinguishes job completion from row failure		Pre-Condition	bulk job contains a mix of successful and failed rows	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (job with failed rows is still marked as completed)	ENV	DEV	STAGGING	PROD
+Steps		1	run a bulk job with some invalid rows		test type	EDGE CASE				
+		2	wait until processing ends							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job status is completed, not failed				
+		5				failed rows are reflected in counters				
+		6				successful rows are not rolled back				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-068									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system differentiates job-level failure from row-level failure		Pre-Condition	system encounters a job-level failure (e.g. unrecoverable error before row processing)	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (job status failed is shown only when job-level failure occurs	ENV	DEV	STAGGING	PROD
+Steps		1	trigger a job-level failure scenario		test type	NEGATIVE				
+		2	observe job status							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job status is set to failed				
+		5				no row-level processing occurs				
+		6				error message is displayed clearly				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-069									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user refreshes the page while viewing job status		Pre-Condition	bulk job is processing or completed	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (UI refresh does not reset job status or progress)	ENV	DEV	STAGGING	PROD
+Steps		1	open job status view		test type	EDGE CASE				
+		2	refresh the browser							
+		3	observe job state		Status Response	Expected Result	Actual Result	Status		Status
+		4				job status is preserved				
+		5				progress counters remain accurate				
+		6				no duplicate job is created				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-070									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user leaves and returns to job status view		Pre-Condition	bulk job exists	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (user can reopen job status view and see latest progress)	ENV	DEV	STAGGING	PROD
+Steps		1	navigate away from job status page		test type	POSITIVE				
+		2	reopen the same job							
+		3	observe job information		Status Response	Expected Result	Actual Result	Status		Status
+		4				latest job status is shown				
+		5				progress counters reflect current state 				
+		6				UI does not show stale data				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-071									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			system shows consistent job status across sessions		Pre-Condition	bulk job is processing, multiple users have access to the job	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (job progress remains consistent when multiple users view the same job)	ENV	DEV	STAGGING	PROD
+Steps		1	open the job status view as user A		test type	EDGE CASE				
+		2	open the same job as user B							
+		3	compare job status and counters		Status Response	Expected Result	Actual Result	Status		Status
+		4				job status is consistent across users				
+		5				progress counters match 				
+		6				no conflicting state is shown				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-072									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			user attempts to interact with job status view		Pre-Condition	bulk job is processing or completed	DATE			
+Url					Description	Bulk Job Status & Progres Tracking (job status view does not allow interaction that alters job state)	ENV	DEV	STAGGING	PROD
+Steps		1	open job status view 		test type	NEGATIVE				
+		2	attempt to modify job state (if any action is present)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job status view is read-only				
+		5				no action can change job state 				
+		6				no accidental reprocessing occurs 				
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Bulk_Reply-073							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Identifier selector is displayed in Bulk Reply modal		Pre-Condition	bulk reply modal is opened from any entry point	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	observe the bulk reply form		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier selector is visible		Passed		Passed
+		5				available options include ticket number and custom field		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-074							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Ticket Number is selected as default identifier		Pre-Condition	bulk reply modal is opened from any enty point 	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	observe the default identifier value		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				ticket number is selected by default		Passed		Passed
+		5				custom field key selector is not displayed		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-075							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			User can switch identifier type to Custom Field		Pre-Condition	access modal on specific tab	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	open identifier selector 		test type	POSITIVE				
+		2	select custom field							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				identifier type changes to custom field		Passed		Passed
+		5				field key selector becomes visible		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-076							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Switching identifier back to Ticket Number clears custom field configuration		Pre-Condition	identifier type is costum field	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	change identifier type to ticket number		test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				previously selected field key is cleared		Passed		Passed
+		5				no residual configuration remains		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-077							PASSED		
+Create at			15/01/2026		created by	Rizal	Tester	rizal		
+Scenario			Field Key is mandatory when identifier type is Custom Field		Pre-Condition	identifier type is costum field, no field is selected	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to upload xlsx file or submit the job		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				action is blocked 		Passed		
+		5				validation message indicates field key is required		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-078							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			User can select a valid Custom Field Key		Pre-Condition	identifier type is costum field, at least one valid custom field exists	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	open field key selector 		test type	POSITIVE				
+		2	select a valid field key							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				field key is selected successfully		Passed		Passed
+		5				no validation error is shown		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-079							PASSED		
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			Invalid or unsupported Field Key is rejected		Pre-Condition	identifier type is custom field	DATE	03/02/2026		
+Url					Description	Identifier Selector	ENV	DEV	STAGGING	PROD
+Steps		1	select an unsupported or stale field key if applicable		test type	NEGATIVE				
+		2	attempt to proceed							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				job creation is blocked		Passed		Passed
+		5				error message indicates invalid identifier configuration		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-080							PASSED		
+Create at			15/01/2026		created by	Rizal	Tester	rizal		
+Scenario			Field Key options are filtered by ticket type context		Pre-Condition	bulk reply modal is opened from a specific ticket type tab, identifier type is custom field	DATE	03/02/2026		
+Url					Description	Context Aware Field Key Availability	ENV	DEV	STAGGING	PROD
+Steps		1	open field key selector		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only field keys relevant to the selected ticket type are displayed		Passed		
+		5				irrelevant field keys are not selectable		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Bulk_Reply-081							PASSED		PASSED
+Create at			15/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			XLSX file with required columns identifier and reply is accepted		Pre-Condition		DATE	29/01/2026		
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	Select an XLSX file containing identifier and reply columns							
+		3	Upload the file		Status Response	Expected Result	Actual Result	Status		Status
+		4	Observe the validation and job creation result			file upload is accepted		Passed		Passed
+		5				bulk job is created successfully		Passed		Passed
+		6				job status changes to queued or processing		Passed		Passed
+		7				no error validation is shown		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-082									
+Create at			15/01/2026		created by	Rizal	Tester			
+Scenario			XLSX file with required columns in different order is accepted		Pre-Condition		DATE			
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	configure a valid identifier type							
+		3	upload an xlsx file where column order is changed		Status Response	Expected Result	Actual Result	Status		Status
+		4	submit the bulk reply job			system correctly detecs required columns				
+		5				bulk job is created without validation error				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-083							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			upload an xlsx file missing the identifier columns 		Pre-Condition		DATE	29/01/2026		
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool 		test type	NEGATIVE				
+		2	upload an xlsx file missing the identifier column							
+		3	attempt to proceed with job creation		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe the validation message			upload is rejected		Passed		Passed
+		5				validation error is shown: missing required column identifier		Passed		Passed
+		6				bulk jojb is not created		Passed		Passed
+		7						Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-084							PASSED		
+Create at			19/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			upload an xlsx file missing the reply columns 		Pre-Condition		DATE	29/01/2026		
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file missing the reply column							
+		3	attempt to proceed		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe the error message			upload is rejected		Passed		Passed
+		5				validation error is shown: missing required column reply		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-085							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			upload an xlsx file with incorrect column names (e.g. identifier, replies)		Pre-Condition		DATE	29/01/2026		
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file with incorrect column names							
+		3	submit the file		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe the validation result			error indicates required columns are not found		Passed		Passed
+		5				display not found on result report 		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-086							PASSED		
+Create at			19/01/2026		created by	Rizal	Tester	rizal		
+Scenario			upload an xlsx file containing extra columns besides identifier and reply		Pre-Condition		DATE	03/02/2026		
+Url					Description	XLSX Required Columns Validation (Identifier, Reply)	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file containing extra columns in addition to identifier and reply							
+		3	submit the file		Status Response	Expected Result	Actual Result	Status		Status
+		4	monitor job processing			extra columns are ignored		Passed		
+		5				bulk job is created and processed normally		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-087							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	rizal		atik
+Scenario			all row contain valid identifier and reply values		Pre-Condition		DATE	04/02/2026		
+Url					Description	XLSX Format Row-Level Content Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file where all rows contain valid identifier and reply values							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	wait for job completion			all rows are processed 		Passed		Passed
+		5	review the result report			replies are successfully created for all rows		Passed		Passed
+		6				result report shows all rows as success		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-088							FAILED		
+Create at			19/01/2026		created by	Rizal	Tester	rizal		
+Scenario			one or more rows have an empty identifier value 		Pre-Condition		DATE	04/02/2026		
+Url					Description	XLSX Format Row-Level Content Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file containing one or more rows with empty identifier values							
+		3	wait for job completion		Status Response	Expected Result	Actual Result	Status		Status
+		4	review failed row details			affected rows fail validation				
+		5				failed rows show error code invalid_row				
+		6				other valid rows continue processing	blocked processing	Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-089							PASSED		
+Create at			19/01/2026		created by	Rizal	Tester	rizal		
+Scenario			one or more rows have an empty reply value		Pre-Condition		DATE	04/02/2026		
+Url					Description	XLSX Format Row-Level Content Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file containing one or more rows with empty reply values							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe row level processing results			affected rows fail validation		Passed		
+		5				error message indicaties empty reply		Passed		
+		6				job continues processing remaining rows		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-090							PASSED		PASSED
+Create at			19/01/2026		created by	Rizal	Tester	rizal 		atik
+Scenario			identifier contains with leading whitespace characters		Pre-Condition		DATE	04/02/2026		
+Url					Description	XLSX Format Row-Level Content Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file where identifier values contain with leading whitespace							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	review row validation results			whitespace is trimmed		Passed		Passed
+		5				bulk reply message is successfully sent for the row		Passed		Passed
+		6				row is not marked as invalid_row		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-091							PASSED		
+Create at			19/01/2026		created by	Rizal	Tester	rizal		
+Scenario			reply contains multiline text or line breaks		Pre-Condition		DATE	04/02/2026		
+Url					Description	XLSX Format Row-Level Content Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file with multiline or line-break content in the reply column							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	open the created replies			reply content is accepted		Passed		
+		5				text formatting is preserved in the created message		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-092									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			identifier does not match any ticket		Pre-Condition		DATE			
+Url					Description	XLSX Identifier Resolution	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file with identifiers that do not match any ticket							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	review the result report			row fails		Passed		Passed
+		5				error code ticket_not_found is returned in the result report		Passed		Passed
+		6				other rows continue processing				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-093									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			identifier matches multiple tickets		Pre-Condition		DATE			
+Url					Description	XLSX Identifier Resolution	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file where identifiers match multiple tickets							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	review row error details			row fails				
+		5				error code ambiguous_identifier is returned				
+		6				job processing continues				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-094									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			identifier contains leading or trailing whitespace		Pre-Condition		DATE			
+Url					Description	XLSX Format 	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file with identifiers containing leading or trailingwhitespace							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	obsere identifier resolution results			whitespace is trimmed before matching				
+		5				identifier is resolved successfully				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-095									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			duplicate identifiers appeat in multiple rows		Pre-Condition		DATE			
+Url					Description	XLSX Format 	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file containing duplicate identifiers across multiple rows							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe reply creation order			each row is processed indenpedently				
+		5				multiple replies are created for the same ticket				
+		6				processing follows file row order				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-096									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			identifier cell contains an excel formula that evaluates to a valid sting		Pre-Condition		DATE			
+Url					Description	XLSX Formula & Data Type Handling	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file where the identifier cell contains an excel formula							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe identifier processing			system reads the evaluated value				
+		5				identifier is processed normally				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-097									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			excel formula evaluates to an empty value		Pre-Condition		DATE			
+Url					Description	XLSX Formula & Data Type Handling	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file where an excel formula evaluates to an empty value							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	review row validation result			row is treated as invalid				
+		5				row fails with invalid_row				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-098									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			identifier cell containsnumeric values (auto-formatted by excel)		Pre-Condition		DATE			
+Url					Description	XLSX Formula & Data Type Handling	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file where identifier values are numeric							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	verify identifier matching			value is read as a string				
+		5				identifier matching remains accurate				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-099									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			upload an xlsx file with exactly 5000 rows		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file containing exactly 5000 or 5000< rows 							
+		3	start the bulk job		Status Response		Actual Result	Status		Status
+		4	wait for processing to complete			file is accepted				
+		5				bulk job is created and processed successfully				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-100									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			upload an xlsx file with more than 5000 rows		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file containing more than 5000 rows							
+		3	attempt to proceed with job creation		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe validaiton error			upload is rejected				
+		5				error code row_limit_exceeded is shown				
+		6				job is not created				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-101									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			upload an xlsx file larger than 10 MB		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file larger than 10 MB							
+		3	observe upload validation result 		Status Response	Expected Result	Actual Result	Status		Status
+		4				upload is rejected				
+		5				error code payload_too_large is shown				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-102									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			upload an xlsx file with exactly 5000 rows and file under 10 MB		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits Combine 	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file combine							
+		3	observe upload validation result 		Status Response	Expected Result	Actual Result	Status		Status
+		4				upload is accepted 				
+		5				bulk job is created				
+		6				job is processed successfully				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-103									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			upload an xlsx file containing more than 5000 rows and file size larger than 10MB		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits Combine 	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	upload an xlsx file larger than 10 MB and 5000 > rows 							
+		3	observe upload validation result 		Status Response	Expected Result	Actual Result	Status		Status
+		4				upload is rejected				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-104									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			xlsx file contains only header rows without any data		Pre-Condition		DATE			
+Url					Description	XLSX File Size & Row Limits	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload an xlsx file containing only header rows							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe job status and result report			bulk job is created				
+		5				total rows = 0				
+		6				job status is immediately set to completed				
+		7				result report is empty				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-105									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			mixed result file (e.g. 10 rows: 6 valid, 4 invalid)		Pre-Condition		DATE			
+Url					Description	Partial Success Handilng	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file containing a mix of valid and invalid rows							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	wait for job completion			bulk job status is completed				
+		5	review progress counters			progress counters reflect:  total = 10, success = 6, failed = 4				
+		6				successfully proceddes rows are not rolled back				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-106									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			bulk replies include tickets that are already in resolve status		Pre-Condition		DATE			
+Url					Description	Contextual Scenario	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	upload an xlsx file containing identifiers for resolved ticket							
+		3	start the bulk job		Status Response	Expected Result	Actual Result	Status		Status
+		4	verify reply creation result			replies are still created by default				
+		5				rows are not treated as failures				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-107									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			download result report after job completion		Pre-Condition		DATE			
+Url					Description	Result Report Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	POSITIVE				
+		2	wait until the bulk job is completed							
+		3	download the result report 		Status Response	Expected Result	Actual Result	Status		Status
+		4	open and review report content			report contains per-flow details: row_number identifier resolved_ticket_number status message_id (for success) or error_code (for failure) 				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-108									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			attempt to download result report while job is still processing		Pre-Condition		DATE			
+Url					Description	Result Report Validation	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	NEGATIVE				
+		2	start a bulk job							
+		3	attempt to download the result report while the job is still processing 		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe download behavior			download action is disabled or shows loading state				
+		5				no corrupted or partial file is downloaded				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-109									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			attempt to download result report after retention period expires		Pre-Condition		DATE			
+Url					Description	Result Report Validation	ENV	DEV	STAGGING	PROD
+Steps		1	wait until the result report retention period expires		test type	EDGE CASE				
+		2	attempt to download the report							
+		3	observe system response		Status Response	Expected Result	Actual Result	Status		Status
+		4				download is blocked				
+		5				user is informed that the report has expired				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-110									
+Create at			19/01/2026		created by	Rizal	Tester			
+Scenario			job processing is interrupted mid-way (e.g. service restart)		Pre-Condition		DATE			
+Url					Description	Failure Recovery & Idempotency	ENV	DEV	STAGGING	PROD
+Steps		1	open the bulk reply tool		test type	EDGE CASE				
+		2	upload a large xlsx file and start a bulk job							
+		3	interrupt the service during processing		Status Response	Expected Result	Actual Result	Status		Status
+		4	restart the service			job resumes safely				
+		5	monitor job resumption and progress			successfully processed rows are not duplicated				
+		6				remaining rows continue processing				
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	SIX-Bulk_Reply-111									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			system displays view report button for successful bulk job		Pre-Condition	bulk reply job has finished processing, all rows are processed successfully.	DATE			03/02/2026
+Url					Description	View Report Button is Displayed Bulk Job Succeeds	ENV	DEV	STAGGING	PROD
+Steps		1	complete bulk reply upload and processing		test type	POSITIVE				
+		2	observe upload progress list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status message shows "all bulk reply send successful"				Passed
+		5				view report button is visible				Passed
+		6				view error button is not displayed				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-112									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			system shows error access for partially failed job		Pre-Condition	bulk reply job is completed, at least one row failed	DATE			03/02/2026
+Url					Description	View Error Button is Displayed When Bulk Job Contains Failed Rows	ENV	DEV	STAGGING	PROD
+Steps		1	complete bulk reply processing		test type	POSITIVE				
+		2	observe upload progress list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status shows "there are X failed items"				
+		5				view error button is visible				
+		6				view report button is hidden				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-113									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user checks upload status while job is in progress		Pre-Condition	bulk job upload or processing is still running	DATE			
+Url					Description	View Report And View Error Buttons Are Hidden During Processing	ENV	DEV	STAGGING	PROD
+Steps		1	upload bulk reply file		test type	POSITIVE				
+		2	observe upload progress list during processing							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				loading indicator is shown				
+		5				no view report or view error button appears				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-114									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user opens report modal		Pre-Condition	bullk job is completed successfully	DATE			03/02/2026
+Url					Description	Bulk Reply Report Modal Opens Successfully	ENV	DEV	STAGGING	PROD
+Steps		1	click view report		test type	POSITIVE				
+		2	observe modal							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal opens correctly				Passed
+		5				modal title shows file name				Passed
+		6				no UI glitch or blank state				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-115									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user reviews summary information		Pre-Condition	bulk job contains mixed success and failed rows	DATE			03/02/2026
+Url					Description	Report Modal Displays Correct Summary Counters	ENV	DEV	STAGGING	PROD
+Steps		1	open view error / view report modal		test type	POSITIVE				
+		2	observe summary counters							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all = success + failed				Passed
+		5				summary numbers match processed rows				Passed
+		6				counters are not negative or zero incorrectly 				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-116									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user reviews detailed report rows		Pre-Condition	bulk job processed multiple rows	DATE			03/02/2026
+Url					Description	Report Modal Displays Row-Level Result Table	ENV	DEV	STAGGING	PROD
+Steps		1	open report modal		test type	POSITIVE				
+		2	scoll through table							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				each row displays :  Identifier status (success/failed) description				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-117									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user reviews successful entries		Pre-Condition	bulk job contains successful rows	DATE			03/02/2026
+Url					Description	Successful Rows Display Description	ENV	DEV	STAGGING	PROD
+Steps		1	open report modal 		test type	POSITIVE				
+		2	locate rows with success status							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status is "success"				Passed
+		5				description confirms reply sent				Passed
+		6				no error message is shown				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-118									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user reviews error details		Pre-Condition	bulk job contains failed rows	DATE			03/02/2026
+Url					Description	Failed Rows Display Clear Error Description	ENV	DEV	STAGGING	PROD
+Steps		1	open report modal		test type	POSITIVE				
+		2	locate failed rows							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status is "failed"				
+		5				description clearly explains error (e.g. data not found, empty reply message)				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-119									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			system handles partial success correctly		Pre-Condition	bulk job contains mixed valid and invalid rows	DATE			
+Url					Description	Failed Rows Do Not Affect Successful Rows	ENV	DEV	STAGGING	PROD
+Steps		1	uploaf file with mixed validity		test type	EDGE CASE				
+		2	open report modal							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				successful rows remain success				
+		5				failed rows are isolated				
+		6				no rollback occurs				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-120									
+Create at			20/01/2026		created by	Rizal	Tester			Syafiq
+Scenario			user views report for fully failed job		Pre-Condition	bulk job completed, all rows failed	DATE			03/02/2026
+Url					Description	Report Modal Handles All Roes Failed Scenario	ENV	DEV	STAGGING	PROD
+Steps		1	upload file with all invalid rows		test type	POSITIVE				
+		2	open view error modal							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all rows marked as failed				
+		5				error description shown for each row				
+		6				summary reflects zero success				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-121									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user opens report with many rows		Pre-Condition	bulk job processed large dataset (near limit)	DATE			
+Url					Description	Report Modal Supports Large Number Of Rows	ENV	DEV	STAGGING	PROD
+Steps		1	complete bulk reply with large file		test type	POSITIVE				
+		2	open report modal							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal loads without crash				
+		5				scrolling works correctly				
+		6				UI remains responsive				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-122									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user closes report		Pre-Condition	report modal is open	DATE			
+Url					Description	Close Button closes Report Modal Correctly	ENV	DEV	STAGGING	PROD
+Steps		1	click close		test type	POSITIVE				Syafiq
+		2								03/02/2026
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal closes				Passed
+		5				upload progress state remains unchanged				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-123									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user restart bulk reply process		Pre-Condition	report modal is open	DATE			
+Url					Description	User Restart Bulk Reply Process	ENV	DEV	STAGGING	PROD
+Steps		1	click start over		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal closes 				
+		5				bulk reply form is reset				
+		6				no duplicate job is created				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-124									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			unauthorized access atempt		Pre-Condition	bulk job belongs to different user	DATE			
+Url					Description	User Cannot Access Report Of Another User's Bulk Job	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to open report using unauthorized user		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				access is denied				
+		5				report modal does not open				
+		6				proper error message is shown				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-125									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			user refreshes page before opening report		Pre-Condition	bulk job is completed	DATE			
+Url					Description	Report Modal State Remains Consistent After Page Refresh	ENV	DEV	STAGGING	PROD
+Steps		1	refresh page		test type	EDGE CASE				
+		2	open upload progress list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				correct status is displayed				
+		5				view report / view error button remains available				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-126									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			system processes bulk reply within defined SLA 		Pre-Condition	system is in normal load condition, xlsx file size is within allowed limit	DATE			
+Url					Description	Bulk Reply Upload Processing Completes Within Acceptable Time	ENV	DEV	STAGGING	PROD
+Steps		1	upload valid bulk reply file		test type	EDGE CASE				
+		2	monitor processing duration 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Upload starts immediately				
+		5				Processing completes within SLA defined in PRD				
+		6				No timeout or system error occurs				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-127									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			User interacts with UI while job is running		Pre-Condition	Bulk job is processing	DATE			
+Url					Description	UI remains responsive during bulk job processing	ENV	DEV	STAGGING	PROD
+Steps		1	start bulk reply processing		test type	EDGE CASE				
+		2	navigate through other pages							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				UI does not freeze				
+		5				navigation remains smooth				
+		6				job continues in background				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-128									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			System handles concurrent bulk processing		Pre-Condition	Multiple users initiate bulk reply jobs	DATE			
+Url					Description	Multiple bulk jobs can be processed concurrently	ENV	DEV	STAGGING	PROD
+Steps		1	User A uploads bulk file		test type	EDGE CASE				
+		2	User B uploads bulk file simultaneously							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Jobs are processed independently				
+		5				No cross-job data contamination				
+		6				System remains stable				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-129									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario			error information is visible in report		Pre-Condition	job completed with failed rows	DATE			
+Url					Description	Result Report Includes Error Detail For Failed Rows	ENV	DEV	STAGGING	PROD
+Steps		1	open result report 		test type	EDGE CASE				
+		2	inspect failed row detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error code is displayed				
+		5				error message is descriptive				
+		6				failed rows do not contain message_id				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-130									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-131									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-132									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Bulk_Reply-133									
+Create at			20/01/2026		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								

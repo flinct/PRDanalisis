@@ -1,0 +1,1071 @@
+total cases =			67							
+DEV				STAGGING			PROD			
+Passed			30	Passed		0	Passed	36		
+Failed			35	Failed		0	Failed	27		
+Need to test			2	Need to test		67	Need to test	3		
+On test			0	On test		0	On test	1		
+No Status			0	No Status		0	No Status	0		
+Test ID	SIX-TicketTypes-001				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket types page		Pre-Condition	login, have access to settings/tickets	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka 	Tester			kholik
+Url					Description	display ticket types page, no ticket type created		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	settings							
+		3	tickets		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display all : - title page - add new ticket button - tabs(ticket types(on focus), archived) - searchbar - ticket types table(name, attribute, ellipsis button) - empty state when no data has created	The display same with the expect result	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-002							PASSED	NEED TO TEST	PASSED
+Create at					Created By	Aka 	Tester			kholik
+Scenario			Verify ticket types page		Pre-Condition	login, have access to settings/tickets	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Url			https://v2.satuinbox.com/id/settings/inbox/tickets		Description	display ticket types page, <25 ticket type created	ENV	DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	settings							
+		3	tickets		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4			200	display all : - title page - add new ticket button - tabs(ticket types(on focus), archived) - searchbar - ticket types table(name, attribute, ellipsis button) - display all data	The display same with the expected result https://jam.dev/c/9cc9fc5e-e2f0-4861-8b4e-75cc9ce4ed02 	Passed	Passed	Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-003				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Create at					Created By	Aka 	Tester			kholik
+Scenario			Verify ticket types page		Pre-Condition	login, have access to settings/tickets		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display ticket types page, have more than 25 data		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	settings							
+		3	tickets		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4			204 & 200	display all : - title page - add new ticket button - tabs(ticket types(on focus), archived) - searchbar - ticket types table(name, attribute, ellipsis button) - pagination navigator - show max 25 data per page	the display same with expected the result https://jam.dev/c/0c9b1e0b-051d-4b11-b466-69fd9f4bad43 	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-004				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket types page tabs		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display all archived ticket types		DEV	STAGGING	PROD
+Steps		1	click archive tab		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display archived ticket types table: ticket type name custom attributes ellipsis button (edit ticket type and restore ticket type)	The display same with expected the result https://jam.dev/c/1d6f45d9-dfc2-40cb-af91-1d7817aece74  	Passed		Passed
+		5				highlighted archive tabs	The display same with expected the result https://jam.dev/c/8dc996e9-bbfb-4c3e-ae63-90a354e48498	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-005				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket types page tabs		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display all active ticket types		DEV	STAGGING	PROD
+Steps		1	click archive tab		test type	NEGATIVE				
+		2	click ticket type tab							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display active ticket types table from archive ticket type table: ticket type name custom attributes ellipsis button (edit ticket type and archive ticket type) 	the display same with the expected result https://jam.dev/c/a8d3aef4-debd-4fc3-9c9a-36fa7700e9f4  	Passed		Passed
+		5				highlighted ticket types tabs	highlighted not change to type tabs but in there in archive tabs https://jam.dev/c/691ea7fc-cc92-4235-bb0c-3bf19699fc4e	Failed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-TicketTypes-006				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify search bar		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display all selected tabs ticket types		DEV	STAGGING	PROD
+Steps		1	click search bar field		test type	POSITIVE				
+		2	input "a"							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display all ticket type on selected tabs that contains "a" on their name	the dislay same with the expectec result https://jam.dev/c/bcde68f0-36d8-4d5c-90de-f12da0f238b6	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-007				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify search bar		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display empty state		DEV	STAGGING	PROD
+Steps		1	click search bar field		test type	POSITIVE				
+		2	input "bakjbl"							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display empty state if no ticket type on selected tabs that contains "bakjbl"	the display in the same in result https://jam.dev/c/7b127062-735a-445a-a9d8-d049ff92998c	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-008				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify search bar		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	reset search bar, display default data		DEV	STAGGING	PROD
+Steps		1	click search bar field		test type	POSITIVE				
+		2	input "bakjbl"							
+		3	click (X) button on search bar		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display all data on selected tabs	the display in the same result https://jam.dev/c/c7312f95-dbf7-4879-873b-ce14e32bcead	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-009				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ellipsis button on table		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket types table, edit ticket type button		DEV	STAGGING	PROD
+Steps		1	click ellipsis button on selected ticket type		test type	POSITIVE				
+		2	click edit ticket type							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display action menu	The result same with the expect result https://jam.dev/c/b972073e-d7b9-42ae-94d5-a6b8a2472dbf	Passed		Passed
+		5				open update ticket type page for selected ticket type	The result same with the expect result https://jam.dev/c/b972073e-d7b9-42ae-94d5-a6b8a2472dbf	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-010				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ellipsis button on table		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket types table, archive ticket type button		DEV	STAGGING	PROD
+Steps		1	click ellipsis button on selected ticket type		test type	POSITIVE				
+		2	click archive ticket type							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display action menu	the result with the same expectation https://jam.dev/c/0077c7df-d93f-4177-84b5-99e49824834e	Passed		Passed
+		5				open archive confirmation modal for selected ticket type	the result with the same expectation https://jam.dev/c/0077c7df-d93f-4177-84b5-99e49824834e	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-011				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ellipsis button on table		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	archive table, edit ticket type button		DEV	STAGGING	PROD
+Steps		1	click archive tabs		test type	POSITIVE				
+		2	click ellipsis button on selected ticket type							
+		3	click edit ticket type		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display action menu	the result is same of expected result https://jam.dev/c/4cca07a0-02d4-4483-8928-5415e67f04b5	Passed		Passed
+		5				open update ticket type page for selected ticket type		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-012				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ellipsis button on table		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	archive table, archive ticket type button		DEV	STAGGING	PROD
+Steps		1	click archive tabs		test type	POSITIVE				
+		2	click ellipsis button on selected ticket type							
+		3	click archive ticket type		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display action menu	The result is same of expectation https://jam.dev/c/d7a76170-a59c-44bd-8753-9584f6d5521a	Passed		Passed
+		5				open restore confirmation modal confirmation modal for selected ticket type		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-013				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			Verify add new ticket type button		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display create new ticket types page. general		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	NEGATIVE				
+		2	click general							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				option selection display	straight to create new ticket type / there is no shipping selection display method and not implementation https://jam.dev/c/d0acaf07-94ee-47b9-87bd-a8c2ac62c4ab	Failed		Failed
+		5				create new ticket type page opened	The form ticket opened and display accordion to expectation	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-014				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			Verify create new ticket type page		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display create new ticket types page		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				create new ticket type page displays : - header:     - title    - cancel button    - create button    - ikon selector    - ticket type name text field - custom attribute section - stage section - bind to team section	bind to team section not yet created / expected result https://jam.dev/c/be9eae4d-ee68-490e-9802-aca09cdbbbec	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-015				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			Verify create new ticket type header page		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	create new ticket types header page. cancel button		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	NEGATIVE				
+		2	change website path to any website. ex: https://translate.google.co.id/?hl=id							
+		3	change path again to. create new ticket type page		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	cancel button			cancel button path to settings/tickets page	path to previous page https://jam.dev/c/e55302af-0695-4466-bc28-d3756ba0569d	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-016				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type header page		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	create new ticket types header page. icon selector, 		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2	click icon on header							
+		3	select emoji		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				emoji picker opens	open and close lagging not smooth / lancar sesuai proses https://jam.dev/c/0852823a-4c38-4cb1-9b71-afcd9d1ef073	Passed		Passed
+		5				icon changed to selected emoji	Icon changed accordion to expect https://jam.dev/c/0852823a-4c38-4cb1-9b71-afcd9d1ef073	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-017				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type header page		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type name. valid input, >= 5 characters, alphanumeric		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	NEGATIVE				
+		2	click ticket type name text field							
+		3	input text field with valid input "tes 1"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create butotn			new ticket type created	message error/Expected result https://jam.dev/c/44a79904-3fa5-4e5b-98ad-1181973239a4	Failed		Passed
+		5				added to ticket type table	not redirect saat error/Expected result https://jam.dev/c/44a79904-3fa5-4e5b-98ad-1181973239a4	Failed		Passed
+		6				success toast appears	errorrrrrrrrrr sepertinya forbidden/Expected result https://jam.dev/c/44a79904-3fa5-4e5b-98ad-1181973239a4	Failed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-018				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type name validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	click ticket type name input		test type	POSITIVE				
+		2	input 3 characters "223"							
+		3	click create button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				new ticket type not created	new ticket type created / result is expected	Failed		Passed
+		5				display error message "min 5 characters"	error message not displayed / result is expected	Failed		Passed
+		6				not leave page	leave create new ticket type page / result is expected	Failed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-019				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type name validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	click ticket type name input		test type	POSITIVE				
+		2	input 51 characters "123456789012345678901234567890123456789012345678901"							
+		3	click create button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				new ticket type not created	according to expectation	Passed		Passed
+		5				display error message "max 50 characters"	according to expectation	Passed		Passed
+		6				not leave page	according to expectation	Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-020				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type name validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type name. input special characters		DEV	STAGGING	PROD
+Steps		1	click ticket type name input		test type	NEGATIVE				
+		2	input "@1234"							
+		3	click create button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				new ticket type not created	new ticket type created	Failed		Passed
+		5				display error message "only input alphabet and number"	error message not displayed | dispkay error no special character validation	Failed		Passed
+		6				not leave page	leave create new ticket type page	Failed		Passed
+		7								
+		8								
+		9								
+										
+										
+										@
+Test ID	SIX-TicketTypes-021				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type name validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type name. input same value		DEV	STAGGING	PROD
+Steps		1	click ticket type name input		test type	POSITIVE				
+		2	input "tes 1"							
+		3	click create button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				new ticket type not created	accordion to expect	Passed		Passed
+		5				not leave page	accordion to expect	Passed		Passed
+		6				failed toast appears with message "ticket type already exist"	accordion to expect	Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-022				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type header page		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	create new ticket types page. create button		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	NEGATIVE				
+		2	click create button							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				error message on ticket type name "min 5 characters"	error message on ticket type name "min 3 characters" / accordion to expected	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-023				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type section form		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display section form. no custom attributes added		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2								
+		3			Status Response	-	Actual Result	Status	Status	Status
+		4				section form display: - custom attribute description - default form   - ticket title field(disable)   - ticket title default input    - description field(disable)   - description default input  - add new field   - add text field button   - add list option field button   - add date picker field button   - add upload image field button -stage   - not stated with field submit and default value 60 minute   - active with field in progress and default value 60 minute   - button add status   - done field with disabled value and default 60 minute	accordion to expected	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-024				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type title validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type title default input. input <= 50 characters, alphanumeric 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	click ticket title default input field							
+		3	input "testing 1"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create button			new ticket type created	accordion of expected	Passed		Passed
+		5				not displays any error message	accordion of expected	Passed		Passed
+		6				leave create new ticket type page	accordion of expected	Passed		Passed
+		7				"testing 1" as default input when created new ticket with this ticket type	accordion of expected	Passed		Passed
+		8				display "testing 1" as titke default input and description when editing this ticket type	empty field on title and description default input field	Failed		Failed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-025				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type title validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type title default input. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	click ticket title default input field							
+		3	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create button			new ticket type not created		Passed		Passed
+		5				display error message "max 50 characters"		Passed		Passed
+		6				not leave page		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-026				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type title validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type title default input. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	click ticket title default input field							
+		3	input "@1234"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create button			new ticket type not created	new ticket type created	Failed		Passed
+		5				display error message "only input alphabet and number"	error message not displayed	Failed		Failed
+		6				not leave page	leave create new ticket type page	Failed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-027				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type description validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		19/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type description default input. input <= 250 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title name							
+		3	click ticket description default input field		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input "1234567890123456789012345678901234567890123456789012345678901"			new ticket type created	new ticket type not created	Failed		Failed
+		5	click create button			not displays any error message	display errror message "max 50 characters" but not highlighted	Failed		Passed
+		6				leave create new ticket type page	not leave page	Failed		Failed
+		7				"1234567890123456789012345678901234567890123456789012345678901123456789012345678901234567890123456789012345678901123456789012345678901234567890123456789012345678901" as default input when created new ticket with this ticket type	error input	Failed		Failed
+		8				display "1234567890123456789012345678901234567890123456789012345678901123456789012345678901234567890123456789012345678901123456789012345678901234567890123456789012345678901" as description default input when editing this ticket type	error input	Failed		Failed
+		9				text input height is adjustable based on the number of characters, with default height twice of the label	not automatically adjust based of characters input	Passed		Passed
+										
+										
+										
+Test ID	SIX-TicketTypes-028				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type description validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket type description default input. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title name							
+		3	click ticket description default input field		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input "#@#@#"			new ticket type created	accordion of expected	Passed		Passed
+		5	click create button			not displays any error message	accordion of expected	Passed		Passed
+		6				leave create new ticket type page	accordion of expected	Passed		Passed
+		7				"#@#@#" as default input when created new ticket with this ticket type	accordion of expected	Passed		Passed
+		8				display "#@#@#" as description default input when editing this ticket type	empty field on description default input field	Failed		Failed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-029				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type description validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type description default input. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title name							
+		3	click ticket description default input field		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	input "333"			new ticket type not created	new ticket type created	Failed		Passed
+		5	click create button			display error message "min 5 characters"	error message not displayed	Failed		Passed
+		6				not leave page	leave create new ticket type page	Failed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-030				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type section form		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	display section form. custom attribute field added, text		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2	click text custom attribute on add new field section							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				text fielf custom attribute display: - text field name - default input field - drag n drop action button for repostition between custom fields - toogle switch for mandatory or optional field (mandatory by default) - remove button	accordion of expected	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-031				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, field name. input  >=5 <=50 characters, alphabet		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type created	accordion of expected	Passed		Passed
+		5	input "qwert" on text field name custom attribute			not displays any error message	accordion of expected	Passed		Passed
+		6	click create button			leave create new ticket type page	accordion of expected	Passed		Passed
+		7				"qwert" as field name and "Masukkan+"qwert"" as vlalue when create new ticket with this ticket type	the placeholder not accordion of field name	Passed		Passed
+		8				display "qwert" as text field name when editing this ticket type	accordion of expected	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-032				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, field name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "a" on text field name custom attribute			display error message "min 5 characters"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-033				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, field name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type not created	accordion of expected	Passed		Passed
+		5	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" on text field name custom attribute			display error message "max 50 characters"	accordion of expected	Passed		Passed
+		6	click create button			not leave page	accordion of expected	Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-034				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, field name. input numbers 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "11111" on text field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-035				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, field name. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "@@@@@" on text field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-036				Tester	Aka		PASSED	NEED TO TEST	NEED TO TEST
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, default input. input  <=50 characters, alphabet		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type created	accordion of expect	Passed		Passed
+		5	input valid on text field name custom attribute			not displays any error message	accordion of expect	Passed		Passed
+		6	input "testing" on text field default input 			leave create new ticket type page	accordion of expect	Passed		Passed
+		7	click create button			"qwert" as field name and "testing" as default value when create new ticket with this ticket type	accordion of expect	Passed		Passed
+		8				display "testing" as text field name when editing this ticket type	accordion of expect	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-037				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. text, default input. input  > 50 characters, alphabet		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(text)			new ticket type not created	in prod accordion of expect	Failed		Passed
+		5	input valid on text field name custom attribute			display error message "max 50 characters"	in prod accordion of expect	Failed		Passed
+		6	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" on text field default input 			not leave page	in prod accordion of expect	Failed		Passed
+		7	click create button							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-038				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			Verify create new ticket type section form		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	display section form. custom attribute field added, list option		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2	click list option custom attribute on add new field section							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				text fielf custom attribute display: - list option field name - 2 options field without (X) button by default - add option button - drag n drop action button for repostition between custom fields - toogle switch for mandatory or optional field (mandatory by default) - remove button	default option only have 1 field	Failed		Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-039				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, field name. input >= 5 <= 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type created	in prod accordion of expect	Passed		Passed
+		5	input "qwert" on option lists field name custom attribute			not displays any error message	in prod accordion of expect	Passed		Passed
+		6	click add option			leave create new ticket type page	in prod accordion of expect	Passed		Passed
+		7	valid input on options			"qwert" as list option field name when create new ticket with this ticket type	in prod accordion of expect	Passed		Passed
+		8	click create button			display "qwert" as list option field name when editing this ticket type	in prod accordion of expect	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-040				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, field name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "a" on option lists field name custom attribute			display error message "min 5 characters"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	valid input on options							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-041				Tester	Aka		PASSED	NEED TO TEST	NEED TO TEST
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, field name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	accordion of expect	Passed		Passed
+		5	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" on option lists field name custom attribute			display error message "max 50 characters"	accordion of expect	Passed		Passed
+		6	click add option			not leave page	accordion of expect	Passed		Passed
+		7	valid input on options							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-042				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, field name. input numbers 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "12343" on option lists field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	valid input on options							
+		8	click create button							
+		9								
+										
+										
+Test ID	SIX-TicketTypes-043				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Url					Description	ticket type custom attribute. option lists, field name. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "!@#$%" on option lists field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	valid input on options							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-044				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type created		Passed		Passed
+		5	input valid option lists field name			not displays any error message		Passed		Passed
+		6	click add option			leave create new ticket type page		Passed		Passed
+		7	input "asdfg" and "dfghj"			display "asdfg" and "dfghj"as options when editing this ticket type		Passed		Passed
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-045				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input valid option lists field name			display error message "min 5 characters"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	input "asd" and "dfg"							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-046				Tester	Aka		FAILED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	accordion of expect	Passed		Passed
+		5	input valid option lists field name			display error message "max 50 characters"	error message not displayed but not highlighted	Failed		Passed
+		6	click add option			not leave page	accordion of expect	Passed		Passed
+		7	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" and valid input							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-047				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input numbers 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input valid option lists field name			display error message "only input alphabet" 	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	input "11111" and valid input option							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-048				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input valid option lists field name			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	input "#####" valid input option							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-049				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. option lists, option name. input same value		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(option lists)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input valid option lists field name			display error message "cannot input the same value"	error message not displayed	Failed		Failed
+		6	click add option			not leave page	leave create new ticket type page	Failed		Failed
+		7	input "qwert" and "qwert"							
+		8	click create button							
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-050				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type section form		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	display section form. custom attribute field added, date picker		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2	click date picker custom attribute on add new field section							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				text fielf custom attribute display: - date picker field name - date picker - drag n drop action button for repostition between custom fields - toogle switch for mandatory or optional field (mandatory by default) - remove button	accordion of expect	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-051				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. date picker, field name. input <= 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type created	accordion of expect	Passed		Passed
+		5	input "qwert" on date picker field name custom attribute			not displays any error message	accordion of expect	Passed		Passed
+		6	click create button			leave create new ticket type page	accordion of expect	Passed		Passed
+		7				"qwert" as date picket field name when create new ticket with this ticket type	accordion of expect	Passed		Passed
+		8				display "qwert" as date picker field name when editing this ticket type	accordion of expect	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-052				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. date picker, field name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "a" on date picker field name custom attribute			display error message "min 5 characters"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-053				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. date picker, field name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type not created	accordion of expect	Passed		Passed
+		5	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" on date picker field name custom attribute			display error message "max 50 characters"	accordion of expect	Passed		Passed
+		6	click create button			not leave page	accordion of expect	Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-054				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. date picker, field name. input numbers 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "11111" on date picker field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-055				Tester	Aka		FAILED	NEED TO TEST	ON TEST
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute.date picker, field name. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "@@@@@" on date picker field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-056				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. date picker, default input. input > today		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(date picker)			new ticket type created	accordion of expect	Passed		Passed
+		5	input valid date picker field name			not displays any error message	accordion of expect	Passed		Passed
+		6	click date picker default input			leave create new ticket type page	accordion of expect	Passed		Passed
+		7	click date > today			open date picker	in producuion can it	Failed		Passed
+		8	click create button			> today as date picker default input when create new ticket with this ticket type	the date entered does not appear	Failed		Failed
+		9				display > today as date picker default input when editing this ticket type	the date entered does not appear	Failed		Failed
+						No display before click create when date selected	the date entered does not appear	Failed		Failed
+										
+										
+Test ID	SIX-TicketTypes-057				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify create new ticket type section form		Pre-Condition	accessed settings/tickets page	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	display section form. custom attribute field added, upload image		DEV	STAGGING	PROD
+Steps		1	click add new ticket type button		test type	POSITIVE				
+		2	click upload image custom attribute on add new field section							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				text fielf custom attribute display: - upload image field name - default input description field - drag n drop action button for repostition between custom fields - toogle switch for mandatory or optional field (mandatory by default) - remove button	accordion of expect	Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-058				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. upload image, field name. input <= 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type created	accordion of expect	Passed		Passed
+		5	input "qwert" on upload image field name custom attribute			not displays any error message	accordion of expect	Passed		Passed
+		6	click create button			leave create new ticket type page	accordion of expect	Passed		Passed
+		7				"qwert" as upload image field name when create new ticket with this ticket type	accordion of expect	Passed		Passed
+		8				display "qwert" as upload image field name when editing this ticket type	accordion of expect	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-059				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. upload image, field name. input < 5 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "a" on upload image field name custom attribute			display error message "min 5 characters"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-060				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. upload image, field name. input > 50 characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type not created	accordion of expect	Passed		Passed
+		5	input "asdfghjklqwertyuiopzxcvbnmqwertyuiopasdfghjklzxcvbn" on upload image field name custom attribute			display error message "max 50 characters"	accordion of expect	Passed		Passed
+		6	click create button			not leave page	accordion of expect	Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-061				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. upload image, field name. input numbers 		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "11111" on upload image field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-062				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute.upload image, field name. input special characters		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type not created	new ticket type created	Failed		Failed
+		5	input "@@@@@" on upload image field name custom attribute			display error message "only input alphabet"	error message not displayed	Failed		Failed
+		6	click create button			not leave page	leave create new ticket type page	Failed		Failed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-063				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. upload image, description default input		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	POSITIVE				
+		2	input valid ticket title default input							
+		3	input valid ticket description default input		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type created	accordion of expect	Passed		Passed
+		5	valid input for upload image field name			not displays any error message	accordion of expect	Passed		Passed
+		6	input "qwert" on upload imag edescription default input			leave create new ticket type page	accordion of expect	Passed		Passed
+		7	click create button			"qwert" as upload image description default input when create new ticket with this ticket type	accordion of expect	Passed		Passed
+		8				display upload image description default input as "qwert" when editing this ticket type	accordion of expect	Passed		Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-064				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			create new ticket type custom attributes validation		Pre-Condition	access settings/tickets/create new ticket type	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	ticket type custom attribute. same value field name		DEV	STAGGING	PROD
+Steps		1	input valid ticket type name		test type	NEGATIVE				
+		2	input valid ticket title name							
+		3	input valid ticket title description		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click add new field(upload image)			new ticket type not created	new ticket type created	Failed		Failed
+		5	click add new field(text)			display error message "cannot have the same value"	error message not displayed	Failed		Failed
+		6	input "qwert" on upload image field name and text field name			not leave page	leave create new ticket type page	Failed		Failed
+		7	click create button							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-065				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			verify archive message		Pre-Condition	access settings/tickets	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	19/12/2025
+Url					Description	archive ticket type with very long 1 word text		DEV	STAGGING	PROD
+Steps		1	click ellipsis button on long 1 word text ticket type		test type	NEGATIVE				
+		2	click archive ticket type button							
+		3	click archive button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				modal appear		Passed		Passed
+		5				word are unwrap to new line OR modal adjusting the width for 50 characters name	name still in 1 line and modal width not adjusting the name	Failed		Passed
+		6				modal moved from ticket type table to archived table		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-TicketTypes-066				Tester	Salahudin		FAILED	NEED TO TEST	FAILED
+Scenario			List Ticket in Searching		Pre-Condition	access settings/tickets	Tester			kholik
+Create at					Created By	Salahudin		12/12/2025	12/12/2025	19/12/2025
+Url			https://jam.dev/c/19c78a06-71f7-4dee-9987-f06af571ece5		Description	Searching and change tab		DEV	STAGGING	PROD
+Steps		1	Navigate to the test case management tool (00:03).		test type	NEGATIVE				
+		2	Attempt to click the ellipsis button next to 'click ellipsis button on long 1 word text ticket type' (00:04).							
+		3	Observe that the action does not complete as expected.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Attempt to click the archive ticket button (00:05).			List ticket if searching and change tab to archive the reset to default list display ticket	List ticket not display default list tiscket if searching and change tab do it	Failed		Failed
+		5	Observe that the action does not complete as expected.			Searching input Reset	Actual Result	Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-067				Tester	Salahudin		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			special character add and form 		Pre-Condition	access settings/tickets	Tester			kholik
+Create at					Created By	Salahudin		12/12/2025	12/12/2025	19/12/2025
+Url			https://jam.dev/c/70524849-17bf-4888-8db7-accb63911e5d		Description	Handle special character in custom field and stage time section label		DEV	STAGGING	PROD
+Steps		1	Navigate to the 'Tickets' section (00:01)		test type	NEGATIVE				
+		2	Click on 'Create Ticket Type' (00:33)							
+		3	In the 'Custom Attributes' section, click 'Add Field' and select 'Options' (00:47)		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Enter a name for the custom field (e.g., 'Test Field') (00:49)				success make ticket or update			
+		5	Click 'Add Option' (00:50)				Symbol handling error not show			
+		6	Do not enter any text for the option and click 'Add Option' again (00:52)							
+		7	Observe the error message 'option is required'							
+		8								
+		9								

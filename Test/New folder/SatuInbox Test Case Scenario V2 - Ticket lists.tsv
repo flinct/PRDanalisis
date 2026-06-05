@@ -1,0 +1,1147 @@
+total cases =			75							
+DEV				STAGGING			PROD			
+Passed			10	Passed		0	Passed	30		
+Failed			1	Failed		0	Failed	9		
+Need to test			64	Need to test		75	Need to test	36		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+Add Ticket List Display Page When Empty Ticket List										
+Test ID	SIX-TicketTypes-001				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify empty ticket list		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns in a predictable order.in ticket list after login	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka & Salahudin	Tester			kholik
+Url					Description	display tickets list page tabs all, complaint, payment, shipping, empty ticket list		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	base 1 : view ticket list empty state			for base 1, Display Empty State Information: - Icon/Illustration visible. - Message text: "Mulai atur sistem dengan buat Ticket Type pertama biar kebutuhan support pelanggan otomatis lebih rapi dan konsisten." (or equivalent in ID). - Main CTA Button Label shows '+ Buat Ticket Type ' to guide admin for initial setup. - other card information		Passed		Passed
+		5	Base 3: login as non Agent/Supervisor WITHOUT "Create Ticket" permission			for base 3 - The "Add New Ticket Type" button is DISABLED or HIDDEN. - User cannot perform create action.		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+Error Display Ticket List Page										
+Test ID	SIX-TicketTypes-002				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			internet no stable during the process		Pre-Condition	As an Agent and Supervisors, i open the fi  connection unstable	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	connection unstable during process or server error it in filter		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	fetch data failed		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4								
+		5				when the have ticket type but the fetch data from server failed, ticket display "Tidak ada data" and additional information for do reload page		Passed		Passed
+		6				the  all tabs not shown		Passed		Passed
+		7				kpi card shown all such as all ticket, new tickets, need response, in progress, overview SLA and solved		Passed		Passed
+		8				Filtering all shown such as scope input search, filters, sort, view settings, and bulk reply button, date range and settings ticket types		Passed		Passed
+						title :Ticket"		Passed		Passed
+										
+										
+										
+										
+										
+										
+										
+Error Manage Ticket List Page Connection Destroyed										
+Test ID	SIX-TicketTypes-003				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			internet no stable during the process		Pre-Condition	As an Agent and Supervisors, i open the fi  connection unstable	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	connection unstable during process it in filter		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	filter, search, add, change tab and kpi, change sort, date criteria and viewsetting, bulkreply 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display error message "connection unstable / internal server error/ jaringan kamu mati"				
+		5				if update data adjust the error display conditions for each label ex Status update fails then  Do not update status badge. Show “Gagal memperbarui status”.				
+		6				if close ticket failts Do not change status. Show “Gagal menutup tiket”.				
+		7				shows display page error when shutdown connection when fetch data				
+		8				Retry available				
+						No silent data change or remove				
+						No partial optimistic update left behind				
+										
+Error Message More Ticket List Page 										
+Test ID	SIX-TicketTypes-004				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			error message validation 		Pre-Condition	error operation	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	error message modal display		DEV	STAGGING	PROD
+Steps		1	login 		test type	POSITIVE				
+		2	Ticket List							
+		3	condition error modal mesage		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				validasi gagal pesan  harus Kontekstual(atau disesuaikan dengan keadaan tersebut dengan language human friendly) not system default		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+										
+Display Ticket List Page <2 Ticket Type										
+Test ID	SIX-TicketTypes-005				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			there is only one type of ticket		Pre-Condition	As an Agent and Supervisors, i have one tickey type	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	the tabs show all only or tabs not display		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	based on table when just one ticket		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				if ticket list have one ticket type, tabs hidden		Passed		Passed
+		5				show button "+ ticket baru"		Passed		Passed
+		6				KPI Card Show ex All tickets, new tickets, need response, in progress, over SLA, and solved		Passed		Passed
+		7				Filtering all shown such as scope input search, filters, sort, view settings, and bulk reply button, date range and settings ticket types		Passed		Passed
+		8				show title "tickets"		Passed		Passed
+										
+										
+										
+Display All Ticket List Page By Tabs All Or Other										
+Test ID	SIX-TicketTypes-006				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Verify Tabs Logic		Pre-Condition	As the agent or supervisor, theres in ticket list	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	ticket list tabs		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on  tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Workspace has >1 ticket types,  Tabs shown are "Semua" + [Type Name 1] + [Type Name 2]. + ...		Passed		
+		5				when Workspace has 1 ticket type, tabs are hidden		Passed		
+		6				highlight first in tabs "all"		Passed		
+		7				highlight first in kpi card "all tickets"		Passed		
+		8								
+		9								
+										
+										
+Test ID	SIX-TicketTypes-007				Tester	Aka		FAILED	NEED TO TEST	FAILED
+Scenario			Verify ticket list page		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns in a predictable order in ticket list after login	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka & Salahudin	Tester			kholik
+Url					Description	display tickets list page tabs all		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	tabs in all		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display datatable tabs All first and no set toggle is : - id ticket theres Ticket ID is on the first line.with Indicator text "Need Response" appears on the second line (soft styling). - title page one line and textwrap - Client theres Name appears on the first line.and Contact appears on the second line. with No extra captions. - Channel and theres icon and text - Priority with settings display can high/medium/urgent/low - Agent can change selected in table - Lifetime with automatic format d or h or m or s - SLA with automatic format d or h or m or s - Status with text and icon and can change inline - Team Inbox and can change selected in table so that when selected, text and icons will appear - tags with text data with an x ​​icon and can change select - last reply theres text balasan and datetime iso 8601 dd m yyyy if theres but if empty then "-" - description type long text if it is more than the width of the column it will be ... ending - created ticket types type date automatic  and not "-" or not empty - closed ticket types with "date" if theres. but if empty then "-" - ellipsis(...) button - pagination select in front of with 25,50,100 - showing ... of .. results - next, number and prev page	 - client tidak ada contact disecond linenya - pagination select theres isn`t any	Failed		Failed
+		5				select & ticket ID sticky left and if scroll horizontally it is not followerd scrolled. then elipsis icon action sticky right 				Failed
+		6				in table, display col custom field not appear when tabs "all" selected				Passed
+						header table sticky top and showing,next,number,andprev page sticky bottom while scrolly vertical not follower appear		Passed		Passed
+						data table can scroll horizontal or vertical		Passed		Passed
+		7				display filtering tabs all: - searchbar with select point scope ex ticketID as default - filters button with icon - view settings icon button - sort with icon button - bul reply - date range sort - settings ticket types		Passed		Passed
+		8				theres KPI card( all ticket, new tickets, need response, in progress, overview SLA and solved) and show all tabs (All - More) if ticket type > 1		Passed		Passed
+		9				tabs(All, ticket type 1, ticket type 2, ...) if ticket type >1		Passed		Passed
+						title page " tickets" show		Passed		Passed
+		10				add button "+ Buat Tiket Baru"		Passed		Passed
+										
+Test ID	SIX-TicketTypes-008				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket list page		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns in a predictable order in ticket list after login	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka & Salahudin	Tester			kholik
+Url					Description	display tickets list page tabs other of all		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	tabs in other of all		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display adding column and data in other of all: - custom field 1 (text) tipe text - custom field 2 (option) text selected - custom field 3 (date) text date - custom field 4 (image) icon image and name file jpg"		Passed		Passed
+		5				the same as the all tab display but the difference is that there is an addition on the expected result 1 tab		Passed		Passed
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-009				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket list Tabs		Pre-Condition	As an Agent and Supervisors, I can switch between tabs	Tester			18/12/2025
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	kholik
+Url					Description	The tab under the title called "tickets" will be tried		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click one ticket from a few ticket list in table from tabs all / complaint / payment/shipping		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Given there is more than one ticket type, When I open the ticket list, Then I see tabs KPI Card including all ticket, new tickets, need response, in progress, overview SLA and solved in KPI Cards		Passed		Passed
+		5				Given I switch tabs, When the tab changes, Then the list shows tickets for that tab scope.		Passed		Passed
+		6				When one of the tabs is clicked it will be in highlight mode which shows the scope list of ticket types		Passed		Passed
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-010				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			display custom field in table		Pre-Condition	As an Agent and Supervisors, I can show ticket type custom fields as columns only when the ticket type tab is active.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display tab all and other of tab		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab other except all		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	view settings button click			Given I am on a ticket type tab other of all, When I enable a custom field column, Then it appears as a column in the table for that tab.		Passed		Passed
+		5	on custom field			Given I return to “All”, When I go to view settings the table, Then those custom field columns list toggle  are not shown.		Passed		Passed
+		6	(added) go back to tab all			Make sure that in the view settings in the ticket ID the toggle is on and cannot be changed at all by displaying a different color to the other toggle lists		Passed		Passed
+		7				Make sure to have the ticket title, client, channel, priority, agent, Lifetime, SLA, status, Team Inbox, Tag, Last Reply, Description, Created, Closed toggle set as default on		Passed		Passed
+		8				Has an icon that can move the list so that the columns will also be moved in display setting with draggable		Passed		Passed
+		9				If the view setting is in the tabs state "all" then the custom field will display only custom field information		Passed		Passed
+										
+										
+										
+Add Logic Button Ticket List For Make Ticket										
+Test ID	SIX-TicketTypes-011				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket list Tabs		Pre-Condition	As an Agent and Supervisors, I can switch between tabs	Tester			18/12/2025
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	kholik
+Url					Description	The tab under the title called "tickets" will be tried		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click add Ticket 		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				- Redirects to "Create Ticket" form/modal.  - Does NOT redirect to "Create Ticket Type" settings.		Passed		Passed
+		5								
+										
+										
+Add Settings Icon Button Ticket List for Manage Ticket Types 										
+Test ID	SIX-TicketTypes-012				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			Verify ticket list Tabs		Pre-Condition	As an Agent and Supervisors, I can switch between tabs	Tester			18/12/2025
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	kholik
+Url					Description	The tab under the title called "tickets" will be tried		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click settings ticket icon gear		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				- Redirects to "Ticket Types Settings" form/modal.  - Does NOT redirect to "Create new Ticket " 		Passed		Passed
+		5								
+										
+										
+Display All Ticket List Page By KPI Card										
+Test ID	SIX-TicketTypes-013				Tester	Aka		PASSED	NEED TO TEST	PASSED
+Scenario			verify kpi card		Pre-Condition	As an Agent and Supervisors, I see KPI summary strip and can filter by KPI cards.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	KPI display and logic default by system and data table changed		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	select kpi card		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	changed tab (beside)			Given the list page is loaded, When I view the KPI strip (tab changed example to all ticket, new tickets, need response, in progress, overview SLA and solved, Then the default active card is “Semua tiket”.marked with highlighted and "all ticket" kpi highlighted		Passed		Passed
+		5				Given I click “Butuh respons”, When applied, Then only tickets flagged as need response appear. and marked with highlighted for "butuh respons" KPI Card		Passed		Passed
+		6								
+		7				When I select the KPI card according to the condition type, it will display a list of conditions		Passed		Passed
+		8				KPI aktif → highlighted Klik ulang KPI aktif → tetap di kpi yang aktif Tidak ada KPI ganda aktif		Passed		Passed
+		9								
+										
+										
+Filtering Ticket List Page And Logic										
+Test ID	SIX-TicketTypes-014				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			searching page functionality		Pre-Condition	As an Agent and Supervisors, I can search tickets using a combined scope selector inside the search box.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	searching page & scope selector		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab semua		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	searching input and select by scope selector			Given I am on “Semua”, When I open the search scope selector, Then I only see: “ID Tiket”, “Judul”, “Klien”, “Deskripsi”				Passed
+		5				Given I am on a ticket type tab other "All":, When I open the search scope selector, Then I also see custom fields for that ticket type.				Passed
+		6				Given I enter multiple terms separated by comma, When I submit search, Then each term is applied as part of the search query.				Failed
+		7				When I delete All the scope in the search, the ticket list table will return to normal				Passed
+		8				Input search text < 500 characters and submit, UI NOT displays error: "Pencarian terlalu panjang".				Failed
+						When I delete a few the scope in the search, the ticket list table will refresh with new filter theres				Passed
+						. Max 20 terms. Each term trimmed.				Failed
+										
+										
+Test ID	SIX-TicketTypes-015				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			searching page functionality		Pre-Condition	As an Agent and Supervisors, I can search tickets using a combined scope selector inside the search box.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	searching page & scope selector		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	go to tab semua and other		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	searching input and select by scope selector							
+		5			422	Input search text > 500 characters and submit, cant input and must ","				Failed
+		6				term >20 cant input more				Failed
+		7								
+		8								
+										
+										
+										
+Test ID	SIX-TicketTypes-016				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			searching page functionality		Pre-Condition	As an Agent and Supervisors, I can search tickets using a combined scope selector inside the search box.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	searching page & scope selector		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	searching input and select by scope selector			Given I am on other of "Semua" tabs, When I open the search scope selector, Then I only see: “ID Tiket”, “Judul”, “Klien”, “Deskripsi” and other custom fields				Passed
+		5				Given I am on a ticket type tab ex complaint, payment and etc except All tabs, When I open the search scope selector, Then I also see custom fields for that ticket type.				Passed
+		6				Given I enter multiple terms separated by comma, When I submit search, Then each term is applied as part of the search query. Max 500 chars. . Max 20 terms. Each term trimmed.				Failed
+		7				When I delete the scope in the search, the ticket list table will return to normal				Passed
+		8				Must be one of allowed scopes for the active tab.				Passed
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-017				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			searching page functionality		Pre-Condition	As an Agent and Supervisors, I can search tickets using a combined scope selector inside the search box.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	searching page & scope selector		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	searching input and select by scope selector			Given I enter multiple terms separated by comma, When I submit search, Then each term is applied as part of the search query.more thab 500 chars. . more 20 terms. Each term trimmed. the asearch query cant input and must input "," and if terms more 20 terms then can`t input when typing				Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-018				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			filtering toggle		Pre-Condition	As an Agent and Supervisors, I can filter tickets using a consistent filter panel.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	filtering table ticket list		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	other tab of all		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click filter button							
+		5	(added1) go back to all and click filter button			Given I am on “Semua”, When I open “Filter”, Then custom field filters are not shown.				Passed
+		6	(added 2) other tab of all again and click filter button			Given I am on a other of "all" tab, When I open “Filter”, Then ticket type custom field filters are shown.				Passed
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-019				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			validation form filtering all tabs input and default value		Pre-Condition	As an Agent and Supervisors, access filtering data ticket list with tabs "all"	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	validation of each input/select on the filtering form was successful		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	filter button icon			Channel have dropdown all channel as default, whatsApp, instagram, email, messanger, and telegram with icon for selected  				Passed
+		5				- priority have dropdown all priority as default, urgent, high, medium , and low				Passed
+		6				Assigned agents have dropdown all agents as default, unassigned, and several registered agents and if selected agent more than 0 clipped will appear				Passed
+		7				 tags have dropdown have default select tags, do a search based on the list of tags, add tags by looking for ones that are not in the task list or delete them directly by clicking the x icon and if you want to select you must click the check box and it will appear as chips				Passed
+		8				Team inbox have a dropdown by default value that is all team inboox by being able to search and click on the previously team registered list				Passed
+		9				status have a dropdown default value that is all status, do a search based on the existing status list and select the existing list where there must be required, allowed, unassigned, ongoing, and resolved, and you can add a custom list apart from that.				Passed
+		10				if the "cancel" button is clicked it will exit the filter while if the "Apply Filter" button is clicked it will run the input or given filter and the datatable UI will change according to the filter				Passed
+										
+										
+Test ID	SIX-TicketTypes-020				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			validation form filtering other of all tabs input and default value		Pre-Condition	As an Agent and Supervisors, access filtering data ticket list with other tabs "all"	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	validation of each input/select on the filtering form was successful		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	filter button icon			same with filters for all tabs with the differences input customs field, namely: - text has input, namely regular text type with the "enter text" placeholder and default value if theres - select list option for example has an existing select list with a datatable with the default value "select option" - date with input start and end dates is combined into one and when clicked it displays the UI for the selected date. You can drag the start date to the end date. The default selected date is "Jan 05, 2026 - Jan 06, 2026" with placeholder "semua tanggal" - image with default toggle has image selected is false toggle - besides of label custom field, there is a chip according to which filter is activated in which tab, for example all, complain, and etc				Passed
+		5								
+		6								
+										
+										
+Test ID	SIX-TicketTypes-021				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			validation form filtering  all tabs input and default value		Pre-Condition	As an Agent and Supervisors, access filtering data ticket list with all tabs have	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	validation of each input/select on the filtering form was successful		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	filter button icon			if submit, filter closed and display datatable in tabs active changed				Passed
+		5	Fill in them one by one, for example status, select then submit, then status and priority, select then submit with the following conditions: - channel = whatsApp or email or etc - priority = urgent or high or etc - assigned agent = unassigned or more 1 preferred agent in list - tags= select tags i choice or more in registered - team inbox= select team one choice ar registered - status = submitted, or resolved or on progress or etc  for other "all" tabs thats add input all custom input:  - text = free content with a maximum of 200 words - date = fill in date start m d, yyyy - date end m d, yyyy - image = selected or no			display one or more chips according of selected when acc filter in bottom filter input ,scope and button and display clicked "atur ulang semua"				Passed
+		6	submit / cancel							
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-022				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			validation form filtering all tabs input and default value		Pre-Condition	As an Agent and Supervisors, access filtering data ticket list with all tabs have	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	validation of each input/select on the filtering form was successful		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	filter button icon			if submit or input, filter not closed , diplay datatable in tabs active not changed,and show error message according to the wrong label, for example if 3 adjust the label first then order 3 times with example custom text: maximum fill 200 char	the error message not display in filter button submit or input change			Failed
+		5	Fill in them one by one, for example status, select then submit, then status and priority, select then submit with the following conditions: - status = except whatsApp or email or etc - priority = except urgent or high or etc - assigned agent = except unassigned or more 1 preferred agent in list - tags= except select tags i choice or more in registered - team inbox= except select team one choice ar registered - status = except submitted, or resolved or on progress or etc - text = except free content with a more than of 200 words - date = except fill in date start m d, yyyy - date end m d, yyyy - image = except selected or not			if cancel, displays the previous filter or returns to the initial display or default UI datatable				Passed
+		6	submit / cancel							
+		7								
+		8								
+		9								
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-023				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Filter Chip Interaction		Pre-Condition	As an Agent and Supervisors, i can settings update chip iteration	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	chip iteration agent or tags is same		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	data column agent or tags in datatable list		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	chips in filter button check (beside 1)			Chips appear after applying filter				Passed
+		5				Click x on 1 chip → only that filter is removed				Passed
+		6				Click Reset all → all filters & chips are gone				Passed
+		7				Datatable refresh without reloading page				Passed
+		8				ui chip value and icon cross middle center				Passed
+										
+										
+										
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-024				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			default action onclick sort		Pre-Condition	As an Agent and Supervisors, I can sort the list by common operational priorities.	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	action icon sort onclick		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click button sort icon		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Given I open “sorted” icon button, When I choose an option, Then the list order updates accordingly.				Passed
+		5				Given I do nothing, When the list loads, Then default sort is “Created” highlighted.				Passed
+		6				The dropdown in sorted list is created, SLA due, longest lifetime, last activity, priority (high first)	 SLA due, longest lifetime, last activity uknown			Failed
+		7				when I choose from the previous default then if selected or clicked it will refresh the UI datatable ticket list according to the selected sort	when i click priority sorted, bug  middle, low, middle			Failed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-025				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Verify view settings button		Pre-Condition	As an Agent and Supervisors, I can customize visible columns per ticket type tab via view settings.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	changed displayy column in table such as ticket id, client dan channel showing		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	view settings button		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				 I can toggle columns on or off for that tab only.				Passed
+		5				Given I am on “All”, When I open “view settings”, Then I can toggle base columns but cannot toggle custom field columns.				Passed
+		6				Given “ID Tiket” is a required column, When I try to hide it, Then the system keeps it enabled.				Passed
+		7				Given I am on other “All” or spesific tabs, When I open “view settings”, Then I can toggle base columns + can toggle custom field columns.				Passed
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-026				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			validation display sort with calendar date range or filter custome date		Pre-Condition	As an Agent and Supervisors, access select date range input	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	date range input for filter custom input and sort		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	go to tab other of All tabs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	klik sort date range and focus			Preset is one of: all, today, last7, last30, custom. Custom requires “YYYY-MM-DD to YYYY-MM-DD”.				Passed
+		5				If the start and end dates are selected, it will display the opacity for the date range until the end date				Passed
+		6				Date range is highlighted and input field auto-filled				Passed
+		7				Fast selection from today to last month can function according to the provisions of the context	bulan ini not according			Failed
+		8								
+		9								
+										
+										
+Display Ticket List Page By Pagination										
+Test ID	SIX-TicketTypes-027							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at					Created By	Aka & salahudin	Tester			
+Scenario			Verify ticket list page pagination		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns in a predictable order.	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Url					Description	display ticket list page in tabs all, complaint, payment, shipping, >1 and <25/50/100 ticket type created	ENV	DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	data table pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4			200	display all : - add the view the list have as default		Passed		Passed
+		5				have next and previous and numbering page theres and disabled except number		Failed		
+		6				display "showing ... of 25/50/100 result"		Failed		
+		7				prev and next disabled and number page "1" active		Failed		
+		8				Pagination behavior and ticket display are consistent across all tabs.		Failed		
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-028				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at					Created By	Aka & salahudin	Tester			kholik
+Scenario			Verify ticket list page pagination		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns in a predictable order.		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display ticket list table page in tabs all, complaint, payment, shipping, have > 25 data		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	data table pagination		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				“Showing 25/50/100 of N (or N+1) results”				Passed
+		5				The Previous button is disabled/hidden if at the beginning of the page number  The Next button is enabled (if more data exists).  Page number 1 is highlighted as active.and several other page numbers with the condition n+1				Passed
+		6				The system displays a maximum of 25 tickets per page by default, with pagination options available for 25 / 50 / 100 entries.				Passed
+		7				When the total number of tickets exceeds the page limit: - Next and Previous buttons are displayed. - Page numbering is shown correctly.				Passed
+		8				Pagination behavior and ticket display are consistent across all tabs.				Passed
+		9				The next  button is disabled/hidden if at the end of the page number.  The prev button is enabled (if more data exists ).  Page number n max is highlighted as active.and several other page numbers with the condition n-1				Passed
+										
+Test ID	SIX-TicketTypes-029				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Row selection logic validation		Pre-Condition	Ticket table displays data with pagination	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate select-all behavior per table page		DEV	STAGGING	PROD
+Steps		1	Login		test type	POSITIVE				
+		2	ticket list							
+		3	Click header checkbox (Select All on page)		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Observe Floating Action Bar			Floating bar shows selected count equal to rows on current page (e.g. 50 selected)				Passed
+		5	Navigate to next page			Selection behavior is consistent when changing pages (reset or persist as per design)				Passed
+		6								
+		7								
+		8								
+										
+Test ID	SIX-TicketTypes-030				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Row selection pagination error prevention		Pre-Condition	Ticket table contains multiple pages	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Prevent unintended bulk actions across pages		DEV	STAGGING	PROD
+Steps		1	Login		test type	NEGATIVE				
+		2	ticket list							
+		3	Select all rows on page 1		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Navigate to page 2		200	Selection does not silently apply to other pages	state selection bocor antar halaman			Failed
+		5	Attempt bulk action		422	System blocks bulk action without explicit selection scope  	floating bulk selection theres			Failed
+		6								
+		7								
+										
+										
+Display Ticket List Table Operation										
+Test ID	SIX-TicketTypes-031				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Verify ticket list page tabs and elipsis		Pre-Condition	As an Agent and Supervisors, I can click ....	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	the detail ticket mode is display		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click one ticket from a few ticket list in table from tabs all / complaint / payment/shipping		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click "..." in ticket list			open modal manage status and tag				Failed
+		5				Then it does not open the ticket detail.				Passed
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-032				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			elipsis validation status error		Pre-Condition	As an Agent and Supervisors, I can update status	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Use "•••" menu to change status. Simulate API Error.		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	click "..."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click update status and connection unstable			Status badge does NOT change.				Failed
+		5	search input (if you want to search for the selected item) or select directly			UI shows: "Gagal memperbarui status".				Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-033				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			elipsis validation status error		Pre-Condition	As an Agent and Supervisors, I can update status	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Use "•••" menu to change status. Simulate success		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click "..."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click update status			Status badge does change.				Passed
+		5	search input (if you want to search for the selected item) or select directly			UI shows: "Berhasil memperbarui status".				Passed
+		6				back to a datatables with fresh data not reload page				Passed
+		7								
+		8								
+										
+Test ID	SIX-TicketTypes-034				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Close Ticket Flow Error		Pre-Condition	As an Agent and Supervisors, I can close ticket	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Use "•••" menu to close ticket. Simulate failed		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	Click "Tutup ticket" in "•••" menu.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Confirm close -> Simulate API Error.			Confirmation Dialog appears (Mandatory).	belum ada tutup ticketnya ketika ... di click			Failed
+		5				Status remains unchanged.				Failed
+		6				UI pop up shows: "Gagal menutup tiket".				Failed
+		7								
+										
+Test ID	SIX-TicketTypes-035				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Manage Tags and verivy		Pre-Condition	As an Agent and Supervisors, I can manage tags from the list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	add tag, remove tag, and search tag		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on tags table or elipsis icon click and click add tag		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4			404	Given I do not have permission to edit tags, When I attempt to add or remove, Then the UI blocks the action with an error message or disabled select and ... not show. 	tidaka ada akun untuk mencoba hal tersebut			Failed
+		5				input validates allowed chars: letters, numbers, underscore, dash only.UI blocks invalid input or shows field error. 	add button  tidak ada disaat melakukan pencarian diluar kendali			Failed
+		6			400	Chip is NOT added. UI shows: "Failed to add tag". Chip is NOT removed. UI shows: "Failed to remove chip tag".				Failed
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-036				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Manage Tags and verivy each ticket		Pre-Condition	As an Agent and Supervisors, I can manage tags from the list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	add tag, remove tag, and search tag		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on column tags table or elipsis icon click and click add tag		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Given I  have permission to edit tags, When I attempt to add or remove, Then the UI blocks the action with  not disabled select and ...  show. 				Passed
+		5				input validates not allowed chars: letters, numbers, underscore, dash only in input search.UI blocks show option with same input or if not same the added option is show	added button in tags datatable not theres			Failed
+		6				Chip is added. UI shows: "success to added tag". Chip is removed. UI shows: "success to remove chip tag".				Passed
+		7								
+		8								
+		9								
+										
+										
+Test ID	SIX-TicketTypes-037				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Manage Tags and verivy select ticket		Pre-Condition	As an Agent and Supervisors, I can manage tags from the select tickets	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	add tag, remove tag, and search tag with Tiket A memiliki tag: finance, urgent. Tiket B memiliki tag: finance, shipping. Tiket C tidak memiliki tag.		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	select Tiket A, Tiket B, dan Tiket C.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click the "Remove tag" or "add tag" button on the Floating Action Bar.			agents can choose one (eg finance) to delete or add from Tickets A and B at once.				Passed
+		5	Note the list of tags that appear in the modal.			input validates not allowed chars: letters, numbers, underscore, dash only in input search.UI blocks show option with same input or if not same the added option is show				Failed
+		6	klik submit			agents can choose added or remove the same chip as the ticket that was not selected, provided that the ticket selected does not have the same chips as the ticket that was not selected				Passed
+		7				Area "All tag contained..." hanya menampilkan example tag: finance, urgent, dan shipping. for remove				Passed
+		8				Modal menampilkan example teks "Remove tag from 3 selected ticket". or "Add tag for 3 selected tickets"				Passed
+		9				close modal and update data not reload page				Passed
+										
+										
+Test ID	SIX-TicketTypes-038				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Manage Tags and verivy select ticket		Pre-Condition	As an Agent and Supervisors, I can manage tags from the select tickets	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	add tag, remove tag, and search tag with Tiket A memiliki tag: finance, urgent. Tiket B memiliki tag: finance, shipping. Tiket C tidak memiliki tag.		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	checkTiket A, Tiket B, dan Tiket C.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click the "Remove tag" or "add tag" button on the Floating Action Bar.			Users no creds can choose one (eg finance) to delete or add from Tickets A and B at once.				Failed
+		5	Note the list of tags that appear in the modal.			input validates  allowed chars: letters, numbers, underscore, dash only in input search.UI blocks show option with not same input or if  same the added option is show				Failed
+		6	klik cancel			Users can choose  added the same chip as the ticket that was selected, provided that the ticket selected have the same chips as the ticket that was  selected				Failed
+		7				Area "All tag contained..."tidak menampilkan example tag: finance, urgent, dan shipping. for remove				Failed
+		8				Modal tidak menampilkan teks "Remove tag from 3 selected ticket". or "Add tag for 3 selected tickets"				Failed
+		9				close modal and not update data must reload page				Failed
+										
+Test ID	SIX-TicketTypes-039				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Manage status and verivy		Pre-Condition	As an Agent and Supervisors, I can manage tags from the list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+										
+Url					Description	check elipsis, check status changed error or success		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on  elipsis icon click and click update status		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4			400	Given the update fails, When the request returns an error, Then the UI shows: "Failed to update ticket status".| "status badge doesnt change"	loading button muter terus			Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-040				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			elipsis validation status error		Pre-Condition	As an Agent and Supervisors, I can update status	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Use "•••" menu to change status. Simulate API Error.		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	click "..."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click update status			Status badge does NOT change.				Passed
+		5	search input (if you want to search for the selected item) or select directly			UI shows: "Gagal memperbarui status".	tidak muncul loading terus			Failed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-041				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			elipsis validation status error		Pre-Condition	As an Agent and Supervisors, I can update status	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Use "•••" menu to change status. Simulate success		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click "..."		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click update status			Status badge does change.				Passed
+		5	search input (if you want to search for the selected item) or select directly			UI shows: "Berhasil memperbarui status".				Passed
+		6				back to a datatables with fresh data not reload page				Passed
+		7								
+		8								
+		9								
+										
+										
+Display All Column Table Ticket List Specs and Action Logic										
+Test ID	SIX-TicketTypes-042				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			verify sticky for id and elipsis		Pre-Condition	As an Agent and Supervisors, I can keep “ID Tiket” and “•••” action column visible while horizontally scrolling	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	sticky table		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	input text field with valid input "tes 1"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click create butotn			Given the table is horizontally scrolled, When I scroll, Then “ID Tiket” stays visible at the left and “•••” and select box stays visible at the right.				Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-043				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Verify Data Formatting, SLA		Pre-Condition	Tickets with various states (Overdue, Resolved, No Reply).	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate specific data		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on the sla section of the table		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				View tickets where the SLA has not yet expired. The SLA column displays a positive value, for example, 2 hours 5 minutes / indicator is not overdue.				Passed
+		5				View ticket where sla is not yet expired. (Visual check) formatted as countdown.				Passed
+		6				View not resolved ticket OR ticket with due date. SLA column not shows "-".				Passed
+		7				Compare 'Ongoing' vs 'Resolved' ticket duration. where Ongoing: Calculation is Now - CreatedAt.and  Resolved: Calculation is Resolved - CreatedAt (Static)				Passed
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-044				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Verify Data Formatting, SLA		Pre-Condition	Tickets with various states (Overdue, Resolved, No Reply).	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate specific data		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on the sla section of the table		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				View ticket where sla is in the past. SLA column shows negative value e.g. -2h 5m / overdue indicator.				Passed
+		5				View ticket where sla is in the past. (Visual check) formatted as countdown.				Passed
+		6				View resolved ticket OR ticket with no due date. SLA column shows "-".				Passed
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-045				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			display colum reply		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns ticket list after login	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka & Salahudin	Tester			kholik
+Url					Description	display tickets list page tabs all, complaint, payment, shipping, no ticket list created		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on column last reply in datatable		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				View ticket with no replies, "last reply" column shows "-" for text and date.				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-046				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			display colum reply		Pre-Condition	As an Agent and Supervisors, I view a list of tickets with the default columns ticket list after login	Tanggal	12/12/2025	12/12/2025	18/12/2025
+Create at					Created By	Aka & Salahudin	Tester			kholik
+Url					Description	display tickets list page tabs all, complaint, payment, shipping, ticket list created		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on column last reply in datatable		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				View ticket with replies, "last reply" column shows chat for text and date format for date.	last reply text not show			Failed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-047				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			verify date table or other		Pre-Condition	As an Agent and Supervisors, datatable part of the column that has the date	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description			DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on column theres date		Status Response		Actual Result	Status	Status	Status
+		4				The date format that appears in the column datatable is "dd m yyyy"				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-048				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Loading State		Pre-Condition	Refresh page with slow network	Tester			kholik
+Create at					Created By	Aka 		12/12/2025	12/12/2025	18/12/2025
+Url					Description	display loading		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	before datatable ticket list display		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Show Loading Skeleton/Spinner.				Passed
+		5				Table layout does NOT break.				Passed
+		6				No partial text rendered.				Passed
+		7								
+										
+Test ID	SIX-TicketTypes-049				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Assign Agents		Pre-Condition	As an Agent and Supervisors, I can update display in column agent with dropdown	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	No redirect to ticket detail page, No modal opened, Inline cell stays in table context, Visual chip update without reload, Error shown inline if save fails		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click directly on Agent column cell		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	verify UI inline edit			Inline dropdown appears without page navigation				Passed
+		5	select 2 agents from dropdown			Chips multi-select visible, current agents shown				Passed
+		6	click Save / blur outside cell			Selected agents shown as chips				Passed
+		7	verify table update			Changes saved				Passed
+		8	refresh page			Agent column updates immediately				Passed
+		9	assign <20 agents			Assigned agents persist				Passed
+		10	check report summary			Validation message shown, save disabled				Passed
+		11	check row detail			Report closed successfully				Passed
+		12	check error message per failed row							
+		13	close report							
+										
+										
+Test ID	SIX-TicketTypes-050				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Unassign All Agents		Pre-Condition	As an Agent and Supervisors, I can update display in column agent with dropdown	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Inline edit tidak auto-save jika error, Tidak redirect ke ticket detail page, Tidak membuka modal error global, Error tampil di konteks cell Agent. Chips revert ke state sebelumnya, User bisa retry inline edit		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	click directly on Agent column cell		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select agent(s) exceeding allowed rule (e.g. >20 agents)			Inline dropdown with chips appears (no redirect, no modal)				Passed
+		5	OR simulate backend failure on save (timeout / 500)			Inline validation error displayed				Failed
+		6	verify data not updated			Inline error message shown (e.g. “Gagal menyimpan agent”)				Failed
+		7	refresh page			Agent column remains unchanged				Failed
+		8	click outside cell / cancel inline edit			No unintended agent assignment persisted				Failed
+		9				Inline edit closed, original data retained				Failed
+										
+Test ID	SIX-TicketTypes-051				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Error: Update Agent		Pre-Condition	As an Agent and Supervisors, I can update display in column agent with dropdown but during the process it failed	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	dropdown agent select and error becuase connection and anything		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on column agent		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Select 2 agents from dropdown -> Save.			Displayed agents do NOT change.				Passed
+		5	Simulate API Error when saving agents.			UI shows: "Gagal memperbarui agen".				Failed
+		6				if it fails to add it will appear. displays an error with the message "agent failed to update, please check the connection or there is a problem with our server"				Failed
+		7								
+		8								
+										
+Test ID	SIX-TicketTypes-052				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			Update Team Inbox		Pre-Condition	As an Agent and Supervisors, I can update display in column team inbox	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	dropdown team inbox select		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	update and selected  in colum team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Displayed value does NOT change.				Passed
+		5	condition error			UI shows: "Gagal memperbarui tim inbox".	pesan errorya "unexpedted error"			Failed
+		6								
+		7								
+		8								
+										
+Test ID	SIX-TicketTypes-053				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			tag-validation -selection team inbox		Pre-Condition	As an Agent and Supervisors, I can update display in column tag	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	dropdown tag select		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	update and selected  in colum tag		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Input validates allowed chars: letters, numbers, underscore, dash only.UI blocks invalid input or shows field error.				Passed
+		5	Requirements: add or remove			Simulate API Error when adding a valid tag.Chip is NOT added. UI shows: "Gagal menambah tag".				Passed
+		6				Simulate API Error when clicking 'x' on a tag.Chip is NOT removed.UI shows: "Gagal menghapus tag".				Passed
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-054				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			team inbox-validation -selection		Pre-Condition	As an Agent and Supervisors, I can update display in column tag	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	dropdown tag select		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	update and selected  in colum team inbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Input validates not allowed chars: letters, numbers, underscore, dash only				Passed
+		5	Requirements: add or remove			Simulate API success when adding a valid team inbox. ui updated				Passed
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-055				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Verify ticket list detail page		Pre-Condition	As an Agent and Supervisors, I can open a ticket from the list.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	the detail ticket mode is display		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	click one ticket from a few ticket list in table from tabs all / complaint / payment/shipping		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				ticket detail opens				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+							 			
+Test ID	SIX-TicketTypes-056				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Custom field image preview failure		Pre-Condition	Image file is missing, corrupted, or inaccessible	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate error handling for image preview		DEV	STAGGING	PROD
+Steps		1	Login		test type	NEGATIVE				
+		2	ticket list							
+		3	Click image filename or thumbnail		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Image fails to load		404 / 500	Contextual and human-readable error message is displayed				Passed
+		5			200	User can close preview and return to table				Passed
+		6								
+		7								
+										
+Test ID	SIX-TicketTypes-057				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Custom field image preview in table		Pre-Condition	Ticket has image attachment in custom field	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate image preview interaction from table		DEV	STAGGING	PROD
+Steps		1	Login		test type	POSITIVE				
+		2	ticket list							
+		3	example Open “Complaint” tab		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Observe Floating Action Bar			Image opens in preview modal or new browser tab				Passed
+		5	Locate row with image file			Image loads successfully without page reload				Passed
+		6	Click image filename or thumbnail icon							
+		7								
+		8								
+										
+										
+Test ID	SIX-TicketTypes-058				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			lifetime logic system		Pre-Condition	As an Agent and Supervisors, the Lifetime data changing continuously	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Lifetime Column data		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on lifetime		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Check "Durasi" column for open ticket. 			value = Current Time - Created Time and Updates/Increases over time. for open ticket automaticly				Passed
+		5	Check "Durasi" column for resolved ticket.			Value = Resolved Time - Created Time and Static (Does not increase)				Passed
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-059				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Missing Custom Field Value		Pre-Condition	As an Agent and Supervisors, access show datatable ticket list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	costom value column fetch error or null 		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus of column which is a custom field		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				all column custom field in Cell shows "-".				Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-060				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			not Missing Custom Field Value		Pre-Condition	As an Agent and Supervisors, access show datatable ticket list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	costom value not fetch error or null 		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus of column which is a custom field		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				custom field 1 tipe data text and random according to content of form				Passed
+		5				custom field 2 tipe data text and select option				Passed
+		6				custom field 3 tipe data text date 				Passed
+		7				custom field 3 tipe data text caption jpg name				Passed
+		8								
+		9								
+										
+Test ID	SIX-TicketTypes-061				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			requirement display table, add, update, filter by label type data		Pre-Condition	As an Agent and Supervisors,  when it appears in the datatable or when input	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	requirements according to the label		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	focus on datatable		Status Response	Expected Result	Actual Result	Status	Status	Status
+										
+		4				"id ticket" the value Required. 1 to 64 chars. Unique within workspace. for input, display or etc and Human readable ticket number shown in list. with type data string				Passed
+		5	or if you want to go to the add section then click add tickert and the form will appear			"title" the value Required. 1 to 200 chars for input or display or etc string				Failed
+		6	or if you want to update, just adjust the mechanism wherever you can do the update			"description" Optional. 0 to 2000 chars. default hidden in view settings more with type data string				Failed
+		7	or if you want to check the filter check by clicking the filter icon and adjusting the mechanism			"Client " Required. 1 to 120 chars.for client name input,display or etc and Optional. 0 to 120 chars.for client contact input, display or etc with type data string				
+		8	success			"channel" Required. Allowed: WA, IG, Email. with tipe data enum by sistem and with icon more				Passed
+						"priority" Required. Allowed: Low, Medium, High, Urgent. with type data enum by sistem 				Passed
+						"Agent" Optional. Max 20 per ticket. Each must be a valid agent id.registered with type data array of string	agent tidak ada maximal			Failed
+						"Lifetime" Derived only. Must never be negative with work Time since created, stops at resolved. tipe number with text				Passed
+						"SLA" Optional. with Due time for SLA countdown.tipe with number and text				Passed
+						"Status" Required. Allowed: Unassigned, Ongoing, Resolved. with type data enum				Passed
+						"Team Inbox" Required. Single value only. with list name team and icon registered type data string				Passed
+						"Tag" Optional. Max 50. Each tag 1 to 32 chars. Allowed chars: letters, numbers, underscore, dash with tag list registered type data array of string	penanda hanya max 27 yang muncul di list dan tanpa batasan dan juga simbol dan angka bisa dilakukan			Failed
+						"Last reply" Optional. 0 to 240 chars shown. Store full separately. for text and Optional. date with type string  				
+						"created at" Required for all tickets with type date in condition Ticket created time.  				Passed
+						"closed at" Required for all tickets with type date in condition Ticket resolved time.  				Passed
+										
+Test ID	SIX-TicketTypes-062				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			custom field empty all 		Pre-Condition	As an Agent and Supervisors, datatable ticket list	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	if empty the default is "-"		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				display other tabs except tabs All:				Passed
+		5				- custom field 1 (text) empty default "- "				Passed
+		6				- custom field 2 (option) empty default "- "				Passed
+		7				- custom field 3 (date) empty default "- "				Passed
+		8				- custom field 4 (image) icon image and empty default "- " jpg				Passed
+										
+										
+										
+Test ID	SIX-TicketTypes-063				Tester	Aka		NEED TO TEST	NEED TO TEST	NEED TO TEST
+Scenario			requirement display table, add, update, filter by label type data error		Pre-Condition	As an Agent and Supervisors,  when it appears in the datatable or when input or select	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	requirements according to the label for input or add		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	focus on datatable		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				"id ticket" the value not Required. more than 64 chars				
+		5	or if you want to go to the add section then click add tickert and the form will appear			"title" the value not Required. more than 200 chars	"ygyuyubyubyubyubyubuybhubuhbhubhubhubhubhubhubhbyuhbubhubuy" actually max 50 character			Failed
+		6	or if you want to update, just adjust the mechanism wherever you can do the update			"description" more than 2000 chars	"kcnjkdncjknjnkjndddsjdjksahjhdishdisahduashhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" actually max 250 char			Failed
+		7	or if you want to check the filter check by clicking the filter icon and adjusting the mechanism			"Client " more than 120 chars.				
+		8				"Agent" more than 20 per ticket				Passed
+		9	error			"Tag" Optional. more than 50				Passed
+			 			"Last reply" more than 240 chars shown and Optional. date not selected "-"				
+						If input exceeds more the maximum limit, an error will be displayed according to the label and condition				Passed
+						If the input is mandatory but not filled in, it will display an error according to the label and mandatory condition itself				Passed
+						If the input or selection is optional, it will display the default by the system such as "-" or others according to the conditions				Passed
+										
+										
+Display Bulk From Table in Ticket List such as update status, and more										
+Test ID	SIX-TicketTypes-064				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			select ticket and display menu bulk		Pre-Condition	As an Agent and Supervisors, I can select multiple tickets and use bulk actions from a bottom action bar.	Tester			kholik
+Create at					Created By	Aka  & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	select ticket and display menu bulk		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	Click select next to the ticket ID		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select multiple or one			Given I select at least one ticket, When selection is active, Then a bottom bulk action bar appears with actions: update status, add tag, remove tag, close, bulk reply, cancel.				Passed
+		5	check bottom bulk menu			Given I clear selection, When no tickets are selected, Then the bulk action bar disappears.				Passed
+		6	cancel (besides)			Count label visible (e.g. "23 tiket dipilih").				Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketTypes-065				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Bulk update status with mixed ticket statuses shows conflict warning Prevent bulk status update when selected tickets have different statuses		Pre-Condition	As an Agent or Supervisor, I can select multiple tickets from the ticket list.  Ticket A → Status Open  Ticket B → Status Pending	Tester			kholik
+Create at					Created By	Aka  & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Verify system shows warning modal when user attempts bulk update with different ticket statuses		DEV	STAGGING	PROD
+Steps		1	Login		test type	NEGATIVE				
+		2	Open ticket list							
+		3	Select multiple tickets with different status		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Bottom bulk action bar appears			Tickets selected				Passed
+		5	Click Update Status			Bulk action bar visible				Passed
+		6	System detects different statuses			System validates selected tickets				Passed
+		7	View warning modal			⚠️ Warning modal appears				Passed
+		8	Click Cancel / Close			Text “Different Status Detected” displayed				Passed
+		9	Verify result			Modal closed				Passed
+						No status change, no API call				Passed
+										
+										
+										
+Test ID	SIX-TicketTypes-066				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			bulk reply modal form		Pre-Condition	As an Agent and Supervisors, I can bulk reply by uploading an .xlsx and choosing visibility in the UI.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	bulk reply modal form specs		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	Click select next to the ticket ID		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select multiple or one			Given I have selected tickets, When I click “Bulk reply”, Then a modal opens showing selected ticket count.				Passed
+		5	click bulk reply button 			Given I click “template downloader”, When downloaded, Then the template includes exactly columns: identifier and reply. 				Passed
+		6				Given I uncheck “send to customer”, When I submit, Then replies are created as internal notes.				Passed
+		7				the ticket type according of tabs exactly: - ticket type show according of tabs of bulk and other of tabs "all" is  "ticket specific" and in tabs "all" is "alll tickets" - check the select identifier required theres option ticket id and option theres custom ticket - If you select a custom field, the selected ticket will appear - uploaded template can click in form or drag and drop from local file and required according of result template download extension				Passed
+		8				when i click cancel the modal is close				Passed
+		9				display exists :  - Modal title: "Balas massal". - ticket type lable and text select - identifier and drodown search select option display if not all if all this disabled - list scroller ticket title and text...tickets selected - Button: "Unduh template". - upload reply label and input file drag ndrop upload - notes upload identifier, reply - Toggle: "Kirim ke pelanggan" (Visibility).				Passed
+										
+										
+Test ID	SIX-TicketTypes-067				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Bulk reply report detail with partial success and failure		Pre-Condition	As an Agent or Supervisor, I can upload a valid bulk reply file and system processes replies asynchronously.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	bulk reply modal form specs		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3	select multiple tickets		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click bulk reply			Bulk reply modal opens				Passed
+		5	download template			Template downloaded successfully				Passed
+		6	upload .xlsx with mixed valid & invalid rows			Upload accepted				Passed
+		7	submit bulk reply			Processing starts				Passed
+		8	system shows progress card			Progress card displayed with status (Processing / Completed)				Passed
+		9	click "View Report"			Bulk Reply Report modal/page opens				Passed
+		10	check report summary			Summary shows total rows, success count, failure count (e.g. 10 success, 2 failed)				Passed
+		11	check row detail			Each row shows status: Success / Data not found / Timeout				Passed
+		12	check error message per failed row			Error message displayed per row				Passed
+		13	close report			Report closed successfully				Passed
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-068				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			bulk reply modal form upload		Pre-Condition	As an Agent and Supervisors, I can bulk reply by uploading an .xlsx and choosing visibility in the UI.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	bulk reply modal form specs		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	change path again to. create new ticket type page		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select multiple or one		422	Upload rejected or file missing "reply", UI shows: "Format file tidak sesuai". ex Upload .xlsx with wrong columns or extension not .xlsx				Passed
+		5	check bottom bulk menu			Upload file where identifier matches multiple tickets (if using non-unique custom field). UI shows conflicting identifiers & ticket count.				Passed
+		6	bulk reply clicked			Upload file containing duplicate rows for same ID. List duplicates in error message.	no error message			Failed
+		7				Required for submit file. more than Max size 10 MB. nore than Max 2000 rows. show error 	max 5mb not 10 mb and not show error			Failed
+		8				Required per row excel data > 5000 chars.and Required per row. Must match selected identifier type. show error	not show error			Failed
+		9								
+										
+Test ID	SIX-TicketTypes-069				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			uploaded error bulk modal form		Pre-Condition	As an Agent and Supervisors, I can upload excel in bulk modal 	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	modal bulk form on upload		DEV	STAGGING	PROD
+Steps		1	login		test type	NEGATIVE				
+		2	ticket list							
+		3	select list ticket		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	click bulk reply			Upload file where identifier matches multiple tickets. Reject upload and UI lists conflicting identifiers & count.				Failed
+		5	focus on upload file			Upload file with duplicate identifiers. reject upload and UI lists duplicates				Failed
+		6				display error message "Failed to process bulk action"				Failed
+		7								
+		8								
+										
+Test ID	SIX-TicketTypes-070				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Cancel Action - Abort Resolving Ticket		Pre-Condition	User selects 1 or more tickets.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate cancel button on confirmation modal		DEV	STAGGING	PROD
+Steps		1	Login		test type	NEGATIVE				
+		2	ticket list							
+		3	Click "Resolved" button on Floating Bar		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	When the confirmation modal appears, click the "Cancel" button			The modal closes.				Passed
+		5				NO change in ticket status (Status remains as is).				Passed
+		6				The tickets remain selected (checkboxes still active) so the user can perform other actions if desired.				Passed
+		7								
+		8								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-071				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Resolve Ticket - Server/API Error		Pre-Condition	Simulate a server downtime or network disconnection (Offline Network).	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate error handling during resolution		DEV	STAGGING	PROD
+Steps		1	Login		test type	NEGATIVE				
+		2	ticket list							
+		3	Select a ticket -> Click "Resolved" -> Confirm		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				The system displays a clear error message, e.g., "Failed to update status. Please check your connection".				Passed
+		5				The ticket status does NOT change to Resolved (remains in the old status).				Passed
+		6				The UI does not freeze (user can dismiss the error message).				Passed
+		7				modal still open				Passed
+		8								
+										
+										
+										
+										
+										
+										
+										
+Test ID	SIX-TicketTypes-072				Tester	Aka		NEED TO TEST	NEED TO TEST	FAILED
+Scenario			Resolve Ticket - Lifetime Calculation Stop		Pre-Condition	Ticket A has status "In Progress" with a running Lifetime (e.g., 2h 30m).	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate lifetime logic on resolved tickets		DEV	STAGGING	PROD
+Steps		1	Login		test type	POSITIVE				
+		2	ticket list							
+		3	Change the status of Ticket A to "Resolved"		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Wait for a few minutes or refresh the page after 5 minutes. Check the "Lifetime" column.			The time calculation in the Lifetime column must STOP.				Passed
+		5				The Lifetime value is frozen at the moment the status changed to Resolved (e.g., remains 2h 30m, does not increase to 2h 35m).	actual 0h			Failed
+		6								
+		7								
+		8								
+										
+										
+Test ID	SIX-TicketTypes-073				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Single Action - Mark Ticket as Resolved via Context Menu		Pre-Condition	ser is on the Ticket List. There is a ticket with status "In Progress" or "Submitted".	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate status update flow via context menu		DEV	STAGGING	PROD
+Steps		1	Login		test type	POSITIVE				
+		2	ticket list							
+		3	Click the kebab menu (...) on a ticket row		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Select "Update status"  -> Click "Change status" -> Select "Resolved"			The modal closes				Passed
+		5				A success notification appears (e.g., "Successfully updated status")				Passed
+		6				The ticket status in the row changes to green with the "Resolved" icon.				Passed
+		7				The table data refreshes automatically.				Passed
+		8								
+										
+										
+										
+Test ID	SIX-TicketTypes-074				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			Bulk Action - Mark Multiple Tickets as Resolved (Direct Button)		Pre-Condition	User selects 3 tickets that are not yet resolved.	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	Validate bulk resolve shortcut functionality		DEV	STAGGING	PROD
+Steps		1	Login		test type	POSITIVE				
+		2	ticket list							
+		3	Check the checkboxes for those 3 tickets		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	Click green "Resolved" button on Floating Bar -> Click "Resolved" on Modal confirmation			The system processes the request.				Passed
+		5				The status of all three tickets updates to "Resolved".				Passed
+		6				The selection checkboxes automatically reset (clear).				Passed
+		7				The table data refreshes automatically.				Passed
+		8								
+										
+										
+Display Ticket List Page Language										
+Test ID	SIX-TicketTypes-075				Tester	Aka		NEED TO TEST	NEED TO TEST	PASSED
+Scenario			lannguage web ui adn message error 		Pre-Condition	As an Agent and Supervisors, can show a text ui indonesian language	Tester			kholik
+Create at					Created By	Aka & salahudin		12/12/2025	12/12/2025	18/12/2025
+Url					Description	language ui		DEV	STAGGING	PROD
+Steps		1	login		test type	POSITIVE				
+		2	ticket list							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Consistency languange ui				Passed
+		5								
+		6								
+		7								
+		8								
+		9								

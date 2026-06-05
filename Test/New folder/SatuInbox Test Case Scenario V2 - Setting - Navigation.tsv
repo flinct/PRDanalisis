@@ -1,0 +1,468 @@
+total cases =			29							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			29	No Status		29	No Status	29		
+Test ID	SIX-Settings_Nav-001									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	open settings		test type	POSITIVE				
+		2	validate first page displayed is general settings							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				general settings is default page				
+		5				general settings nav is highlight				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-002									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Active highlight switches when selecting another sub-menu under the same parent		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	click roles under organisation		test type	POSITIVE				
+		2	observe the navigation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				highlight moves from general to roles 				
+		5				organization parent remains expanded				
+		6				only one sub-menu is active				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-003									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Active highlight updates when switching to a different parent menu		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	From Organization menu, click Inbox > Macros		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				macros sub-menu is highlighted 				
+		5				only highlight on macro navigation				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-004									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Active menu highlight persists after page refresh		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	navigate to shift hours 		test type	POSITIVE				
+		2	refresh the browser page							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shift hours remains highlighted				
+		5				the organization parent menu remains expanded				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-005									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Sidebar highlight remains consistent when using browser back and forward buttons		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	click roles		test type	POSITIVE				
+		2	click members							
+		3	use the browser back button		Status Response	Expected Result	Actual Result	Status		Status
+		4				highlight returns to roles				
+		5				sidebar state matches the displayed content 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-006									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Clicking the active menu does not reset navigation state		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	click the currently active sub-menu		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				highlight remains on the same menu				
+		5				sidebar state does not change unexpectedly				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-007									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Parent menu collapses when clicked while expanded		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	access roles		test type	POSITIVE				
+		2	click the expanded organization parent menu							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				sub menus are hidden (collapsed)				
+		5				no sub menu is highlighted				
+		6				the main content area remains unchanged				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-008									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			No multiple active menu highlights		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	access settings		test type	POSITIVE				
+		2	try click another menu navigation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only one menu item is highlighted at any time 				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-009									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			active highlight visual consistency 		Pre-Condition		DATE			
+Url					Description	general behavior of settings navigation	ENV	DEV	STAGGING	PROD
+Steps		1	access settings		test type	POSITIVE				
+		2	try click another menu navigation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				highlight color and style are consistency accross all menus 				
+		5				active state is clearly distinguishable  from inactive menus				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-010									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Load Organization - general Page		Pre-Condition		DATE			
+Url					Description	Setting Page Per Navigation Menu	ENV	DEV	STAGGING	PROD
+Steps		1	click organization - general 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				general page content is displayed correctly 				
+		5				page loads without error or blank state 				
+		6				sidebar highlight matches the selected menu				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-011									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Load Organization - Roles Page		Pre-Condition		DATE			
+Url					Description	Setting Page Per Navigation Menu	ENV	DEV	STAGGING	PROD
+Steps		1	click organization - roles		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				roles page content is displayed 				
+		5				page loads successfully without UI break				
+		6				no content from previous page remains 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-012									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Load Team Inbox - your team inbox page		Pre-Condition		DATE			
+Url					Description	Setting Page Per Navigation Menu	ENV	DEV	STAGGING	PROD
+Steps		1	click team inbox - your team inbox		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				team inbox settings page is displayed 				
+		5				page content updates correctly 				
+		6				sidebar highlight remains accurate				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-013									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Load Channel - Widget Page		Pre-Condition		DATE			
+Url					Description	Setting Page Per Navigation Menu	ENV	DEV	STAGGING	PROD
+Steps		1	click channel - widget page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				widget settings page is displayed 				
+		5				page content matches selected channel				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-014									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Page content resets when switching between menus		Pre-Condition		DATE			
+Url					Description	Page Consistency & Stability	ENV	DEV	STAGGING	PROD
+Steps		1	open one settings page		test type	POSITIVE				
+		2	navigate to another menu 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				previous state does not persist				
+		5				new page content loads fresh 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-015									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page loads correctly after rapid menu switching		Pre-Condition		DATE			
+Url					Description	Page Consistency & Stability	ENV	DEV	STAGGING	PROD
+Steps		1	quickly click multiple menu items		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				correct page is displayed last 				
+		5				no mixed or broken content 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-016									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page displays appropriate empty or default state		Pre-Condition	no data available	DATE			
+Url					Description	Page Consistency & Stability	ENV	DEV	STAGGING	PROD
+Steps		1	access menu with a blank page		test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				empty state message or default content is shown				
+		5				page does not appear broken				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-017									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			URL updates when navigating between settings menus		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	navigate from one settings menu to another 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				browser URL changes according to the selected menu 				
+		5				URL reflects the current settings page				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-018									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			direct access to settings sub-page via URL 		Pre-Condition	user is logged in 	DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open a settings sub-page URL direclty in the browser		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				target settings page loads successfully				
+		5				no unexpected redirect to another settings page				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-019									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			page refresh preserves settings URL state 		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open a settings sub-page 		test type	POSITIVE				
+		2	refresh the browser 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user remains on the same settings page 				
+		5				URL stays unchanged after refresh 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-020									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Browser back button navigates between Settings URLs correctly		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	Navigate through multiple Settings pages		test type	POSITIVE				
+		2	click the browser back button 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is navigated to the previous setting page				
+		5				URL updates correctly to match the previous page				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-021									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Browser forward button restores Settings page correctly		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	navigate back to a previous setting page		test type	POSITIVE				
+		2	click the browser forward button 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is navigated forward correctly				
+		5				URL matches the restored settings page				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-022									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Invalid Settings URL 		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	enter an invalid settings URL 		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is redirected to a default settings page or error page 				
+		5				application does not crash				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-023									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Unauthorized Access to Settings URL		Pre-Condition	user is logged out or lacks permission 	DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open a settings URL directly		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is redirected to login or access denied page				
+		5				settings page is not displayed				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-024									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Access Settings URL in a new browser tab		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	copy a settings sub-page URL		test type	POSITIVE				
+		2	open it in a new browser tab 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				same settings page loads correclty 				
+		5				user session is preserved 				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-025									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Bookmark a Settings sub-page URL		Pre-Condition	user is logged in 	DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	bookmark a settings sub-page URL		test type	POSITIVE				
+		2	open the bookmark							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is navigated direclty to the bookmarked settings page				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-026									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			URL consistency after rapid menu navigation		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	Quickly navigate across multiple Settings menus		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				URL always reflects the last selected menu				
+		5				No stale or mismatched URL is shown				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-027									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Settings URL Remains Stable on idle		Pre-Condition		DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open a settings page		test type	POSITIVE				
+		2	stay idle for a period of time							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				URL does not change automatically 				
+		5				no unexpected redirect occurs				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-028									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			Access Settings URL After Session Timeout 		Pre-Condition	session has expired 	DATE			
+Url					Description	URL Behavior	ENV	DEV	STAGGING	PROD
+Steps		1	open a settings URL 		test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				user is redirected to login page				
+		5				After login, user is redirected back to the intended Settings page (if supported)				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Settings_Nav-029									
+Create at			12/01/2025		created by	Rizal	Tester			
+Scenario			To Verify That Menu Highlight, Page Content, And URL are always synchronized when navigating within settings.		Pre-Condition	user is logged in, user has access to settings module	DATE			
+Url					Description	Settings Navigation Synchronization Between Menu, Page, and URL	ENV	DEV	STAGGING	PROD
+Steps		1	open settings page		test type	POSITIVE				
+		2	select any menu item in the settings sidebar (organization/inbox/channels/subscription)							
+		3	observe navigation navigation result		Status Response	Expected Result	Actual Result	Status		Status
+		4	refresh the page			the clicked menu item is highlighted as active				
+		5	use browser and forward buttons			the corresponding page content is displayed				
+		6				the URL reflects the selected page				
+		7				menu, page, and URL remain consistent after refresh				
+		8				menu, page, and URL remain consistent when using back/forward				
+		9								

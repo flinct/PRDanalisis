@@ -1,0 +1,964 @@
+total cases =			60							
+DEV				STAGGING			PROD			
+Passed			42	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			18	No Status		60	No Status	60		
+Test ID	SIX-Broadcast-001							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario					Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description		ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName": "string"}]							
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-002							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Authorization & Security		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid x-signature-key	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName": "string"}]							
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-003							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario					Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Invalid x-signature-key (random text)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			403 Forbidden. message: "Signature key required".				
+		5	audience: ["6289655057778"],							
+		6	message: "string",							
+		7	properties: [{"contactName": "string"}]							
+		8	invalid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-004							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario					Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Missing x-signature-key	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			401 Unauthorized, message: "Signature key required".				
+		5	audience: ["6289655057778"],							
+		6	message: "string",							
+		7	properties: [{"contactName": "string"}]							
+		8	missing x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-005									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario					Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Very long signature key (e.g., 10,000 chars)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Expected: 403, no crash.				
+		5	audience: ["6289655057778"],							
+		6	message: "string",							
+		7	properties: [{"contactName": "string"}]							
+		8	Very long signature key (e.g., 10,000 chars)							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-006							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid request with all fields filled	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName": "string"}]							
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-007							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid request without optional teamInboxId	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	// teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName": "string"}]							
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-008							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid request with multiple audience numbers	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	// teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778","6289655057770"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName": "string"}]			sent to all receipent				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-009							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid request with empty properties array	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	// teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778","6289655057770"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: []			sent to all receipent				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-010							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition	x-signature-key → Required (authorization) Content-Type: application/json	DATE			
+Url			/open-api/broadcast		Description	Valid request with multiple properties items	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	POSITIVE				
+		2	channel: "whatsapp_web",							
+		3	// teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 201 or 200 depending on implementation				
+		5	audience: ["6289655057778"],			Message broadcast triggered				
+		6	message: "string",			Brodcast job created				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			all properties success displayed at detail broadcast				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-011							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Missing "name" field	ENV	DEV	STAGGING	PROD
+Steps		1	// "name": "string",		test type	NEGATIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-012							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	"name" empty string	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "",		test type	NEGATIVE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-013							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	"channel" missing 	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	//channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-014							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Unsupported channel (e.g. "telegram")	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "kakaotalk",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 or 422 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-015							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	empty channel 	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 or 422 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-016							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Missing sender	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	//sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-017							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Sender not numeric	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746asd",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-018							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Sender includes + sign	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "+6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-019							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Sender empty string	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-020							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Missing audience	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	//audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-021							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience empty array 	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: [""],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-022							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience empty array 2	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["",""],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-023							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience contains invalid numbers (alphabet, symbols)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778@"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-024							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience contains invalid numbers (alphabet, symbols) 2	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-025							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	message missing	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	//message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-026							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	message empty string	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	message: "",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-027							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Properties contains null value	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":""}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-028							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Properties object missing key name	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-029							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	teamInboxId set but does not exist	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	NEGATIVE				
+		2	channel: "string",							
+		3	teamInboxId: "invalid Id string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["@6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-030							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Name extremely long (>= 250 chars)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "long string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-031							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Message extremely long (100k characters)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "long string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-032							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience max limit (e.g., 10k numbers)	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-033							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Properties includes unexpected keys	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"},{"@":"asdsapi@"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-034							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Multiple duplicate audience numbers	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778","6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"},{"@":"asdsapi@"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-035							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Field-Level Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	message containing unicode and emoji	ENV	DEV	STAGGING	PROD
+Steps		1	"name": "string",		test type	EDGE				
+		2	channel: "whatsapp_web",							
+		3	teamInboxId: "string",		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	sender: "6285135431746",			Returns 400 depending on implementation				
+		5	audience: ["6289655057778","6289655057778"],			Return message error				
+		6	message: "string",			Message broadcast not triggered				
+		7	properties: [{"contactName":"string"}, {"awbNumber":"string"}, {"team":"string"},{"@":"asdsapi@"}]			Brodcast job not created				
+		8	Valid x-signature-key							
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-036							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Sender not linked to any WhatsApp account in system	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with disconnected number or not registered at whatsapp		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 depending on implementation				
+		5				Return message error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-037							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Sender blocked	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with suspended number		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 or 403 depending on implementation				
+		5				Return message error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-038							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	TeamInboxId belongs to another company	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with teamInboxId belong to other company		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 or 403 depending on implementation				
+		5				Return message error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-039							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience number blocked on WhatsApp	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast to audience or receipent that has blocked by whatsapp		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 201 				
+		5				Return partial messages error				
+		6				Message broadcast triggered				
+		7				Brodcast job created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-040							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Audience number invalid WhatsApp	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast to audience or receipent that invalid number or not registered at whatsapp		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 201 				
+		5				Return partial messages error "invalid receipent number"				
+		6				Message broadcast triggered				
+		7				Brodcast job created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-041							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Account daily quota exceeded	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast when daily limit has reached		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 or 429 depending on implementation				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-042							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Message contains disallowed content (e.g., template-required type)	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with forbidden content from satuinbox		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 or 429 depending on implementation				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-043							PASSED		
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	System detects spam pattern	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with many request that indicating spam		test type	EDGE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 400 or 429 depending on implementation				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-044									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Broadcast sent when system has partial WhatsApp outage	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast when service is down		test type	EDGE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 500				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-045									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Broadcast when audience includes numbers from different countries	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with audience numbuer from other countries		test type	EDGE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 500 or 200?				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-046									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Business Logic Validation		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Job created but sending fails at worker	ENV	DEV	STAGGING	PROD
+Steps		1	simulate worker failure		test type	EDGE				
+		2	send broadcast							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 500 or 200?				
+		5				Return messages error				
+		6				Message broadcast not triggered				
+		7				Brodcast job not created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-047									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Functional Behavior		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Schedule immediate broadcast	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast without set the schedule ( perform immediate sending )		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 201 or 200 depending on implementation				
+		5				Message broadcast triggered				
+		6				Brodcast job created				
+		7				broadcast message sent immediatelly				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-048									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Functional Behavior		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Schedule broadcast	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast with the schedule 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 201 or 200 depending on implementation				
+		5				Message broadcast triggered				
+		6				Brodcast job created				
+		7				broadcast message sent based on schedule				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-049									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Functional Behavior		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Properties injected correctly into conversation ( custom attributes section )	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast		test type	POSITIVE				
+		2	vallidate properties are injected successfully ( custom attributes section )							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 201 or 200 depending on implementation				
+		5				Message broadcast triggered				
+		6				Brodcast job created				
+		7				porperties injected to the conversation with same audience number				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-050									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Functional Behavior		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Multiple audiences but one invalid	ENV	DEV	STAGGING	PROD
+Steps		1	send broadcast to multiple audience		test type	POSITIVE				
+		2	4 valid audience							
+		3	1 invalid audience		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Returns 200				
+		5				Return partially message error				
+		6				Message broadcast triggered				
+		7				Brodcast job created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-051									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Functional Behavior		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	Simultaneous broadcasts (load test)	ENV	DEV	STAGGING	PROD
+Steps		1	try to load test broadcast api		test type	POSITIVE				
+		2	validate p90							
+		3	validate p95		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	validate p99			Returns 200				
+		5				Return partially message error				
+		6				Message broadcast triggered				
+		7				Brodcast job created				
+		8				all response fullfill the requeirement 				
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-052									
+Create at			12/12/2025		created by	Danny	Tester			
+Scenario			Backend Resilience & Stability		Pre-Condition		DATE			
+Url			/open-api/broadcast		Description	API still responsive under high concurrency (100+ req/sec)	ENV	DEV	STAGGING	PROD
+Steps		1	try to perfromance test broadcast api		test type	POSITIVE				
+		2	validate p90							
+		3	validate p95		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	validate p99			Returns 200				
+		5				Return partially message error				
+		6				Message broadcast triggered				
+		7				Brodcast job created				
+		8				all response fullfill the requeirement 				
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-053									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			bulk broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	bulk broadcast with right context message	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk broadcast button		test type	POSITIVE				
+		2	download template, and filled template with valid input and with correct message(right context)							
+		3	Halo Kak 👋Kami ada promo spesial hari ini 🎉 ✨ Diskon hingga 30%✨ Stok terbatas. Yuk pesan sekarang sebelum kehabisan! 📩 Info & order: WA 08xxxxxxxx Terima kasih 🙏  Halo Kak, kami ingin menginformasikan bahwa saat ini sedang ada promo spesial dengan diskon hingga 30% untuk produk pilihan. Promo ini berlaku dalam waktu terbatas dan selama stok masih tersedia. Jangan lewatkan kesempatan ini dan segera lakukan pemesanan. Untuk informasi lebih lanjut dan pemesanan, silakan hubungi kami melalui WhatsApp. Terima kasih atas perhatian dan kepercayaannya.  Pelanggan kami yang terhormat, tim delivery kami MALEACHI ARGA KRISWANTO (6285147210617) telah mencoba mengantarkan paket Anda dengan No. AWB JKT1500213675851, namun pengiriman tidak berhasil karena alamat tidak sesuai. Saat ini paket sedang dalam proses pengembalian ke cabang. Informasi lebih lanjut dapat diakses melalui Website SAP Express.  Dear Valued Customer, tim delivery kami MALEACHI ARGA KRISWANTO (6285147210617) telah mencoba mengantarkan paket Anda dengan No. AWB JKT1500213675851, namun pengiriman tidak berhasil karena alamat tidak sesuai. Paket saat ini sedang dalam proses pengembalian ke cabang. For more details, please visit SAP Express website.  Pelanggan yang terhormat, paket Anda dengan No. AWB JKT1500213675851 belum berhasil dikirim karena alamat tidak sesuai. Paket saat ini dalam proses pengembalian ke cabang. Detail pengiriman dapat dilihat melalui Website SAP Express.		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	valid input on bulk broadcast modal, upload edited template			broadcast scheduled				
+		5	click create broadcast button			broadcast sent				
+		6				send spintax message				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-054									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			bulk broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	bulk broadcast with out of context message	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk broadcast button		test type	POSITIVE				
+		2	download template, and filled template with valid input and with wrong message(out of context)							
+		3	Apa kabar sob ? sehat ?  Selamat Tahun baruu 🎉 🎇 🎆  Agak Laen ini AHAHAHAHAHAHA ☝🏼  Agak Laen ini AHAHAHAHAHAHA :)		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	valid input on bulk broadcast modal, upload edited template			broadcast scheduled				
+		5	click create broadcast button			broadcast sent				
+		6				send original message				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-055									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			bulk broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	bulk broadcast with right context and out of context message	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk broadcast button		test type	EDGE				
+		2	download template, and filled template with valid input and with right and wrong message(right context and out of context)							
+		3	Pelanggan yang terhormat! paket AWB  Pelanggan yang terhormat % a  Pelanggan yang terhormat a 50%  Pelanggan yang terhormat, paket AWB  tim delivery kami MALEACHI ARGA KRISWANTO (6285147210617) ini agak laen  Pelanggan yang terhormat! Saya ingin mengucapkan AHAHAHAHAHAHA  Pelanggan yang terhormat * h  Agak Laen ini AHAHAHAHAHAHA Info lengkap tersedia di Website SAP Express☝🏼  paket AWB JKT1500213675851 gagal terkirim, Agak Laen ini AHAHAHAHAHAHA :)  		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	valid input on bulk broadcast modal, upload edited template			broadcast scheduled				
+		5	click create broadcast button			broadcast sent				
+		6				send original message 				
+		7				send spintax message, if can spintax				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-056									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			bulk broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	bulk broadcast with right context and out of context message. more random	ENV	DEV	STAGGING	PROD
+Steps		1	click bulk broadcast button		test type	EDGE				
+		2	download template, and filled template with valid input and with more random right and wrong message(right context and out of context) 							
+		3	Woi Pelanggan yang terhormat,ini paket nya akan telat, karena ada masalah di gudang itu  selamat siang Pelanggan yang terhormat, ini paket lu dengan AWB JKT1500213675851 gua buka ya  Pelanggan yang terhormat, HEHEHEHEHE apa kabar sob ?  gua mau ngasih tau ke lu semua, kalo gua bakal adain acara di [sini] besok jam 7 malem, dateng ye  teamm dlvry km MALEACHI ARGA KRISWANTO (6285147210617) ni agk anh  Paket nya gagal terkirim uey, punten pisan inimah, nanti dikirim ulang ya, mohon bersabar  Waaahhh orang ini lagi, seneng banget belanja lu kayanya, sori ya paket nya bakal telat, lagi banyak yang sakit soalnya, paling lusa baru sampe 🙏		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	valid input on bulk broadcast modal, upload edited template			broadcast scheduled				
+		5	click create broadcast button			broadcast sent				
+		6				send original message 				
+		7				send spintax message, if can spintax				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-057									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			  broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	  broadcast with right context message	ENV	DEV	STAGGING	PROD
+Steps		1	click new broadcast button		test type	POSITIVE				
+		2	input broadcast name							
+		3	select account channel to send message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select audience/receiver			broadcast scheduled				
+		5	input correct message (right context)			broadcast sent				
+		6	Pelanggan kami yang terhormat, tim delivery kami MALEACHI ARGA KRISWANTO (6285147210617) telah mencoba mengantarkan paket Anda dengan No. AWB JKT1500213675851, namun pengiriman tidak berhasil karena alamat tidak sesuai. Saat ini paket sedang dalam proses pengembalian ke cabang. Informasi lebih lanjut dapat diakses melalui Website SAP Express.			send spintax message				
+		7	send broadcast							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-058									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			  broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	  broadcast with out of context message	ENV	DEV	STAGGING	PROD
+Steps		1	click new broadcast button		test type	POSITIVE				
+		2	input broadcast name							
+		3	select account channel to send message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select audience/receiver			broadcast scheduled				
+		5	input wrong message (out of context)			broadcast sent				
+		6	Apa kabar sob ? sehat ?			send original message				
+		7	send broadcast							
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-059									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			  broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	  broadcast with right context and out of context message	ENV	DEV	STAGGING	PROD
+Steps		1	click new broadcast button		test type	EDGE				
+		2	input broadcast name							
+		3	select account channel to send message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select audience/receiver			broadcast scheduled				
+		5	input right and wrong message(right context and out of context)			broadcast sent				
+		6	Pelanggan yang terhormat * h			send original message 				
+		7	send broadcast			send spintax message, if can spintax				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-Broadcast-060									
+Create at			19/01/2026		created by	Aka	Tester			
+Scenario			  broadcast		Pre-Condition	have connected number, open broadcast page	DATE			
+Url					Description	  broadcast with right context and out of context message. more random	ENV	DEV	STAGGING	PROD
+Steps		1	click new broadcast button		test type	EDGE				
+		2	input broadcast name							
+		3	select account channel to send message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4	select audience/receiver			broadcast scheduled				
+		5	input more random right and wrong message(right context and out of context) 			broadcast sent				
+		6	selamat siang Pelanggan yang terhormat, ini paket lu dengan AWB JKT1500213675851 gua buka ya			send original message 				
+		7	send broadcast			send spintax message, if can spintax				
+		8								
+		9								
