@@ -1,8 +1,8 @@
-total cases =			85							
+total cases =			86							
 DEV				STAGGING			PROD			
 Passed			85	Passed		0	Passed	0		
 Failed			0	Failed		0	Failed	0		
-Need to test			0	Need to test		0	Need to test	0		
+Need to test			1	Need to test		1	Need to test	1		
 On test			0	On test		0	On test	0		
 No Status			0	No Status		85	No Status	85		
 Test ID	SIX-Group-001							PASSED		
@@ -15,9 +15,12 @@ Steps		1	add new number to satuinbox		test type	POSITIVE
 		4	send a message to the group from registered number			room created		Passed		
 		5				message displayed		Passed		
 		6								
-		7								
-		8								
-		9								
+		7							
+		8							
+		9							
+									
+									
+									
 										
 										
 										
@@ -31,9 +34,12 @@ Steps		1	access conversaton		test type	POSITIVE
 		4	send a message from member 			message from registered number displayed		Passed		
 		5				message from member displayed		Passed		
 		6								
-		7								
-		8								
-		9								
+		7							
+		8							
+		9							
+									
+									
+									
 										
 										
 										
@@ -47,12 +53,12 @@ Steps		1	access conversaton		test type	POSITIVE
 		4	send a message from member 			message from registered number displayed with correct name and number		Passed		
 		5				message from member displayed with correct member name and number 		Passed		
 		6								
-		7								
-		8								
-		9								
-										
-										
-										
+		7							
+		8							
+		9							
+									
+									
+									
 Test ID	SIX-Group-004							PASSED		
 Create at			12/12/2025		created by	Danny	Tester	Danny		
 Scenario			load groupchat room		Pre-Condition		DATE	12/12/2025		
@@ -1375,6 +1381,22 @@ Steps		1	restart service		test type	EDGE
 		4				outbound resume		Passed		
 		5						Passed		
 		6						Passed		
-		7								
-		8								
-		9								
+		7							
+		8							
+		9							
+									
+									
+									
+Test ID	SIX-Group-086							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			05/06/2026		created by	OpenCode	Tester			
+Scenario			[UNDEVELOPED] WhatsApp group mention in conversation		Pre-Condition	WA group conversation exists. Feature not implemented in current FE/BE build.	DATE			
+Url					Description	[UNDEVELOPED] mention picker triggered by @ in WhatsApp group conversation	ENV	DEV	STAGGING	PROD
+Steps		1	open group conversation		test type	POSITIVE			
+		2	type @ in composer						
+		3	observe composer behavior		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				participant picker opens and shows group members per PRD		Need to Test	Need to Test	Need to Test
+		5				current build note: feature is still undeveloped and should be tracked separately		Need to Test	Need to Test	Need to Test
+		6							
+		7							
+		8							
+		9							

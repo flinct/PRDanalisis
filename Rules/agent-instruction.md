@@ -135,6 +135,7 @@ Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa dipe
 | Menganalisa PRD | Menyimpan temuan ke memory | Memory rules |
 | Menulis PRD | Mengecek struktur, testability, dan impact | prd-writing-rule.md, qa-analysis-rule.md, impact-analysis-rule.md |
 | Membuat QA test / steps | Menyusun coverage, traceability, execution support | test-case-rule.md, qa-analysis-rule.md |
+| Membuat / update test case TSV | Mengikuti template `SatuInbox Test Case Scenario V2` | test-case-rule.md |
 | Membuat test case | Merevisi analisa karena ada temuan baru | qa-analysis-rule.md |
 | Memperbaiki bug | Mengecek dampak ke modul lain | impact-analysis-rule.md |
 | Membandingkan PRD | Analisa interkoneksi | qa-analysis-rule.md |
@@ -147,6 +148,7 @@ Agent mungkin **dalam proses eksekusi** perlu melakukan tindakan lain tanpa dipe
 - Menulis/update file → baca memory rules
 - Membandingkan → baca `prd-comparison-rule.md`
 - Membuat test case → baca `test-case-rule.md`
+- Membuat atau update test case TSV → baca `test-case-rule.md`
 - Mengecek dampak → baca `impact-analysis-rule.md`
 - Verifikasi implementasi BE → baca `Memory/CLAUDE-be.md`
 - Verifikasi implementasi FE → baca `Memory/CLAUDE-fe.md`

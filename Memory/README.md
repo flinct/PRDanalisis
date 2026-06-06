@@ -17,7 +17,7 @@ README ini harus konsisten dengan aturan di `Rules/`:
 - `global-memory-update-rule.md`
 - `memory-write-rule.md`
 - `prd-writing-rule.md` — Framework penulisan PRD dengan Lite/Standard/Full mode, conditional sections, dan quality gate berbasis Conversation V2 dan Ticket V2.
-- `test-case-rule.md` — Framework penulisan QA test plan, test cases, test steps, coverage matrix, execution runbook, dan automation mapping berbasis hasil PRD analysis.
+- `test-case-rule.md` — Framework penulisan QA test plan, test cases, test steps, coverage matrix, execution runbook, automation mapping berbasis hasil PRD analysis, dan output manual TSV `SatuInbox Test Case Scenario V2`.
 - `qa-analysis-rule.md` — **WAJIB.** Framework metodologi analisa QA senior untuk semua skenario: PRD analysis, feature dev, bug fix, interconnection, impact, risk. Merged from deprecated `analisa-prd-rule.md`.
 - ~~`analisa-prd-rule.md`~~ — **DEPRECATED.** Semua konten sudah di-merge ke `qa-analysis-rule.md`. Jangan gunakan untuk analisa baru.
 

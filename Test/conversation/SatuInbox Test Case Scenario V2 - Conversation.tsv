@@ -513,8 +513,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-032				 			NEED TO TEST	NEED TO TEST	FAILED
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			12/12/2025
-Url					Description	set reminder validation. quick reminder. in 1 hour(default)	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			12/12/2025
+Url					Description	[UNDEVELOPED] set reminder validation. quick reminder. in 1 hour(default)	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -529,8 +529,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-033				 			NEED TO TEST	NEED TO TEST	FAILED
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			12/12/2025
-Url					Description	set reminder validation. quick reminder. in 2 hour	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			12/12/2025
+Url					Description	[UNDEVELOPED] set reminder validation. quick reminder. in 2 hour	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -545,8 +545,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-034				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. quick reminder. tomorrow, same time	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. quick reminder. tomorrow, same time	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -561,8 +561,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-035				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. quick reminder. in 2 days, same time	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. quick reminder. in 2 days, same time	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -577,8 +577,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-036				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. quick reminder. in a week, same time	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. quick reminder. in a week, same time	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -593,8 +593,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-037				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 0930	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 0930	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -610,8 +610,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-038				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 0930, wait 5 min	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 0930, wait 5 min	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -628,8 +628,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-039				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 0942	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 0942	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:42		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -645,8 +645,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-040				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 0948	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 0948	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:48		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -662,8 +662,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-041				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 0955	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 0955	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:55		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -679,8 +679,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-042				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 2330	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 2330	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 23:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -696,8 +696,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-043				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default, 2350	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default, 2350	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 23:50		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -713,8 +713,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-044				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. 0930, pick 0945	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. 0930, pick 0945	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -730,8 +730,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-045				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. 0930, pick 0945, +3 days	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. 0930, pick 0945, +3 days	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -747,8 +747,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-046				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. 0930, pick 0945, +3 days. Same Value	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. 0930, pick 0945, +3 days. Same Value	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -764,8 +764,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-047				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default 0930, repeat every 3 hours	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default 0930, repeat every 3 hours	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -781,8 +781,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-048				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default 0930, repeat every 6 days	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default 0930, repeat every 6 days	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -798,8 +798,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-049				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default 0930, repeat every 2 weeks	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default 0930, repeat every 2 weeks	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -815,8 +815,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-050				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default 0930, repeat every 1 month	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default 0930, repeat every 1 month	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -832,8 +832,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-051				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. custom time. default 0930, repeat every 12 months	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. custom time. default 0930, repeat every 12 months	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on 15 oct 25, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -849,8 +849,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-052				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. cancel	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. cancel	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	POSITIVE				
 		2	select and open conversation							
 		3	click set reminder button on, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -865,8 +865,8 @@ Steps		1	open your-inbox		test type	POSITIVE
 										
 Test ID	SIX-Convo-053				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. input alphabet on repeat every	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. input alphabet on repeat every	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	NEGATIVE				
 		2	select and open conversation							
 		3	click set reminder button, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -881,8 +881,8 @@ Steps		1	open your-inbox		test type	NEGATIVE
 										
 Test ID	SIX-Convo-054				 			NEED TO TEST	NEED TO TEST	NEED TO TEST
 Created at			07/11/2025		created by	Aka	Tester	Aka		Aka
-Scenario			verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
-Url					Description	set reminder validation. input 3 digits on repeat every	ENV	DEV	STAGGING	PROD
+Scenario			[UNDEVELOPED] verify set reminder		Pre-Condition	accessed inbox page. linked number. have at least 1 conversation	DATE			
+Url					Description	[UNDEVELOPED] set reminder validation. input 3 digits on repeat every	ENV	DEV	STAGGING	PROD
 Steps		1	open your-inbox		test type	NEGATIVE				
 		2	select and open conversation							
 		3	click set reminder button, 09:30		Status Response	Expected Result	Actual Result	Status	Status	Status
@@ -7885,10 +7885,10 @@ Test ID	SIX-Convo-485							PASSED	NEED TO TEST	PASSED
 Scenario			your inbox nav validation		Pre-Condition		DATE	28/11/2025		11/12/2025
 Url					Description	default displayed page after login	ENV	DEV	STAGGING	PROD
 Steps		1	login		test type	POSITIVE				
-		2	select an ongoing convo							
+		2	select an open convo assigned to current user					
 		3	validate chat handler and status		Status Response	Expected Result	Actual Result		Status	Status
 		4				chat.handler == currentUser		Passed		Passed
-		5				chat.status == "assigned" are shown		Passed		Passed
+		5				chat.status == "open" and assignee == currentUser		Passed		Passed
 		6								
 		7								
 		8								

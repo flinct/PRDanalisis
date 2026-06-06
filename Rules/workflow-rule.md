@@ -79,15 +79,16 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 # Before Creating or Updating Test Cases
 
 1. Read `test-case-rule.md` for QA test writing, steps, coverage, and execution support.
-2. Read `qa-analysis-rule.md`, especially Test Specification Layer and Traceability Matrix sections.
-3. Read relevant PRD analysis and impact analysis.
-4. Read the source PRD or patch/addendum.
-5. Read existing test cases in affected scope.
-6. Build requirement-to-test coverage before writing detailed steps.
-7. Ensure test cases stay within feature boundary and do not test out-of-scope behavior as required behavior.
-8. Include regression scenarios from impact analysis.
-9. Include state, RBAC, API/event contract, data lifecycle, migration, rollout, rollback, and observability tests when triggered by PRD analysis.
-10. Define test data, environment, execution entry/exit criteria, evidence, and automation readiness.
+2. If the requested output is a manual TSV file or must follow `SatuInbox Test Case Scenario V2`, use the Manual TSV Output Mode section inside `test-case-rule.md`.
+3. Read `qa-analysis-rule.md`, especially Test Specification Layer and Traceability Matrix sections.
+4. Read relevant PRD analysis and impact analysis.
+5. Read the source PRD or patch/addendum.
+6. Read existing test cases in affected scope.
+7. Build requirement-to-test coverage before writing detailed steps.
+8. Ensure test cases stay within feature boundary and do not test out-of-scope behavior as required behavior.
+9. Include regression scenarios from impact analysis.
+10. Include state, RBAC, API/event contract, data lifecycle, migration, rollout, rollback, and observability tests when triggered by PRD analysis.
+11. Define test data, environment, execution entry/exit criteria, evidence, and automation readiness.
 
 ---
 

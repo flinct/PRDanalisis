@@ -21,6 +21,8 @@ Use this rule when the user asks to:
 
 This rule is for writing executable QA artifacts. For analyzing PRD risk, impact, and requirement gaps, use `Rules/qa-analysis-rule.md` first.
 
+If the requested output must be written into a manual TSV file that follows `SatuInbox Test Case Scenario V2`, use the Manual TSV Output Mode section in this file. This file remains the canonical rule for analysis depth, coverage, step quality, execution discipline, and final TSV shape.
+
 ---
 
 # Required Source Inputs
@@ -56,6 +58,18 @@ If PRD analysis does not exist, create a minimal requirement extraction first us
 | Traceability Matrix | Requirement-to-test mapping and coverage status |
 
 Every important finding from PRD analysis must either produce a test case, be marked as not testable with reason, or be logged as an open question/blocker.
+
+---
+
+# Relationship With Manual TSV Output
+
+When the user asks for a SatuInbox manual test case TSV, use this split:
+
+- `Rules/qa-analysis-rule.md` for requirement extraction, risk, impact, and traceability
+- `Rules/test-case-rule.md` for coverage rules, test data discipline, step writing quality, and execution support
+- the Manual TSV Output Mode section in `Rules/test-case-rule.md` for the final TSV block structure and field naming
+
+Do not force generic QA metadata into the TSV when the template does not provide a field for it. Keep the TSV structurally compatible with the existing files.
 
 ---
 
@@ -424,3 +438,344 @@ Before finalizing QA tests, verify:
 - [ ] Expected results are exact and observable.
 - [ ] Automation readiness is correctly marked.
 - [ ] Execution entry and exit criteria are documented for release validation.
+
+---
+
+# Manual TSV Output Mode
+
+Use this mode when the user asks to:
+
+- create or update `.tsv` test case files
+- follow `SatuInbox Test Case Scenario V2`
+- fill manual test case templates per module
+- produce environment-based execution tracking in existing TSV files
+
+This mode is for manual TSV output only. It does not replace the general QA rigor in the rest of this file.
+
+## TSV Output Principles
+
+Every manual TSV test case must:
+
+- follow the existing template structure exactly
+- stay readable for testers and reviewers
+- contain short, executable, repeatable steps
+- contain observable expected results
+- stay consistent with existing module files
+
+## TSV Output vs Generic QA Fields
+
+Map generic QA fields to TSV as follows:
+
+| Generic QA Field | TSV Field |
+| ----- | ----- |
+| `TC-ID` | `Test ID` |
+| `Precondition` | `Pre-Condition` |
+| `Steps` | `Steps` |
+| `Expected Result` | `Expected Result` |
+| Environment / execution status | `ENV` and per-environment status columns |
+
+The following generic QA metadata must not be forced into the TSV if the template does not provide an explicit field:
+
+- `Req ID`
+- `Level`
+- `Priority`
+- `Test Data`
+- `Postcondition`
+- `Automation Status`
+
+If the user asks for traceability, priority, test data, or automation mapping, provide them in a supporting document or in another requested format, not by breaking the TSV structure.
+
+## TSV File Structure
+
+A manual TSV file contains two main parts:
+
+1. Summary section at the top.
+2. Repeated test case blocks.
+
+### Summary Section Rules
+
+Preserve the existing template layout.
+
+- `total cases =` must contain the total number of test cases in the file.
+- Environment labels must remain `DEV`, `STAGGING`, and `PROD` to stay compatible with the existing template.
+- Each environment summary uses:
+  - `Passed`
+  - `Failed`
+  - `Need to test`
+  - `On test`
+  - `No Status`
+- Summary counts must match the actual case statuses in the file.
+
+### Test Case Block Structure
+
+Each test case block must keep this field order:
+
+1. `Test ID`
+2. `Create at`
+3. `created by`
+4. `Tester`
+5. `Scenario`
+6. `Pre-Condition`
+7. `DATE`
+8. `Url`
+9. `Description`
+10. `ENV`
+11. `Steps`
+12. `test type`
+13. `Status Response`
+14. `Expected Result`
+15. `Actual Result`
+16. `Status`
+
+Do not change field order, labels, or block layout.
+
+## TSV Field Writing Rules
+
+### `Test ID`
+
+- Must be unique within the file.
+- Use a stable module prefix.
+- Recommended format:
+
+```text
+SIX-<MODULE>-001
+SIX-<MODULE>-002
+SIX-<MODULE>-003
+```
+
+Examples:
+
+- `SIX-AUTH-001`
+- `SIX-TICKET-001`
+- `SIX-SETTING-001`
+
+If an existing file already uses another stable pattern such as `SIX-Test-001`, keep that pattern consistent within the file instead of mixing formats.
+
+### `Create at`
+
+- Fill with test case creation date.
+- Use one consistent date format per file.
+- Safe existing format: `DD/MM/YYYY`.
+
+### `created by`
+
+- Fill with the author name.
+- Use one consistent author naming style.
+
+### `Tester`
+
+- Fill when a tester is assigned.
+- May stay empty when no PIC is assigned yet.
+
+### `Scenario`
+
+- Write one short and specific validation target.
+- One test case should validate one main objective.
+- Do not combine multiple unrelated rules in one scenario.
+
+Good patterns:
+
+- `Register with valid fullname, email, username, phone, password`
+- `Verify fullname validation`
+- `Duplicate email`
+
+### `Pre-Condition`
+
+- Describe the required starting state.
+- Keep it factual, not procedural.
+- Leave empty if there is no special setup.
+
+Good examples:
+
+- `Existing email in DB`
+- `existing username in DB`
+- `User already logged in as Admin`
+
+Bad examples:
+
+- `Open register page`
+- `Click submit`
+
+### `DATE`
+
+- Fill with execution date when the test has been run.
+- May stay empty if not executed yet.
+- Use the same date format as `Create at`.
+
+### `Url`
+
+- Fill with the main page, domain, or endpoint under test.
+- Keep it short and relevant.
+
+Examples:
+
+- `dev-v2.satuinbox.com`
+- `/auth/register`
+- `/settings/team-member`
+
+For UI testing, use the relevant domain or page.
+For API testing, use the relevant endpoint.
+
+### `Description`
+
+- Explain the objective in one sentence.
+- Focus on the behavior being verified.
+- Prefer patterns such as `Verify ...` or `Try ...`.
+
+Examples:
+
+- `Verify user can register successfully with valid input`
+- `Try input fullname with <3 characters`
+- `Verify system rejects duplicate email`
+
+`Description` must stay consistent with `Scenario`, `test type`, and the expected results.
+
+### `ENV`
+
+- Keep the environment columns as `DEV`, `Staging`, and `Prod`.
+- Fill status in the corresponding environment status cells.
+
+### `Steps`
+
+- Steps must be ordered and repeatable.
+- Start each step with an action verb.
+- Write one main action per step.
+- Include exact input values when relevant.
+- Add DB validation as a separate step only when needed.
+
+Good examples:
+
+1. `Open register page`
+2. `Input fullname "John Doe"`
+3. `Click Register`
+
+Bad examples:
+
+1. `Testing registration`
+2. `Do the process`
+
+If one scenario needs too many steps because it covers several different validations, split it into multiple test cases.
+
+### `test type`
+
+- Must be `POSITIVE` or `NEGATIVE`.
+- Use `POSITIVE` for accepted or success behavior.
+- Use `NEGATIVE` for invalid input, permission denial, duplicates, limits, and error handling.
+
+### `Status Response` / `Expected Result`
+
+Use this area as the list of observable checkpoints.
+
+- Each row should represent one verification point.
+- Write outcome statements, not instructions.
+- Keep each expected result singular when possible.
+- Expected results must align with `Description` and `Steps`.
+
+Good examples:
+
+- `Register Failed`
+- `System will display Error: "invalid email format"`
+- `System must not sent verification email`
+
+Bad examples:
+
+- `Check error`
+- `Make sure it works`
+
+Use observable outcomes such as:
+
+- UI state change
+- API response
+- error message
+- data change
+- relevant event or side effect
+
+### `Actual Result`
+
+- Fill with the factual execution result.
+- Leave empty if not tested yet.
+- Keep it short and specific.
+
+Examples:
+
+- `no email services`
+- `system returning error Nama pengguna hanya boleh berisi huruf kecil dan angka`
+- `redirected to dashboard`
+
+### `Status`
+
+Use one consistent status vocabulary.
+
+Existing values in current files:
+
+- `Passed`
+- `Failed`
+- `Need to Test`
+- `On Test`
+- `No Status`
+
+Usage:
+
+- `Passed`: actual result matches expected result
+- `Failed`: actual result does not match expected result
+- `Need to Test`: not started
+- `On Test`: in progress or not finalized yet
+- `No Status`: only when the template or process still needs it
+
+For per-case header summary values, keep uppercase if the existing file already uses it, for example:
+
+- `PASSED`
+- `FAILED`
+- `NEED TO TEST`
+- `ON TEST`
+
+## TSV Granularity Rules
+
+Split into separate test cases when:
+
+- the validation rule is different
+- the main expected result is different
+- the precondition is materially different
+- the test type changes between positive and negative
+
+Good split examples:
+
+- fullname below minimum length = one test case
+- fullname above maximum length = one test case
+- fullname contains numbers = one test case
+
+Do not merge all such validations into one test case.
+
+## TSV Language Rules
+
+- Use one primary language within the file.
+- Existing examples mostly use simple English for steps and descriptions.
+- System terms and error messages may follow the actual product language.
+- Avoid unnecessary mixed-language sentences.
+- Keep sentences short and direct.
+
+## TSV Quality Checklist
+
+Every manual TSV test case should satisfy this checklist:
+
+- clear objective
+- specific input or condition
+- repeatable steps
+- observable expected result
+- unambiguous per-environment status
+
+Avoid:
+
+- overly generic scenarios
+- jumpy or incomplete steps
+- unverifiable expected results
+- one test case covering many objectives
+- inconsistent status naming
+
+## TSV Consistency Notes
+
+- Keep the template structure intact.
+- Keep step numbering sequential.
+- Keep status naming consistent across the file.
+- Update `total cases` and the top summary after adding or changing test cases.
+- Prefer one module-specific `Test ID` prefix per file.
