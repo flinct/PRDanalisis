@@ -14,7 +14,7 @@ Steps		1	Open register page		test type	POSITIVE
 		2	Input fullname “John Doe”							
 		3			Status Response	Expected Result	Actual Result	Status		Status
 		4				Successfull register		Passed		
-		5				System will display success register page		Passed		
+		5				System will display success register page	testing	Failed		
 		6				System will sent an email to verify register	no email services	Failed		
 
 

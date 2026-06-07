@@ -1,0 +1,3551 @@
+{
+  "schemaVersion": 1,
+  "sourceFile": "auth/AUTH.tsv",
+  "sourceFileName": "AUTH.tsv",
+  "createdAt": "2026-06-07T14:58:08.215Z",
+  "updatedAt": "2026-06-07T15:01:35.193Z",
+  "cases": {
+    "SIX-Test-001": {
+      "testcaseId": "SIX-Test-001",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "testing",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T15:01:35.193Z"
+      },
+      "history": [
+        {
+          "eventId": "evt_1780844495193_ob3c0",
+          "action": "update",
+          "at": "2026-06-07T15:01:35.193Z",
+          "snapshot": {
+            "notes": "",
+            "overallStatus": {
+              "DEV": "PASSED",
+              "Staging": "NEED TO TEST",
+              "Prod": "NEED TO TEST"
+            },
+            "results": [
+              {
+                "rowKey": "1",
+                "actual": "",
+                "status": {
+                  "DEV": "Passed",
+                  "Staging": "",
+                  "Prod": ""
+                }
+              },
+              {
+                "rowKey": "2",
+                "actual": "",
+                "status": {
+                  "DEV": "Failed",
+                  "Staging": "",
+                  "Prod": ""
+                }
+              },
+              {
+                "rowKey": "3",
+                "actual": "no email services",
+                "status": {
+                  "DEV": "Failed",
+                  "Staging": "",
+                  "Prod": ""
+                }
+              }
+            ],
+            "updatedAt": "2026-06-07T14:58:08.215Z"
+          }
+        }
+      ]
+    },
+    "SIX-Test-002": {
+      "testcaseId": "SIX-Test-002",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-003": {
+      "testcaseId": "SIX-Test-003",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-004": {
+      "testcaseId": "SIX-Test-004",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-005": {
+      "testcaseId": "SIX-Test-005",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-006": {
+      "testcaseId": "SIX-Test-006",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-007": {
+      "testcaseId": "SIX-Test-007",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "ON TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-008": {
+      "testcaseId": "SIX-Test-008",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "ON TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-009": {
+      "testcaseId": "SIX-Test-009",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-010": {
+      "testcaseId": "SIX-Test-010",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-011": {
+      "testcaseId": "SIX-Test-011",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "ON TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-012": {
+      "testcaseId": "SIX-Test-012",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "NEED TO TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "5",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-013": {
+      "testcaseId": "SIX-Test-013",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-014": {
+      "testcaseId": "SIX-Test-014",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-015": {
+      "testcaseId": "SIX-Test-015",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-016": {
+      "testcaseId": "SIX-Test-016",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-017": {
+      "testcaseId": "SIX-Test-017",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-018": {
+      "testcaseId": "SIX-Test-018",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "system returning error Nama pengguna hanya boleh berisi huruf kecil dan angka",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-019": {
+      "testcaseId": "SIX-Test-019",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "system do no validate trailing spaces",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-020": {
+      "testcaseId": "SIX-Test-020",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "NEED TO TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-021": {
+      "testcaseId": "SIX-Test-021",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "NEED TO TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-022": {
+      "testcaseId": "SIX-Test-022",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-023": {
+      "testcaseId": "SIX-Test-023",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-024": {
+      "testcaseId": "SIX-Test-024",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-025": {
+      "testcaseId": "SIX-Test-025",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-026": {
+      "testcaseId": "SIX-Test-026",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-027": {
+      "testcaseId": "SIX-Test-027",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "NEED TO TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "System do not trim spaces",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-028": {
+      "testcaseId": "SIX-Test-028",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "input 02xxx, validation failed",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-029": {
+      "testcaseId": "SIX-Test-029",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "input  02xxx, validation failed",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-030": {
+      "testcaseId": "SIX-Test-030",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-031": {
+      "testcaseId": "SIX-Test-031",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-032": {
+      "testcaseId": "SIX-Test-032",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-033": {
+      "testcaseId": "SIX-Test-033",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "",
+          "Prod": "rizal"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-034": {
+      "testcaseId": "SIX-Test-034",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-035": {
+      "testcaseId": "SIX-Test-035",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System allow password contains username / email",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-036": {
+      "testcaseId": "SIX-Test-036",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System allow password contains username / email",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-037": {
+      "testcaseId": "SIX-Test-037",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System allow password contains spacing",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "no email services",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-038": {
+      "testcaseId": "SIX-Test-038",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-039": {
+      "testcaseId": "SIX-Test-039",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-040": {
+      "testcaseId": "SIX-Test-040",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-041": {
+      "testcaseId": "SIX-Test-041",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-042": {
+      "testcaseId": "SIX-Test-042",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "5",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "6",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "7",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "8",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "9",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-043": {
+      "testcaseId": "SIX-Test-043",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-044": {
+      "testcaseId": "SIX-Test-044",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-045": {
+      "testcaseId": "SIX-Test-045",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-046": {
+      "testcaseId": "SIX-Test-046",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System allow input number only",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-047": {
+      "testcaseId": "SIX-Test-047",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System do not validate duplication organization name",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-048": {
+      "testcaseId": "SIX-Test-048",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-049": {
+      "testcaseId": "SIX-Test-049",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limit the input to 13 digits",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-050": {
+      "testcaseId": "SIX-Test-050",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-051": {
+      "testcaseId": "SIX-Test-051",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-052": {
+      "testcaseId": "SIX-Test-052",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-053": {
+      "testcaseId": "SIX-Test-053",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-054": {
+      "testcaseId": "SIX-Test-054",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limit the input to 15 digits",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-055": {
+      "testcaseId": "SIX-Test-055",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-056": {
+      "testcaseId": "SIX-Test-056",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-057": {
+      "testcaseId": "SIX-Test-057",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-058": {
+      "testcaseId": "SIX-Test-058",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-059": {
+      "testcaseId": "SIX-Test-059",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-060": {
+      "testcaseId": "SIX-Test-060",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "NEED TO TEST",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "no message error validation ",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-061": {
+      "testcaseId": "SIX-Test-061",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "no message error validation, file successfully inputed",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-062": {
+      "testcaseId": "SIX-Test-062",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-063": {
+      "testcaseId": "SIX-Test-063",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limit the input to 16 digits",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-064": {
+      "testcaseId": "SIX-Test-064",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-065": {
+      "testcaseId": "SIX-Test-065",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "System limits the input accept only numbers",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-066": {
+      "testcaseId": "SIX-Test-066",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-067": {
+      "testcaseId": "SIX-Test-067",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "login failed",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "user stay on login page",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-068": {
+      "testcaseId": "SIX-Test-068",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-069": {
+      "testcaseId": "SIX-Test-069",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-070": {
+      "testcaseId": "SIX-Test-070",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "login successfull",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "userd directed to dashboard",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "insensitive username field, when sign up needed to be lowercase",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-071": {
+      "testcaseId": "SIX-Test-071",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-072": {
+      "testcaseId": "SIX-Test-072",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "system will display error Password minimal 6 karakter",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-073": {
+      "testcaseId": "SIX-Test-073",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "system will display error Password minimal 6 karakter",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-074": {
+      "testcaseId": "SIX-Test-074",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "FAILED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Failed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-075": {
+      "testcaseId": "SIX-Test-075",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-076": {
+      "testcaseId": "SIX-Test-076",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "PASSED",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "Passed",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-077": {
+      "testcaseId": "SIX-Test-077",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-078": {
+      "testcaseId": "SIX-Test-078",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    },
+    "SIX-Test-079": {
+      "testcaseId": "SIX-Test-079",
+      "current": {
+        "notes": "",
+        "overallStatus": {
+          "DEV": "",
+          "Staging": "NEED TO TEST",
+          "Prod": "NEED TO TEST"
+        },
+        "results": [
+          {
+            "rowKey": "1",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "2",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "3",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "4",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "5",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "6",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "7",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "8",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "9",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "10",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "11",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "12",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "13",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "14",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          },
+          {
+            "rowKey": "15",
+            "actual": "",
+            "status": {
+              "DEV": "",
+              "Staging": "",
+              "Prod": ""
+            }
+          }
+        ],
+        "updatedAt": "2026-06-07T14:58:08.215Z"
+      },
+      "history": []
+    }
+  }
+}
