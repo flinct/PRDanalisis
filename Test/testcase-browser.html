@@ -250,13 +250,44 @@
   }
 
   // ─── EXEC JSON BUILDER ───────────────────────────────────────────────────────
-  function hasExecChange(oldCur, newCur) {
-    if (!oldCur) return false;
-    if ((oldCur.notes||'') !== (newCur.notes||'')) return true;
-    for (const e of ENV) {
-      if ((oldCur.overallStatus?.[e]||'') !== (newCur.overallStatus?.[e]||'')) return true;
+  // Builds a full snapshot of a TC (definition + execution) for storage in JSON
+  function tcToSnapshot(tc) {
+    return {
+      testType:        tc.testType || '',
+      tester:          tc.tester || '',
+      createDate:      tc.createDate || '',
+      scenario:        tc.scenario || '',
+      precondition:    tc.precondition || '',
+      description:     tc.description || '',
+      url:             tc.url || '',
+      steps:           [...(tc.steps || [])],
+      expectedResults: (tc.expectedResults || []).map(er => ({ ...er })),
+      notes:           tc.exec?.notes || '',
+      overallStatus:   { DEV:'', Staging:'', Prod:'', ...(tc.exec?.overallStatus||{}) },
+      results:         (tc.exec?.results || []).map(r => ({
+        rowKey: r.rowKey,
+        actual: r.actual || '',
+        status: { DEV:r.status?.DEV||'', Staging:r.status?.Staging||'', Prod:r.status?.Prod||'' },
+      })),
+      updatedAt: tc.exec?.updatedAt || null,
+    };
+  }
+
+  function hasAnyChange(oldSnap, newSnap) {
+    if (!oldSnap) return true;
+    const defFields = ['testType','tester','createDate','scenario','precondition','description','url'];
+    for (const f of defFields) {
+      if ((oldSnap[f]||'') !== (newSnap[f]||'')) return true;
     }
-    const or = oldCur.results||[], nr = newCur.results||[];
+    const os = oldSnap.steps||[], ns = newSnap.steps||[];
+    if (os.length !== ns.length || os.some((s,i) => s !== ns[i])) return true;
+    const oe = oldSnap.expectedResults||[], ne = newSnap.expectedResults||[];
+    if (oe.length !== ne.length || oe.some((e,i) => (e.expected||'') !== (ne[i]?.expected||''))) return true;
+    if ((oldSnap.notes||'') !== (newSnap.notes||'')) return true;
+    for (const e of ENV) {
+      if ((oldSnap.overallStatus?.[e]||'') !== (newSnap.overallStatus?.[e]||'')) return true;
+    }
+    const or = oldSnap.results||[], nr = newSnap.results||[];
     if (or.length !== nr.length) return true;
     for (let i=0; i<or.length; i++) {
       if ((or[i].actual||'') !== (nr[i].actual||'')) return true;
@@ -275,42 +306,29 @@
     for (const tc of cases) {
       if (!tc.id) continue;
       const prevCase = prevCases[tc.id];
-      const oldCurrent = prevCase?.current || null;
+      const oldFull = prevCase?.current || null; // full snapshot from previous save
 
-      const newCurrent = {
-        notes: tc.exec.notes||'',
-        overallStatus: {
-          DEV:     tc.exec.overallStatus.DEV||'',
-          Staging: tc.exec.overallStatus.Staging||'',
-          Prod:    tc.exec.overallStatus.Prod||'',
-        },
-        results: tc.exec.results.map(r => ({
-          rowKey: r.rowKey,
-          actual: r.actual||'',
-          status: { DEV:r.status.DEV||'', Staging:r.status.Staging||'', Prod:r.status.Prod||'' },
-        })),
-        updatedAt: tc.exec.updatedAt || now,
-      };
+      const newFull = tcToSnapshot(tc);
 
       const prevHistory = prevCase?.history || [];
       let newHistory = [...prevHistory];
 
-      if (hasExecChange(oldCurrent, newCurrent)) {
-        if (oldCurrent) {
+      if (hasAnyChange(oldFull, newFull)) {
+        if (oldFull) {
           newHistory.push({
             eventId: uid(),
             action: tc._isReset ? 'reset' : 'update',
             at: now,
             ...(tc._resetReason ? { reason: tc._resetReason } : {}),
-            snapshot: oldCurrent,
+            snapshot: oldFull,  // full previous state (definition + execution)
           });
         }
-        newCurrent.updatedAt = now;
+        newFull.updatedAt = now;
       }
 
       newCasesMap[tc.id] = {
         testcaseId: tc.id,
-        current: newCurrent,
+        current: newFull,
         history: newHistory,
       };
     }
@@ -458,6 +476,18 @@
     try { const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('handles','readonly').objectStore('handles').get('root'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
     catch { return null; }
   }
+  async function saveLastFileIDB(path) { try { const db=await openIDB(); db.transaction('handles','readwrite').objectStore('handles').put(path,'lastFile'); } catch(e){} }
+  async function loadLastFileIDB() {
+    try { const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('handles','readonly').objectStore('handles').get('lastFile'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
+    catch { return null; }
+  }
+  function findNodeByPath(nodes, targetPath) {
+    for (const n of nodes) {
+      if (n.kind==='file' && n.path===targetPath) return n;
+      if (n.kind==='dir' && n.children) { const f=findNodeByPath(n.children,targetPath); if(f) return f; }
+    }
+    return null;
+  }
   async function writeFile(fh, text) { const w=await fh.createWritable(); await w.write(text); await w.close(); }
 
   // ─── UI PRIMITIVES ────────────────────────────────────────────────────────────
@@ -496,9 +526,108 @@
   }
 
   // ─── HISTORY PANEL ────────────────────────────────────────────────────────────
-  function HistoryPanel({ history }) {
+  // Computes field-level diff between two full snapshots (definition + execution)
+  function diffAll(before, after) {
+    const changes = [];
+    if (!before || !after) return changes;
+
+    // Definition fields
+    const defMap = [
+      ['Test Type',     'testType'],
+      ['Tester',        'tester'],
+      ['Date',          'createDate'],
+      ['Scenario',      'scenario'],
+      ['Pre-Condition', 'precondition'],
+      ['Description',   'description'],
+      ['URL',           'url'],
+    ];
+    for (const [label, key] of defMap) {
+      const bv = before[key]||'', av = after[key]||'';
+      if (bv !== av) changes.push({ field:label, from:bv, to:av, type:'text' });
+    }
+
+    // Steps
+    const bs = before.steps||[], as_s = after.steps||[];
+    const maxS = Math.max(bs.length, as_s.length);
+    for (let i=0; i<maxS; i++) {
+      const bv = bs[i]||'', av = as_s[i]||'';
+      if (bv !== av) changes.push({ field:`Step ${i+1}`, from:bv, to:av, type:'text' });
+    }
+
+    // Expected results (definition)
+    const be = before.expectedResults||[], ae = after.expectedResults||[];
+    const maxE = Math.max(be.length, ae.length);
+    for (let i=0; i<maxE; i++) {
+      const bv = be[i]?.expected||'', av = ae[i]?.expected||'';
+      const rk = be[i]?.key || ae[i]?.key || String(i+1);
+      if (bv !== av) changes.push({ field:`Expected ${rk}`, from:bv, to:av, type:'text' });
+    }
+
+    // Overall status per env
+    for (const e of ENV) {
+      const bv = before.overallStatus?.[e]||'', av = after.overallStatus?.[e]||'';
+      if (bv !== av) changes.push({ field:`Overall ${e}`, from:bv, to:av, type:'status' });
+    }
+
+    // Notes
+    const bn = before.notes||'', an = after.notes||'';
+    if (bn !== an) changes.push({ field:'Notes', from:bn, to:an, type:'text' });
+
+    // Results: actual + status per row
+    const br = before.results||[], ar = after.results||[];
+    const maxR = Math.max(br.length, ar.length);
+    for (let i=0; i<maxR; i++) {
+      const bRow = br[i]||{}, aRow = ar[i]||{};
+      const rk = bRow.rowKey || aRow.rowKey || String(i+1);
+      if ((bRow.actual||'') !== (aRow.actual||''))
+        changes.push({ field:`Row ${rk} Actual`, from:bRow.actual||'', to:aRow.actual||'', type:'text' });
+      for (const e of ENV) {
+        const bst = bRow.status?.[e]||'', ast = aRow.status?.[e]||'';
+        if (bst !== ast) changes.push({ field:`Row ${rk} ${e}`, from:bst, to:ast, type:'status' });
+      }
+    }
+
+    return changes;
+  }
+
+  function DiffRow({ change }) {
+    const isEmpty = v => !v || v.trim() === '';
+    return (
+      <div style={{ display:'flex', alignItems:'center', gap:6, padding:'3px 0', flexWrap:'wrap' }}>
+        <span style={{ fontSize:10, color:'#475569', minWidth:110, flexShrink:0 }}>{change.field}</span>
+        <span style={{ fontSize:10 }}>
+          {isEmpty(change.from)
+            ? <span style={{ color:'#334155', fontStyle:'italic' }}>—</span>
+            : change.type==='status'
+              ? <span style={sStyle(change.from)}>{change.from}</span>
+              : <span style={{ color:'#ef4444', background:'#2d0e0e', padding:'1px 6px', borderRadius:4, fontFamily:'inherit', maxWidth:240, display:'inline-block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', verticalAlign:'middle' }}>{change.from}</span>
+          }
+        </span>
+        <span style={{ fontSize:10, color:'#334155' }}>→</span>
+        <span style={{ fontSize:10 }}>
+          {isEmpty(change.to)
+            ? <span style={{ color:'#334155', fontStyle:'italic' }}>—</span>
+            : change.type==='status'
+              ? <span style={sStyle(change.to)}>{change.to}</span>
+              : <span style={{ color:'#4ade80', background:'#052e16', padding:'1px 6px', borderRadius:4, fontFamily:'inherit', maxWidth:240, display:'inline-block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', verticalAlign:'middle' }}>{change.to}</span>
+          }
+        </span>
+      </div>
+    );
+  }
+
+  function HistoryPanel({ history, currentSnapshot }) {
     const [open, setOpen] = useState(false);
     if (!history || history.length === 0) return null;
+
+    // Build entries with afterState: entry[i]'s afterState = entry[i+1].snapshot or currentSnapshot
+    const withAfter = history.map((evt, i) => ({
+      ...evt,
+      afterState: history[i + 1]?.snapshot ?? currentSnapshot ?? null,
+    }));
+    // Display in reverse chronological order (most recent first)
+    const displayed = [...withAfter].reverse();
+
     return (
       <div style={{ marginTop:10, border:'1px solid #1e293b', borderRadius:6, overflow:'hidden' }}>
         <div onClick={()=>setOpen(o=>!o)}
@@ -509,41 +638,40 @@
         </div>
         {open && (
           <div>
-            {[...history].reverse().map((evt, i) => (
-              <div key={evt.eventId||i} style={{ padding:'10px 14px', borderTop:'1px solid #0a0f1a', background:i%2===0?'transparent':'#06090f' }}>
-                <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:6, flexWrap:'wrap' }}>
-                  <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10,
-                    background:evt.action==='reset'?'#2a1a04':'#060d1c',
-                    color:evt.action==='reset'?'#fbbf24':'#60a5fa',
-                    border:`1px solid ${evt.action==='reset'?'#713f12':'#1e3a5f'}` }}>
-                    {(evt.action||'update').toUpperCase()}
-                  </span>
-                  <span style={{ fontSize:10, color:'#475569' }}>{fmtDate(evt.at)}</span>
-                  {evt.reason && <span style={{ fontSize:10, color:'#94a3b8' }}>— {evt.reason}</span>}
-                </div>
-                <div style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:4 }}>
-                  {ENV.map(e => {
-                    const st = evt.snapshot?.overallStatus?.[e];
-                    return st ? (
-                      <div key={e} style={{ display:'flex', gap:4, alignItems:'center' }}>
-                        <span style={{ fontSize:9, color:'#334155' }}>{e}:</span>
-                        <span style={sStyle(st)}>{st}</span>
+            {displayed.map((evt, i) => {
+              const changes = diffAll(evt.snapshot, evt.afterState);
+              return (
+                <div key={evt.eventId||i} style={{ padding:'10px 14px', borderTop:'1px solid #0a0f1a', background:i%2===0?'transparent':'#06090f' }}>
+                  {/* Header row */}
+                  <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8, flexWrap:'wrap' }}>
+                    <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10,
+                      background:evt.action==='reset'?'#2a1a04':'#060d1c',
+                      color:evt.action==='reset'?'#fbbf24':'#60a5fa',
+                      border:`1px solid ${evt.action==='reset'?'#713f12':'#1e3a5f'}` }}>
+                      {(evt.action||'update').toUpperCase()}
+                    </span>
+                    <span style={{ fontSize:10, color:'#475569' }}>{fmtDate(evt.at)}</span>
+                    {evt.reason && <span style={{ fontSize:10, color:'#94a3b8' }}>— {evt.reason}</span>}
+                    <span style={{ fontSize:9, color:'#1e293b', marginLeft:'auto' }}>
+                      {changes.length} field{changes.length!==1?'s':''} changed
+                    </span>
+                  </div>
+                  {/* Diff table */}
+                  {changes.length > 0
+                    ? (
+                      <div style={{ background:'#080c14', borderRadius:4, padding:'6px 10px', border:'1px solid #1e2d45' }}>
+                        {changes.map((c, ci) => <DiffRow key={ci} change={c} />)}
                       </div>
-                    ) : null;
-                  })}
+                    )
+                    : (
+                      <div style={{ fontSize:10, color:'#334155', fontStyle:'italic' }}>
+                        (no diff data — snapshot only)
+                      </div>
+                    )
+                  }
                 </div>
-                {evt.snapshot?.notes && (
-                  <div style={{ fontSize:11, color:'#64748b', padding:'4px 8px', background:'#0a0f1a', borderRadius:4, marginBottom:4 }}>
-                    Notes: {evt.snapshot.notes}
-                  </div>
-                )}
-                {(evt.snapshot?.results||[]).filter(r=>r.actual).map((r,ri)=>(
-                  <div key={ri} style={{ fontSize:10, color:'#475569', marginTop:2 }}>
-                    Row {r.rowKey}: <span style={{ color:'#94a3b8' }}>{r.actual}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -601,7 +729,7 @@
   }
 
   // ─── CARD EDITOR ─────────────────────────────────────────────────────────────
-  function CardEditor({ cases:initCases, execData:initExecData, fileHandle, rootHandle, filePath, onSaved }) {
+  function CardEditor({ cases:initCases, execData:initExecData, fileHandle, rootHandle, filePath }) {
     const [cases, setCases]       = useState(initCases);
     const [execData, setExecData] = useState(initExecData);
     const [expanded, setExpanded] = useState(null);
@@ -613,7 +741,7 @@
     const [saveMsg, setSaveMsg]   = useState('');
     const [resetIdx, setResetIdx] = useState(null);
 
-    useEffect(()=>{ setCases(initCases); setExecData(initExecData); setDirty(false); setExpanded(null); }, [initCases]);
+    useEffect(()=>{ setCases(initCases); setExecData(initExecData); setDirty(false); }, [initCases]);
 
     // ── state helpers ──
     function upd(i, fn) { setCases(p=>{ const n=[...p]; n[i]=fn({...n[i]}); return n; }); setDirty(true); }
@@ -697,7 +825,6 @@
 
         setDirty(false);
         setSaveMsg('Saved ✓'); setTimeout(()=>setSaveMsg(''),2500);
-        if (onSaved) onSaved();
       } catch(e) { setSaveMsg('Error: '+e.message); }
       setSaving(false);
     }
@@ -896,7 +1023,7 @@
                     </div>
 
                     {/* History */}
-                    <HistoryPanel history={tc.history}/>
+                    <HistoryPanel history={tc.history} currentSnapshot={tcToSnapshot(tc)}/>
 
                     {/* Actions */}
                     <div style={{ display:'flex', justifyContent:'space-between', marginTop:14 }}>
@@ -970,7 +1097,14 @@
           const perm = await h.queryPermission({ mode:'readwrite' });
           if(perm==='granted') {
             setRootHandle(h); setDirName(h.name); setLoading(true);
-            setTree(await scanDir(h)); setLoading(false);
+            const newTree = await scanDir(h);
+            setTree(newTree); setLoading(false);
+            // Auto-reopen last file after page reload (e.g. triggered by Live Server)
+            const lastPath = await loadLastFileIDB();
+            if (lastPath) {
+              const node = findNodeByPath(newTree, lastPath);
+              if (node) openFile(node, h);
+            }
           } else {
             setSavedHandle(h);
           }
@@ -982,8 +1116,15 @@
       await saveHandleIDB(handle);
       setRootHandle(handle); setSavedHandle(null);
       setDirName(handle.name); setLoading(true);
-      setTree(await scanDir(handle));
+      const newTree = await scanDir(handle);
+      setTree(newTree);
       setSelected(null); setFileData(null); setLoading(false);
+      // Auto-reopen last file if available
+      const lastPath = await loadLastFileIDB();
+      if (lastPath) {
+        const node = findNodeByPath(newTree, lastPath);
+        if (node) openFile(node, handle);
+      }
     }
 
     async function openFolder() {
@@ -997,16 +1138,18 @@
       catch(e) { if(e.name!=='AbortError') setError(e.message); }
     }
 
-    async function openFile(node) {
+    async function openFile(node, rootHandleOverride) {
+      const effRoot = rootHandleOverride || rootHandle;
       setSelected(node); setFileData(null); setLoading(true);
+      await saveLastFileIDB(node.path);
       try {
         const text = await (await node.handle.getFile()).text();
         if(node.ext==='md'||node.ext==='txt') {
           setFileData({ type:'md', content:text });
         } else {
           const parsed = parseFile(text, node.ext);
-          if(parsed.type==='card' && rootHandle) {
-            const execData = await loadExecFile(rootHandle, node.path);
+          if(parsed.type==='card' && effRoot) {
+            const execData = await loadExecFile(effRoot, node.path);
             const mergedCases = mergeExecIntoCases(parsed.cases, execData);
             setFileData({ ...parsed, cases:mergedCases, execData:execData||null });
           } else {
@@ -1017,9 +1160,6 @@
       setLoading(false);
     }
 
-    async function refreshTree() {
-      if(rootHandle) setTree(await scanDir(rootHandle));
-    }
 
     return (
       <div style={{ display:'flex', flexDirection:'column', height:'100vh', color:'#e2e8f0', background:'#080c14' }}>
@@ -1114,12 +1254,12 @@
                 <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
                   {fileData.type==='card' && (
                     <CardEditor
+                      key={selected?.path}
                       cases={fileData.cases}
                       execData={fileData.execData}
                       fileHandle={selected.handle}
                       rootHandle={rootHandle}
                       filePath={selected.path}
-                      onSaved={refreshTree}
                     />
                   )}
                   {fileData.type==='flat' && <div style={{ overflowY:'auto', flex:1 }}><FlatViewer headers={fileData.headers} rows={fileData.rows}/></div>}
