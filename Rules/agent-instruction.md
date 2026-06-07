@@ -80,8 +80,9 @@ Rules/impact-analysis-rule.md     → Jika test perlu regression, rollout, rollb
 
 ```
 Rules/memory-routing-rule.md      → WAJIB. Tahu konten masuk global atau feature memory.
-Rules/memory-write-rule.md        → WAJIB. Format penulisan.
-Rules/global-memory-write-rule.md → Jika akan update global memory.
+Rules/memory-write-rule.md        → Jika akan menulis memory baru.
+Rules/memory-update-rule.md       → Jika akan update feature memory yang sudah ada.
+Rules/global-memory-write-rule.md → Jika akan menulis global memory baru.
 Rules/global-memory-update-rule.md→ Jika akan update global memory.
 ```
 
