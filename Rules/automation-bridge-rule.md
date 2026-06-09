@@ -27,6 +27,7 @@
 3. **Regenerate JSON artifacts** in `Test/conversation/` if needed.
 4. **Sync/generate automation specs** in `sixV2Automation` from the updated TSV/JSON.
 5. **Update `sixV2Automation/AGENTS.md`** whenever generated scripts, page objects, or test counts change.
+6. **Do not use a single meta-spec as the final automation target**; bucket the testcase into the real spec files (`convo-list-overview`, `convo-room`, `convo-detail-panel`, `convo-nav`, `convo-list-features`, `convo-supplement`).
 
 ---
 
