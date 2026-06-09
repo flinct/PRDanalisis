@@ -1,0 +1,484 @@
+total cases =			30								
+DEV				STAGGING			PROD		created at	03/03/2026	
+Passed			24	Passed		0	Passed	0	update by		
+Failed			0	Failed		0	Failed	0	update at		
+Need to test			0	Need to test		0	Need to test	0			
+On test			0	On test		0	On test	0			
+No Status			6	No Status		30	No Status	30			
+Test ID	SalesContact-001							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	rizal			
+Scenario			Create new contact with unique identifier from sales flow		Pre-Condition	logged in as sales agent, Identifier not exist in workspace	DATE	12/05/2026			
+Url					Description	GLOBAL CONTACT - New Identifier	ENV	DEV	STAGGING	PROD	
+Steps		1	open add new lead form		test type	POSITIVE					
+		2	fill in lead title and team inbox								
+		3	click new contact tab		Status Response	Expected Result	Actual Result	Status		Status	
+		4	enter a new whatsapp number (+62)			Form opens successfully		Passed			
+		5	fill in all required fields			New contact tab is available		Passed			
+		6	click save lead			Whatsapp field accepts E.164 format		Passed			
+		7				One global contact created		Passed			
+		8				One sales area context created with area = sales		Passed			
+		9				Lead linked to new global contact		Passed			
+											
+											
+											
+Test ID	SalesContact-002							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	rizal			
+Scenario			Create contact with identifier already existing in workspace		Pre-Condition	Logged in as sales agent, Whatsapp number already registered in workspace	DATE	12/05/2026			
+Url					Description	GLOBAL CONTACT - Duplicate Identifier Trigger	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form 		test type	POSITIVE					
+		2	Click new contact tab								
+		3	Enter existing whatsapp number		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe system response			Form opens successfully		Passed			
+		5				New contact tab is available		Passed			
+		6				Duplicate contact prompt modal appears		Passed			
+		7				Modal shows 'Kontak sudah tersedia'		Passed			
+		8				Button 'Tambahkan ke sales' is visible		Passed			
+		9				button 'Batal' is visible		Passed			
+											
+											
+											
+Test ID	SalesContact-003							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	rizal			
+Scenario			Confirm 'Tambahkan ke sales' on duplicate prompt		Pre-Condition	Logged in as sales agent, duplicate contact prompt is shown for existing operational contact	DATE	12/05/2026			
+Url					Description	DUPLICATE PROMPT - Confirm Add to sales	ENV	DEV	STAGGING	PROD	
+Steps		1	Duplicate contact prompt is displayed		test type	POSITIVE					
+		2	Click 'Tambahkan ke sales'								
+		3	Observe result		Status Response	Expected Result	Actual Result	Status		Status	
+		4				Prompt is displayed with correct buttons		Passed			
+		5				System uses existing global contact (no new one created)		Passed			
+		6				Lead linked to same contactId		Passed			
+		7				No duplicate global contact in database		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-004							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	kholik			
+Scenario			Cancel duplicate prompt does not create any data		Pre-Condition	Logged in as sales agent, Duplicate contact prompt is shown	   	13/05/2026			
+Url					Description	DUPLICATE PROMPT - Cancel Action	ENV	DEV	STAGGING	PROD	
+Steps		1	Duplicate contact prompt is displayed		test type	POSITIVE					
+		2	Click 'Batal'								
+		3	Observe result		Status Response	Expected Result	Actual Result	Status		Status	
+		4				Prompt is displayed		Passed			
+		5				Modal closes		Passed			
+		6				No new global contact created		Passed			
+		7				No new sales area context created		Passed			
+		8				Form remains open with previous input		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-005										
+Create at			11/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Duplicate prompt masks phone/email when user lacks full date permission		Pre-Condition	Logged in as sales agent without full phone/email permission. Existing contact has whatsapp and email	DATE	13/05/2026			
+Url					Description	DUPLICATE PROMPT - Data Marking	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Enter existing whatsapp number								
+		3	Duplicate contact prompt appears		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe phone and email display in prompt			Prompt appears		Passed			
+		5				Prompt appears with masked data		Passed			
+		6				Phone number is masked (e.g +62812****789)		Passed			
+		7				Email is masked (e.g r***@domain.com)		Passed			
+		8				No restricted area name or history shown		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-006							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	kholik			
+Scenario			Duplicate prompt does not show 'Gunakan kontak ini' in sales flow		Pre-Condition	Logged in as sales agent. Duplicate contact found	DATE	13/05/2026			
+Url					Description	DUPLICATE PROMPT - Button Visibility Sales Flow	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	NEGATIVE					
+		2	Enter existing identifier								
+		3	Duplicate contact appears		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Inspect prompt buttons			Prompt appears		Passed			
+		5				Tambahkan ke sales' button is shown		Passed			
+		6				Gunakan kontak ini' button is NOT shown in sales flow		Passed			
+		7									
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-007							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	kholik			
+Scenario			Duplicate prompt does not expose restricted area name or history		Pre-Condition	Logged in as sales agent. Existing contact belongs to Operational area.	DATE	13/05/2026			
+Url					Description	DUPLICATE PROMPT - No Restricted Data Exposure	ENV	DEV	STAGGING	PROD	
+Steps		1	Openn add new lead form		test type	NEGATIVE					
+		2	Enter identifier that belongs to operational contact								
+		3	Duplicate contact prompt appears		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Inspect prompt content			Form opens 		Passed			
+		5				Prompt appears		Passed			
+		6				Prompt shows only safe summary		Passed			
+		7				No operational area name, team name, or contact history is visible		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-008							PASSED			
+Create at			11/05/2026		created by	Rizal	Tester	kholik			
+Scenario			Create contact with invalid whatsapp format 		Pre-Condition	Logged in as sales agent	DATE	13/05/2026			
+Url					Description	FIELD VALIDATION - Invalid Whatsapp Format	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	NEGATIVE					
+		2	Click new contact tab								
+		3	Enter invalid whatsapp number		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click save lead			Form opens 		Passed			
+		5	Observe error			New contact tab available		Passed			
+		6				Field accepts input 		Passed			
+		7				Save is blocked		Passed			
+		8				Error shown ' Format kontak tidak valid'	pesan sukses	Failed			report bug
+		9									
+											
+											
+											
+Test ID	SalesContact-009							PASSED			skipped
+Create at			11/05/2026		created by	Rizal	Tester	kholik			
+Scenario			Create lead without selecting team inbox		Pre-Condition	Logged in as sales agent	DATE	13/05/2026			
+Url					Description	FIELD VALIDATION - Team inbox Required	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	NEGATIVE					
+		2	Fill in lead title								
+		3	Leave team inbox empty		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click save lead			Form opens					
+		5	Observe error			Lead tite filled					
+		6				Team inbox is empty					
+		7				Save is blocked					
+		8				Error shown 'Team inbox wajib dipilih'					
+		9									
+											
+											
+											
+Test ID	SalesContact-010							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Scenario contact picker only shows sales contacts		Pre-Condition	Logged in as sales agent. Contacts exist in both sales and operational area	DATE	13/05/2026			
+Url					Description	SALES CONTACT PICKER - Area Filter	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Click existing contact tab								
+		3	Open contact picker / search sales contact		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe contact list			Form opens		Passed			
+		5				Existing contact tab available		Passed			
+		6				Picker opens		Passed			
+		7				Only sales area contacts are listed		Passed			
+		8				Operational - only contact do NOT appear		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-011							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Sales contact picker shows area badge for each contact 		Pre-Condition	Logged in as sales agent. Sales contact exist	DATE	13/05/2026			
+Url					Description	SALES CONTACT PICKER - Area Badge Display	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Click existing contact tab								
+		3	Open contact picker 		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe contact list items			Form opens 		Passed			
+		5				Existing contact tab available		Passed			
+		6				Picker opens with contact list		Passed			
+		7				Each contact displays 'sales' badge		Passed			
+		8				no 'operational' badge shown in sales picker		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-012							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Sales contact picker shows empty state when no sales contacts available		Pre-Condition	Logged in as sales agent. No sales contact exist in workspace	DATE	13/05/2026			
+Url					Description	SALES CONTACT PICKER - Empty State	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Click existing contact tab								
+		3	Open contact picker		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe empty state			Form opens 		Passed			
+		5				Tab available		Passed			
+		6				Picker opens		Passed			
+		7				Empty state displayed: 'Tidak ada kontak sales'		Failed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-013							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Sales agent can only see contacts created by self or assigned to self		Pre-Condition	Logged in as sales agent. Another sales agent has contact not assigned to current user	DATE	13/05/2026			
+Url					Description	RBAC VISIBILITY - Sales Agent Visibility	ENV	DEV	STAGGING	PROD	
+Steps		1	Navigate to sales contact page		test type	POSITIVE					
+		2	Observe contact list								
+		3	Search foro contact owned by another sales agent (not assigned to current user)		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe search result			Contact page loads		Passed			
+		5				Only own and assigned contact are visible		Passed			
+		6				Contact from othet agent does not appear		Passed			
+		7				no hidden count or hint shown		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-014							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Sales agent accesses sales contat from another team inbox via direct URL		Pre-Condition	Logged in as sales agent. Target contact belongs to a team inbox the agent has no access to	DATE	13/05/2026			
+Url					Description	SERVER-SIDE ENFORCEMENT - Direct URL Access Denied	ENV	DEV	STAGGING	PROD	
+Steps		1	Copry direct URL of a sales contact from another team inbox		test type	NEGATIVE					
+		2	Paste URL in browser and navigate								
+		3	Observe response		Status Response	Expected Result	Actual Result	Status		Status	
+		4				URL is valid 		Passed			
+		5				Page navigates 		Passed			
+		6				Akses Ditolak' Message is shown		Passed			
+		7				No contact metadata is exposed		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-015										tidak ada
+Create at			12/05/2026		created by	Rizal	Tester				
+Scenario			Permission denied state shown on contact page when agent has no team inbox access		Pre-Condition	Logged in as sales agent with no team inbox assigned	DATE				
+Url					Description	PERMISSION DENIED STATE - No Team Inbox Access	ENV	DEV	STAGGING	PROD	
+Steps		1	Navigate to sales contact page		test type	NEGATIVE					
+		2	Observe page content								
+		3			Status Response	Expected Result	Actual Result	Status		Status	
+		4				Page loads					
+		5				Permission denied state shown ' akses ditolak, kamu tidak memiliki izin untuk melihat kontak ini' with kontak button					
+		6									
+		7									
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-016							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Contact assigned to lead becomes visible to sales agent		Pre-Condition	Lead in as sales agent. A lead is assigned to current agent. The contact is owned by another agent	DATE	13/05/2026			
+Url					Description		ENV	DEV	STAGGING	PROD	
+Steps		1	Lead is assigned to current sales agent 		test type	POSITIVE					
+		2	Navigate to sales contact page								
+		3	Search for contact linked to that lead		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe result			Lead assignment confirmed 	diconfirmation but dont have notification	Passed			
+		5				Contact page loads		Passed			
+		6				Contact appears in list		Passed			
+		7				Contact visible due to lead assignment		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-017							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Contact disappears from list when lead is unassigned from sales agent		Pre-Condition	Logged in as sales agent. Contact is visible because of lead assignment	DATE	13/05/2026			
+Url					Description	RBAC VISIBILITY - Contact Hidden After Lead Unassign	ENV	DEV	STAGGING	PROD	
+Steps		1	Contact visible in sales agent list via assigned lead		test type	POSITIVE					
+		2	supervisor unassign lead from sales agent								
+		3	sales agent refreshes contacts pages		Status Response	Expected Result	Actual Result	Status		Status	
+		4	observe contact list			Contact visible before unassign 		Passed			
+		5				Lead unassigned		Passed			
+		6				Page refreshed		Passed			
+		7				Contact no longer appears in list		Passed			
+		8				No error message shown		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-018							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Submitting duplicate identifier twice does not create two sales area contexts		Pre-Condition	Logged in as sales agent. Duplicate contact prompt is shown	DATE	13/05/2026			
+Url					Description	IDEMPOTENCY - Double Submit on Duplicate Prompt	ENV	DEV	STAGGING	PROD	
+Steps		1	Duplicate contact prompt is shown		test type	EDGE CASE					
+		2	Click 'Tambahkan ke sales' 								
+		3	Immediately click 'Tambahkan ke sales' again		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Check database/contact detail			Prompt is shown 		Passed			
+		5				First click processed		Passed			
+		6				Second click blocked or ignored 		Passed			
+		7				ONly 1 sales area context exists for the contactId + teminboxId combination		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-019							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Sales area contect is not created when sales agent only searches or views a contact		Pre-Condition	Logged in as sales agent. An existing contact is visibile in search results	DATE	13/05/2026			
+Url					Description	AREA CONTEXT CREATION - No Context on View/Search	ENV	DEV	STAGGING	PROD	
+Steps		1	Navigate to sales contact page		test type	EDGE CASE					
+		2	Search for an existing contact 								
+		3	Click to view contact		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Do not perform any edit or action			Page loads		Passed			
+		5	Check if new area context was created			Contact appears in search		Passed			
+		6				Contact detail opens		Passed			
+		7				User only views, no action taken		Passed			
+		8				No new sales area context is created in database		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-020							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Create new lead triggers automatic sales area context creation		Pre-Condition	Logged in as sales agent. Gloval contact exists without sales area context	DATE	13/05/2026			
+Url					Description	LEADS INTEGRATION - Auto sales area context on lead create	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Select existing contact without sales area context								
+		3	Fill in required lead fields 		Status Response	Expected Result	Actual Result	Status		Status	
+		4	click save lead			Form opens 		Passed			
+		5	observe contact area context			Contact selected 		Passed			
+		6				Fields filled 		Passed			
+		7				Lead saved successfully		Passed			
+		8				Sales area context automatically created with source = 'lead'		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-021							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Global contact has both sales and operastional context, Sales agent only sees sales references 		Pre-Condition	Logged in as sales agent. Contact has both sales and operational area context	DATE	13/05/2026			
+Url					Description	CONTACT DETAIL - Area Scoped References	ENV	DEV	STAGGING	PROD	
+Steps		1	Navigate to contact Detail of a contact with dual area context 		test type	POSITIVE					
+		2	Observe area context badges shown								
+		3	Observe references section (conversations, ticket, leads)		Status Response	Expected Result	Actual Result	Status		Status	
+		4				Contact detail opens		Passed			
+		5				Only 'Sales' badge is shown, no 'Operational'		Passed			
+		6				Only sales references are displayed		Passed			
+		7				Operational conversations/tickets/leads are NOT visible		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-022							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Adding operational contact to lead via 'Tambahkan ke sales'		Pre-Condition		DATE	13/05/2026			
+Url					Description		ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form 		test type	POSITIVE					
+		2	Existing contact tab: search for operational contact by identifier								
+		3	Duplicate prompt appears		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click 'Tambahkan ke Sales' 			Form opens 		Passed			
+		5	Complete lead form and click save lead			Search returns prompt instead of contact		Passed			
+		6				Prompt shows 'Kontak sudah tersedia'		Passed			
+		7				Sales area context created for the contact		Passed			
+		8				Lead saved, linked to existing global contact		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-023							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Operational - only contact does not appear in lead contact picker		Pre-Condition	Logged in as sales agent. Contact exists only in operational area	DATE	13/05/2026			
+Url					Description	LEADS INTEGRATION - Operational Contact Hidden in picker	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	NEGATIVE					
+		2	Click existing contact tab								
+		3	Open contact picker		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Search for operational only contact by name			Form opens		Passed			
+		5	Observe search results			Existing contact tab active		Passed			
+		6				Picker opens		Passed			
+		7				Search executed		Passed			
+		8				Contact does not appear in results		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-024							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Toast shown after successfully adding new lead 		Pre-Condition	Logged in as sales agent. All required lead fileds are valid	DATE	13/05/2026			
+Url					Description	TOAST - add new lead success	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	POSITIVE					
+		2	Fill in all required fields correctly								
+		3	Click save lead		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Observe toast notification			Form opens		Passed			
+		5				All filled correctly		Passed			
+		6				Lead saved		Passed			
+		7				Success toast shown 'added new lead' with with 'new lead has been successfully added'		Passed			
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-025										skip
+Create at			12/05/2026		created by	Rizal	Tester				
+Scenario			Toast shown when adding new lead fails 		Pre-Condition	Logged in as sales agent. Server error simulated	DATE				
+Url					Description	TOAST - Add new lead failed	ENV	DEV	STAGGING	PROD	
+Steps		1	Open add new lead form		test type	NEGATIVE					
+		2	Fill in all required fields								
+		3	Simulate network/server error		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click save lead			Fields filled					
+		5	Observe toast notification			Error condition active					
+		6				Save attempted					
+		7				Error toast shown 'failed to add new lead' with 'something went wrong'					
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-026										skip
+Create at			12/05/2026		created by	Rizal	Tester				
+Scenario			Broadcast recipient picker only shows sales contact for sales agent		Pre-Condition	Logged in as sales agent with area scope = sales. both sales and operational contact exist	DATE				
+Url					Description	BROADCAST - Recipient picker area filter	ENV	DEV	STAGGING	PROD	
+Steps		1	Navigate to broadcast creation page		test type	POSITIVE					
+		2	Open recipient picker								
+		3	Observe contact list 		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Check if operational contacts are present			Broadcast page loads					
+		5				Recipient picker opens					
+		6				Only sales contacts are listed					
+		7				Operational only contact do NOT appear					
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-027							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Admin enables client contacts module and sets area scope to sales		Pre-Condition	Logged in as admin. Role for sales agent exist. Client contacts module is disabled	DATE	13/05/2026			
+Url					Description	RBAC ROLE CONFIG - enable client contacts + set area scope sales	ENV	DEV	STAGGING	PROD	
+Steps		1	Open role detail for sales agent role		test type	POSITIVE					
+		2	Enable client contacts module toggle								
+		3	Select area scope 'sales'		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click save			Role detail opens 		Passed			
+		5	Observe saved configuration 			Client contacts module is toggled ON		Passed			
+		6				Area scope radio group appears with options: Operasional / Sales / Semua		Passed			
+		7				Role saved successfully		Passed			
+		8				Area scope value = sales is persisted		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-028							PASSED			
+Create at			12/05/2026		created by	Rizal	Tester	Kholik			
+Scenario			Admin sets Contact Visibility Scope to own_and_assigned for Sales Agent role		Pre-Condition	Logged in as Admin. Client Contacts module is enabled for the role.	DATE	13/05/2026			
+Url					Description	RBAC ROLE CONFIG – Set Visibility Scope own_and_assigned	ENV	DEV	STAGGING	PROD	
+Steps		1	Open Role Detail for Sales Agent role		test type	POSITIVE					
+		2	Go to Client Contacts section								
+		3	Select Visibility Scope: 'Kontak yang dibuat sendiri dan assigned ke saya'		Status Response	Expected Result	Actual Result	Status		Status	
+		4	Click Save			Role detail opens		Passed			
+		5	Observe saved configuration			Client contacts section visible 		Passed			
+		6				Visibility scope radio selected		Passed			
+		7				Role saved successfully		Passed			
+		8				Visibility scope = own_and_assigned is persisted		Passed			
+		9									
+											
+											
+											
+Test ID	SalesContact-029										
+Create at			12/05/2026		created by	Rizal	Tester				
+Scenario					Pre-Condition		DATE				
+Url					Description		ENV	DEV	STAGGING	PROD	
+Steps		1			test type	POSITIVE					
+		2									
+		3			Status Response	Expected Result	Actual Result	Status		Status	
+		4									
+		5									
+		6									
+		7									
+		8									
+		9									
+											
+											
+											
+Test ID	SalesContact-030										skip
+Create at			12/05/2026		created by	Rizal	Tester				
+Scenario			Helper text is displayed in Role Detail explaining Area Scope does not grant module access		Pre-Condition	Logged in as admin. Role detail is open with client contacts enabled	DATE				
+Url					Description	RBAC ROLE CONFIG - Helper Text Visibility	ENV	DEV	STAGGING	PROD	
+Steps		1	Open role detail for any sales role		test type	POSITIVE					
+		2	Enable client contacts module								
+		3	Observe helper text near area scope section		Status Response	Expected Result	Actual Result	Status		Status	
+		4				Role detail opens					
+		5				Client contacts enabled 					
+		6				Helper text is visibile explaining area scope only filters data area and does not grant module access					
+		7									
+		8									
+		9									

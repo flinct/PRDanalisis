@@ -30,7 +30,8 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 ### Untuk SEMUA tipe tugas (wajib):
 
 1. `Rules/workflow-rule.md` — execution order dan prioritas
-2. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
+2. `Rules/structure-rule.md` — repository structure, di mana file harus ditaruh
+3. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
 
 ### ANALYSIS / PRD / FEATURE DEV:
 
@@ -74,6 +75,7 @@ Rules/qa-analysis-rule.md         → Interconnection analysis jika PRD saling t
 Rules/test-case-rule.md           → WAJIB. QA test writing, steps, coverage, execution support.
 Rules/qa-analysis-rule.md         → WAJIB. Source analysis dan Test Specification Layer.
 Rules/impact-analysis-rule.md     → Jika test perlu regression, rollout, rollback, atau cross-feature coverage.
+Rules/automation-bridge-rule.md   → Jika test case TSV akan disinkronkan ke repo automation.
 ```
 
 ### MEMORY WRITE:

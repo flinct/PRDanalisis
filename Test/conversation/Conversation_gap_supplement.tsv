@@ -1,0 +1,505 @@
+total cases =			49									
+DEV				STAGGING			PROD				
+Passed			0	Passed		0	Passed		0		
+Failed			0	Failed		0	Failed		0		
+Need to test			49	Need to test		49	Need to test		49		
+On test			0	On test		0	On test		0		
+No Status			0	No Status		0	No Status		0		
+Test ID	SIX-Convo-Gap-01								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List filters		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Switch to All Conversation tab and verify combined chats across channels appear	ENV	DEV	STAGGING	PROD	
+Steps		1	open main navigation		test type	POSITIVE					
+Steps		2	click tab All Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				All conversations appear across All Conversation			NEED TO TEST		
+		5				counters update			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-02								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List filters		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Switch to Closed tab and verify resolved chats only	ENV	DEV	STAGGING	PROD	
+Steps		1	open main navigation		test type	POSITIVE					
+Steps		2	click tab Closed		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Only resolved chats appear in Closed			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-03								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List filters		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Filter chats by channel Live Chat	ENV	DEV	STAGGING	PROD	
+Steps		1	open main navigation		test type	POSITIVE					
+Steps		2	select channel filter Live Chat		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Only Live Chat items appear			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-04								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List filters		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Filter chats by tag CS Pre-order	ENV	DEV	STAGGING	PROD	
+Steps		1	open chat list		test type	POSITIVE					
+Steps		2	open filter panel		test type	POSITIVE					
+Steps		3	select tag CS Pre-order		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Only chats with tag CS Pre-order show			NEED TO TEST		
+		6				Filter badge shows current tag			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-05								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List sorting		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Sort by Most Recent	ENV	DEV	STAGGING	PROD	
+Steps		1	open chat list		test type	POSITIVE					
+Steps		2	change sort to Most Recent		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Latest chat is at top of list			NEED TO TEST		
+		5				Sort persists after tab switch			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-06								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List sorting		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Sort by Longest Waiting	ENV	DEV	STAGGING	PROD	
+Steps		1	open chat list		test type	POSITIVE					
+Steps		2	change sort to Longest Waiting		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Oldest unresolved chat is at top of list			NEED TO TEST		
+		5				List reorders within <1s			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-07								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List state persistence		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Scroll and filter persist per tab	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox		test type	POSITIVE					
+Steps		2	scroll down to chat position 50		test type	POSITIVE					
+Steps		3	apply filter Agent=Rizki		test type	POSITIVE					
+Steps		4	switch to Unassigned then back to Your Inbox		test type	POSITIVE					
+		5			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		6				Scroll position restored to previously viewed position			NEED TO TEST		
+		7				Filter Agent=Rizki still applied			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-08								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List bulk actions		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Bulk assign unassigned chats	ENV	DEV	STAGGING	PROD	
+Steps		1	open Unassigned tab		test type	POSITIVE					
+Steps		2	select 3 chats with checkboxes		test type	POSITIVE					
+Steps		3	click Assign button		test type	POSITIVE					
+Steps		4	confirm assign to me		test type	POSITIVE					
+		5			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		6				selected chats moved to Your Inbox			NEED TO TEST		
+		7				toast shows success + count assigned			NEED TO TEST		
+		8				unassigned counter decreases			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-09								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List bulk actions		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Bulk delete selected chats	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox		test type	POSITIVE					
+Steps		2	select 2 chats		test type	POSITIVE					
+Steps		3	click Delete and confirm		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				selected chats removed from inbox			NEED TO TEST		
+		6				counter updates			NEED TO TEST		
+		7				toast shows success message			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-10								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List indicators		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Hold indicator visibility	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox with a chat on Hold		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Hold icon appears on chat card			NEED TO TEST		
+		4				Tooltip shows who set Hold and timestamp			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-11								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List indicators		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	SLA countdown colors	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox with chats having various SLA		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Green when SLA > 50% remaining			NEED TO TEST		
+		4				Yellow when SLA <= 50% and > 10% remaining			NEED TO TEST		
+		5				Red when SLA <= 10% or overdue			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-12								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Chat List indicators		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Presence avatars on chat card	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox with 2 agents viewing same conversation		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Presence avatars appear			NEED TO TEST		
+		4				Hover shows agent names			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-13								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room bubbles		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Private note bubble styling and visibility	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	agent writes a private note		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Private note appears with yellow background			NEED TO TEST		
+		5				Visible only to agents, not customer			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-14								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room bubbles		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Inline reply-to reference shows above message	ENV	DEV	STAGGING	PROD	
+Steps		1	open a chat with existing message		test type	POSITIVE					
+Steps		2	send a reply referencing that message		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Replying bar shows referenced message above main bubble			NEED TO TEST		
+		5				Clicking reply-to opens anchored message			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-15								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room typing		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Typing indicator shows real-time agent names	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	agent A and B start typing		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Typing indicator lists agent names			NEED TO TEST		
+		5				When more than 5 agents, shows and X more			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-16								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room typing		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Typing indicator fades after inactivity	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room with typing agents		test type	POSITIVE					
+Steps		2	wait 6 seconds after typing stops		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Typing indicator disappears			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-17								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room message status		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Message status progression sent -> delivered -> read	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room as agent		test type	POSITIVE					
+Steps		2	send message to customer		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Initially shows sent			NEED TO TEST		
+		5				Then shows delivered icon			NEED TO TEST		
+		6				Then shows read blue icon			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-18								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room message status		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Failed message shows red and retry available	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room with failed message		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Failed message shows red status icon			NEED TO TEST		
+		4				Retry icon is clickable			NEED TO TEST		
+		5				Auto-retry triggers every 5s with max 3 attempts			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-19								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room attachments		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Ctrl+V paste image	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	copy image from clipboard		test type	POSITIVE					
+Steps		3	paste into text area		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Image converted to attachment preview			NEED TO TEST		
+		6				Send button enabled			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-20								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room attachments		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Drag and drop file upload	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	drag a PDF into text area		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				File preview appears before send			NEED TO TEST		
+		5				File attaches on send			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-21								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room attachments		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Invalid attachment toast	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	paste an oversized file > 100MB		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Toast shows Gagal mengunggah file. Periksa ukuran/format.			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-22								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room actions		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Create ticket from selected message	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	multi-select messages and click Create Ticket		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Ticket created and linked to conversation			NEED TO TEST		
+		5				Ticket reference ID shown in chat			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-23								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room menu		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Screenshot button visible if add-on active	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room with screenshot add-on enabled		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Screenshot button appears in header			NEED TO TEST		
+		4				Screenshot image captured			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-24								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Conversation Room automation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Quick Reply dropdown present and selectable	ENV	DEV	STAGGING	PROD	
+Steps		1	open conversation room		test type	POSITIVE					
+Steps		2	open Quick Reply dropdown		test type	POSITIVE					
+Steps		3	select a template		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Selected template text inserted into text area			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-25								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Unread badge updates real-time	ENV	DEV	STAGGING	PROD	
+Steps		1	open sidebar with unread counters		test type	POSITIVE					
+Steps		2	receive new message in another tab		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Unread badge on relevant tab increments within 2s			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-26								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Counter tooltip shows breakdown	ENV	DEV	STAGGING	PROD	
+Steps		1	hover unread counter on Your Inbox		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Tooltip shows Unassigned, Ongoing, Resolved breakdown			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-27								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Switching tab completes in <1s	ENV	DEV	STAGGING	PROD	
+Steps		1	open unassigned		test type	POSITIVE					
+Steps		2	click Your Inbox		test type	POSITIVE					
+Steps		3	click Closed		test type	POSITIVE					
+Steps		4	click All Conversation		test type	POSITIVE					
+		5			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		6				Each tab switch completes within 1s			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-28								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Create Team Inbox (Admin)	ENV	DEV	STAGGING	PROD	
+Steps		1	login as Admin		test type	POSITIVE					
+Steps		2	click Create Team Inbox		test type	POSITIVE					
+Steps		3	input name CS Kurir and assign 2 agents		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Team Inbox appears in sidebar			NEED TO TEST		
+		6				Assigned agents see it immediately live			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-29								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Rename Team Inbox (Admin)	ENV	DEV	STAGGING	PROD	
+Steps		1	login as Admin		test type	POSITIVE					
+Steps		2	open Team Inbox settings for CS Kurir		test type	POSITIVE					
+Steps		3	rename to CS Driver		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Team Inbox name updates across all agents			NEED TO TEST		
+		6				Live socket update reflected in sidebar			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-30								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Delete Team Inbox requires confirmation	ENV	DEV	STAGGING	PROD	
+Steps		1	login as Admin		test type	POSITIVE					
+Steps		2	click Delete for Team Inbox		test type	POSITIVE					
+Steps		3	confirm deletion		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Team Inbox removed			NEED TO TEST		
+		6				toast shows success			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-31								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Drag and drop chat to Team Inbox	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox		test type	POSITIVE					
+Steps		2	drag chat card to Team Inbox CS Kurir		test type	POSITIVE					
+Steps		3	confirm		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Chat appears under Team Inbox CS Kurir			NEED TO TEST		
+		6				Owner team updates in backend			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-32								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Multi-select handover via checkboxes	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox		test type	POSITIVE					
+Steps		2	select 3 chats		test type	POSITIVE					
+Steps		3	click Handover to another agent		test type	POSITIVE					
+Steps		4	confirm		test type	POSITIVE					
+		5			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		6				Selected chats assigned to target agent			NEED TO TEST		
+		7				Counters update in source and target inbox			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-33								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Quick search filters inbox/team names	ENV	DEV	STAGGING	PROD	
+Steps		1	open sidebar search		test type	POSITIVE					
+Steps		2	type CS		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Result filters matching team names			NEED TO TEST		
+		5				Click result navigates to inbox			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-34								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Keyboard shortcut tab switch	ENV	DEV	STAGGING	PROD	
+Steps		1	open inbox		test type	POSITIVE					
+Steps		2	press Ctrl+1 for Your Inbox		test type	POSITIVE					
+Steps		3	press Ctrl+2 for Unassigned		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Tabs switch accordingly with <1s			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-35								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Inbox Navigation		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Failure retry on load error	ENV	DEV	STAGGING	PROD	
+Steps		1	open sidebar when API is failing		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Shows retry button + error message			NEED TO TEST		
+		4				List reloads if API restored			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-36								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Get Conversation assigns FIFO	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox as agent		test type	POSITIVE					
+Steps		2	click Get Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				New conversation assigned to agent			NEED TO TEST		
+		5				Order respects FIFO queue			NEED TO TEST		
+		6				Chat appears in Your Inbox			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-37								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Editable batch size	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox		test type	POSITIVE					
+Steps		2	change batch field from default to 3		test type	POSITIVE					
+Steps		3	click Get Conversation		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Exactly 3 conversations assigned			NEED TO TEST		
+		6				Batch resets to default after claim			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-38								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Conflict toast on simultaneous pull	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox as agent A		test type	POSITIVE					
+Steps		2	simultaneously click Get Conversation with another agent B for last remaining chat		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				One agent gets success			NEED TO TEST		
+		5				Other agent sees conflict toast			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-39								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Warning when max active conversations reached	ENV	DEV	STAGGING	PROD	
+Steps		1	agent fills up max active conversations capacity		test type	POSITIVE					
+Steps		2	attempt to click Get Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Maximum active conversations reached toast appears			NEED TO TEST		
+		5				No new conversation assigned			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-40								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Empty queue shows no conversations available	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox with empty unassigned queue		test type	POSITIVE					
+Steps		2	click Get Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				No conversations available toast appears			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-41								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Invalid batch resets to default	ENV	DEV	STAGGING	PROD	
+Steps		1	input batch field with -1		test type	POSITIVE					
+Steps		2	click Get Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Batch resets to queue count			NEED TO TEST		
+		5				System does not allow negative batch			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-42								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Agent Pull Queue		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Failed fetch prompts retry	ENV	DEV	STAGGING	PROD	
+Steps		1	open Your Inbox with API unstable		test type	POSITIVE					
+Steps		2	click Get Conversation		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Failed to fetch conversation. Please retry toast appears			NEED TO TEST		
+		5				System attempts to claim again			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-43								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Group metadata system messages visible	ENV	DEV	STAGGING	PROD	
+Steps		1	open a group chat		test type	POSITIVE					
+Steps		2	group icon changes		test type	POSITIVE					
+Steps		3	group name updates		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				System messages show group icon updated			NEED TO TEST		
+		6				System messages show group name updated			NEED TO TEST		
+		7				No state/ownership/SLA change triggered			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-44								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Send as selector default identity	ENV	DEV	STAGGING	PROD	
+Steps		1	open group chat with multi-number		test type	POSITIVE					
+Steps		2	inspect composer area		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Send as selector is visible			NEED TO TEST		
+		5				Session identity number is preselected			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-45								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Switch Send as identity and audit	ENV	DEV	STAGGING	PROD	
+Steps		1	open group chat		test type	POSITIVE					
+Steps		2	change Send as to another eligible number		test type	POSITIVE					
+Steps		3	send message		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Message sent using selected identity			NEED TO TEST		
+		6				Confirmation badge shows sent as number			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-46								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Quoted reply preserves preview + deeplink	ENV	DEV	STAGGING	PROD	
+Steps		1	open a group session with previous messages		test type	POSITIVE					
+Steps		2	open quoted reply preview card		test type	POSITIVE					
+Steps		3	click Open History		test type	POSITIVE					
+		4			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		5				Preview shows previous message context			NEED TO TEST		
+		6				Click opens related history anchor			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-47								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Multi-number inbound appends to same session	ENV	DEV	STAGGING	PROD	
+Steps		1	group receives message from number A		test type	POSITIVE					
+Steps		2	same group receives message from number B		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				Both messages appear in same session			NEED TO TEST		
+		5				Outbound identity remains session default unless overridden			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-48								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Resolved chat does not block new group session	ENV	DEV	STAGGING	PROD	
+Steps		1	resolve group chat		test type	POSITIVE					
+Steps		2	new inbound arrives		test type	POSITIVE					
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		4				New Unassigned session created			NEED TO TEST		
+		5				Banner links previous resolved session			NEED TO TEST		
+
+Test ID	SIX-Convo-Gap-49								NEED TO TEST	NEED TO TEST	NEED TO TEST
+Create at			12/12/2025		created by	QA	Tester	QA	NEED TO TEST	NEED TO TEST	
+Scenario			Group Chat		Pre-Condition	accessed inbox page. linked number	DATE	12/12/2025	12/12/2025	12/12/2025	
+Url					Description	Group typing and online state preserved	ENV	DEV	STAGGING	PROD	
+Steps		1	open group with participants		test type	POSITIVE					
+		2			Status Response	Expected Result	Actual Result	Status	Status	Status	
+		3				Typing and presence update in real time			NEED TO TEST		

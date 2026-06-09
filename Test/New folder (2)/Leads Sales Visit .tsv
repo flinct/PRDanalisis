@@ -1,0 +1,2304 @@
+total cases =			143							
+DEV				STAGGING			PROD			Note 
+Passed			108	Passed		0	Passed	18		Export Leads is HOLD
+Failed			18	Failed		0	Failed	0		
+Need to test			4	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			13	No Status		143	No Status	125		
+Test ID	LeadsSalesVisit-001							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify default tab is all		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				tab all is selected by default		Passed		Passed
+		5				"all" tab visually highlighted 		Passed		Passed
+		6								
+		7				  				
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-002							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify pipeline tabs are available		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table page 		test type	POSITIVE				
+		2	observe available tabs							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				systems displyays 'all' AND		Passed		Passed
+		5				other predefined pipeline categories		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-003							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify switching tab updates list data		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	click pipeline tab (e.g. negotiation)		test type	POSITIVE				
+		2	observe list 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				list updates accroding to selected pipeline		Passed		Passed
+		5				active tab visually highlighted 		Passed		Passed
+		6				previous tab no longer highlighted		Passed		Passed
+		7				no full page reload		Passed		Passed
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-004							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify tab filtering applies within team inbox scope 		Pre-Condition	logged in as supervisor	DATE	14/04/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	select pipeline tab		test type	POSITIVE				
+		2	observe list data							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only leads within allowed team inbox appear		Passed		Passed
+		5				leads form other team inbox do not appear		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-005							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify tab filtering applies within assigned scope 		Pre-Condition	logged in as sales member	DATE	14/04/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	select pipeline tab		test type	POSITIVE				
+		2	observe list data							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only leads within assigned to sales member		Passed		Passed
+		5				leads form other assigned do not appear		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-006							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify member visibility on default tab		Pre-Condition	login as sales member	DATE	05/03/2026		14/04/2026
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				sales member sees leads where member is included in assignees		Passed		Passed
+		5				sales member does not see unassigned leads		Passed		Passed
+		6				sales member does not see leads assigned to other		Passed		Passed
+		7				sales member does not see leads outside team inbox		Passed		Passed
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-007							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify case insensitive search		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input lead title in lowercase		test type	POSITIVE				
+		2	repeat using uppercase							
+		3	repeat using mixed case		Status Response	Expected Result	Actual Result	Status		Status
+		4				result identical regardless of text case		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-008							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify search by lead title		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input existing lead title keyword		test type	POSITIVE				
+		2	press enter / trigger search							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only leads matching title appear		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-009							FAILED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify search by contact name		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input contact name keywoard		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				leads linked to matching contact appear	isnt function	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-010							FAILED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify search by office name		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input office name keyword		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				leads with matching office appear	same with tc-009	Failed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-011							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify search applies only within selected tab		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	select specific pipeline tab		test type	POSITIVE				
+		2	input search keyword							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				result filtered by selected pipeline and search keywoard		Passed		Passed
+		5				leads outside selected pipeline do not appear		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-012							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify clearing search restores default state		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	perform search 		test type	POSITIVE				
+		2	clear search input							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				list return to full dataset within selected tab		Passed		Passed
+		5				sorting restored to default		Passed		Passed
+		6				no page reload		Passed		Passed
+		7								
+		8								
+		9								
+										
+						 				
+										
+Test ID	LeadsSalesVisit-013							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify search response time		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input keyword 		test type	POSITIVE				
+		2	measure time until result appears							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				respinse time < 300ms (under normal network)		Passed		Passed
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-014							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			search with no matching result		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	input random string		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				empty state displayed		Passed		Passed
+		5				no system error		Passed		Passed
+		6				no infinite loading		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-015							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			rapid tab siwthing 		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	SEARCH FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	quicly switch between multiple tabs		test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				no crash 		Passed		Passed
+		5				no overlapping data		Passed		Passed
+		6				only last selected tab data shown		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-016							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify team inbox is available		Pre-Condition		DATE	05/03/2026		14/04/2026
+Url					Description	ADVANCED FILTER - TEAM INBOX	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table		test type	POSITIVE				
+		2	open advanced filter section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				team inbox filter dropdown is visible		Passed		Passed
+		5				dropdown can be opened		Passed		Passed
+		6				options displayed according to role		Passed		Passed
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-017							PASSED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify supervisor sees only supervised team inbox		Pre-Condition	login as supervisor supervising team inbox A & B	DATE	05/03/2026		14/04/2026
+Url					Description	ADVANCED FILTER - TEAM INBOX	ENV	DEV	STAGGING	PROD
+Steps		1	open team inbox filter dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only inbox A & B are visible 		Passed		Passed
+		5				inbox outside supervision NOT visible		Passed		Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-018							FAILED		PASSED
+Create at			26/02/2026		created by	Rizal	Tester	rizal		rizal
+Scenario			verify member sees only assigned team inbox		Pre-Condition	login as member belonging to inbox X	DATE	05/03/2026		14/04/2026
+Url					Description	ADVANCED FILTER - TEAM INBOX	ENV	DEV	STAGGING	PROD
+Steps		1	open team inbox filter dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only inbox X visible	      	Failed		Passed
+		5				other inbox options NOT VISIBLE				Passed
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-019							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify filtering by team inbox updates list		Pre-Condition		DATE	05/03/2026		
+Url					Description	ADVANCED FILTER - TEAM INBOX	ENV	DEV	STAGGING	PROD
+Steps		1	select team inbox from filter		test type	POSITIVE				
+		2	observed lead list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				list updates according to selected team inbox		Passed		
+		5				no full page reload		Passed		
+		6				date refresh time < 2 seconds		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-020							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify filtering respects permission scope		Pre-Condition	login as member 	DATE	05/03/2026		
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	select team inbox		test type	POSITIVE				
+		2	observe list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				member only sees leads within selected team inbox AND		Passed		
+		5				where number is assignee		Passed		
+		6				no authoried data exposed		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-021							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify clearing team inbox filter restores default state		Pre-Condition		DATE	05/03/2026		
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	apply team inbox filter		test type	POSITIVE				
+		2	clear filter							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				list return to previously selected tab AND		Passed		
+		5				full dataset within permission		Passed		
+		6				no page reload		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-022							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify tags filter is available		Pre-Condition		DATE	05/03/2026		
+Url					Description	ADVANCED FILTER - TAG	ENV	DEV	STAGGING	PROD
+Steps		1	open advanced filter		test type	POSITIVE				
+		2	open tags filter							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				tag options visible		Passed		
+		5				tag options match backend config		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-023							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify single tag filtering		Pre-Condition		DATE	05/03/2026		
+Url					Description	ADVANCED FILTER - TAG	ENV	DEV	STAGGING	PROD
+Steps		1	select one tag		test type	POSITIVE				
+		2	apply filter							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only leads containging selected tag appear		Passed		
+		5				no full page reload		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-024							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify multiple tags		Pre-Condition		DATE	05/03/2026		
+Url					Description	ADVANCED FILTER - TAG	ENV	DEV	STAGGING	PROD
+Steps		1	select multiple tags		test type	POSITIVE				
+		2	apply filter 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				leads that match selected tags appear		Passed		
+		5				behavior must follow business rule OR LOGIC 				
+		6				AND LOGIC? 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-025							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify clearing tag filter restores default state		Pre-Condition		DATE	05/03/2026		
+Url					Description	ADVANCED FILTER - TAG	ENV	DEV	STAGGING	PROD
+Steps		1	apply tag filter		test type	POSITIVE				
+		2	clear all selected tags							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				data list back to default		Passed		
+		5				selected tab remain unchanged		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-026							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify combined filter (pipeline + team inbox + tags + search)		Pre-Condition		DATE	05/03/2026		
+Url					Description	COMBINE FILTER	ENV	DEV	STAGGING	PROD
+Steps		1	select pipeline tab		test type	POSITIVE				
+		2	apply team inbox filter							
+		3	apply tag filter 		Status Response	Expected Result	Actual Result	Status		Status
+		4	input search keyword			result reflects all filters combined 		Passed		
+		5				no data leak outside permission		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-027							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify export button available		Pre-Condition		DATE			
+Url					Description	EXPORT FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				export button visible				
+		5				button enabled				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-028							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify export follows current tab		Pre-Condition		DATE			
+Url					Description	EXPORT FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	select specific pipeline tab		test type	POSITIVE				
+		2	click export							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				exported file contains only leads from selected pipeline				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-029							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify export folloes current search state		Pre-Condition		DATE			
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	apply search keyword		test type	POSITIVE				
+		2	click export							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				export contains only searched results				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-030							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify export follows advanced filters		Pre-Condition		DATE			
+Url					Description	EXPORT FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	apply team inbox filter		test type	POSITIVE				
+		2	apply tag filter 							
+		3	click export 		Status Response	Expected Result	Actual Result	Status		Status
+		4				export matches filtered dataset exactly				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-031							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify exported fields match lead table display 		Pre-Condition		DATE			
+Url					Description	EXPORT FUNCTION	ENV	DEV	STAGGING	PROD
+Steps		1	click export		test type	POSITIVE				
+		2	observe result							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				export must include columns:lead contact, office name, team inbox, pipeline, assignees, amount, tags				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-032							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify permission based export retriction		Pre-Condition	login as member	DATE			
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	click export		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only leads visible to member are exported 				
+		5				no hidden/unassigned leads included				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-033							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify export failure handling 		Pre-Condition		DATE			
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	simulate export api failure 		test type	EDGE CASE				
+		2	click export							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				shown alert 'export gagal. coba lagi'				
+		5				button re enabled				
+		6				no infinite loading				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-034							ON HOLD		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify large dataset export performance		Pre-Condition	dataset > 1000 records	DATE			
+Url					Description	PIPELINE TAB	ENV	DEV	STAGGING	PROD
+Steps		1	click export		test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				file generated successfully				
+		5				no timeout				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-035							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester			
+Scenario			verify lead table columns are displayed correctly		Pre-Condition	user login	DATE			
+Url					Description	LEAD LIST DATA TABLE - COLUMN DISPLAY	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table page		test type	POSITIVE				
+		2	observe table header							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				system must display columns in order: lead, contact, office, team inbox, pipeline, assignees, amount, tags		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-036							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify multiple assignes display correctly		Pre-Condition		DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE - COLUMN DISPLAY	ENV	DEV	STAGGING	PROD
+Steps		1	observe row with multiple assignees		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				multiple names displayed properly	UI Hidden without elipses	Failed		
+		5				UI does not overflow				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-037							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify clicking lead row navigates to lead detail		Pre-Condition		DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	click any lead row		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				navigate to lead detail page		Passed		
+		5				URL updates correctly		Passed		
+		6				correct lead data displayed				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-038							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify permission enforcement when accessing lead detail		Pre-Condition	login as member	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	manually access lead detail URL of unassigned lead		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				access denied	page infinite loop	Failed		
+		5				show akses ditolak OR 403 page				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-039							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor can view all leads within supervised team inbox		Pre-Condition	supervisor supervises inbox A	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table 		test type	POSITIVE				
+		2	filter by inbox A							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all leads in inbox A visibile		Passed		
+		5				including leads where supervisor is not assignee		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-040							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor cannot see leads from other team inbox		Pre-Condition	supv assigned only to team inbox A	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	observe the leads list		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				inbox B not selectable in filter		Passed		
+		5				just display leads with team inbox A		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-041							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member sees only leads where included in assignees		Pre-Condition	member assigned to lead X but not lead Y	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	open lead table		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				lead X visible		Passed		
+		5				lead Y not visible		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-042							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot see leads from other team inbox		Pre-Condition	member belongs to inbox A only	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	attempt filter inbox B		test type	POSITIVE				
+		2	attempt direct access to lead in inbox B							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				inbox B not selectable OR		Passed		
+		5				access denied		Passed		
+		6				no data leak		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-043							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot access unassigned lead via direct link		Pre-Condition	member not assigned to lead Z	DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE	ENV	DEV	STAGGING	PROD
+Steps		1	copy lead Z detail URL		test type	POSITIVE				
+		2	open URL manually							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				system returns 'akses ditolak' OR	infinite loop page	Failed		
+		5				http 403				
+		6				no lead data exposed				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-044							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify return to same pipeline tab after back navigation		Pre-Condition		DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE - BACK NAV STATE PERSISTENCE	ENV	DEV	STAGGING	PROD
+Steps		1	select specific pipeline tab (e.g. prospect)		test type	POSITIVE				
+		2	click lead row							
+		3	click browser back button 		Status Response	Expected Result	Actual Result	Status		Status
+		4				user returns to lead table		Passed		
+		5				same pipeline tab remains selected		Passed		
+		6				previous filter/search state preserved		Passed		
+		7				no reset to 'all'		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-045							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify filter + search state persistence after back navigation		Pre-Condition		DATE	05/03/2026		
+Url					Description	LEAD LIST DATA TABLE - BACK NAV STATE PERSISTENCE	ENV	DEV	STAGGING	PROD
+Steps		1	apply pipeline tab		test type	POSITIVE				
+		2	apply team inbox filter							
+		3	apply tag filter		Status Response	Expected Result	Actual Result	Status		Status
+		4	search keyword			all filters preserved		Passed		
+		5	click lead row			search keyword preserved		Passed		
+		6	click back			data shown same as before navigation		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-046							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			verify lead title is displayed on lead detail page		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section	ENV	DEV	STAGGING	PROD
+Steps		1	open lead detail page		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				lead title displayed correctly 		Passed		
+		5				title matches database value		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-047							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member can edit lead title if assigned		Pre-Condition	login as member, member include in assignees of the lead	DATE	16/04/2026		
+Url					Description	Lead Detail - Header Section	ENV	DEV	STAGGING	PROD
+Steps		1	open lead detail		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save successful		Passed		
+		5				updated title displayed immediately		Passed		
+		6				data persists after refresh		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-048							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor can edit lead title within supervised team inbox 		Pre-Condition	login as supervisor, lead belongs to supervised team inbox	DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section	ENV	DEV	STAGGING	PROD
+Steps		1	edit lead title 		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save successtul		Passed		
+		5				updated value displayed		Passed		
+		6				data persist after refresh		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-049							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor cannot edit lead outside supervised team inbox		Pre-Condition	supervisor does not supervise the leads team inbox	DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section	ENV	DEV	STAGGING	PROD
+Steps		1	attempt to access lead detail via direct URL		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				access denied		Passed		
+		5				no data modified		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-050							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title cannot be empty		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section (Validation)	ENV	DEV	STAGGING	PROD
+Steps		1	clear lead title input		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save blocked 		Passed		
+		5				error message shown	alert is not shown	Failed		
+		6				data not change		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-051							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title must be minimum 3 chars		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section (Validation)	ENV	DEV	STAGGING	PROD
+Steps		1	input title with 1-2 chars		test type	NEGATIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save blocked 	current validation is 1 minimum chars	Failed		
+		5				valdation error displayed		Failed		
+		6				no update persisted		Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-052							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title mut not exceed 120 chars		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section (Validation)	ENV	DEV	STAGGING	PROD
+Steps		1	input title with 121+ chars		test type	NEGATIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save blocked OR	submission is not blocked	Failed		
+		5				input prevented beyond 120 chars 		Failed		
+		6				error message is shown if exceeded		Failed		
+		7				no invalid data saved		Failed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-053							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			cancel edit does not change title 		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Header Section (Validation)	ENV	DEV	STAGGING	PROD
+Steps		1	modify title		test type	POSITIVE				
+		2	click cancel/blur without save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				original title remains		Passed		
+		5				no update saved		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-054							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor can change pipeline		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	select different pipeline		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				stored value updated	spv doesnt change pipeline	Failed		
+		5				data persists after refresh 				
+		6				reflected in lead table 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-055							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot edit pipeline		Pre-Condition	login as member (assigned lead)	DATE	05/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	double click row lead 		test type	POSITIVE				
+		2	observe detail lead							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				field disabled/read only		Passed		
+		5								
+		6				           				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-056							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			assignees field supports multi select		Pre-Condition	login as supervisor 	DATE	05/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	open assignee dropdown		test type	POSITIVE				
+		2	select multiple users							
+		3	save		Status Response	Expected Result	Actual Result	Status		Status
+		4				multiple assignees stored 		Passed		
+		5				persist after refresh		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-057							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			assignee option restricted to team inbox member		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	open assignee dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only users from selected team inbox appear		Passed		
+		5				no external user selectable		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-058							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			at least one assignee required 		Pre-Condition		DATE	05/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	remove all assignees		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save blocked 	untuk flow saat ini assignees bisa kosong	Passed		
+		5				validation error shown 		Passed		
+		6				no update persisted		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-059							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot edit assignees		Pre-Condition	login as member	DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	tap row lead		test type	POSITIVE				
+		2	observe detail lead section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				assignee field read only		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-060							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			tags field supports multiple selection 		Pre-Condition		DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	select multiple tags		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				multiple tags stored		Passed		
+		5				display persists after refresh		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-061							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			amount accepts numeric value		Pre-Condition		DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	input valid numeric value		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save successful		Passed		
+		5				value stored correctly		Passed		
+		6				data persists after refresh				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-062							FAILED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			block invalid numeric input		Pre-Condition		DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	input alphabetic chars		test type	NEGATIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save blocked 		Passed		
+		5				validation error shown	validation is not shown	Failed		
+		6				no invalid data saved		Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-063							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor can change team inbox		Pre-Condition		DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	select different team inbox		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				lead team inbox updated		Passed		
+		5				persist after refresh		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-064							PASSED		
+Create at			26/02/2026		created by	Rizal	Tester	rizal		
+Scenario			changing team inbox removes invalid assignees		Pre-Condition	lead has assignee from inbox A	DATE	06/03/2026		
+Url					Description	Lead Detail - Sales Fields Section	ENV	DEV	STAGGING	PROD
+Steps		1	change team inbox to inbox B		test type	POSITIVE				
+		2	save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				assignees not in inbox B removed automatically		Passed		
+		5				assignees empty		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-065							PASSED		
+Create at			27/03/2026		created by	Rizal	Tester	rizal		
+Scenario			users opens create lead form from lead list header		Pre-Condition		DATE	09/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	navigate to lead list page		test type	POSITIVE				
+		2	observe header section							
+		3	click add lead button		Status Response	Expected Result	Actual Result	Status		Status
+		4				add lead button is visible		Passed		
+		5				modal/side sheet opens		Passed		
+		6				user remains on lead list page		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-066							PASSED		
+Create at			08/04/2026		created by	Rizal	Tester	rizal		
+Scenario			observe create lead form structe renders correctly		Pre-Condition		DATE	06/03/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	click add button lead		test type	POSITIVE				
+		2	observe create lead form							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				field lead title, team inbox, contact, assignees, save button, and cancel button is visible		Passed		
+		5				form can be closed via cancel button		Passed		
+		6				form can be closed by clicking outside		Passed		
+		7				form can be closed using ESC key		Passed		
+		8				does not contain amount, tags, and description		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-067							FAILED		
+Create at			08/04/2026		created by	Rizal	Tester	rizal		
+Scenario			member with single team inbox is auto selected		Pre-Condition	user has only one accessible team inbox	DATE	10/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	click add lead button		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				team inbox field is automatically populated		Failed		
+		5				team inbox field is locked 		Failed		
+		6				current user is automatically included in assignees	current user still manual selected 	Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-068							PASSED		
+Create at			08/04/2026		created by	Rizal	Tester	rizal		
+Scenario			form initial state validation		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	open create lead form 		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				all fields are in default (empty) state		Passed		
+		5				no validation error is shown before user interaction 		Passed		
+		6				save button is disabled		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-069							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title minimum character validation		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	enter less then 3 characters in lead title 		test type	POSITIVE				
+		2	fill other fields correctly							
+		3	click save		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked 		Passed		
+		5				validation error is shown for minimum character requirement 	toast only shown internal server error	Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-070							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title maximum character validation 		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	enter more than 120 characters in lead title		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked 		Passed		
+		5				validation error is shown for exceeding maximum length 	toast only shown internal server error	Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-071							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title with whitespace only		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	enter only spaces in lead title 		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				input is trimmed automatically		Passed		
+		5				field is treated as empty		Passed		
+		6				submission is blocked 		Passed		
+		7				error message  is shown 		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-072							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title trims leading and trailing spaces		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	enter valuewith spaces at beginning and end (" my lead ")		test type	POSITIVE				
+		2	fill other required fields							
+		3	click save		Status Response	Expected Result	Actual Result	Status		Status
+		4				value is trimmed before submission		Passed		
+		5				lead is created using trimmed value 		Passed		
+		6				no validation error is triggered		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-073							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			only assigned team inbox can be selected		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	open team inbox dropdown		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				only team inbox assigned to the user is displayed		Passed		
+		5				no unassigned team inbox appears		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-074							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			selected contact is displayed correctly		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	select an existing contact		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				selected contact is shown in the field		Passed		
+		5				contact data is consistent		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-075							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			at least one assignee is required		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	remove all assignees		test type	NEGATIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked		Passed		
+		5				save button is disabled		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-076							FAILED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			member must include self in assignees		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	open form 		test type	POSITIVE				
+		2	attempt to remove self from assignees							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				system prevents removal		Failed		
+		5				current user remains selected	user still removed	Failed		
+		6				 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-077							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			user can access create new contact		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	open contact selector 		test type	POSITIVE				
+		2	click create new contact							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				create contact form is opened		Passed		
+		5				user remains in create lead context no page navigation		Passed		
+		6				 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-078							NEED TO TEST		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			create new contact successfully		Pre-Condition		DATE	10/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	open create contact form		test type	POSITIVE				
+		2	fill required contact fields 							
+		3	submit		Status Response	Expected Result	Actual Result	Status		Status
+		4				contact is successfully created		Passed		
+		5				newly created contact is automatically selected in contact field				
+		6				contact is visible in selector list				
+		7				user returns to create lead form with data preserved				
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-079							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			contact is required		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	leave contact empty		test type	NEGATIVE				
+		2	fill other fields							
+		3	click save		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is disabled		Passed		
+		5								
+		6				 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-080							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			save button disabled when form is invalid		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	open create lead form		test type	NEGATIVE				
+		2	leave required fields empty							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save button is disabled		Passed		
+		5				user cannot trigger submission		Passed		
+		6				 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-081							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			save button enabled when form is valid		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	fill all required fields correctly		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				save button becomes enabled		Passed		
+		5				button is clickable		Passed		
+		6				 				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-082							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			successfully create lead		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	fill all required fields with valid data		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				create lead request is sent to state		Passed		
+		5				save button shows loading state		Passed		
+		6				button is disabled during processing		Passed		
+		7				lead is successfully creates		Passed		
+		8				user is redirected to lead detail page		Passed		
+		9				success toast is displayed		Passed		
+										
+										
+										
+Test ID	LeadsSalesVisit-083							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			data correctness after creation		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD - FIELD VALIDATION	ENV	DEV	STAGGING	PROD
+Steps		1	create lead with specific values 		test type	POSITIVE				
+		2	observe lead detail page							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				lead title matches input		Passed		
+		5				team inbox is correctly assigned		Passed		
+		6				contact is correctly linked		Passed		
+		7				assignees are correctly assigned		Passed		
+		8				default pipeline is automatically set		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-084							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			open create planned visit form 		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	click new visit		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				create visit form opens		Passed		
+		5				no page navigation occurs		Passed		
+		6				user remains on lead detail page		Passed		
+		7				form is initialized with the current lead context		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-085							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			validate create visit form structure		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	open create visit form		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				form contains only Lead, Contact, Planned Time		Passed		
+		5				"Save" and "Cancel" buttons are available		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-086							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			lead title and contact is displayed as read only		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	open create visit form		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				lead title and contact is displayed correctly		Passed		
+		5				field is not editable		Passed		
+		6				value matches the current lead		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-087							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			empty planned date and time		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	open form 		test type	NEGATIVE				
+		2	do not fill date, hour and minute							
+		3	click buat kunjungan		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked		Passed		
+		5				error messages displayed		Passed		
+		6				date, hour, and minute fields are highlighted as invalid		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-088							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			invalid hour input 		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	enter hour > 23 (e.g. 25)		test type	NEGATIVE				
+		2	fill other fields correctly							
+		3	click buat kunjungan		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked		Passed		
+		5				error message is displayed "masukan jam yang valid (0-23)"		Passed		
+		6				hour field is highlighted		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-089							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			invalid minute input 		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	enter minute > 59 (e.g., 70		test type	NEGATIVE				
+		2	fill other fields correctly							
+		3	click buat kunjungan		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked		Passed		
+		5				error message is displayed "masukan menit yang valid (0-59)"		Passed		
+		6				minute field is highlighted		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-090							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			date is not selected		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	leave date empty		test type	NEGATIVE				
+		2	fill hour and minute							
+		3	click buat kunjungan		Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked		Passed		
+		5				error message is displayed "silakan pilih tanggal"		Passed		
+		6				date field is highlighted		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-091							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			planned datetime in the past 		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	select past date and time		test type	NEGATIVE				
+		2	click buat kunjungan							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				submission is blocked 		Passed		
+		5				error message is displayed  e.g. waktu rencana harus di masa depan		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-092							PASSED		
+Create at			09/04/2026		created by	Rizal	Tester	rizal		
+Scenario			successfully create planned visit		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	fill valid date and time		test type	POSITIVE				
+		2	click buat kunjungan							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				request is sent to server		Passed		
+		5				button is disabled during loading 		Passed		
+		6				visit is successfully created		Passed		
+		7				status is set to on plan		Passed		
+		8				user remains on lead detail page 		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-093							PASSED		
+Create at			27/03/2026		created by	Rizal	Tester	rizal		
+Scenario			team inbox behavior and dependency		Pre-Condition	form opened	DATE	13/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	open team inbox dropdown		test type	POSITIVE				
+		2	search inbox							
+		3	select team inbox		Status Response	Expected Result	Actual Result	Status		Status
+		4	change selected team inbox			dropdown supports search		Passed		
+		5				only accessible inbox is displayed		Passed		
+		6				assignee list updates based on inbox		Passed		
+		7				invalid assignees are removed automatically		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-094							FAILED		
+Create at			27/03/2026		created by	Rizal	Tester	rizal		
+Scenario			assignee behavior and permission		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	open assignee dropdown		test type	POSITIVE				
+		2	select multiple users							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				multi select is supported		Passed		
+		5				only users from selected team inbox are shown		Passed		
+		6				at least one assignee is required		Passed		
+		7				if sales member role, current user is auto selected and cannot be removed	current result the sales member not automatically assign	Failed		
+		8				supervisor can freely select assigneed		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-095							PASSED		
+Create at			27/03/2026		created by	Rizal	Tester	rizal		
+Scenario			contact selection and creation		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE LEAD	ENV	DEV	STAGGING	PROD
+Steps		1	open contact dropdown		test type	POSITIVE				
+		2	select existing contact							
+		3	create new contact		Status Response	Expected Result	Actual Result	Status		Status
+		4				selected contact is displayed		Passed		
+		5				contact is required		Passed		
+		6				new contact can be created and selected		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-096							PASSED		
+Create at			30/03/2026		created by	Rizal	Tester	rizal		
+Scenario			duplicate visit warning behavior		Pre-Condition	existing same datetime	DATE	13/04/2026		
+Url					Description	CREATE NEW VISIT - DUPLICATE	ENV	DEV	STAGGING	PROD
+Steps		1	select same datetime		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				warning is displayed		Failed		
+		5				submission is allowed 		Failed		
+		6				visit is still created		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-097							FAILED		
+Create at			30/03/2026		created by	Rizal	Tester	rizal		
+Scenario			successful create visit flow		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE NEW VISIT - SUCCESS	ENV	DEV	STAGGING	PROD
+Steps		1	valid input		test type	POSITIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				request sent once		Passed		
+		5				visit created with on plan status		Passed		
+		6				user stays on lead detail		Passed		
+		7				visit section refreshes		Passed		
+		8				new visit appears in list		Passed		
+		9				sorting follows planned time ascending	sorting still desc	Failed		
+										
+										
+										
+Test ID	LeadsSalesVisit-098							NEED TO TEST		
+Create at			30/03/2026		created by	Rizal	Tester			
+Scenario			create visit failure handling		Pre-Condition		DATE			
+Url					Description	CREATE NEW VISIT - ERROR	ENV	DEV	STAGGING	PROD
+Steps		1	simulate error/invalid input		test type	NEGATIVE				
+		2	click save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				error message "failed to save. please try again" displayed				
+		5				modal remains open				
+		6				data is preserved				
+		7				retry is allowed				
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-099							PASSED		
+Create at			30/03/2026		created by	Rizal	Tester	rizal		
+Scenario			data consistency accross platform		Pre-Condition		DATE	13/04/2026		
+Url					Description	CREATE NEW VISIT - DATA CONSISTENCY	ENV	DEV	STAGGING	PROD
+Steps		1	open mobile app		test type	POSITIVE				
+		2	check created lead and visit 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				data is visible on mobile		Passed		
+		5				data is consistent with web		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+Test ID	LeadsSalesVisit-100							FAILED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor opens WAITING REVIEW visit 		Pre-Condition	login as supervisor, visit status = waiting review	DATE	02/03/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor 		test type	POSITIVE				
+		2	open lead detail							
+		3	click a visit with status waiting review		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe visit detail modal			planned time is displayed		Passed		
+		5				checkin time is displayed	checkin time is empty	Failed		
+		6				status badge shows: waiting review		Passed		
+		7				badge color matches design spec		Passed		
+		8				no duplicate badge		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-101							FAILED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			header renders correctly for APPROVED visit		Pre-Condition		DATE	02/03/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	visit status = approved		test type	POSITIVE				
+		2	open visit detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status badge = approved (green)		Passed		
+		5				approved by (name)	approved by is not displays	Failed		
+		6				approval timestamp	approval timestamp is not displays	Failed		
+		7				approve/reject buttons not visible		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-102							FAILED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			header renders correctly for REJECTED visit 		Pre-Condition		DATE	02/03/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	visit status = rejected		test type	POSITIVE				
+		2	reject reason exists							
+		3	open visit detail		Status Response	Expected Result	Actual Result	Status		Status
+		4				badge = rejected (red)		Passed		
+		5				reject reason visible		Passed		
+		6				rejected by (name)	rejected by is not displays	Failed		
+		7				approval timestamp		Failed		
+		8				no action button		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-103							PASSED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			late visit gets approved > late badge still visible		Pre-Condition		DATE	02/03/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR (LATE BADGE)	ENV	DEV	STAGGING	PROD
+Steps		1	planned at = 10:00		test type	POSITIVE				
+		2	checked in = 10:30							
+		3	status waiting review > supervisor clicks approve		Status Response	Expected Result	Actual Result	Status		Status
+		4	open visit detail			primary badge : approve		Passed		
+		5				late badge still visible		Passed		
+		6				approval metadata stored		Passed		
+		7				visit locked		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-104							PASSED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			late visit gets REJECTED > late badge still visible		Pre-Condition		DATE	14/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR (LATE BADGE)	ENV	DEV	STAGGING	PROD
+Steps		1	planned at = 10:00		test type	POSITIVE				
+		2	checked in = 10:30							
+		3	status waiting review > supervisor clicks rejected with reason		Status Response	Expected Result	Actual Result	Status		Status
+		4	submit			primary badge: rejected		Passed		
+		5				late badge visible		Passed		
+		6				reject reason shown		Passed		
+		7				visit locked		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-105							PASSED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			on time visit > late badge not visible		Pre-Condition		DATE	14/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR (LATE BADGE)	ENV	DEV	STAGGING	PROD
+Steps		1	planned at = 10:00		test type	POSITIVE				
+		2	checked in = 09:55							
+		3	open detail visit		Status Response	Expected Result	Actual Result	Status		Status
+		4				only status badge shown		Passed		
+		5				no late badge		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-106							PASSED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			selfie image renders correctly		Pre-Condition		DATE	14/04/2026		
+Url					Description	SELFIE DETAIL VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	visit outcome = visited		test type	POSITIVE				
+		2	selfie exists							
+		3	open detail visit		Status Response	Expected Result	Actual Result	Status		Status
+		4				image loads successfully		Passed		
+		5				no broken placeholder		Passed		
+		6				no distortion		Passed		
+		7				image resolution acceptable		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-107							PASSED		
+Create at			27/02/2026		created by	Rizal	Tester	rizal		
+Scenario			location data renders completely 		Pre-Condition		DATE	14/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	observe location on detail visit		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				location is shown		Passed		
+		5				address shownmax 240 chars		Passed		
+		6				format readable		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-108							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approve and reject buttons are visible only when status is waiting review		Pre-Condition	visit status = waiting review	DATE	16/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor		test type	POSITIVE				
+		2	open visit detail							
+		3	observe available action buttons		Status Response	Expected Result	Actual Result	Status		Status
+		4				approve button is visible		Passed		
+		5				reject button is visible		Passed		
+		6				no other decision buttons are visible		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-109							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot see approve or reject buttons		Pre-Condition	visit status = waiting review	DATE	16/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	login as member		test type	POSITIVE				
+		2	open visit detail with status waiting review							
+		3	observe action section		Status Response	Expected Result	Actual Result	Status		Status
+		4				approve button is not visible		Passed		
+		5				reject button is not visible		Passed		
+		6				visit detail is view only		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-110							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor successfully approves a visit 		Pre-Condition	visit status = waiting review	DATE	21/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	open waiting review visit		test type	POSITIVE				
+		2	click approve							
+		3	wait for UI response		Status Response	Expected Result	Actual Result	Status		Status
+		4				status badge changes to approved		Passed		
+		5				approve and reject buttons disappear		Passed		
+		6				visit becomes non editable		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-111							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			modal closes automatically after approval		Pre-Condition	visit opened in modal 	DATE	16/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	click approve		test type	POSITIVE				
+		2	observe UI behavior							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				modal closes automatically		Passed		
+		5				user returned to visit list or history view		Passed		
+		6				approved visit visible in list		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-112							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			visit list refreshes after approval		Pre-Condition		DATE	16/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	approve visit		test type	POSITIVE				
+		2	observe visit list 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status updates to approves		Passed		
+		5				visit no longer shown as waiting review		Passed		
+		6				no manual page refresh required		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-113							NEED TO TEST		
+Create at			02/03/2026		created by	Rizal	Tester			
+Scenario			approve button shows loading state during submission		Pre-Condition		DATE			
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	simulate slow network		test type	NEGATIVE				
+		2	click approve							
+		3	observe button state		Status Response	Expected Result	Actual Result	Status		Status
+		4				button shows loading spinner				
+		5				button becomes disabled				
+		6				cannot click multiple times				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-114							NEED TO TEST		
+Create at			02/03/2026		created by	Rizal	Tester			
+Scenario			error message displayed if approval fails		Pre-Condition		DATE			
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	disconnect internet		test type	NEGATIVE				
+		2	click approve							
+		3	observe response		Status Response	Expected Result	Actual Result	Status		Status
+		4				error message is shown				
+		5				status remains waiting review				
+		6				approve button remains visible				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-115							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approved visit remains approved after page refresh 		Pre-Condition		DATE	17/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	approve visit 		test type	POSITIVE				
+		2	refresh browser							
+		3	reopen visit		Status Response	Expected Result	Actual Result	Status		Status
+		4				status remains approved		Passed		
+		5				approve button not visible		Passed		
+		6				reject button not visible		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-116							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approved visit appears correctly in History tab (MOBILE)		Pre-Condition		DATE	17/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	approve visit		test type	POSITIVE				
+		2	navigate to history tab (Mobile)							
+		3	locate visit		Status Response	Expected Result	Actual Result	Status		Status
+		4				visit visible in history 		Passed		
+		5				status shows approved		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-117									
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			visit already approved by another supervisor		Pre-Condition		DATE	17/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	open wiating review visit		test type	EDGE CASE				
+		2	simulate visit being approved elsewhere							
+		3	click approve		Status Response	Expected Result	Actual Result	Status		Status
+		4				error message "data already changed. please reload"				
+		5				status updated after refresh				
+		6				approve button disappears after reload				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-118							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approving late visit keeps late badge visible		Pre-Condition		DATE	17/04/2026		
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	open late visit 		test type	POSITIVE				
+		2	click approve							
+		3	observe visit in history		Status Response	Expected Result	Actual Result	Status		Status
+		4				status = Approved		Passed		
+		5				late badge still visible		Passed		
+		6				no visual inconsistency		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-119									
+Create at			02/03/2026		created by	Rizal	Tester			
+Scenario			approved visit cannot be reopened for decision		Pre-Condition		DATE			
+Url					Description	WEB VISIT DETAIL - SUPERVISOR	ENV	DEV	STAGGING	PROD
+Steps		1	approve visit		test type	POSITIVE				
+		2	reopen same visit							
+		3	observe action area 		Status Response	Expected Result	Actual Result	Status		Status
+		4				no decision buttons 				
+		5				visit detail fully read only				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-120							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reject button visible for waiting review visit 		Pre-Condition	visit status = waiting review	DATE	17/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor 		test type	POSITIVE				
+		2	open lead detail							
+		3	open visit detail with status waiting review 		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe action section			reject button visible		Passed		
+		5				approve button visible		Passed		
+		6				status badge shows waiting review		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-121							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reject button not visible for non waiting review status		Pre-Condition	visit status = approved	DATE	17/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor		test type	POSITIVE				
+		2	open approved visit							
+		3	observe action section		Status Response	Expected Result	Actual Result	Status		Status
+		4				reject button not visible		Passed		
+		5				no decision inpuf field shown		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-122							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			member cannot see reject button		Pre-Condition		DATE	17/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	login as member 		test type	POSITIVE				
+		2	open waiting review visit 							
+		3	observe UI 		Status Response	Expected Result	Actual Result	Status		Status
+		4				reject button not visible		Passed		
+		5				no reason input field shown		Passed		
+		6				view only mode		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-123							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			cannot submit reject without reason		Pre-Condition		DATE	17/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	click reject		test type	POSITIVE				
+		2	leave reson empty							
+		3	click submit reject		Status Response	Expected Result	Actual Result	Status		Status
+		4				reject button is not visible		Passed		
+		5				visit status remains waiting review		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-124							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			cannot submit reject with whitespace only reason		Pre-Condition		DATE	17/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	enter only spaces in reason field		test type	POSITIVE				
+		2	click submit reject							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				reject button remains not visible		Passed		
+		5				reject not processed		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-125							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reject reason minimum character validation		Pre-Condition		DATE	21/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	enter 2-3 characters only		test type	NEGATIVE				
+		2	click submit							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				validation error shown		Passed		
+		5				reject blocked		Passed		
+		6				status unchanged		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-126							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reject reason maximum character validation		Pre-Condition		DATE	21/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	enter chars 500 >		test type	NEGATIVE				
+		2	click submit							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				frontend enforced limit		Passed		
+		5				max 500 chars		Passed		
+		6				input restricted		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-127							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor successfully rejects visit with valid reason		Pre-Condition		DATE	21/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	click reject		test type	POSITIVE				
+		2	enter valid reason 							
+		3	click submit reject		Status Response	Expected Result	Actual Result	Status		Status
+		4				status badge changes to rejected		Passed		
+		5				reject & approve buttons disappear		Passed		
+		6				visit becomes read only 		Passed		
+		7				reject reason displayed in detail view		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-128							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reject reason displayed in visit detail after rejection		Pre-Condition		DATE	21/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	reject visit with valid reason 		test type	POSITIVE				
+		2	reopen visit detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				reject reason visible		Passed		
+		5				clearly labeled as reject reason		Passed		
+		6				field not editable		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-129							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			visit list updates after rejection		Pre-Condition		DATE	21/04/2026		
+Url					Description	SUPERVISOR - REJECTED VISIT	ENV	DEV	STAGGING	PROD
+Steps		1	reject visit 		test type	POSITIVE				
+		2	return to visit list							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				visit status shows rejected		Passed		
+		5				visit not longer categorized as waiting review		Passed		
+		6				sorting remains correct		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-130							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			Supervisor can open visit detail with status reschedule		Pre-Condition	visit status = reschedule, visit appears in leads history tab	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor		test type	POSITIVE				
+		2	navigate to leads history tab							
+		3	select visit with status badge RESCHEDULED		Status Response	Expected Result	Actual Result	Status		Status
+		4	open detail modal			detail modal opens successfully 		Passed		
+		5				status badge displays rescheduled		Passed		
+		6				planned time is displayed		Passed		
+		7				closed time is displayed		Passed		
+		8				note is displayed (if exists)		Passed		
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-131							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approve and reject buttons must not appear for rescheduled visit		Pre-Condition	visit status = rescheduled	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	open rescheduled visit detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				approve button not visible		Passed		
+		5				reject button not visible		Passed		
+		6				reject reason input field not visible		Passed		
+		7				no decision related ui component		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-132							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			rescheduled visit must be read only		Pre-Condition	visit status = rescheduled	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	open rescheduled visit detail		test type	POSITIVE				
+		2	attempt any interaction on fields 							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				no editable field available		Passed		
+		5				no action button available 		Passed		
+		6				no status modification possible		Passed		
+		7				ui does not allow any submission		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-133							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reschedule sequence label must appear next to status badge		Pre-Condition	visit has been reschedule at least once	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor 		test type	POSITIVE				
+		2	open history tab 							
+		3	locate visit with status rescheduled		Status Response	Expected Result	Actual Result	Status		Status
+		4	observe status badge area 			status badge shows: rescheduled		Passed		
+		5				label "reschedule #1" appears next to badge 		Passed		
+		6				label s visually separated from badge		Passed		
+		7				label formatting consistent with design		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-134							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reschedule sequence number must increment correctly		Pre-Condition	visit has been rescheduled multiple times	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	open leads history tab		test type	POSITIVE				
+		2	open visit detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				label shows "Reschedule #2"		Passed		
+		5				number  matches reschedule sequence order		Passed		
+		6				no duplication (e.g. not showing #1 if actual is #2)		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-135							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			reschedule sequence label must appear consistently in list and detail view		Pre-Condition		DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	observe visit in leads history list		test type	POSITIVE				
+		2	open visit detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				reschedule #X visible iin history list		Passed		
+		5				same number visible in detail view 		Passed		
+		6				sequence number consistent between list and detail		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-136							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			first reschedule must display as reschedule #1		Pre-Condition	visit has been rescheduled once	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW RESCHEDULE	ENV	DEV	STAGGING	PROD
+Steps		1	open visit detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				label displays exactly "Reschedule #1"		Passed		
+		5				not "Reschedule #0"		Passed		
+		6				not empty		Passed		
+		7				not null		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-137							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			supervisor can open visit detail with status cancelled		Pre-Condition		DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	login as supervisor		test type	POSITIVE				
+		2	navigate to history tab 							
+		3	select visit with status badge cancelled		Status Response	Expected Result	Actual Result	Status		Status
+		4	open detail modal			detail modal opens successfully 		Passed		
+		5				status badge displays cancelled		Passed		
+		6				planned time is displayed		Passed		
+		7				note is displayed (if exists)		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-138							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			approve and reject buttons must not appears for cancelled visit		Pre-Condition	visit status = cancelled	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	open cancelled visit detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				approve button not visible		Passed		
+		5				reject button not visible		Passed		
+		6				reject reason input NOT visible		Passed		
+		7				no decision related UI component rendered		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-139							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			cancelled visit must be read only		Pre-Condition	visit status = cancelled	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	open cancelled visit detail		test type	POSITIVE				
+		2	attempt any interaction on fields							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				no editable fields available		Passed		
+		5				no action button available		Passed		
+		6				no status modification possible		Passed		
+		7				UI does not allow submission		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-140							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			cancelled visit must not display checkin data		Pre-Condition		DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	open cancelled visit detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				checkin time not displayed		Passed		
+		5				selfie photo not displayed		Passed		
+		6				location not displayed 		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-141							PASSED		
+Create at			02/03/2026		created by	Rizal	Tester	rizal		
+Scenario			status badge must render correctly for cancelled		Pre-Condition	visit status = cancelled	DATE	22/04/2026		
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	view visit in list		test type	POSITIVE				
+		2	open visit detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				status badge text = cancelled		Passed		
+		5				badge color matches design specification (grey color)		Passed		
+		6				badge consistent between list and detail		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-142									
+Create at			02/03/2026		created by	Rizal	Tester			
+Scenario			cancelled visit must not display reschedule sequence lable		Pre-Condition	visit status = cancelled	DATE			
+Url					Description	SUPERVISOR - REVIEW CANCELLED	ENV	DEV	STAGGING	PROD
+Steps		1	view visit in history list		test type	POSITIVE				
+		2	open detail							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				no reschedule #X label displayed				
+		5				only rescheduled visits display sequence label				
+		6				       				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	LeadsSalesVisit-143									
+Create at			02/03/2026		created by	Rizal	Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								

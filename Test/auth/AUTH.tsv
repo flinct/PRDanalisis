@@ -1,12 +1,12 @@
 total cases =			79							
 DEV				STAGGING			PROD			
-Passed			51	Passed		0	Passed	0		
-Failed			16	Failed		0	Failed	0		
-Need to test			5	Need to test		0	Need to test	0		
-On test			4	On test		0	On test	0		
+Passed			1	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
 No Status			0	No Status		0	No Status	0		
 
-Test ID	SIX-Test-001				Note:	abdcef		On Test	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-001							Passed		
 Create at			12/12/2025		created by	Danny	Tester	dany		
 Scenario			Register with valid fullname, email, username, phone, password		Pre-Condition	abcdefgh	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Verify user can register successfully with valid input	ENV	DEV	Staging	Prod
@@ -14,144 +14,144 @@ Steps		1	Open register page		test type	POSITIVE
 		2	Input fullname “John Doe”							
 		3	test 2							
 		4			Status Response	Expected Result	Actual Result	Status		Status
-		5				Successfull register	/login2	On Test		
-		6				System will display success register page	testing 22	On Test		
-		7				System will sent an email to verify register	no email services	Failed		
-		8				test 2				
+		5				Successfull register				
+		6				System will display success register page				
+		7				System will sent an email to verify register				
+		8				test 2	tested			
 
 
 
 
-Test ID	SIX-Test-002							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-002									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify fullname validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input fullname with <3 characters	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input fullname “Jo”							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Fullname must be at least 3 characters”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Fullname must be at least 3 characters”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-003							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-003									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify fullname validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input fullname with >35 characters	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input fullname with more than 40 characters							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Fullname cannot exceed 35 characters”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Fullname cannot exceed 35 characters”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-004							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-004									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify fullname validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Validate alphabet-only rule	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input fullname with “John123”							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Fullname can only contain letters and spaces”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Fullname can only contain letters and spaces”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-005							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-005									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify fullname validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Validate disallowed symbols	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input fullname with “John@Doe”							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Fullname can only contain letters and spaces”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Fullname can only contain letters and spaces”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-006							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-006									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify fullname validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Fullname with double spaces will be trimmed	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input fullname with “John  Doe”							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Passed		
-		5				System will display success register page		Passed		
-		6				System will sent an email to verify register	no email services	Failed		
-		7				System will trimming spaces automatically		Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
+		7				System will trimming spaces automatically				
 
 
 
 
-Test ID	SIX-Test-007							ON TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-007									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Email with leading/trailing spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input email with  user@example.com							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Failed		
-		5				System will display success register page		Failed		
-		6				System will sent an email to verify register		Failed		
-		7				System will trimming spaces automatically		Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
+		7				System will trimming spaces automatically				
 
 
 
 
-Test ID	SIX-Test-008							ON TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-008									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Email with Uppercase typed	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input email with USER@EXAMPLE.COM							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Failed		
-		5				System will display Error: “invalid email format”		Failed		
-		6				System will sent an email to verify register		Failed		
-		7				System will converted to lowercase automatically		Failed		
+		4				Successfull register				
+		5				System will display Error: “invalid email format”				
+		6				System will sent an email to verify register				
+		7				System will converted to lowercase automatically				
 
 
 
 
-Test ID	SIX-Test-009							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-009									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Invalid email (missing @)	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input email with userexample.com							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “invalid email format”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “invalid email format”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-010							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-010									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Invalid email (missing domain)	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input email with user@							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “invalid email format”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “invalid email format”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-011							ON TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-011									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition	Existing email in DB	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Duplicate email	ENV	DEV	Staging	Prod
@@ -165,7 +165,7 @@ Steps		1	Open register page		test type	NEGATIVE
 
 
 
-Test ID	SIX-Test-012							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-012									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify email validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	validate redirect after register and verified email after click link	ENV	DEV	Staging	Prod
@@ -181,424 +181,424 @@ Steps		1	Open register page		test type	POSITIVE
 
 
 
-Test ID	SIX-Test-013							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-013									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username < 6 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input username with john							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Username must be 6 to 30 characters long”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Username must be 6 to 30 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-014							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-014									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username > 30 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input username more than 30 chars							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Username must be 6 to 30 characters long”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Username must be 6 to 30 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-015							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-015									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username with spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input username john doe01							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “no spaces allowed”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “no spaces allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-016							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-016									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username with special chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input username johndoe01@							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “no special character allowed”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “no special character allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-017							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-017									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition	existing username in DB	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input existing username	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input existing username 							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Username already taken”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “Username already taken”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-018							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-018									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username with uppercase	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input username JOHNDOE							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Failed		
-		5				System will display success register page		Failed		
-		6				System will sent an email to verify register		Failed		
-		7				System must converted to lowercase automatically	system returning error Nama pengguna hanya boleh berisi huruf kecil dan angka	Passed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
+		7				System must converted to lowercase automatically				
 
 
 
 
-Test ID	SIX-Test-019							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-019									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify username validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Username with trailing space	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input username joshdoe 							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Failed		
-		5				System will display success register page		Failed		
-		6				System will sent an email to verify register		Failed		
-		7				System must trim spaces automatically	system do no validate trailing spaces	Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
+		7				System must trim spaces automatically				
 
 
 
 
-Test ID	SIX-Test-020							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-020									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Valid phone (08xxx format)	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input phone number with 08xxx format							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Passed		
-		5				System will display success register page		Passed		
-		6				System will sent an email to verify register	no email services	Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
 
 
 
 
-Test ID	SIX-Test-021							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-021									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Valid phone (628xxx format)	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input phone number with 62xxx format							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Passed		
-		5				System will display success register page		Passed		
-		6				System will sent an email to verify register	no email services	Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
 
 
 
 
-Test ID	SIX-Test-022							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-022									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone < 10 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with < 10 digits number							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “phone number must be 10 to 12 characters long”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “phone number must be 10 to 12 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-023							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-023									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone > 12 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with > 12 digits number							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “phone number must be 10 to 12 characters long”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “phone number must be 10 to 12 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-024							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-024									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with special chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with specials chars							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “numbers only allowed”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “numbers only allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-025							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-025									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with alphanumeric	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with alphanumeric							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “numbers only allowed”		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				System will display Error: “numbers only allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-026							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-026									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with spaces							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “numbers only allowed”		Passed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “numbers only allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-027							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-027									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with trailing	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	Input phone number with spaces							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Successfull register		Passed		
-		5				System will display success register page		Passed		
-		6				System will sent an email to verify register	no email services	Failed		
-		7				System will trim spaces automatically	System do not trim spaces	Failed		
+		4				Successfull register				
+		5				System will display success register page				
+		6				System will sent an email to verify register				
+		7				System will trim spaces automatically				
 
 
 
 
-Test ID	SIX-Test-028							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-028									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with Invalid prefix	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with Invalid prefix							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “phone number must start with 08xxx or 628xxx”	input 02xxx, validation failed	Failed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “phone number must start with 08xxx or 628xxx”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-029							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-029									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone with prefix spacing	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number with Invalid prefix							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “phone number must start with 08xxx or 628xxx”	input  02xxx, validation failed	Failed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “phone number must start with 08xxx or 628xxx”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-030							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-030									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify phone number validation		Pre-Condition	existing phone number	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Phone existing data in DB	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input phone number that already registered							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Failed		
-		5				System will display Error: “phone number already taken”		Failed		
-		6				System must not sent verification email		Failed		
+		4				Register Failed				
+		5				System will display Error: “phone number already taken”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-031							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-031									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password < 8 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password < 8 chars							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”		Passed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-032							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-032									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password > 16 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password > 16 chars							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”		Passed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-033							PASSED		rizal
+Test ID	SIX-Test-033									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password without special char	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password without special char							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”		Passed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-034							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-034									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password without uppercase char	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password without uppercase char							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”		Passed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “Password must be alphanumeric and include at least one special character, one uppercase letter, and be 8 to 16 characters long”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-035							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-035									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password contains username	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password contains username							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Failed		
-		5				System will display Error: “password cannot contains username or email!”	System allow password contains username / email	Failed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “password cannot contains username or email!”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-036							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-036									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password same as email	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password same as email							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Failed		
-		5				System will display Error: “password cannot contains username or email!”	System allow password contains username / email	Failed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “password cannot contains username or email!”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-037							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-037									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Verify password validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input Password that contains spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	Input password that contains spaces							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Failed		
-		5				System will display Error: “no spaces allowed”	System allow password contains spacing	Failed		
-		6				System must not sent verification email	no email services	Failed		
+		4				Register Failed				
+		5				System will display Error: “no spaces allowed”				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-038							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-038									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Empty input validation		Pre-Condition		DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	register without filling certain field	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	try register with Empty fullname							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Register Failed		Passed		
-		5				Button register disabled and cannot be clicked		Passed		
-		6				System must not sent verification email		Passed		
+		4				Register Failed				
+		5				Button register disabled and cannot be clicked				
+		6				System must not sent verification email				
 
 
 
 
-Test ID	SIX-Test-039							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-039									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Onboarding page display behavior		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Onboarding page displayed after successfull registration	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding form displayed once		Passed		
-		5				display successfull onboarding page		Passed		
+		4				Onboarding form displayed once				
+		5				display successfull onboarding page				
 
 
 
 
-Test ID	SIX-Test-040							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-040									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Onboarding page display behavior		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	User refreshes page after submitting onboarding	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding form displayed once		Passed		
-		5				Form not re-displayed (already completed)		Passed		
-		6				display successfull onboarding page		Passed		
+		4				Onboarding form displayed once				
+		5				Form not re-displayed (already completed)				
+		6				display successfull onboarding page				
 
 
 
 
-Test ID	SIX-Test-041							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-041									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Onboarding page display behavior		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	User tries to access onboarding again manually via url path	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
 
 
 
 
-Test ID	SIX-Test-042							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-042									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Onboarding page display behavior		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Filling all form with valid criteria	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
 		7				“organization must be 3 to 50 characters long, alphabetical, spacing and . ”				
 		8				“NIB must be number with 13 characters long”				
 		9				“NPWP must be number with 15 characters long”				
@@ -609,480 +609,480 @@ Steps		1	Open register page		test type	POSITIVE
 
 
 
-Test ID	SIX-Test-043							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-043									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Organization name validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input organization name <3 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-044							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-044									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Organization name validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input organization name >50 chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-045							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-045									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Organization name validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input organization Name with scpecial chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-046							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-046									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Organization name validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input organization Name with number only	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”	System allow input number only	Failed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “Organization name must be 3 to 50 characters long and may contain letters, numbers, spaces, and periods.”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-047							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-047									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Organization name validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input organization Name with existing name in DB	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “organization name already taken”	System do not validate duplication organization name	Failed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “organization name already taken”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-048							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-048									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NIB < 13 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NIB must be number with 13 characters long”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NIB must be number with 13 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-049							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-049									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NIB > 13 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NIB must be number with 13 characters long”	System limit the input to 13 digits	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NIB must be number with 13 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-050							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-050									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NIB with alphabets	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NIB must be number with 13 characters long”	System limits the input accept only numbers	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NIB must be number with 13 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-051							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-051									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NIB with special chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NIB must be number with 13 characters long”	System limits the input accept only numbers	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NIB must be number with 13 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-052							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-052									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NIB with spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
-		7				System must be automatically trim spaces	System limits the input accept only numbers	Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
+		7				System must be automatically trim spaces				
 
 
 
 
-Test ID	SIX-Test-053							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-053									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NPWP validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NPWP < 15 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NPWP must be number with 15 characters long”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NPWP must be number with 15 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-054							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-054									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NPWP validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NPWP > 15 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NPWP must be number with 15 characters long”	System limit the input to 15 digits	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NPWP must be number with 15 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-055							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-055									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NPWP validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NPWP with alphabets	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NPWP must be number with 15 characters long”	System limits the input accept only numbers	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NPWP must be number with 15 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-056							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-056									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NPWP validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NPWP with special chars	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “NPWP must be number with 15 characters long”	System limits the input accept only numbers	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “NPWP must be number with 15 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-057							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-057									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NPWP validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input NPWP with spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
-		7				System must be automatically trim spaces	System limits the input accept only numbers	Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
+		7				System must be automatically trim spaces				
 
 
 
 
-Test ID	SIX-Test-058							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-058									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB upload validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try upload NIB with 3mb file size	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
 
 
 
 
-Test ID	SIX-Test-059							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-059									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB upload validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try upload NIB with > 5mb file size	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “maximum file upload is 5 mb”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “maximum file upload is 5 mb”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-060							NEED TO TEST	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-060									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB upload validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try upload NIB with invalid extension	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “only .jpg or .pdf allowed”	no message error validation 	Failed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “only .jpg or .pdf allowed”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-061							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-061									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			NIB upload validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try upload NIB with corrupted file	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Failed		
-		5				System will display Error: upload failed	no message error validation, file successfully inputed	Failed		
-		6				System must not display successfull onbarding page		Failed		
+		4				Onboarding Failed				
+		5				System will display Error: upload failed				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-062							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-062									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			ID number validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input ID < 16 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “ID must be number with 16 characters long”		Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “ID must be number with 16 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-063							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-063									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			ID number validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input ID > 16 digits	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “ID must be number with 16 characters long”	System limit the input to 16 digits	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “ID must be number with 16 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-064							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-064									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			ID number validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input with alphabets	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	NEGATIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				Onboarding Failed		Passed		
-		5				System will display Error: “ID must be number with 16 characters long”	System limits the input accept only numbers	Passed		
-		6				System must not display successfull onbarding page		Passed		
+		4				Onboarding Failed				
+		5				System will display Error: “ID must be number with 16 characters long”				
+		6				System must not display successfull onbarding page				
 
 
 
 
-Test ID	SIX-Test-065							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-065									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			ID number validation		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Try input with spaces	ENV	DEV	Staging	Prod
 Steps		1	Open register page		test type	POSITIVE				
 		2	register							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				User directed to dashboard		Passed		
-		5				Onboarding form displayed once		Passed		
-		6				Form not re-displayed (already completed)		Passed		
-		7				System must be automatically trim spaces	System limits the input accept only numbers	Passed		
+		4				User directed to dashboard				
+		5				Onboarding form displayed once				
+		6				Form not re-displayed (already completed)				
+		7				System must be automatically trim spaces				
 
 
 
 
-Test ID	SIX-Test-066							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-066									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with validate username		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with validate username	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	POSITIVE				
 		2	input username testaka							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				successfull login		Passed		
-		5				user directed to dashboard		Passed		
+		4				successfull login				
+		5				user directed to dashboard				
 
 
 
 
-Test ID	SIX-Test-067							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-067									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with validate email		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with validate email	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	POSITIVE				
 		2	input username Testaka@gmail.com							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				successfull login	login failed	Failed		
-		5				user directed to dashboard	user stay on login page	Failed		
+		4				successfull login				
+		5				user directed to dashboard				
 
 
 
 
-Test ID	SIX-Test-068							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-068									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with invalid username		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login without validate username	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username Testaka@							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed		Passed		
-		5				user stay on login page		Passed		
+		4				login failed				
+		5				user stay on login page				
 		6				system will display error Email dan/atau password salah. Coba lagi atau coba reset password anda.				
 
 
 
 
-Test ID	SIX-Test-069							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-069									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with invalid email		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login without validate email	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username Testaka12@gmail.com							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed		Passed		
-		5				user stay on login page		Passed		
+		4				login failed				
+		5				user stay on login page				
 		6				system will display error Email dan/atau password salah. Coba lagi atau coba reset password anda.				
 
 
 
 
-Test ID	SIX-Test-070							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-070									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with uppercase username		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with uppercase username	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username TESTAKA							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed	login successfull	Failed		
-		5				user stay on login page	userd directed to dashboard	Failed		
-		6				system will display error Email dan/atau password salah. Coba lagi atau coba reset password anda.	insensitive username field, when sign up needed to be lowercase			
+		4				login failed				
+		5				user stay on login page				
+		6				system will display error Email dan/atau password salah. Coba lagi atau coba reset password anda.				
 
 
 
 
-Test ID	SIX-Test-071							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-071									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with invalid password		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with wrong password	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username testaka							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed		Passed		
-		5				user stay on login page		Passed		
+		4				login failed				
+		5				user stay on login page				
 		6				system will display error Email dan/atau password salah. Coba lagi atau coba reset password anda.				
 
 
 
 
-Test ID	SIX-Test-072							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-072									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with invalid password		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with password < 6	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username testaka							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed		Passed		
-		5				user stay on login page		Passed		
-		6				system will display error Password minimal 8 karakter	system will display error Password minimal 6 karakter			
+		4				login failed				
+		5				user stay on login page				
+		6				system will display error Password minimal 8 karakter				
 
 
 
 
-Test ID	SIX-Test-073							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-073									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Login with invalid password		Pre-Condition	User completes registration successfully	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	user try login with password < 8 characters	ENV	DEV	Staging	Prod
 Steps		1	open login page		test type	NEGATIVE				
 		2	input username testaka							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				login failed		Passed		
-		5				user stay on login page		Passed		
-		6				system will display error Password minimal 8 karakter	system will display error Password minimal 6 karakter	Failed		
+		4				login failed				
+		5				user stay on login page				
+		6				system will display error Password minimal 8 karakter				
 
 
 
 
-Test ID	SIX-Test-074							FAILED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-074									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Check Access token longevity		Pre-Condition	after register, user login and directed to onboarding page	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	access token should expired after 15 minutes	ENV	DEV	Staging	Prod
 Steps		1	register		test type	POSITIVE				
 		2	login							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				System must refresh access token automatically		Failed		
-		5				Onboarding success		Failed		
+		4				System must refresh access token automatically				
+		5				Onboarding success				
 
 
 
 
-Test ID	SIX-Test-075							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-075									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Check Access token longevity		Pre-Condition	after register, user login and directed to onboarding page	DATE	12/12/2025		
 Url			dev-v2.satuinbox.com		Description	Access token should remain valid within 15 minutes	ENV	DEV	Staging	Prod
 Steps		1	register		test type	POSITIVE				
 		2	login							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				System must use the existing access token		Passed		
-		5				Onboarding success		Passed		
+		4				System must use the existing access token				
+		5				Onboarding success				
 
 
 
 
-Test ID	SIX-Test-076							PASSED	NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-076									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Check Access token longevity		Pre-Condition		DATE	12/12/2025		
 Url			https://dev-v2-api.satuinbox.com/api/auth/login		Description	Confirm that the access token truly becomes invalid after 15 minutes	ENV	DEV	Staging	Prod
 Steps		1	login via endpoint		test type	NEGATIVE				
 		2	Capture the token and its exp (expiry) claim (if JWT) or store timestamp.							
 		3			Status Response	Expected Result	Actual Result	Status		Status
-		4				The request returns 401 Unauthorized with an error : token_expired or invalid_token.		Passed		
+		4				The request returns 401 Unauthorized with an error : token_expired or invalid_token.				
 
 
 
 
-Test ID	SIX-Test-077								NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-077									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Check Access token longevity		Pre-Condition		DATE	12/12/2025		
 Url			https://dev-v2-api.satuinbox.com/api/auth/login		Description	Confirm that the refresh token truly refresh the access token	ENV	DEV	Staging	Prod
@@ -1095,7 +1095,7 @@ Steps		1	login via endpoint		test type	POSITIVE
 
 
 
-Test ID	SIX-Test-078								NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-078									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			Check Access token longevity		Pre-Condition	user already login at 1 browser	DATE	12/12/2025		
 Url					Description	Confirm that only one user session can be activated	ENV	DEV	Staging	Prod
@@ -1108,7 +1108,7 @@ Steps		1	login in browser 1		test type	POSITIVE
 
 
 
-Test ID	SIX-Test-079								NEED TO TEST	NEED TO TEST
+Test ID	SIX-Test-079									
 Create at			12/12/2025		created by	Danny	Tester			
 Scenario			validate all feature can be used		Pre-Condition	new register user successfull onboarding	DATE	12/12/2025		
 Url					Description	user access setting and use desired feature	ENV	DEV	Staging	Prod

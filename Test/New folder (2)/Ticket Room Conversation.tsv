@@ -1,0 +1,1068 @@
+total cases =			66							
+DEV				STAGGING			PROD			
+Passed			57	Passed		0	Passed	0		
+Failed			6	Failed		0	Failed	0		
+Need to test			3	Need to test		0	Need to test	64		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		66	No Status	2		
+Test ID	SIX-TicketConv-001							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Ticket Header Information		Pre-Condition	- User memiliki akses ke ticket - Ticket berhasil dibuat	DATE	04/06/26		
+Url					Description	Verify ticket header information displayed correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Observe ticket header section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Ticket ID displayed correctly		Passed		
+		5				Ticket Type displayed correctly		Passed		
+		6				Client Name displayed correctly		Passed		
+		7				Channel Badge displayed when available		Passed		
+		8				Last Activity information displayed correctly		Passed		
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-002							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Ticket Description		Pre-Condition	- Ticket has description	DATE	04/06/26		
+Url					Description	Verify ticket description is displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Observe ticket description section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Description displayed correctly		Passed		
+		5				Description content matches ticket data		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-003							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Edit Ticket Description		Pre-Condition	- User has edit permission - Ticket has description	DATE	04/06/26		
+Url					Description	Verify description can be edited	ENV	DEV	STAGGING	PROD
+Steps		1	Double click description field		test type	POSITIVE				
+		2	Modify description text							
+		3	Click Save		Status Response	Expected Result	Actual Result	Status		Status
+		4				Description enters edit mode		Passed		
+		5				Updated description saved successfully		Passed		
+		6				New description displayed		Passed		
+		7				Activity log created		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-004							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Cancel Ticket Description Edit		Pre-Condition	- User has edit permission	DATE	04/06/26		
+Url					Description	Verify edit can be cancelled	ENV	DEV	STAGGING	PROD
+Steps		1	Double click description		test type	POSITIVE				
+		2	Modify description							
+		3	Press Escape key		Status Response	Expected Result	Actual Result	Status		Status
+		4				Edit mode closed		Passed		
+		5				Changes discarded		Passed		
+		6				Original description remains		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-005							PASSED		
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Ticket Conversation Thread		Pre-Condition	-  Ticket has messages	DATE	05/06/26		
+Url					Description	Verify thread displayed correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Observe message thread							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Customer messages displayed		Passed		
+		5				Agent messages displayed		Passed		
+		6				Internal notes displayed		Passed		
+		7				Sender name displayed		Passed		
+		8				Sender role displayed		Passed		
+		9				Timestamp displayed				
+										
+										
+										
+Test ID	SIX-TicketConv-006							PASSED		
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Verify Message Ordering		Pre-Condition	- Ticket contains multiple messages	DATE	05/06/26		
+Url					Description	Verify thread ordered chronologically	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Observe first and last message							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Oldest message displayed on top		Passed		
+		5				Newest message displayed at bottom		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-007							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Verify Visibility Labels		Pre-Condition	Ticket contains customer message and internal note	DATE	05/06/26		
+Url					Description	Verify message visibility label displayed correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Observe message labels							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Customer visible message displays “Balas pelanggan”		Passed		
+		5				Internal note displays “Catatan internal”		Passed		
+		6				Customer message never displays “Catatan internal”		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-008							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Send Customer Reply		Pre-Condition	-    Ticket status Open	DATE	05/06/26		
+Url					Description	Verify customer reply sent successfully	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Ensure active tab is Balas Pelanggan							
+		3	Type message		Status Response	Expected Result	Actual Result	Status		Status
+		4	Click Kirim			Message sent successfully		Passed		
+		5				Message appears in conversation thread		Passed		
+		6				Draft cleared after successful send		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-009							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Send Internal Note		Pre-Condition	- Ticket status open	DATE	05/06/26		
+Url					Description	Verify internal note sent successfully	ENV	DEV	STAGGING	PROD
+Steps		1	Switch to Catatan Internal		test type	POSITIVE				
+		2	Input note							
+		3	Click Kirim		Status Response	Expected Result	Actual Result	Status		Status
+		4				Internal note created successfully		Passed		
+		5				Note visible in thread		Passed		
+		6				Note not delivered to customer		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-010							FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Verify Default Composer Tab		Pre-Condition	-     User opens ticket conversation	DATE	05/06/26		
+Url					Description	Verify default tab selection	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Default selected tab is Balas pelanggan	https://jam.dev/c/0cb943a8-33ab-4c2f-8f7d-e6b52ae33fff	Failed		
+		5								
+		6				per ver2.5.0, ini di ganti ke internal notes sebagai default selected tab				
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-011							FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Verify Draft Preservation Between Tabs		Pre-Condition	-     Ticket opened	DATE	05/06/26		
+Url					Description	Verify draft stored separately per tab	ENV	DEV	STAGGING	PROD
+Steps		1	Type text in Balas pelanggan		test type	POSITIVE				
+		2	Switch to Catatan Internal							
+		3	Type another text		Status Response	Expected Result	Actual Result	Status		Status
+		4	Switch back			Customer reply draft preserved	https://jam.dev/c/12f831b6-ea5d-44d9-9fa9-c76e0425e7aa	Failed		
+		5				Internal note draft preserved		Failed		
+		6				Drafts stored separately		Failed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-012				Note:	This feature has not been implemented for Internal Notes yet.		FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Mention Eligible Agent		Pre-Condition	-     Ticket open -     User in Catatan Internal	DATE	05/06/26		
+Url					Description	Verify mention picker works	ENV	DEV	STAGGING	PROD
+Steps		1	Switch to Catatan Internal		test type	POSITIVE				
+		2	Type @							
+		3	Select agent		Status Response	Expected Result	Actual Result	Status		Status
+		4	Send note			Mention picker displayed				
+		5				Selected agent inserted				
+		6				Internal note sent successfully				
+		7				Mention notification created				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-013				Note:	This feature has not been implemented for Internal Notes yet.		FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Mention Restriction		Pre-Condition	-    User on Balas Pelanggan tab	DATE	05/06/26		
+Url					Description	Verify mention disabled	ENV	DEV	STAGGING	PROD
+Steps		1	Open Balas pelanggan		test type	NEGATIVE				
+		2	Type @							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Mention picker not displayed				
+		5				@ treated as normal text				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-014							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Closed Ticket Restriction		Pre-Condition	-    Ticket status Closed	DATE	05/06/26		
+Url					Description	Verify composer disabled	ENV	DEV	STAGGING	PROD
+Steps		1	Open closed ticket		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Composer disabled		Passed		
+		5				Send action disabled		Passed		
+		6				Helper text displayed		Passed		
+		7				User cannot send message		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-015							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Close Ticket		Pre-Condition	-    Ticket status Open -    User memiliki permission	DATE	05/06/26		
+Url					Description	Verify ticket can be closed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Click Tutup							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Ticket status changed to Closed		Passed		
+		5				Composer disabled		Passed		
+		6				Helper text displayed		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-016							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Reopen Ticket		Pre-Condition	-    Ticket status Closed	DATE	05/06/26		
+Url					Description	Verify ticket can be reopened	ENV	DEV	STAGGING	PROD
+Steps		1	Open Closed Ticket		test type	POSITIVE				
+		2	Click Buka Kembali							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Ticket status changed to Open		Passed		
+		5				Composer enabled		Passed		
+		6				User can send message again		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-017							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Snooze Ticket		Pre-Condition	- Ticket open	DATE	05/06/26		
+Url					Description	Verify snooze action	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket		test type	POSITIVE				
+		2	Click Snooze							
+		3	Select future datetime		Status Response	Expected Result	Actual Result	Status		Status
+		4	Save			Ticket successfully snoozed		Passed		
+		5				Ticket status remains unchanged		Passed		
+		6				Snooze information saved		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-018							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Team Inbox		Pre-Condition	-    Ticket has Team Inbox	DATE	05/06/26		
+Url					Description	Verify Team Inbox displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Detail Sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Team Inbox displayed		Passed		
+		5				Value matches ticket data		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-019							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Ticket Assignee		Pre-Condition	-    Ticket assigned	DATE	05/06/26		
+Url					Description	Verify assignee displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Detail Sidebar		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Assignee displayed		Passed		
+		5				Assignee matches ticket data		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-020							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	-    Ticket assigned	Tester	Aprizal		
+Scenario			Assignee Update Reflection		Pre-Condition	- Ticket status open	DATE	05/06/26		
+Url					Description	Verify sidebar updated after assignee changed	ENV	DEV	STAGGING	PROD
+Steps		1	Assign another user		test type	POSITIVE				
+		2	Refresh data if required							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Sidebar updated		Passed		
+		5				New assignee displayed		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-021							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Completed Date		Pre-Condition	-    Ticket Done	DATE	05/06/26		
+Url					Description	Verify completed date displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open completed ticket		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Completed date displayed		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-022							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Empty Completed Date		Pre-Condition	-    Ticket not completed	DATE	05/06/26		
+Url					Description	Verify completed date empty	ENV	DEV	STAGGING	PROD
+Steps		1	Open active ticket		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Completed date field empty		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-023							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View FRT Timer		Pre-Condition	-    SLA available - Make sure you have already response the customer message on ticket conversation (Ticket Room)	DATE	05/06/26		
+Url					Description	Verify FRT displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Sidebar		test type	POSITIVE				
+		2	See on the SLA section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				FRT displayed		Passed		
+		5				Time format correct		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-024							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Submitted Time		Pre-Condition	-    SLA available	DATE	05/06/26		
+Url					Description	Verify submitted value displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open SLA section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Submitted time displayed		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-025							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Active Indicator		Pre-Condition	-    Ticket Active	DATE	05/06/26		
+Url					Description	Verify active SLA indicator	ENV	DEV	STAGGING	PROD
+Steps		1	Open SLA section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Active indicator visible		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-026							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Waiting Time		Pre-Condition	-    Ticket enters Waiting state	DATE	05/06/26		
+Url					Description	Verify waiting time displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open SLA section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Waiting time displayed		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-027							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View In Progress Time		Pre-Condition	-    Ticket In Progress	DATE	05/06/26		
+Url					Description	Verify In Progress time displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open SLA section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				In Progress time displayed		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-028							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Done Time		Pre-Condition	-    Ticket Done	DATE	05/06/26		
+Url					Description	Verify Done time displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open SLA section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Done indicator displayed		Passed		
+		5				Done time displayed		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-029							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Ticket Attributes		Pre-Condition	-    Ticket type has custom attributes	DATE	05/06/26		
+Url					Description	Verify attribute rendered correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Configured fields displayed		Passed		
+		5				Field count matches configuration		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-030							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Attribute Value Validation		Pre-Condition	-    Ticket contains attribute values	DATE	05/06/26		
+Url					Description	Verify attribute values displayed correctly	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Detail		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Attribute values displayed correctly		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-031							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Attribute Persistence		Pre-Condition	-    Ticket contains attribute values	DATE	05/06/26		
+Url					Description	Verify attribute remains after refresh	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket		test type	POSITIVE				
+		2	Refresh page							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Attribute value unchanged		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-032							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Edit Ticket Attribute		Pre-Condition	-    User has permission	DATE	05/06/26		
+Url					Description	Verify attribute editable	ENV	DEV	STAGGING	PROD
+Steps		1	Modify attribute value		test type	POSITIVE				
+		2	Save							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Value updated successfully		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-033				Note:	ALL ROLE HAVE PERMISSION TO EDIT ATTRIBUTE VALUE		PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Attribute Permission Restriction		Pre-Condition	-    User (Non admin) lacks permission	DATE	05/06/26		
+Url					Description	Verify attribute protected	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Detail		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Attribute displayed read-only				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-034							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Related Conversation Summary		Pre-Condition	-    Ticket memiliki related conversation	DATE	05/06/26		
+Url					Description	Verify related conversation summary displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket Conversation		test type	POSITIVE				
+		2	Navigate to Percakapan Terkait section							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Related conversation section displayed		Passed		
+		5				Client name displayed		Passed		
+		6				Conversation identifier displayed		Passed		
+		7				Lihat detail chat action displayed		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-035							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Open Related Conversation Detail		Pre-Condition	-    Related conversation exists	DATE	05/06/26		
+Url					Description	Verify user can open conversation detail	ENV	DEV	STAGGING	PROD
+Steps		1	Open Percakapan Terkait		test type	POSITIVE				
+		2	Click Lihat detail chat							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conversation Detail Panel opened		Passed		
+		5				Ticket Detail Panel replaced		Passed		
+		6				User remains on Ticket page		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-036							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Conversation History		Pre-Condition	-    Conversation contains messages	DATE	05/06/26		
+Url					Description	Verify conversation history displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Conversation Detail Panel		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Customer messages displayed		Passed		
+		5				Agent messages displayed		Passed		
+		6				Message timestamp displayed		Passed		
+		7				Messages displayed chronologically				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-037							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Back To Ticket Detail		Pre-Condition	-    Conversation Detail Panel opened	DATE	05/06/26		
+Url					Description	Verify return navigation	ENV	DEV	STAGGING	PROD
+Steps		1	Open Conversation Detail		test type	POSITIVE				
+		2	Click Back							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Ticket Detail restored		Passed		
+		5				No page reload occurs		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-038							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Preserve Sidebar State		Pre-Condition	-    Ticket Detail previously opened	DATE	05/06/26		
+Url					Description	Verify ticket detail state preserved	ENV	DEV	STAGGING	PROD
+Steps		1	Expand several sidebar sections		test type	POSITIVE				
+		2	Open Conversation Detail							
+		3	Click Back		Status Response	Expected Result	Actual Result	Status		Status
+		4				Previous Ticket Detail state preserved		Passed		
+		5				Expanded sections remain unchanged		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-039							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Empty Related Conversation		Pre-Condition	-    Ticket has no related conversation	DATE	05/06/26		
+Url					Description	Verify empty state behavior	ENV	DEV	STAGGING	PROD
+Steps		1	Open Ticket		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				No conversation displayed		Passed		
+		5				No system error occurs		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-040							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Client Information		Pre-Condition	- Verify client information displayed	DATE	05/06/26		
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1	Open Data Klien section		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Available client fields displayed		Passed		
+		5				Displayed value matches source data		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-041							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Dynamic Client Data		Pre-Condition	-    Different channel sources available	DATE	05/06/26		
+Url					Description	Verify fields follow source channel	ENV	DEV	STAGGING	PROD
+Steps		1	Open ticket from WhatsApp		test type	POSITIVE				
+		2	Open ticket from Widget							
+		3	Open ticket from Email		Status Response	Expected Result	Actual Result	Status		Status
+		4				Displayed fields differ according to source		Passed		
+		5				No empty invalid field rendered		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-042							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Missing Client Data		Pre-Condition	-    Client data partially missing	DATE	05/06/26		
+Url					Description	Verify missing field handling	ENV	DEV	STAGGING	PROD
+Steps		1	Open ticket with incomplete client data		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Available fields displayed		Passed		
+		5				No page error occurs		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-043							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			View Linked Bubble List		Pre-Condition	-    Ticket has linked bubbles	DATE	05/06/26		
+Url					Description	Verify linked bubble displayed	ENV	DEV	STAGGING	PROD
+Steps		1	    Ticket has linked bubbles		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Linked bubble list displayed		Passed		
+		5				Sender name displayed		Passed		
+		6				Bubble preview displayed		Passed		
+		7				Linked bubble counter displayed		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-044							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Validate Counter Consistency		Pre-Condition	-    Ticket contains linked bubbles	DATE	05/06/26		
+Url					Description	Verify counter accuracy	ENV	DEV	STAGGING	PROD
+Steps		1	Count displayed linked bubbles		test type	POSITIVE				
+		2	Compare with counter value							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Counter equals total linked bubbles		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+Test ID	SIX-TicketConv-045							FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			 Validate Linked Bubble Counter Synchronization After Append		Pre-Condition	* Ticket sudah memiliki minimal 1 linked bubble. * User memiliki permission untuk append linked bubble. * Terdapat customer message baru di Conversation yang belum ditautkan ke ticket.	DATE	05/06/26		
+Url					Description	Memastikan jumlah bubble chat sinkron dan benar	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	    Catat jumlah linked bubble pada section Tautan Tiket (Chat Bubble).							
+		3	    Kembali ke Conversation Thread.		Status Response	Expected Result	Actual Result	Status		Status
+		4	    Pilih customer bubble baru yang relevan.			    Bubble baru berhasil ditautkan ke ticket.	https://jam.dev/c/6440eaed-b3ca-4549-859e-30df2e5b5054	Failed		
+		5	    Klik Tambahkan ke tiket.			Bubble baru muncul pada daftar Tautan Tiket.		Failed		
+		6	Pilih ticket aktif yang sama.			Counter linked bubble bertambah sesuai jumlah bubble yang ditambahkan.		Failed		
+		7	    Kembali ke Ticket Conversation.			    Counter linked bubble sama dengan jumlah item yang tampil pada daftar linked bubble.		Failed		
+		8	Periksa jumlah linked bubble pada section Tautan Tiket (Chat Bubble)			Tidak ada perbedaan antara jumlah linked bubble aktual dan jumlah yang ditampilkan pada header section.		Failed		
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-046							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Auto Scroll To Source Bubble		Pre-Condition	-    Linked bubble exists deep in conversation	DATE	05/06/26		
+Url					Description	Verify auto-scroll behavior	ENV	DEV	STAGGING	PROD
+Steps		1	Click linked bubble		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conversation automatically scrolled		Passed		
+		5				Selected bubble visible		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-047							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Highlight Source Bubble		Pre-Condition	-    Linked bubble opened	DATE	05/06/26		
+Url					Description	Verify highlighted bubble	ENV	DEV	STAGGING	PROD
+Steps		1	Open linked bubble		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Target bubble highlighted		Passed		
+		5				Highlight clearly distinguishable		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-048							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Remove Linked Bubble		Pre-Condition	-    Linked bubble count > 1	DATE	05/06/26		
+Url					Description	Verify unlink action	ENV	DEV	STAGGING	PROD
+Steps		1	Click unlink		test type	POSITIVE				
+		2	Confirm "Hapus Pesan"							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Bubble removed		Passed		
+		5				Counter updated		Passed		
+		6				Audit log recorded		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-049							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Unlink Confirmation		Pre-Condition	-    Linked bubble count > 1	DATE	05/06/26		
+Url					Description	Verify confirmation displayed	ENV	DEV	STAGGING	PROD
+Steps		1	Click unlink		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Confirmation dialog displayed		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-050							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Cancel Remove Linked Bubble		Pre-Condition	-     Confirmation modal opened	DATE	05/06/26		
+Url					Description	Verify cancel behavior	ENV	DEV	STAGGING	PROD
+Steps		1	Open unlink confirmation		test type	POSITIVE				
+		2	Click cancel							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Bubble remains linked		Passed		
+		5				Counter unchanged		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-051							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Prevent Last Bubble Removal		Pre-Condition	-    Only 1 linked bubble remains	DATE	05/06/26		
+Url					Description	Verify last bubble cannot be removed	ENV	DEV	STAGGING	PROD
+Steps		1	Open Tautan Tiket section		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Unlink action unavailable		Passed		
+		5				Last linked bubble remains		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-052							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Last linked bubble remains		Pre-Condition	-    Ticket has minimum linked bubble	DATE	05/06/26		
+Url					Description	Verify counter minimum value	ENV	DEV	STAGGING	PROD
+Steps		1	Observe linked bubble section		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Counter never displays 0		Passed		
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-053							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Linked Bubble Sort Order		Pre-Condition	-    Multiple linked bubbles exist	DATE	05/06/26		
+Url					Description	Verify bubble ordering	ENV	DEV	STAGGING	PROD
+Steps		1	Open linked bubble list		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Latest linked bubble displayed first		Passed		
+		5				Order follows descending timestamp		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-054							NEED TO TEST		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Remove Linked Bubble After Add More Bubble		Pre-Condition	* Ticket aktif. * Ticket memiliki minimal 2 linked bubble. * Salah satu bubble berasal dari hasil Add More Bubble.	DATE	05/06/26		
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	Masuk ke section Tautan Tiket.							
+		3	Pilih linked bubble hasil Add More Bubble.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Klik Remove/Unlink.			Tombol unlink tidak tampil atau disabled.		Passed		
+		5	    Konfirmasi penghapusan.			User tidak dapat menghapus linked bubble terakhir.		Passed		
+		6				Linked bubble tetap tersedia sebagai konteks minimum ticket.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-055				Note:	Ada sedikit ambigu fitur disini https://jam.dev/c/2dc0427d-6bd6-4a6e-85ce-6ed584205b75		PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Reply Customer Content Should Display Immediately		Pre-Condition	* Ticket memiliki linked bubble. * Ticket aktif.	DATE	05/06/26		
+Url					Description	Memastikan agar reply message bisa muncul tanpa harus refresh page	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	    Kirim Balas ke Pelanggan.							
+		3	Amati thread ticket setelah pesan berhasil dikirim.		Status Response	Expected Result	Actual Result	Status		Status
+		4				Bubble reply langsung muncul.		Passed		
+		5				Isi pesan tampil lengkap.		Passed		
+		6				Tidak perlu refresh page.		Passed		
+		7				Tidak ada bubble kosong.		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-056							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Prevent Remove Last Linked Bubble		Pre-Condition	-    Ticket hanya memiliki 1 linked bubble.	DATE	05/06/26		
+Url					Description	Memastikan agar linked bubble tidak bisa <1 atau linked bubble kosong didalam ticket 	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	Masuk ke Tautan Tiket.							
+		3	    Cari aksi unlink pada linked bubble terakhir.		Status Response	Expected Result	Actual Result	Status		Status
+		4				Tombol unlink tidak tampil atau disabled.		Passed		
+		5				User tidak dapat menghapus linked bubble terakhir.		Passed		
+		6				Linked bubble tetap tersedia sebagai konteks minimum ticket.		Passed		
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-057							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Ticket Detail Conversation Content Scrollable		Pre-Condition	- Memiliki percakapan panjang pada conversation utama	DATE	05/06/26		
+Url					Description	Memastikan panel "Detail chat" tetap dapat di-scroll ketika data panjang.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	Di sidebar pada section "Percakapan terkait" klik tombol "lihat detail chat"							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Isi percakapan bisa di scroll		Passed		
+		5				    Tidak ada content yang terpotong.		Passed		
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-058							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Outbound Message Should Create Single Ticket Message Record		Pre-Condition	- User memiliki akses Ticket Conversation - Ticket aktif - Ticket memiliki linked bubble	DATE	05/06/26		
+Url					Description	Memastikan satu pesan yang dikirim dari Ticket Conversation hanya membuat satu message record.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	EDGE CASE				
+		2	Klik "Balas ke pelanggan".							
+		3	 Kirim satu pesan outbound.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Amati thread Ticket Conversation.			Pesan hanya muncul satu kali pada Ticket Conversation.		Passed		
+		5	Amati Conversation Channel terkait.			Pesan hanya muncul satu kali pada Conversation Channel.		Passed		
+		6				Tidak ada duplikasi bubble setelah beberapa detik.		Passed		
+		7				Tidak ada bubble tambahan yang dibuat tanpa aksi user.		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-059							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Ticket Message Should Not Be Duplicated After Delayed Synchronization		Pre-Condition	- Ticket aktif - Conversation masih terhubung	DATE	08/06/26		
+Url					Description	Memastikan sistem tidak membuat ticket message baru dari conversation message yang sama setelah proses sinkronisasi tertunda.	ENV	DEV	STAGGING	PROD
+Steps		1	Kirim pesan dari Ticket Conversation.		test type	EDGE CASE				
+		2	Catat waktu pengiriman.							
+		3	Tunggu beberapa waktu.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Refresh halaman.			Jumlah pesan tetap sama.		Passed		
+		5	Buka kembali ticket yang sama.			Tidak muncul bubble baru dengan isi yang identik.		Passed		
+		6				Tidak ada duplikasi reply.		Passed		
+		7				Riwayat ticket tetap konsisten.		Passed		
+		8						Passed		
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-060							NEED TO TEST		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester			
+Scenario			Ticket Message And Conversation Message Mapping Should Remain Unique		Pre-Condition	- User memiliki akses log atau developer tools (jika tersedia)	DATE	05/06/26		
+Url					Description	Memastikan satu conversation message tidak menghasilkan lebih dari satu ticket message.	ENV	DEV	STAGGING	PROD
+Steps		1	Kirim pesan dari Ticket Conversation.		test type	EDGE CASE				
+		2	Catat identifier message yang tersedia.							
+		3	Refresh halaman.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Tunggu proses sinkronisasi.			Satu outbound message menghasilkan satu bubble ticket.				
+		5	Verifikasi message yang sama tidak muncul kembali sebagai record baru.			Tidak terdapat bubble duplikat.				
+		6				Mapping ticket message tetap unik.				
+		7				Riwayat percakapan tidak bertambah tanpa aktivitas baru.				
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-061							FAILED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Customer Media Message Should Be Displayed In Ticket Conversation		Pre-Condition	- Ticket aktif - Ticket terhubung dengan conversation - Channel mendukung media (WhatsApp, Instagram, dll)	DATE	05/06/26		
+Url					Description	Memastikan media yang dikirim pelanggan muncul dan dapat diakses pada Ticket Conversation.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Conversation Channel yang memiliki ticket aktif.		test type	POSITIVE				
+		2	Kirim media dari akun customer (gambar/file/video).							
+		3	Tunggu proses sinkronisasi.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Buka Ticket Conversation terkait.			Media customer muncul pada Ticket Conversation.		Passed		
+		5	Cari media yang baru dikirim customer.			Thumbnail atau preview media ditampilkan.		Passed		
+		6				Media dapat dibuka atau diunduh sesuai behavior sistem.		Passed		
+		7				 Tidak diperlukan refresh halaman untuk melihat media.		Passed		
+		8				Urutan media sesuai kronologi percakapan.		Passed		
+		9				Preview Dokumen bisa ditampilkan		Failed		
+						Dokumen bisa dibuka atau diunduh sesuai behavior sistem		Failed		
+										
+										
+Test ID	SIX-TicketConv-062							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Agent Media Reply Should Be Displayed In Ticket Conversation		Pre-Condition	- Ticket aktif - Ticket memiliki linked bubble - User memiliki akses Balas ke Pelanggan	DATE	05/06/26		
+Url					Description	Memastikan media yang dikirim agent melalui Ticket Conversation tersimpan dan tampil dengan benar.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Ticket Conversation.		test type	POSITIVE				
+		2	Pilih mode "Balas ke pelanggan".							
+		3	Lampirkan file atau gambar.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Kirim pesan.			Media berhasil terkirim.		Passed		
+		5	Amati thread Ticket Conversation.			Media tampil pada Ticket Conversation.		Passed		
+		6	Amati Conversation Channel terkait.			Media tampil pada Conversation Channel.		Passed		
+		7				Preview media dapat ditampilkan.		Passed		
+		8				Tidak ada bubble kosong setelah pengiriman media.		Passed		
+		9				Media tersimpan pada histori ticket.		Passed		
+										
+										
+										
+Test ID	SIX-TicketConv-063							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Auto Ticket Synchronization Should Include Media Messages		Pre-Condition	- Conversation telah diubah menjadi Ticket menggunakan tombol Ticket. - Ticket masih aktif.	DATE	05/06/26		
+Url					Description	Memastikan seluruh pesan media baru yang masuk ke conversation otomatis tersinkron ke Ticket Conversation.	ENV	DEV	STAGGING	PROD
+Steps		1	Buat ticket dari Conversation Channel menggunakan tombol Ticket.		test type	EDGE CASE				
+		2	Kirim media dari customer setelah ticket dibuat.							
+		3	Tunggu sinkronisasi.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Buka Ticket Conversation.			Media customer otomatis muncul pada Ticket Conversation.		Passed		
+		5				Tidak hanya pesan teks yang tersinkron.		Passed		
+		6				Media dapat dibuka atau di-preview.		Passed		
+		7				Urutan percakapan tetap sesuai kronologi.		Passed		
+		8				Tidak ada kehilangan context antara Conversation Channel dan Ticket Conversation.		Passed		
+		9								
+										
+										
+										
+			On Conversation Page							
+										
+Test ID	SIX-TicketConv-064							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Hide "Tambahkan ke Ticket" Option When No Active Ticket Exists (The conversation never making ticket anymore)		Pre-Condition	- Conversation belum pernah dibuatkan ticket. - Tidak ada ticket aktif yang terkait dengan conversation. - User memiliki akses membuat ticket.	DATE	05/06/26		
+Url					Description	Memastikan opsi "Tambahkan ke Ticket" tidak ditampilkan ketika conversation belum memiliki ticket aktif.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka halaman Inbox Conversation. (Conversation page/main inbox)		test type	NEGATIVE				
+		2	Pilih conversation yang belum pernah dibuat ticket.							
+		3	Pilih satu atau lebih bubble customer.		Status Response	Expected Result	Actual Result	Status		Status
+		4	Amati action menu yang muncul.			Opsi "Buat Ticket" tetap tersedia.		Passed		
+		5				 Opsi "Tambahkan ke Ticket" tidak ditampilkan		Passed		
+		6				User tidak dapat memilih ticket tujuan.		Passed		
+		7				Tidak ada modal append ticket yang muncul.		Passed		
+		8								
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-065							PASSED		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario			Selected Bubble State Should Reset After Successful Append To Ticket		Pre-Condition	- Conversation memiliki ticket aktif. - Terdapat bubble customer yang eligible untuk ditambahkan ke ticket. - User memiliki akses append ticket.	DATE	05/06/26		
+Url					Description	Memastikan state selected bubble dibersihkan setelah proses "Tambahkan ke Ticket" berhasil.	ENV	DEV	STAGGING	PROD
+Steps		1	Buka Inbox Conversation.		test type	NEGATIVE				
+		2	Pilih satu atau lebih bubble customer.							
+		3	Klik "Tambahkan ke Ticket"		Status Response	Expected Result	Actual Result	Status		Status
+		4	Pilih ticket tujuan.			Bubble yang berhasil ditambahkan otomatis tidak lagi terpilih.		Passed		
+		5	Konfirmasi append hingga berhasil.			Checkbox selection kembali kosong.		Passed		
+		6	Amati state bubble yang sebelumnya dipilih.			Action bar selection menghilang.		Passed		
+		7	Amati action bar yang muncul.			User tidak dapat melakukan append ulang terhadap selection yang sama tanpa memilih bubble kembali.		Passed		
+		8				State halaman telah ter-refresh tanpa perlu manual uncheck bubble.				
+		9								
+										
+										
+										
+Test ID	SIX-TicketConv-066							NEED TO TEST		NEED TO TEST
+Create at			04/06/2026		created by	Aprizal	Tester	Aprizal		
+Scenario					Pre-Condition		DATE	05/06/26		
+Url					Description		ENV	DEV	STAGGING	PROD
+Steps		1			test type	EDGE CASE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4								
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+										
+						QA Notes, Clik here https://docs.google.com/spreadsheets/d/18CWHt0-hKFknVHRK72asp1Dyu8M4nhnQxpAMfrRZ10c/edit?gid=1020886876#gid=1020886876				

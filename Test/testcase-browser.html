@@ -201,14 +201,35 @@
     return { type:'flat', ...parseFlatFormat(ne) };
   }
 
-  // ─── MERGE: definition (TSV) + execution (JSON) ──────────────────────────────
-  // Priority: JSON > legacy TSV data > empty
-  function mergeExecIntoCases(cases, execData) {
+  // ─── VERSION HELPERS ─────────────────────────────────────────────────────────
+  // Resolve active version name from exec JSON (supports old flat format)
+  function getActiveVersion(execData) {
+    if (!execData) return 'v1';
+    if (execData.activeVersion) return execData.activeVersion;
+    if (execData.cases && !execData.versions) return 'v1'; // old flat format
+    const keys = Object.keys(execData.versions || {});
+    return keys.length > 0 ? keys[keys.length - 1] : 'v1';
+  }
+
+  // Resolve version-specific cases map (handles old flat format as 'v1')
+  function getVersionCases(execData, versionId) {
+    if (!execData) return null;
+    if (execData.versions?.[versionId]?.cases) return execData.versions[versionId].cases;
+    // Old flat format: treat as 'v1'
+    if (!execData.versions && execData.cases && versionId === 'v1') return execData.cases;
+    return null; // version exists in JSON but no cases yet (new version)
+  }
+
+  // ─── MERGE: definition (TSV) + execution (JSON, version-aware) ───────────────
+  function mergeExecIntoCases(cases, execData, versionId) {
+    const hasJsonFile = execData !== null;
+    const versionCases = getVersionCases(execData, versionId);
+
     return cases.map(tc => {
-      const execCase = execData?.cases?.[tc.id];
+      const execCase = versionCases?.[tc.id];
 
       if (execCase?.current) {
-        // JSON execution file exists — use it
+        // JSON data exists for this version → use it
         const cur = execCase.current;
         const execResults = tc.expectedResults.map(er => {
           const found = (cur.results||[]).find(r => r.rowKey===er.key);
@@ -228,22 +249,31 @@
         };
       }
 
-      // No JSON yet — fall back to legacy TSV execution data
-      const leg = tc._legacyExec;
-      const execResults = tc.expectedResults.map((er, i) => {
-        const found = leg?.results?.[i];
-        return found
-          ? { rowKey:er.key, actual:found.actual||'', status:{ DEV:'', Staging:'', Prod:'', ...found.status } }
-          : EMPTY_EXEC_ROW(er.key);
-      });
+      if (!hasJsonFile) {
+        // No JSON file at all → fall back to legacy TSV execution data
+        const leg = tc._legacyExec;
+        const execResults = tc.expectedResults.map((er, i) => {
+          const found = leg?.results?.[i];
+          return found
+            ? { rowKey:er.key, actual:found.actual||'', status:{ DEV:'', Staging:'', Prod:'', ...found.status } }
+            : EMPTY_EXEC_ROW(er.key);
+        });
+        return {
+          ...tc,
+          exec: {
+            notes: leg?.notes||'',
+            overallStatus: { DEV:'', Staging:'', Prod:'', ...(leg?.overallStatus||{}) },
+            results: execResults,
+            updatedAt: null,
+          },
+          history: [],
+        };
+      }
+
+      // JSON file exists but no data for this case in this version → empty exec
       return {
         ...tc,
-        exec: {
-          notes: leg?.notes||'',
-          overallStatus: { DEV:'', Staging:'', Prod:'', ...(leg?.overallStatus||{}) },
-          results: execResults,
-          updatedAt: null,
-        },
+        exec: EMPTY_EXEC(tc.expectedResults.length),
         history: [],
       };
     });
@@ -298,18 +328,16 @@
     return false;
   }
 
-  function buildExecJSON(cases, prevExecData, sourceFile, sourceFileName) {
+  function buildExecJSON(cases, prevExecData, sourceFile, sourceFileName, versionId) {
     const now = nowISO();
-    const prevCases = prevExecData?.cases || {};
+    const prevVersionCases = getVersionCases(prevExecData, versionId) || {};
     const newCasesMap = {};
 
     for (const tc of cases) {
       if (!tc.id) continue;
-      const prevCase = prevCases[tc.id];
-      const oldFull = prevCase?.current || null; // full snapshot from previous save
-
+      const prevCase = prevVersionCases[tc.id];
+      const oldFull = prevCase?.current || null;
       const newFull = tcToSnapshot(tc);
-
       const prevHistory = prevCase?.history || [];
       let newHistory = [...prevHistory];
 
@@ -320,18 +348,26 @@
             action: tc._isReset ? 'reset' : 'update',
             at: now,
             ...(tc._resetReason ? { reason: tc._resetReason } : {}),
-            snapshot: oldFull,  // full previous state (definition + execution)
+            snapshot: oldFull,
           });
         }
         newFull.updatedAt = now;
       }
 
-      newCasesMap[tc.id] = {
-        testcaseId: tc.id,
-        current: newFull,
-        history: newHistory,
-      };
+      newCasesMap[tc.id] = { testcaseId: tc.id, current: newFull, history: newHistory };
     }
+
+    // Migrate old flat format to versioned structure
+    let existingVersions = { ...(prevExecData?.versions || {}) };
+    if (!prevExecData?.versions && prevExecData?.cases) {
+      existingVersions = { 'v1': { createdAt: prevExecData.createdAt || now, cases: prevExecData.cases } };
+    }
+
+    existingVersions[versionId] = {
+      createdAt: existingVersions[versionId]?.createdAt || now,
+      updatedAt: now,
+      cases: newCasesMap,
+    };
 
     return {
       schemaVersion: SCHEMA_VERSION,
@@ -339,15 +375,17 @@
       sourceFileName: sourceFileName||'',
       createdAt: prevExecData?.createdAt || now,
       updatedAt: now,
-      cases: newCasesMap,
+      activeVersion: versionId,
+      versions: existingVersions,
     };
   }
 
   // After save, apply newExecData back into cases state (update updatedAt & history)
-  function applyExecDataToCases(cases, execData) {
+  function applyExecDataToCases(cases, execData, versionId) {
+    const versionCases = getVersionCases(execData, versionId) || {};
     return cases.map(tc => {
       const { _isReset, _resetReason, _legacyExec, ...rest } = tc;
-      const ec = execData?.cases?.[tc.id];
+      const ec = versionCases[tc.id];
       if (!ec?.current) return { ...rest };
       const cur = ec.current;
       const execResults = rest.expectedResults.map(er => {
@@ -729,19 +767,81 @@
   }
 
   // ─── CARD EDITOR ─────────────────────────────────────────────────────────────
-  function CardEditor({ cases:initCases, execData:initExecData, fileHandle, rootHandle, filePath }) {
-    const [cases, setCases]       = useState(initCases);
-    const [execData, setExecData] = useState(initExecData);
-    const [expanded, setExpanded] = useState(null);
-    const [search, setSearch]     = useState('');
-    const [fStatus, setFStatus]   = useState('All');
-    const [env, setEnv]           = useState('DEV');
-    const [dirty, setDirty]       = useState(false);
-    const [saving, setSaving]     = useState(false);
-    const [saveMsg, setSaveMsg]   = useState('');
-    const [resetIdx, setResetIdx] = useState(null);
+  function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath }) {
+    const [cases, setCases]               = useState(initCases);
+    const [execData, setExecData]         = useState(initExecData);
+    const [activeVersion, setActiveVersion] = useState(initialVersion || 'v1');
+    const [addingVer, setAddingVer]       = useState(false);
+    const [newVerName, setNewVerName]     = useState('');
+    const [expanded, setExpanded]         = useState(null);
+    const [search, setSearch]             = useState('');
+    const [fStatus, setFStatus]           = useState('All');
+    const [env, setEnv]                   = useState('DEV');
+    const [dirty, setDirty]               = useState(false);
+    const [saving, setSaving]             = useState(false);
+    const [saveMsg, setSaveMsg]           = useState('');
+    const [resetIdx, setResetIdx]         = useState(null);
 
-    useEffect(()=>{ setCases(initCases); setExecData(initExecData); setDirty(false); }, [initCases]);
+    // In-memory stash: { [versionId]: cases[] }
+    // Allows switching versions freely without saving — current version is stashed before switching
+    const { useRef } = React;
+    const stashRef = useRef({});
+
+    useEffect(()=>{
+      stashRef.current = {};  // clear stash on new file
+      setCases(initCases); setExecData(initExecData);
+      setActiveVersion(initialVersion || 'v1');
+      setDirty(false);
+    }, [initCases]);
+
+    // ── version helpers ──
+    function allVersionNames() {
+      // Saved versions (from JSON) + any unsaved versions currently in stash or active
+      const saved = execData?.versions
+        ? Object.keys(execData.versions)
+        : (execData?.cases ? ['v1'] : []);
+      const unsaved = [...Object.keys(stashRef.current), activeVersion];
+      const result = [...saved];
+      for (const v of unsaved) { if (!result.includes(v)) result.push(v); }
+      return result;
+    }
+    function suggestNextVer() {
+      const vers = allVersionNames();
+      const last = vers[vers.length - 1] || 'v1';
+      const m = last.match(/^(.*?)(\d+)$/);
+      return m ? m[1] + (parseInt(m[2]) + 1) : last + '-2';
+    }
+    function switchVersion(ver) {
+      if (ver === activeVersion) return;
+      // Stash current version's in-memory state before leaving
+      stashRef.current[activeVersion] = cases;
+      // Restore target version: stash first, then saved JSON, then empty
+      const stashed = stashRef.current[ver];
+      if (stashed) {
+        setCases(stashed);
+      } else {
+        setCases(mergeExecIntoCases(cases, execData, ver));
+      }
+      setActiveVersion(ver);
+    }
+    function openAddVer() { setNewVerName(suggestNextVer()); setAddingVer(true); }
+    function confirmAddVer() {
+      const name = newVerName.trim();
+      if (!name) return;
+      if (allVersionNames().includes(name)) { alert('Version sudah ada.'); return; }
+      // Stash current version before creating new one
+      stashRef.current[activeVersion] = cases;
+      // New version: copy definition, reset all exec fields
+      const resetCases = cases.map(tc => ({
+        ...tc,
+        exec: EMPTY_EXEC(tc.expectedResults.length),
+        history: [],
+      }));
+      setCases(resetCases);
+      setActiveVersion(name);
+      setAddingVer(false); setNewVerName('');
+      setDirty(true);
+    }
 
     // ── state helpers ──
     function upd(i, fn) { setCases(p=>{ const n=[...p]; n[i]=fn({...n[i]}); return n; }); setDirty(true); }
@@ -814,9 +914,9 @@
 
         if (rootHandle && filePath) {
           const srcName = filePath.split('/').pop();
-          const newExec = buildExecJSON(cases, execData, filePath, srcName);
+          const newExec = buildExecJSON(cases, execData, filePath, srcName, activeVersion);
           await saveExecFile(rootHandle, filePath, newExec);
-          const updCases = applyExecDataToCases(cases, newExec);
+          const updCases = applyExecDataToCases(cases, newExec, activeVersion);
           setCases(updCases);
           setExecData(newExec);
         } else {
@@ -876,6 +976,39 @@
               </button>
             ))}
           </div>
+
+          {/* ── Version picker ── */}
+          <div style={{ display:'flex', gap:5, alignItems:'center', borderLeft:'1px solid #1e293b', paddingLeft:8 }}>
+            <span style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>VER</span>
+            <select
+              value={activeVersion}
+              onChange={e=>switchVersion(e.target.value)}
+              style={{ fontSize:11, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'#0f172a', color:'#2dd4bf', outline:'none', cursor:'pointer', fontFamily:'inherit' }}>
+              {allVersionNames().map(ver=>(
+                <option key={ver} value={ver}>{ver}{stashRef.current[ver] ? ' *' : ''}</option>
+              ))}
+            </select>
+            {addingVer ? (
+              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                <input
+                  value={newVerName}
+                  onChange={e=>setNewVerName(e.target.value)}
+                  onKeyDown={e=>{ if(e.key==='Enter') confirmAddVer(); if(e.key==='Escape') setAddingVer(false); }}
+                  autoFocus
+                  placeholder="nama version..."
+                  style={{ fontSize:10, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'#0f172a', color:'#e2e8f0', outline:'none', width:100, fontFamily:'inherit' }}
+                />
+                <button onClick={confirmAddVer} style={{ fontSize:12, background:'none', border:'none', color:'#4ade80', cursor:'pointer', padding:0 }}>✓</button>
+                <button onClick={()=>setAddingVer(false)} style={{ fontSize:12, background:'none', border:'none', color:'#f87171', cursor:'pointer', padding:0 }}>✕</button>
+              </div>
+            ) : (
+              <button onClick={openAddVer}
+                style={{ fontSize:11, padding:'2px 9px', borderRadius:6, border:'1px solid #1e293b', background:'transparent', color:'#475569', cursor:'pointer' }}>
+                + New
+              </button>
+            )}
+          </div>
+
           <span style={{ fontSize:10, color:'#334155' }}>{filtered.length}/{cases.length}</span>
           <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
             {saveMsg && <span style={{ fontSize:11, color:saveMsg.startsWith('Error')?'#f87171':'#4ade80' }}>{saveMsg}</span>}
@@ -1150,8 +1283,9 @@
           const parsed = parseFile(text, node.ext);
           if(parsed.type==='card' && effRoot) {
             const execData = await loadExecFile(effRoot, node.path);
-            const mergedCases = mergeExecIntoCases(parsed.cases, execData);
-            setFileData({ ...parsed, cases:mergedCases, execData:execData||null });
+            const activeVersion = getActiveVersion(execData);
+            const mergedCases = mergeExecIntoCases(parsed.cases, execData, activeVersion);
+            setFileData({ ...parsed, cases:mergedCases, execData:execData||null, activeVersion });
           } else {
             setFileData(parsed);
           }
@@ -1242,7 +1376,7 @@
                     <>
                       <span style={{ fontSize:10, color:'#334155' }}>{fileData.cases.length} test cases · editable</span>
                       {fileData.execData
-                        ? <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#052e16', color:'#4ade80', border:'1px solid #166534' }}>✓ execution JSON loaded</span>
+                        ? <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#052e16', color:'#4ade80', border:'1px solid #166534' }}>✓ {fileData.activeVersion || 'v1'} · {Object.keys(fileData.execData?.versions || {}).length || 1} version(s)</span>
                         : <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#2a1a04', color:'#fbbf24', border:'1px solid #713f12' }}>TSV only — save to create JSON</span>
                       }
                     </>
@@ -1257,6 +1391,7 @@
                       key={selected?.path}
                       cases={fileData.cases}
                       execData={fileData.execData}
+                      initialVersion={fileData.activeVersion || 'v1'}
                       fileHandle={selected.handle}
                       rootHandle={rootHandle}
                       filePath={selected.path}
