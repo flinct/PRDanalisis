@@ -1521,6 +1521,239 @@
     );
   }
 
+  // ─── AGENT PANEL ──────────────────────────────────────────────────────────────
+  const AGENT_URL = 'http://localhost:3001';
+
+  function AgentPanel({ context, onClose }) {
+    const [messages,  setMessages]  = useState([]);
+    const [input,     setInput]     = useState('');
+    const [streaming, setStreaming] = useState(false);
+    const [serverOk,  setServerOk]  = useState(null); // null=checking, true, false
+    const [sessionId] = useState(() => `s-${Date.now()}`);
+    const bottomRef   = useRef(null);
+    const inputRef    = useRef(null);
+
+    // Check server health on mount
+    useEffect(() => {
+      fetch(`${AGENT_URL}/health`).then(r => r.ok ? setServerOk(true) : setServerOk(false)).catch(() => setServerOk(false));
+    }, []);
+
+    // Auto-scroll to latest message
+    useEffect(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    async function sendMessage() {
+      const text = input.trim();
+      if (!text || streaming || !serverOk) return;
+
+      const userMsg = { role: 'user', content: text };
+      setMessages(prev => [...prev, userMsg, { role: 'assistant', content: '', toolCalls: [], _streaming: true }]);
+      setInput('');
+      setStreaming(true);
+
+      try {
+        const apiMsgs = [...messages, userMsg].map(m => ({ role: m.role, content: m.content || '' }));
+
+        const resp = await fetch(`${AGENT_URL}/chat`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ messages: apiMsgs, context, sessionId }),
+        });
+
+        if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+
+        const reader  = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+
+          // consume complete SSE lines
+          const parts = buf.split('\n');
+          buf = parts.pop();
+
+          for (const line of parts) {
+            if (!line.startsWith('data: ')) continue;
+            let evt;
+            try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+
+            setMessages(prev => {
+              const next = [...prev];
+              const last = { ...next[next.length - 1] };
+
+              if (evt.type === 'text') {
+                last.content = (last.content || '') + evt.content;
+              } else if (evt.type === 'tool_call') {
+                last.toolCalls = [...(last.toolCalls || []), {
+                  id: evt.id, tool: evt.tool, input: evt.input, result: null,
+                }];
+              } else if (evt.type === 'tool_result') {
+                last.toolCalls = (last.toolCalls || []).map(tc =>
+                  tc.id === evt.id ? { ...tc, result: evt.preview } : tc
+                );
+              } else if (evt.type === 'error') {
+                last.content = `⚠ ${evt.message}`;
+              } else if (evt.type === 'done') {
+                last._streaming = false;
+              }
+
+              next[next.length - 1] = last;
+              return next;
+            });
+          }
+        }
+      } catch (e) {
+        setMessages(prev => {
+          const next = [...prev];
+          next[next.length - 1] = { ...next[next.length - 1], content: `⚠ ${e.message}`, _streaming: false };
+          return next;
+        });
+      } finally {
+        setStreaming(false);
+      }
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    }
+
+    const btnStyle = (active) => ({
+      fontSize: 10, padding: '2px 8px', borderRadius: 4, cursor: 'pointer', border: 'none',
+      background: active ? '#6d28d9' : 'var(--elevated-bg)', color: active ? '#fff' : 'var(--text-3)',
+    });
+
+    return (
+      <div style={{
+        position: 'fixed', top: 44, right: 0, bottom: 0, width: 400, zIndex: 100,
+        background: 'var(--sidebar-bg)', borderLeft: '1px solid var(--border-1)',
+        display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.4)',
+      }}>
+
+        {/* Header */}
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--elevated-bg)', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#a78bfa', flex: 1 }}>◈ QA Agent</span>
+          <span style={{
+            fontSize: 9, padding: '1px 6px', borderRadius: 10, fontWeight: 600,
+            background: serverOk === null ? 'var(--elevated-bg)' : serverOk ? '#052e16' : '#2d0e0e',
+            color:      serverOk === null ? 'var(--text-4)'      : serverOk ? '#4ade80' : '#f87171',
+            border:     `1px solid ${serverOk === null ? 'var(--border-1)' : serverOk ? '#166534' : '#7f1d1d'}`,
+          }}>
+            {serverOk === null ? 'connecting…' : serverOk ? '● online' : '● offline — jalankan server.js'}
+          </span>
+          <button onClick={() => setMessages([])} title="New session"
+            style={{ fontSize: 11, background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '0 4px' }}>
+            ⊕
+          </button>
+          <button onClick={onClose}
+            style={{ fontSize: 13, background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '0 4px' }}>
+            ✕
+          </button>
+        </div>
+
+        {/* Context badge */}
+        {context && (
+          <div style={{ padding: '4px 12px', borderBottom: '1px solid var(--elevated-bg)', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, background: 'var(--deep-bg)' }}>
+            <span style={{ fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: 1 }}>Context:</span>
+            <span style={{ fontSize: 10, color: 'var(--text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{context.filename}</span>
+            <span style={{ fontSize: 9, color: 'var(--text-5)', flexShrink: 0 }}>{context.type}</span>
+          </div>
+        )}
+
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          {messages.length === 0 && (
+            <div style={{ textAlign: 'center', marginTop: 40, color: 'var(--text-4)', fontSize: 11 }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>◈</div>
+              <div>Tanya agent tentang PRD, test case, atau analisa coverage.</div>
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
+                {[
+                  'Analisa coverage PRD ini',
+                  'Cari gap test case vs PRD',
+                  'Buat ringkasan test case yang ada',
+                  'Run automation untuk TC ini',
+                ].map(s => (
+                  <button key={s} onClick={() => { setInput(s); inputRef.current?.focus(); }}
+                    style={{ fontSize: 10, padding: '4px 12px', borderRadius: 6, cursor: 'pointer',
+                      background: 'var(--elevated-bg)', border: '1px solid var(--border-1)', color: 'var(--text-3)' }}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {messages.map((msg, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4,
+              alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+
+              {/* Tool calls */}
+              {msg.role === 'assistant' && (msg.toolCalls || []).map((tc, j) => (
+                <div key={j} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, maxWidth: '90%',
+                  background: 'var(--deep-bg)', border: '1px solid var(--border-1)', color: 'var(--text-4)' }}>
+                  <div style={{ color: '#a78bfa', fontWeight: 600, marginBottom: 2 }}>
+                    🔧 {tc.tool}({Object.keys(tc.input || {}).map(k => `${k}: "${String(tc.input[k]).slice(0, 30)}"`).join(', ')})
+                  </div>
+                  {tc.result !== null && (
+                    <div style={{ color: 'var(--text-5)', fontStyle: 'italic' }}>{tc.result}</div>
+                  )}
+                </div>
+              ))}
+
+              {/* Message bubble */}
+              {(msg.content || msg._streaming) && (
+                <div style={{
+                  maxWidth: '92%', padding: '8px 12px', borderRadius: 8, fontSize: 12, lineHeight: 1.7,
+                  background: msg.role === 'user' ? '#2d1b69' : 'var(--elevated-bg)',
+                  border: `1px solid ${msg.role === 'user' ? '#4c1d95' : 'var(--border-1)'}`,
+                  color: msg.role === 'user' ? '#ddd6fe' : 'var(--text-2)',
+                }}>
+                  {msg.role === 'assistant'
+                    ? <div className="md" style={{ fontSize: 12 }} dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }} />
+                    : msg.content
+                  }
+                  {msg._streaming && !msg.content && (
+                    <span style={{ color: 'var(--text-5)', animation: 'pulse 1s infinite' }}>▍</span>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input */}
+        <div style={{ padding: '8px 12px', borderTop: '1px solid var(--elevated-bg)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              placeholder={serverOk ? 'Tanya agent… (Enter kirim, Shift+Enter newline)' : 'Server offline — jalankan: node server.js'}
+              disabled={!serverOk || streaming}
+              rows={1}
+              style={{ flex: 1, fontSize: 12, padding: '6px 10px', borderRadius: 6, resize: 'none', overflow: 'hidden',
+                border: '1px solid var(--border-1)', background: 'var(--elevated-bg)', color: 'var(--text-1)',
+                outline: 'none', fontFamily: 'inherit', opacity: serverOk ? 1 : 0.5 }}
+              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+            />
+            <button onClick={sendMessage} disabled={!input.trim() || streaming || !serverOk}
+              style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, cursor: 'pointer', flexShrink: 0, border: 'none',
+                background: streaming ? 'var(--text-5)' : '#6d28d9', color: '#fff',
+                opacity: (!input.trim() || !serverOk) ? 0.4 : 1 }}>
+              {streaming ? '…' : '↑'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ─── THEME SWITCHER (isolated component — only this re-renders on theme change)
   const ThemeSwitcher = React.forwardRef(function ThemeSwitcher({ onSwitch }, ref) {
     const [activeTheme, setActiveTheme] = useState('navy');
@@ -1558,8 +1791,22 @@
     const [error, setError]               = useState(null);
     const [savedHandle, setSavedHandle]   = useState(null);
     const [sideSearch, setSideSearch]     = useState('');
-    const themeRef = useRef(null);  // ref to ThemeSwitcher — only it re-renders on theme change
+    const themeRef  = useRef(null);  // ref to ThemeSwitcher — only it re-renders on theme change
+    const [agentOpen, setAgentOpen] = useState(false);
     const supported = 'showDirectoryPicker' in window;
+
+    // Context injected into every AI agent request — built from currently open file
+    const agentContext = selected && fileData ? {
+      filename:  selected.node.name,
+      path:      selected.node.path,
+      sectionId: selected.sectionId,
+      type:      fileData.type,
+      content:   fileData.type === 'md'
+        ? fileData.content?.slice(0, 3000)
+        : fileData.type === 'card'
+          ? fileData.cases?.slice(0, 15).map(tc => `${tc.id}: ${tc.scenario}`).join('\n')
+          : null,
+    } : null;
 
     function switchTheme(id) {
       const t = THEMES.find(x => x.id === id);
@@ -1738,6 +1985,14 @@
               </>
             )}
           </div>
+          {/* AI Agent toggle */}
+          <button onClick={() => setAgentOpen(o => !o)} title="QA Agent"
+            style={{ fontSize:11, padding:'3px 10px', borderRadius:6, cursor:'pointer', flexShrink:0,
+              border: agentOpen ? 'none' : '1px solid var(--border-1)',
+              background: agentOpen ? '#6d28d9' : 'transparent',
+              color: agentOpen ? '#fff' : 'var(--text-3)' }}>
+            ◈ Agent
+          </button>
           {/* Theme picker — isolated component, does NOT trigger App re-render */}
           <ThemeSwitcher ref={themeRef} onSwitch={switchTheme} />
           {savedHandle && !hasContent && (
@@ -1755,6 +2010,7 @@
           </button>
         </div>
 
+        {agentOpen && <AgentPanel context={agentContext} onClose={() => setAgentOpen(false)} />}
         <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
 
           {/* Sidebar */}
