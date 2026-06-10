@@ -3,7 +3,7 @@
 > **Analysis Type:** Type 1 — Feature Development Analysis (Re-analysis dari v1.1)
 > **Source PRD:** `PRD/Whatsapp web v2/PRD WA Web Account Channel Event Log.md` v1.2
 > **Rules Applied:** `qa-analysis-rule.md`, `impact-analysis-rule.md`, `workflow-rule.md`
-> **Analisa Sebelumnya:** `Temp Analysis/prd-analysis-account-channel-event-log-v1.1.md`
+> **Analisa Sebelumnya:** `Assessments/archive/legacy-temp-analysis/prd-analysis-account-channel-event-log-v1.1.md`
 > **Tanggal Analisa:** 2026-06-02
 
 ---

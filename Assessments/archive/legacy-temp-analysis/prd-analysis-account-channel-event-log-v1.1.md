@@ -4,7 +4,7 @@
 > **Source PRD:** `PRD/Whatsapp web v2/PRD WA Web Account Channel Event Log.md` v1.1
 > **Rules Applied:** `qa-analysis-rule.md`, `impact-analysis-rule.md`, `workflow-rule.md`
 > **Reference Memory:** `global-memory.md`, `whatsapp-web-v1-vs-v2-comparison.md`, `CLAUDE-be.md`, `CLAUDE-fe.md`
-> **Analisa Sebelumnya:** `Temp Analysis/prd-analysis-account-channel-event-log.md` (v1.0)
+> **Analisa Sebelumnya:** `Assessments/archive/legacy-temp-analysis/prd-analysis-account-channel-event-log.md` (v1.0)
 > **Tanggal Analisa:** 2026-06-02
 
 ---

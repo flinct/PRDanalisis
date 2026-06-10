@@ -22,14 +22,16 @@ Fokus:
 PRD/
 Rules/
 Memory/
-Temp Analysis/
+Assessments/
+Scripts/
 Test/
 ```
 
 - `PRD/`: sumber requirement product, dikelompokkan per domain atau fitur.
 - `Rules/`: aturan kerja agent saat menganalisis PRD, membandingkan PRD, impact analysis, menulis memory, test case.
 - `Memory/`: konteks reusable dari analisis sebelumnya.
-- `Temp Analysis/`: hasil analisis sementara. Belum tentu canonical memory.
+- `Assessments/`: artefak analisis permanen dengan versioning.
+- `Scripts/`: helper script untuk parsing, migration, atau generation.
 - `Test/`: dokumen test atau validasi QA dari hasil analisis.
 
 ---

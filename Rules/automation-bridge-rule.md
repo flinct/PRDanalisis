@@ -38,7 +38,7 @@
 - `sixV2Automation` is the **implementation target**.
 - Any testcase addition, deletion, rename, or status label change must be reflected in the automation generator input.
 - If a testcase is marked `[UNDEVELOPED]`, keep that label in `Conversation.tsv`; automation should respect it and can skip/mark fixme.
-- Keep generated automation files out of `PRDanalisis` root. Put scripts in `Temp Analysis/scripts/` and outputs in `Test/conversation/`.
+- Keep generated automation files out of `PRDanalisis` root. Put scripts in `Scripts/analysis/` and outputs in `Test/conversation/`.
 
 ---
 

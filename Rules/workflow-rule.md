@@ -22,10 +22,12 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 
 # Before PRD Analysis
 
-1. Read `qa-analysis-rule.md` for full analysis methodology.
+1. Read `qa-analysis-rule.md` for full analysis methodology and QA Assessment Report requirements.
 2. Read global memory for shared entity lifecycle, RBAC, architecture constraints.
 3. Read existing feature memories affected.
 4. If comparing multiple PRDs, also read `prd-comparison-rule.md`.
+5. Save the final decision-bearing analysis as a permanent artifact in `Assessments/<domain>/<feature-slug>/` using the canonical template at `Assessments/templates/qa-assessment-report-template.md`.
+6. If the analysis is a revision, move the prior approved/current version into `versions/` and summarize the analysis changes in the new report.
 
 ---
 
@@ -44,26 +46,29 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 # Before Impact Analysis
 
 1. Perform PRD analysis or comparison first.
-2. Use analysis output as input for impact analysis (impact-analysis-rule.md).
-3. For comprehensive assessment (feature dev, bug fix, or interconnection), use qa-analysis-rule.md.
+2. Use the QA Assessment Report output as input for impact analysis (`impact-analysis-rule.md`).
+3. For comprehensive assessment (feature dev, bug fix, or interconnection), use `qa-analysis-rule.md`.
+4. If the impact analysis changes the final decision, update the permanent artifact in `Assessments/<domain>/<feature-slug>/` rather than leaving the decision only in a temporary note.
 
 ---
 
 # Before Bug Fix Analysis
 
-1. Read qa-analysis-rule.md for bug fix analysis methodology.
-2. Read impact-analysis-rule.md for blast radius assessment.
+1. Read `qa-analysis-rule.md` for bug fix analysis methodology.
+2. Read `impact-analysis-rule.md` for blast radius assessment.
 3. Identify root cause, scope, regression risk, and production safety.
-4. Document affected modules and data integrity risk.
+4. Document affected modules, data integrity risk, and a standardized final decision enum.
+5. Save the final bug-fix assessment as a QA Assessment Report in `Assessments/<domain>/<feature-slug>/` when it is used as a persistent decision artifact.
 
 ---
 
 # Before Interconnection Analysis
 
-1. Read qa-analysis-rule.md for interconnection methodology.
+1. Read `qa-analysis-rule.md` for interconnection methodology.
 2. Build dependency matrix and event mapping.
 3. Identify shared resources and async consumers.
 4. Assess chain-reaction risk across features.
+5. Record the outcome in the standard QA Assessment Report format if it affects a real go / revise / hold decision.
 
 ---
 

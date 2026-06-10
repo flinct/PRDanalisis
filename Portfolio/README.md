@@ -28,8 +28,8 @@ Portfolio repository for demonstrating structured PRD analysis, product risk map
 | `PRD/` | Source product requirements grouped by feature/domain. |
 | `BRD/` | Business requirement inputs and working documents. |
 | `Rules/` | Analysis frameworks, workflow rules, memory routing, PRD writing, QA analysis, and test case rules. |
-| `Memory/` | Canonical product understanding, cross-PRD findings, implementation comparison, and reusable analysis context. |
-| `Temp Analysis/` | Working analysis and impact assessment drafts. |
+| `Assessments/` | Canonical assessment artifacts with version history and templates. |
+| `Scripts/` | Analysis, parsing, and migration helper scripts. |
 | `Test/` | QA validation documents and test-related outputs. |
 | [`presentasi.md`](../presentasi.md) | Presentation explaining how this PRD analysis repo works for QA. |
 | [`Portfolio/PORTFOLIO.md`](PORTFOLIO.md) | Case study version of this repository for portfolio review. |
@@ -40,7 +40,7 @@ Portfolio repository for demonstrating structured PRD analysis, product risk map
 2. Read [`presentasi.md`](../presentasi.md) to understand the operating model.
 3. Read [`Memory/README.md`](../Memory/README.md) to understand the knowledge architecture.
 4. Review [`Memory/global-memory.md`](../Memory/global-memory.md) for canonical product rules.
-5. Check selected deep dives in `Memory/` and `Temp Analysis/` for analysis quality.
+5. Check selected deep dives in `Memory/` and `Assessments/` for analysis quality.
 
 ## Highlight Artifacts
 

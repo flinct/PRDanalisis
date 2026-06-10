@@ -3,42 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Case Browser</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <title>QA Browser — SatuInbox</title>
+  <script>
+    // Block Live Server auto-reload when saving TSV/JSON files.
+    // livereload.js uses `socket.onmessage = fn` (property assignment, not addEventListener),
+    // so we intercept the onmessage setter on every WebSocket connected to the live-reload port.
+    (function() {
+      const NativeWS = window.WebSocket;
+
+      function PatchedWS(url, protocols) {
+        const ws = protocols != null ? new NativeWS(url, protocols) : new NativeWS(url);
+        const isLR = typeof url === 'string' && (url.includes('livereload') || url.includes('5500'));
+        if (isLR) {
+          let _handler = null;
+          let _listenerAdded = false;
+          Object.defineProperty(ws, 'onmessage', {
+            get() { return _handler; },
+            set(fn) {
+              _handler = fn;
+              if (!_listenerAdded) {
+                _listenerAdded = true;
+                NativeWS.prototype.addEventListener.call(ws, 'message', function(evt) {
+                  try { const d = JSON.parse(evt.data); if (d && d.command === 'reload') return; } catch(e) {}
+                  if (_handler) _handler.call(ws, evt);
+                });
+              }
+            },
+            configurable: true
+          });
+        }
+        return ws;
+      }
+
+      PatchedWS.prototype = NativeWS.prototype;
+      PatchedWS.CONNECTING = 0; PatchedWS.OPEN = 1; PatchedWS.CLOSING = 2; PatchedWS.CLOSED = 3;
+      window.WebSocket = PatchedWS;
+
+      // Backup: override location.reload for any scripted reload attempt
+      try {
+        Object.defineProperty(Location.prototype, 'reload', {
+          value: function() { console.info('[QA Browser] scripted reload blocked'); },
+          configurable: true, writable: true
+        });
+      } catch(e) {}
+    })();
+  </script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style id="theme-vars">
+    :root {
+      --app-bg: #080c14; --sidebar-bg: #06090f; --elevated-bg: #0f172a; --deep-bg: #0a0f1a;
+      --border-1: #1e293b; --border-2: #0f172a; --border-3: #0a0f1a;
+      --text-1: #e2e8f0; --text-2: #94a3b8; --text-3: #64748b; --text-4: #475569; --text-5: #334155; --text-6: #1e293b;
+      --sec-brd: #8b5cf6; --sec-brd-bg: #13072a; --sec-brd-bd: #3b1f6e;
+      --sec-prd: #3b82f6; --sec-prd-bg: #06101e; --sec-prd-bd: #1e3a5f;
+      --sec-test: #10b981; --sec-test-bg: #021510; --sec-test-bd: #064e3b;
+    }
+  </style>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body, #root { height: 100%; }
-    body { background: #080c14; font-family: 'IBM Plex Mono', monospace; }
+    body { background: var(--app-bg); font-family: 'IBM Plex Mono', monospace; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #06090f; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-    select option { background: #0f172a; color: #e2e8f0; }
+    ::-webkit-scrollbar-track { background: var(--sidebar-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-1); border-radius: 3px; }
+    select option { background: var(--elevated-bg); color: var(--text-1); }
     textarea, input { font-family: 'IBM Plex Mono', monospace; }
-    .md h1 { font-size: 20px; color: #f1f5f9; margin: 20px 0 10px; border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
-    .md h2 { font-size: 16px; color: #e2e8f0; margin: 16px 0 8px; }
-    .md h3 { font-size: 13px; color: #cbd5e1; margin: 14px 0 6px; }
-    .md p  { font-size: 13px; color: #94a3b8; line-height: 1.7; margin: 6px 0; }
-    .md ul, .md ol { padding-left: 20px; color: #94a3b8; font-size: 13px; line-height: 1.7; }
+    .md h1 { font-size: 20px; color: var(--text-1); margin: 20px 0 10px; border-bottom: 1px solid var(--border-1); padding-bottom: 6px; }
+    .md h2 { font-size: 16px; color: var(--text-1); margin: 16px 0 8px; }
+    .md h3 { font-size: 13px; color: var(--text-2); margin: 14px 0 6px; }
+    .md p  { font-size: 13px; color: var(--text-2); line-height: 1.7; margin: 6px 0; }
+    .md ul, .md ol { padding-left: 20px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
     .md li { margin: 3px 0; }
-    .md code { background: #1e293b; color: #60a5fa; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: inherit; }
-    .md pre  { background: #0a0f1a; border: 1px solid #1e293b; padding: 14px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
-    .md pre code { background: none; padding: 0; color: #94a3b8; }
+    .md code { background: var(--border-1); color: #60a5fa; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: inherit; }
+    .md pre  { background: var(--deep-bg); border: 1px solid var(--border-1); padding: 14px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
+    .md pre code { background: none; padding: 0; color: var(--text-2); }
     .md a    { color: #60a5fa; }
-    .md blockquote { border-left: 2px solid #334155; padding-left: 12px; color: #64748b; margin: 8px 0; }
+    .md blockquote { border-left: 2px solid var(--text-5); padding-left: 12px; color: var(--text-3); margin: 8px 0; }
     .md table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 12px; }
-    .md th   { background: #0a0f1a; padding: 6px 10px; text-align: left; color: #475569; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #1e293b; }
-    .md td   { padding: 6px 10px; color: #94a3b8; border-bottom: 1px solid #0f172a; }
-    .md strong { color: #e2e8f0; }
+    .md th   { background: var(--deep-bg); padding: 6px 10px; text-align: left; color: var(--text-4); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-1); }
+    .md td   { padding: 6px 10px; color: var(--text-2); border-bottom: 1px solid var(--elevated-bg); }
+    .md strong { color: var(--text-1); }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { useState, useEffect, useRef } = React;
+  const { useState, useEffect, useRef, startTransition } = React;
+
+  // ─── THEMES ───────────────────────────────────────────────────────────────────
+  /* eslint-disable */
+  const THEMES = (function() {
+    const T = [
+      { id:"navy", name:"Deep Navy", swatch:["#080c14","#8b5cf6","#3b82f6","#10b981"],
+        vars:{"--app-bg":"#080c14","--sidebar-bg":"#06090f","--elevated-bg":"#0f172a","--deep-bg":"#0a0f1a","--border-1":"#1e293b","--border-2":"#0f172a","--border-3":"#0a0f1a","--text-1":"#e2e8f0","--text-2":"#94a3b8","--text-3":"#64748b","--text-4":"#475569","--text-5":"#334155","--text-6":"#1e293b","--sec-brd":"#8b5cf6","--sec-brd-bg":"#13072a","--sec-brd-bd":"#3b1f6e","--sec-prd":"#3b82f6","--sec-prd-bg":"#06101e","--sec-prd-bd":"#1e3a5f","--sec-test":"#10b981","--sec-test-bg":"#021510","--sec-test-bd":"#064e3b"}},
+      { id:"slate", name:"Slate Tengah", swatch:["#111827","#a78bfa","#60a5fa","#34d399"],
+        vars:{"--app-bg":"#111827","--sidebar-bg":"#0f172a","--elevated-bg":"#1a2234","--deep-bg":"#0d1117","--border-1":"#1e293b","--border-2":"#172032","--border-3":"#0f172a","--text-1":"#f1f5f9","--text-2":"#94a3b8","--text-3":"#6b7280","--text-4":"#4b5563","--text-5":"#374151","--text-6":"#1f2937","--sec-brd":"#a78bfa","--sec-brd-bg":"#1e1040","--sec-brd-bd":"#4c1d95","--sec-prd":"#60a5fa","--sec-prd-bg":"#0c1a30","--sec-prd-bd":"#1e3a5f","--sec-test":"#34d399","--sec-test-bg":"#052e16","--sec-test-bd":"#064e3b"}},
+      { id:"charcoal", name:"Charcoal Hangat", swatch:["#1c1917","#c084fc","#67e8f9","#86efac"],
+        vars:{"--app-bg":"#1c1917","--sidebar-bg":"#171412","--elevated-bg":"#211f1d","--deep-bg":"#121110","--border-1":"#292524","--border-2":"#221f1d","--border-3":"#1c1a18","--text-1":"#fafaf9","--text-2":"#a8a29e","--text-3":"#78716c","--text-4":"#57534e","--text-5":"#44403c","--text-6":"#292524","--sec-brd":"#c084fc","--sec-brd-bg":"#1e0b36","--sec-brd-bd":"#581c87","--sec-prd":"#67e8f9","--sec-prd-bg":"#083344","--sec-prd-bd":"#155e75","--sec-test":"#86efac","--sec-test-bg":"#052e16","--sec-test-bd":"#14532d"}},
+      { id:"zinc", name:"Zinc Netral", swatch:["#18181b","#818cf8","#38bdf8","#4ade80"],
+        vars:{"--app-bg":"#18181b","--sidebar-bg":"#141417","--elevated-bg":"#1e1e21","--deep-bg":"#0f0f11","--border-1":"#27272a","--border-2":"#1f1f22","--border-3":"#18181b","--text-1":"#fafafa","--text-2":"#a1a1aa","--text-3":"#71717a","--text-4":"#52525b","--text-5":"#3f3f46","--text-6":"#27272a","--sec-brd":"#818cf8","--sec-brd-bg":"#1e1b4b","--sec-brd-bd":"#3730a3","--sec-prd":"#38bdf8","--sec-prd-bg":"#082f49","--sec-prd-bd":"#0369a1","--sec-test":"#4ade80","--sec-test-bg":"#052e16","--sec-test-bd":"#15803d"}},
+      { id:"night", name:"Night Contrast", swatch:["#0d0d10","#cba6f7","#89b4fa","#a6e3a1"],
+        vars:{"--app-bg":"#0d0d10","--sidebar-bg":"#13131a","--elevated-bg":"#1e1e2e","--deep-bg":"#090910","--border-1":"#313244","--border-2":"#1e1e2e","--border-3":"#181825","--text-1":"#cdd6f4","--text-2":"#a6adc8","--text-3":"#7f849c","--text-4":"#6c7086","--text-5":"#45475a","--text-6":"#313244","--sec-brd":"#cba6f7","--sec-brd-bg":"#1e0a33","--sec-brd-bd":"#6c3483","--sec-prd":"#89b4fa","--sec-prd-bg":"#0a1a3a","--sec-prd-bd":"#2563eb","--sec-test":"#a6e3a1","--sec-test-bg":"#0a2b1a","--sec-test-bd":"#15803d"}},
+      { id:"slatelight", name:"Slate Terang", swatch:["#1e2433","#9f7aea","#4299e1","#38a169"],
+        vars:{"--app-bg":"#1e2433","--sidebar-bg":"#1a202e","--elevated-bg":"#242e42","--deep-bg":"#161c28","--border-1":"#2a3347","--border-2":"#232d3f","--border-3":"#1e2535","--text-1":"#e2e8f0","--text-2":"#94a3b8","--text-3":"#718096","--text-4":"#4a5568","--text-5":"#3a4a63","--text-6":"#2d3748","--sec-brd":"#9f7aea","--sec-brd-bg":"#1a1035","--sec-brd-bd":"#4c2a8a","--sec-prd":"#4299e1","--sec-prd-bg":"#0c1e33","--sec-prd-bd":"#1e4e79","--sec-test":"#38a169","--sec-test-bg":"#0a2318","--sec-test-bd":"#1a5a38"}},
+    ];
+    return T;
+  })();
+  /* eslint-enable */
+
+  function applyThemeVars(theme) {
+    const root = document.documentElement;
+    for (const [k, v] of Object.entries(theme.vars)) {
+      root.style.setProperty(k, v);
+    }
+  }
+
+  // ─── SECTION CONFIG ───────────────────────────────────────────────────────────
+  const SECTIONS = [
+    { id:'brd',  label:'BRD',        folderName:'BRD',  color:'var(--sec-brd)',  dimBg:'var(--sec-brd-bg)',  dimBd:'var(--sec-brd-bd)'  },
+    { id:'prd',  label:'PRD',        folderName:'PRD',  color:'var(--sec-prd)',  dimBg:'var(--sec-prd-bg)',  dimBd:'var(--sec-prd-bd)'  },
+    { id:'test', label:'Test Cases', folderName:'Test', color:'var(--sec-test)', dimBg:'var(--sec-test-bg)', dimBd:'var(--sec-test-bd)' },
+  ];
 
   // ─── CONSTANTS ───────────────────────────────────────────────────────────────
   const STATUS_OPTIONS = ['Passed', 'Failed', 'On Test', 'Need to Test', ''];
@@ -52,7 +141,7 @@
     'need to test': { bg: '#2a1a04', fg: '#fbbf24', bd: '#713f12' },
   };
   function sStyle(val = '') {
-    const s = STATUS_STYLE[(val||'').toLowerCase().trim()] || { bg:'#0f172a', fg:'#334155', bd:'#1e293b' };
+    const s = STATUS_STYLE[(val||'').toLowerCase().trim()] || { bg:'var(--elevated-bg)', fg:'var(--text-5)', bd:'var(--border-1)' };
     return { background:s.bg, color:s.fg, border:`1px solid ${s.bd}`, padding:'2px 9px', borderRadius:20, fontSize:10, fontWeight:700, whiteSpace:'nowrap', display:'inline-block' };
   }
 
@@ -67,14 +156,12 @@
   function uid() { return 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
   // ─── MODELS ──────────────────────────────────────────────────────────────────
-  // Execution result row (per expected-result row)
   const EMPTY_EXEC_ROW = (rowKey = '1') => ({
     rowKey,
     actual: '',
     status: { DEV: '', Staging: '', Prod: '' },
   });
 
-  // Execution state for one test case
   const EMPTY_EXEC = (count = 1) => ({
     notes: '',
     overallStatus: { DEV: '', Staging: '', Prod: '' },
@@ -82,18 +169,13 @@
     updatedAt: null,
   });
 
-  // Full test case object used in UI state
   const EMPTY_TC = () => ({
-    // ── definition (from TSV) ──
     id: '', scenario: '', precondition: '', description: '', url: '',
     testType: 'POSITIVE', tester: '', createdBy: '', createDate: '',
     steps: [''],
     expectedResults: [{ key: '1', expected: '' }],
-    // ── execution (from JSON) ──
     exec: EMPTY_EXEC(1),
     history: [],
-    // ── internal flags (cleared after save) ──
-    // _isReset, _resetReason
   });
 
   // ─── PARSERS ─────────────────────────────────────────────────────────────────
@@ -111,15 +193,13 @@
 
   function isCardFmt(lines) { return lines.slice(0,30).some(l => l[0]==='Test ID'); }
 
-  // parseBlock: extracts DEFINITION fields + _legacyExec (execution embedded in TSV)
-  // _legacyExec is only used as fallback when no JSON execution file exists yet
   function parseBlock(rows) {
     const tc = {
       id:'', scenario:'', precondition:'', description:'', url:'',
       testType:'POSITIVE', tester:'', createdBy:'', createDate:'',
       steps: [],
       expectedResults: [],
-      exec: null,   // will be filled by mergeExecIntoCases
+      exec: null,
       history: [],
       _legacyExec: {
         notes: '',
@@ -202,25 +282,22 @@
   }
 
   // ─── VERSION HELPERS ─────────────────────────────────────────────────────────
-  // Resolve active version name from exec JSON (supports old flat format)
   function getActiveVersion(execData) {
     if (!execData) return 'v1';
     if (execData.activeVersion) return execData.activeVersion;
-    if (execData.cases && !execData.versions) return 'v1'; // old flat format
+    if (execData.cases && !execData.versions) return 'v1';
     const keys = Object.keys(execData.versions || {});
     return keys.length > 0 ? keys[keys.length - 1] : 'v1';
   }
 
-  // Resolve version-specific cases map (handles old flat format as 'v1')
   function getVersionCases(execData, versionId) {
     if (!execData) return null;
     if (execData.versions?.[versionId]?.cases) return execData.versions[versionId].cases;
-    // Old flat format: treat as 'v1'
     if (!execData.versions && execData.cases && versionId === 'v1') return execData.cases;
-    return null; // version exists in JSON but no cases yet (new version)
+    return null;
   }
 
-  // ─── MERGE: definition (TSV) + execution (JSON, version-aware) ───────────────
+  // ─── MERGE ───────────────────────────────────────────────────────────────────
   function mergeExecIntoCases(cases, execData, versionId) {
     const hasJsonFile = execData !== null;
     const versionCases = getVersionCases(execData, versionId);
@@ -229,7 +306,6 @@
       const execCase = versionCases?.[tc.id];
 
       if (execCase?.current) {
-        // JSON data exists for this version → use it
         const cur = execCase.current;
         const execResults = tc.expectedResults.map(er => {
           const found = (cur.results||[]).find(r => r.rowKey===er.key);
@@ -250,7 +326,6 @@
       }
 
       if (!hasJsonFile) {
-        // No JSON file at all → fall back to legacy TSV execution data
         const leg = tc._legacyExec;
         const execResults = tc.expectedResults.map((er, i) => {
           const found = leg?.results?.[i];
@@ -270,7 +345,6 @@
         };
       }
 
-      // JSON file exists but no data for this case in this version → empty exec
       return {
         ...tc,
         exec: EMPTY_EXEC(tc.expectedResults.length),
@@ -280,7 +354,6 @@
   }
 
   // ─── EXEC JSON BUILDER ───────────────────────────────────────────────────────
-  // Builds a full snapshot of a TC (definition + execution) for storage in JSON
   function tcToSnapshot(tc) {
     return {
       testType:        tc.testType || '',
@@ -357,7 +430,6 @@
       newCasesMap[tc.id] = { testcaseId: tc.id, current: newFull, history: newHistory };
     }
 
-    // Migrate old flat format to versioned structure
     let existingVersions = { ...(prevExecData?.versions || {}) };
     if (!prevExecData?.versions && prevExecData?.cases) {
       existingVersions = { 'v1': { createdAt: prevExecData.createdAt || now, cases: prevExecData.cases } };
@@ -380,7 +452,6 @@
     };
   }
 
-  // After save, apply newExecData back into cases state (update updatedAt & history)
   function applyExecDataToCases(cases, execData, versionId) {
     const versionCases = getVersionCases(execData, versionId) || {};
     return cases.map(tc => {
@@ -405,7 +476,7 @@
     });
   }
 
-  // ─── SERIALIZER: TSV (definition + compat execution for backward read) ────────
+  // ─── SERIALIZER ───────────────────────────────────────────────────────────────
   function q(v) { const s=(v||'').replace(/"/g,'""'); return s.includes('\t')||s.includes('\n')||s.includes('"')?`"${s}"`:s; }
   function row(...cols) { return cols.map(q).join('\t'); }
 
@@ -448,9 +519,6 @@
   }
 
   // ─── EXEC FILE I/O ────────────────────────────────────────────────────────────
-  // Resolves TSV path → execution JSON path
-  // versions/2.3.0/login.tsv  →  ['.tcdata','2.3.0','login.execution.json']
-  // conversation/login.tsv     →  ['.tcdata','conversation','login.execution.json']
   function resolveExecPathParts(tsvRelPath) {
     const parts = tsvRelPath.split('/');
     const filename = parts[parts.length-1].replace(/\.tsv$/i,'.execution.json');
@@ -484,13 +552,13 @@
     await writeFile(fh, JSON.stringify(execData, null, 2));
   }
 
-  // ─── FILE SYSTEM + INDEXEDDB ──────────────────────────────────────────────────
+  // ─── FILE SYSTEM + IDB ───────────────────────────────────────────────────────
   const SUPPORTED_EXT = /\.(tsv|csv|md|txt)$/i;
 
   async function scanDir(handle, base='') {
     const entries = [];
     for await (const [name, entry] of handle.entries()) {
-      if (name.startsWith('.')) continue; // hide .tcdata
+      if (name.startsWith('.')) continue;
       const path = base ? `${base}/${name}` : name;
       if (entry.kind==='directory') {
         entries.push({ kind:'dir', name, path, handle:entry, children:await scanDir(entry,path) });
@@ -514,7 +582,7 @@
     try { const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('handles','readonly').objectStore('handles').get('root'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
     catch { return null; }
   }
-  async function saveLastFileIDB(path) { try { const db=await openIDB(); db.transaction('handles','readwrite').objectStore('handles').put(path,'lastFile'); } catch(e){} }
+  async function saveLastFileIDB(val) { try { const db=await openIDB(); db.transaction('handles','readwrite').objectStore('handles').put(val,'lastFile'); } catch(e){} }
   async function loadLastFileIDB() {
     try { const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('handles','readonly').objectStore('handles').get('lastFile'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
     catch { return null; }
@@ -527,9 +595,21 @@
     return null;
   }
   async function writeFile(fh, text) { const w=await fh.createWritable(); await w.write(text); await w.close(); }
+  async function saveThemeIDB(tid) { try { const db=await openIDB(); db.transaction('handles','readwrite').objectStore('handles').put(tid,'theme'); } catch {} }
+  async function loadThemeIDB() {
+    try { const db=await openIDB(); return new Promise(res=>{ const r=db.transaction('handles','readonly').objectStore('handles').get('theme'); r.onsuccess=()=>res(r.result||null); r.onerror=()=>res(null); }); }
+    catch { return null; }
+  }
+
+  // ─── HELPERS ─────────────────────────────────────────────────────────────────
+  function countFiles(node) {
+    if (node.kind === 'file') return 1;
+    if (!node.children) return 0;
+    return node.children.reduce((s, c) => s + countFiles(c), 0);
+  }
 
   // ─── UI PRIMITIVES ────────────────────────────────────────────────────────────
-  function Btn({ onClick, children, color='#334155', bg='transparent', title }) {
+  function Btn({ onClick, children, color='var(--text-5)', bg='transparent', title }) {
     return (
       <button onClick={onClick} title={title}
         style={{ fontSize:11, padding:'4px 12px', borderRadius:6, border:`1px solid ${color}`, background:bg, color:bg!=='transparent'?'#fff':color, cursor:'pointer', whiteSpace:'nowrap' }}>
@@ -538,7 +618,7 @@
     );
   }
   function StatusSelect({ value, onChange }) {
-    const s = STATUS_STYLE[(value||'').toLowerCase().trim()] || { bg:'#0f172a', fg:'#334155', bd:'#1e293b' };
+    const s = STATUS_STYLE[(value||'').toLowerCase().trim()] || { bg:'var(--elevated-bg)', fg:'var(--text-5)', bd:'var(--border-1)' };
     return (
       <select value={value||''} onChange={e=>onChange(e.target.value)}
         style={{ fontSize:10, fontWeight:700, padding:'2px 6px', borderRadius:20, border:`1px solid ${s.bd}`, background:s.bg, color:s.fg, cursor:'pointer', outline:'none' }}>
@@ -549,50 +629,38 @@
   function Field({ label, children }) {
     return (
       <div>
-        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</div>
+        <div style={{ fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</div>
         {children}
       </div>
     );
   }
   function TInput({ value, onChange, placeholder }) {
     return <input value={value||''} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-      style={{ width:'100%', fontSize:12, padding:'5px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none' }} />;
+      style={{ width:'100%', fontSize:12, padding:'5px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none' }} />;
   }
   function TArea({ value, onChange, rows=3, placeholder }) {
     return <textarea value={value||''} onChange={e=>onChange(e.target.value)} rows={rows} placeholder={placeholder}
-      style={{ width:'100%', fontSize:12, padding:'6px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', resize:'vertical', fontFamily:'inherit' }} />;
+      style={{ width:'100%', fontSize:12, padding:'6px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', resize:'vertical', fontFamily:'inherit' }} />;
   }
 
   // ─── HISTORY PANEL ────────────────────────────────────────────────────────────
-  // Computes field-level diff between two full snapshots (definition + execution)
   function diffAll(before, after) {
     const changes = [];
     if (!before || !after) return changes;
-
-    // Definition fields
     const defMap = [
-      ['Test Type',     'testType'],
-      ['Tester',        'tester'],
-      ['Date',          'createDate'],
-      ['Scenario',      'scenario'],
-      ['Pre-Condition', 'precondition'],
-      ['Description',   'description'],
-      ['URL',           'url'],
+      ['Test Type','testType'],['Tester','tester'],['Date','createDate'],
+      ['Scenario','scenario'],['Pre-Condition','precondition'],['Description','description'],['URL','url'],
     ];
     for (const [label, key] of defMap) {
       const bv = before[key]||'', av = after[key]||'';
       if (bv !== av) changes.push({ field:label, from:bv, to:av, type:'text' });
     }
-
-    // Steps
     const bs = before.steps||[], as_s = after.steps||[];
     const maxS = Math.max(bs.length, as_s.length);
     for (let i=0; i<maxS; i++) {
       const bv = bs[i]||'', av = as_s[i]||'';
       if (bv !== av) changes.push({ field:`Step ${i+1}`, from:bv, to:av, type:'text' });
     }
-
-    // Expected results (definition)
     const be = before.expectedResults||[], ae = after.expectedResults||[];
     const maxE = Math.max(be.length, ae.length);
     for (let i=0; i<maxE; i++) {
@@ -600,18 +668,12 @@
       const rk = be[i]?.key || ae[i]?.key || String(i+1);
       if (bv !== av) changes.push({ field:`Expected ${rk}`, from:bv, to:av, type:'text' });
     }
-
-    // Overall status per env
     for (const e of ENV) {
       const bv = before.overallStatus?.[e]||'', av = after.overallStatus?.[e]||'';
       if (bv !== av) changes.push({ field:`Overall ${e}`, from:bv, to:av, type:'status' });
     }
-
-    // Notes
     const bn = before.notes||'', an = after.notes||'';
     if (bn !== an) changes.push({ field:'Notes', from:bn, to:an, type:'text' });
-
-    // Results: actual + status per row
     const br = before.results||[], ar = after.results||[];
     const maxR = Math.max(br.length, ar.length);
     for (let i=0; i<maxR; i++) {
@@ -624,7 +686,6 @@
         if (bst !== ast) changes.push({ field:`Row ${rk} ${e}`, from:bst, to:ast, type:'status' });
       }
     }
-
     return changes;
   }
 
@@ -632,19 +693,19 @@
     const isEmpty = v => !v || v.trim() === '';
     return (
       <div style={{ display:'flex', alignItems:'center', gap:6, padding:'3px 0', flexWrap:'wrap' }}>
-        <span style={{ fontSize:10, color:'#475569', minWidth:110, flexShrink:0 }}>{change.field}</span>
+        <span style={{ fontSize:10, color:'var(--text-4)', minWidth:110, flexShrink:0 }}>{change.field}</span>
         <span style={{ fontSize:10 }}>
           {isEmpty(change.from)
-            ? <span style={{ color:'#334155', fontStyle:'italic' }}>—</span>
+            ? <span style={{ color:'var(--text-4)', fontStyle:'italic' }}>—</span>
             : change.type==='status'
               ? <span style={sStyle(change.from)}>{change.from}</span>
               : <span style={{ color:'#ef4444', background:'#2d0e0e', padding:'1px 6px', borderRadius:4, fontFamily:'inherit', maxWidth:240, display:'inline-block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', verticalAlign:'middle' }}>{change.from}</span>
           }
         </span>
-        <span style={{ fontSize:10, color:'#334155' }}>→</span>
+        <span style={{ fontSize:10, color:'var(--text-4)' }}>→</span>
         <span style={{ fontSize:10 }}>
           {isEmpty(change.to)
-            ? <span style={{ color:'#334155', fontStyle:'italic' }}>—</span>
+            ? <span style={{ color:'var(--text-4)', fontStyle:'italic' }}>—</span>
             : change.type==='status'
               ? <span style={sStyle(change.to)}>{change.to}</span>
               : <span style={{ color:'#4ade80', background:'#052e16', padding:'1px 6px', borderRadius:4, fontFamily:'inherit', maxWidth:240, display:'inline-block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', verticalAlign:'middle' }}>{change.to}</span>
@@ -657,21 +718,17 @@
   function HistoryPanel({ history, currentSnapshot }) {
     const [open, setOpen] = useState(false);
     if (!history || history.length === 0) return null;
-
-    // Build entries with afterState: entry[i]'s afterState = entry[i+1].snapshot or currentSnapshot
     const withAfter = history.map((evt, i) => ({
       ...evt,
       afterState: history[i + 1]?.snapshot ?? currentSnapshot ?? null,
     }));
-    // Display in reverse chronological order (most recent first)
     const displayed = [...withAfter].reverse();
-
     return (
-      <div style={{ marginTop:10, border:'1px solid #1e293b', borderRadius:6, overflow:'hidden' }}>
+      <div style={{ marginTop:10, border:'1px solid var(--border-1)', borderRadius:6, overflow:'hidden' }}>
         <div onClick={()=>setOpen(o=>!o)}
-          style={{ padding:'6px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:8, background:'#0a0f1a', userSelect:'none' }}>
-          <span style={{ fontSize:9, color:'#475569', textTransform:'uppercase', letterSpacing:1 }}>
-            {open?'▼':'▶'} History ({history.length} entr{history.length===1?'y':'ies'})
+          style={{ padding:'6px 12px', cursor:'pointer', display:'flex', alignItems:'center', gap:8, background:'var(--deep-bg)', userSelect:'none' }}>
+          <span style={{ fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1 }}>
+            {open?'▾':'▸'} History ({history.length} entr{history.length===1?'y':'ies'})
           </span>
         </div>
         {open && (
@@ -679,8 +736,7 @@
             {displayed.map((evt, i) => {
               const changes = diffAll(evt.snapshot, evt.afterState);
               return (
-                <div key={evt.eventId||i} style={{ padding:'10px 14px', borderTop:'1px solid #0a0f1a', background:i%2===0?'transparent':'#06090f' }}>
-                  {/* Header row */}
+                <div key={evt.eventId||i} style={{ padding:'10px 14px', borderTop:'1px solid var(--deep-bg)', background:i%2===0?'transparent':'var(--sidebar-bg)' }}>
                   <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8, flexWrap:'wrap' }}>
                     <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10,
                       background:evt.action==='reset'?'#2a1a04':'#060d1c',
@@ -688,24 +744,15 @@
                       border:`1px solid ${evt.action==='reset'?'#713f12':'#1e3a5f'}` }}>
                       {(evt.action||'update').toUpperCase()}
                     </span>
-                    <span style={{ fontSize:10, color:'#475569' }}>{fmtDate(evt.at)}</span>
-                    {evt.reason && <span style={{ fontSize:10, color:'#94a3b8' }}>— {evt.reason}</span>}
-                    <span style={{ fontSize:9, color:'#1e293b', marginLeft:'auto' }}>
-                      {changes.length} field{changes.length!==1?'s':''} changed
-                    </span>
+                    <span style={{ fontSize:10, color:'var(--text-4)' }}>{fmtDate(evt.at)}</span>
+                    {evt.reason && <span style={{ fontSize:10, color:'var(--text-2)' }}>— {evt.reason}</span>}
+                    <span style={{ fontSize:9, color:'var(--border-1)', marginLeft:'auto' }}>{changes.length} field{changes.length!==1?'s':''} changed</span>
                   </div>
-                  {/* Diff table */}
                   {changes.length > 0
-                    ? (
-                      <div style={{ background:'#080c14', borderRadius:4, padding:'6px 10px', border:'1px solid #1e2d45' }}>
+                    ? <div style={{ background:'var(--app-bg)', borderRadius:4, padding:'6px 10px', border:'1px solid #1e2d45' }}>
                         {changes.map((c, ci) => <DiffRow key={ci} change={c} />)}
                       </div>
-                    )
-                    : (
-                      <div style={{ fontSize:10, color:'#334155', fontStyle:'italic' }}>
-                        (no diff data — snapshot only)
-                      </div>
-                    )
+                    : <div style={{ fontSize:10, color:'var(--text-4)', fontStyle:'italic' }}>(no diff data)</div>
                   }
                 </div>
               );
@@ -716,22 +763,22 @@
     );
   }
 
-  // ─── RESET MODAL ─────────────────────────────────────────────────────────────
+  // ─── RESET MODAL ──────────────────────────────────────────────────────────────
   function ResetModal({ onConfirm, onCancel }) {
     const [reason, setReason] = useState('');
     return (
       <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200 }}>
-        <div style={{ background:'#0f172a', border:'1px solid #1e293b', borderRadius:10, padding:24, width:400 }}>
-          <div style={{ fontSize:14, color:'#f1f5f9', marginBottom:6 }}>↺ Reset Test Case?</div>
-          <div style={{ fontSize:11, color:'#475569', marginBottom:16, lineHeight:1.6 }}>
-            Field <strong style={{color:'#e2e8f0'}}>actual</strong>, <strong style={{color:'#e2e8f0'}}>status</strong>, dan <strong style={{color:'#e2e8f0'}}>notes</strong> akan dikosongkan.
+        <div style={{ background:'var(--elevated-bg)', border:'1px solid var(--border-1)', borderRadius:10, padding:24, width:400 }}>
+          <div style={{ fontSize:14, color:'var(--text-1)', marginBottom:6 }}>↺ Reset Test Case?</div>
+          <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:16, lineHeight:1.6 }}>
+            Field <strong style={{color:'var(--text-1)'}}>actual</strong>, <strong style={{color:'var(--text-1)'}}>status</strong>, dan <strong style={{color:'var(--text-1)'}}>notes</strong> akan dikosongkan.
             State sekarang akan disimpan ke history sebelum reset.
           </div>
           <Field label="Reason (optional)">
             <TInput value={reason} onChange={setReason} placeholder="e.g. Retest after hotfix patch" />
           </Field>
           <div style={{ display:'flex', gap:8, marginTop:16, justifyContent:'flex-end' }}>
-            <Btn onClick={onCancel} color='#334155'>Cancel</Btn>
+            <Btn onClick={onCancel} color='var(--text-5)'>Cancel</Btn>
             <Btn onClick={()=>onConfirm(reason)} bg='#92400e' color='#92400e'>Confirm Reset</Btn>
           </div>
         </div>
@@ -739,29 +786,194 @@
     );
   }
 
-  // ─── FILE NODE (Sidebar) ──────────────────────────────────────────────────────
-  function FileNode({ node, depth=0, selected, onSelect }) {
-    const [open, setOpen] = useState(depth===0);
-    const pl = 10 + depth*14;
-    if (node.kind==='dir') return (
-      <div>
-        <div onClick={()=>setOpen(o=>!o)}
-          style={{ padding:`4px 8px 4px ${pl}px`, cursor:'pointer', fontSize:11, color:'#64748b', display:'flex', alignItems:'center', gap:6, userSelect:'none', borderLeft:'2px solid transparent' }}>
-          <span style={{ fontSize:8 }}>{open?'▼':'▶'}</span>
-          <span>{open?'📂':'📁'}</span>
-          <span style={{ color:open?'#94a3b8':'#64748b' }}>{node.name}</span>
-          <span style={{ fontSize:9, color:'#334155' }}>({node.children.filter(c=>c.kind==='file').length})</span>
-        </div>
-        {open && node.children.map(c=><FileNode key={c.path} node={c} depth={depth+1} selected={selected} onSelect={onSelect}/>)}
+  // ─── INLINE FOLDER INPUT ──────────────────────────────────────────────────────
+  function InlineFolderInput({ depth = 0, onConfirm, onCancel }) {
+    const [name, setName] = useState('');
+    const ref = useRef(null);
+    useEffect(() => { setTimeout(() => ref.current?.focus(), 50); }, []);
+    const pl = 10 + depth * 16 + 20;
+    return (
+      <div style={{ padding:`3px 8px 5px ${pl}px` }}>
+        <input
+          ref={ref}
+          value={name}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { const n = name.trim(); if (n) onConfirm(n); }
+            if (e.key === 'Escape') onCancel();
+          }}
+          placeholder="Folder name… Enter ✓  Esc ✕"
+          style={{ width:'100%', fontSize:11, padding:'3px 8px', borderRadius:4, border:'1px solid #1e3a5f', background:'var(--deep-bg)', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}
+        />
       </div>
     );
-    const active = selected===node.path;
+  }
+
+  // ─── FILE NODE ────────────────────────────────────────────────────────────────
+  function FileNode({ node, depth=0, selected, onSelect, sectionColor, onCreateFolder }) {
+    const [open, setOpen]       = useState(depth < 2);
+    const [showAdd, setShowAdd] = useState(false);
+    const [hover, setHover]     = useState(false);
+    const pl = 10 + depth * 16;
+
+    if (node.kind === 'dir') {
+      const fc = countFiles(node);
+      return (
+        <div>
+          <div
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            style={{
+              display:'flex', alignItems:'center',
+              padding:`4px 8px 4px ${pl}px`,
+              cursor:'pointer', userSelect:'none',
+              background: hover ? 'rgba(255,255,255,0.03)' : 'transparent',
+              margin:'0 4px', borderRadius:4,
+            }}
+          >
+            <span
+              onClick={() => setOpen(o => !o)}
+              style={{ color:'var(--text-4)', fontSize:10, width:14, flexShrink:0, display:'inline-block', textAlign:'center' }}
+            >
+              {open ? '▾' : '▸'}
+            </span>
+            <span
+              onClick={() => setOpen(o => !o)}
+              style={{ fontSize:11, color: open ? 'var(--text-2)' : 'var(--text-4)', flex:1, marginLeft:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}
+            >
+              {node.name}
+            </span>
+            {hover && (
+              <button
+                onClick={e => { e.stopPropagation(); setShowAdd(true); }}
+                title="New subfolder"
+                style={{ fontSize:13, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 3px', flexShrink:0 }}
+              >
+                +
+              </button>
+            )}
+            <span style={{ fontSize:9, color:'var(--border-1)', flexShrink:0, marginLeft:2 }}>{fc}</span>
+          </div>
+          {showAdd && (
+            <InlineFolderInput
+              depth={depth + 1}
+              onConfirm={name => { onCreateFolder(node.handle, name); setShowAdd(false); }}
+              onCancel={() => setShowAdd(false)}
+            />
+          )}
+          {open && node.children.map(c => (
+            <FileNode
+              key={c.path} node={c} depth={depth + 1}
+              selected={selected} onSelect={onSelect}
+              sectionColor={sectionColor} onCreateFolder={onCreateFolder}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // File node
+    const active = selected === node.path;
+    const displayName = node.name.replace(/\.(tsv|csv|md|txt)$/i, '');
+    const isData = node.ext === 'tsv' || node.ext === 'csv';
+
     return (
-      <div onClick={()=>onSelect(node)}
-        style={{ padding:`4px 8px 4px ${pl}px`, cursor:'pointer', fontSize:11, background:active?'#0f1a2e':'transparent', borderLeft:active?'2px solid #3b82f6':'2px solid transparent', color:active?'#e2e8f0':'#64748b', display:'flex', alignItems:'center', gap:6, userSelect:'none' }}>
-        <span>{node.ext==='md'||node.ext==='txt'?'📝':'📊'}</span>
-        <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1 }}>{node.name}</span>
-        <span style={{ fontSize:9, color:'#334155', flexShrink:0 }}>.{node.ext}</span>
+      <div
+        onClick={() => onSelect(node)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{
+          display:'flex', alignItems:'center',
+          padding:`4px 8px 4px ${pl + 18}px`,
+          cursor:'pointer', userSelect:'none',
+          background: active ? 'rgba(255,255,255,0.08)' : hover ? 'rgba(255,255,255,0.03)' : 'transparent',
+          borderLeft: active ? `2px solid ${sectionColor}` : '2px solid transparent',
+          margin:'0',
+        }}
+      >
+        <span style={{
+          width:5, height:5, borderRadius:'50%', flexShrink:0, marginRight:8,
+          background: active ? sectionColor : isData ? '#2d5a8e' : 'var(--text-5)',
+        }}/>
+        <span style={{
+          fontSize: active ? 12 : 11,
+          fontWeight: active ? 700 : 500,
+          color: active ? 'var(--text-1)' : 'var(--text-3)',
+          flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+        }}>
+          {displayName}
+        </span>
+        <span style={{ fontSize:10, fontWeight:600, color: active ? 'var(--text-3)' : 'var(--text-4)', flexShrink:0, marginLeft:4 }}>.{node.ext}</span>
+      </div>
+    );
+  }
+
+  // ─── SIDEBAR SECTION ─────────────────────────────────────────────────────────
+  function SidebarSection({ section, tree, sectionHandle, selected, onSelect, onCreateFolder }) {
+    const [expanded, setExpanded] = useState(true);
+    const [showAdd, setShowAdd]   = useState(false);
+    const [hover, setHover]       = useState(false);
+    const totalFiles = tree ? tree.reduce((s, n) => s + countFiles(n), 0) : 0;
+
+    return (
+      <div>
+        {/* Section header */}
+        <div
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          style={{ display:'flex', alignItems:'center', padding:'8px 10px 5px', userSelect:'none', cursor:'pointer' }}
+          onClick={() => setExpanded(e => !e)}
+        >
+          <span style={{ color:'var(--border-1)', fontSize:9, width:12, flexShrink:0, marginRight:5, display:'inline-block', textAlign:'center' }}>
+            {expanded ? '▾' : '▸'}
+          </span>
+          <span style={{ fontSize:9, fontWeight:700, color: section.color, textTransform:'uppercase', letterSpacing:'0.1em', flex:1 }}>
+            {section.label}
+          </span>
+          {!expanded && totalFiles > 0 && (
+            <span style={{ fontSize:9, color:'var(--text-4)', marginRight:4 }}>{totalFiles}</span>
+          )}
+          {hover && sectionHandle && (
+            <button
+              onClick={e => { e.stopPropagation(); setShowAdd(s => !s); }}
+              title={`New folder in ${section.label}`}
+              style={{ fontSize:14, lineHeight:1, background:'none', border:'none', color:hover?'var(--text-4)':'var(--text-5)', cursor:'pointer', padding:'0 3px', flexShrink:0 }}
+            >
+              +
+            </button>
+          )}
+        </div>
+
+        {expanded && (
+          <div style={{ paddingBottom:4 }}>
+            {showAdd && sectionHandle && (
+              <InlineFolderInput
+                depth={0}
+                onConfirm={name => { onCreateFolder(section.id, sectionHandle, name); setShowAdd(false); }}
+                onCancel={() => setShowAdd(false)}
+              />
+            )}
+            {!tree && (
+              <div style={{ padding:'2px 10px 8px 22px', fontSize:10, color:'var(--border-1)', fontStyle:'italic' }}>
+                /{section.folderName} tidak ditemukan
+              </div>
+            )}
+            {tree && tree.length === 0 && !showAdd && (
+              <div style={{ padding:'2px 10px 8px 22px', fontSize:10, color:'var(--text-4)' }}>Kosong</div>
+            )}
+            {tree && tree.map(node => (
+              <FileNode
+                key={node.path} node={node} depth={0}
+                selected={selected}
+                onSelect={n => onSelect(n, section.id)}
+                sectionColor={section.color}
+                onCreateFolder={(parentHandle, name) => onCreateFolder(section.id, parentHandle, name)}
+              />
+            ))}
+          </div>
+        )}
+
+        <div style={{ height:1, background:'var(--deep-bg)', margin:'2px 8px 2px' }} />
       </div>
     );
   }
@@ -781,22 +993,17 @@
     const [saving, setSaving]             = useState(false);
     const [saveMsg, setSaveMsg]           = useState('');
     const [resetIdx, setResetIdx]         = useState(null);
+    const [page, setPage]                 = useState(1);
 
-    // In-memory stash: { [versionId]: cases[] }
-    // Allows switching versions freely without saving — current version is stashed before switching
-    const { useRef } = React;
     const stashRef = useRef({});
+    const loadMoreRef = useRef(null);
+    const mountedRef = useRef(false);  // guard: prevent on-mount useEffect re-renders
 
-    useEffect(()=>{
-      stashRef.current = {};  // clear stash on new file
-      setCases(initCases); setExecData(initExecData);
-      setActiveVersion(initialVersion || 'v1');
-      setDirty(false);
-    }, [initCases]);
+    // NOTE: useEffect([initCases]) reset removed — CardEditor is keyed by filePath,
+    // so it always mounts fresh. Resetting state on mount via useEffect is redundant
+    // and causes an extra render cascade (confirmed in perf trace).
 
-    // ── version helpers ──
     function allVersionNames() {
-      // Saved versions (from JSON) + any unsaved versions currently in stash or active
       const saved = execData?.versions
         ? Object.keys(execData.versions)
         : (execData?.cases ? ['v1'] : []);
@@ -813,9 +1020,7 @@
     }
     function switchVersion(ver) {
       if (ver === activeVersion) return;
-      // Stash current version's in-memory state before leaving
       stashRef.current[activeVersion] = cases;
-      // Restore target version: stash first, then saved JSON, then empty
       const stashed = stashRef.current[ver];
       if (stashed) {
         setCases(stashed);
@@ -829,9 +1034,7 @@
       const name = newVerName.trim();
       if (!name) return;
       if (allVersionNames().includes(name)) { alert('Version sudah ada.'); return; }
-      // Stash current version before creating new one
       stashRef.current[activeVersion] = cases;
-      // New version: copy definition, reset all exec fields
       const resetCases = cases.map(tc => ({
         ...tc,
         exec: EMPTY_EXEC(tc.expectedResults.length),
@@ -843,10 +1046,7 @@
       setDirty(true);
     }
 
-    // ── state helpers ──
     function upd(i, fn) { setCases(p=>{ const n=[...p]; n[i]=fn({...n[i]}); return n; }); setDirty(true); }
-
-    // Definition
     function updDef(i, f, v) { upd(i, tc=>({...tc,[f]:v})); }
     function updStep(i, si, v) { upd(i, tc=>{ const s=[...tc.steps]; s[si]=v; return {...tc,steps:s}; }); }
     function addStep(i) { upd(i, tc=>({...tc,steps:[...tc.steps,'']})); }
@@ -870,8 +1070,6 @@
         exec:{...tc.exec, results:tc.exec.results.filter((_,j)=>j!==ri)},
       }));
     }
-
-    // Execution
     function updNotes(i, v) { upd(i, tc=>({...tc,exec:{...tc.exec,notes:v}})); }
     function updOverall(i, e, v) { upd(i, tc=>({...tc,exec:{...tc.exec,overallStatus:{...tc.exec.overallStatus,[e]:v}}})); }
     function updActual(i, ri, v) {
@@ -911,7 +1109,6 @@
       setSaving(true);
       try {
         await writeFile(fileHandle, serializeCardToTSV(cases));
-
         if (rootHandle && filePath) {
           const srcName = filePath.split('/').pop();
           const newExec = buildExecJSON(cases, execData, filePath, srcName, activeVersion);
@@ -922,7 +1119,6 @@
         } else {
           setCases(p=>p.map(tc=>{ const {_isReset,_resetReason,_legacyExec,...r}=tc; return r; }));
         }
-
         setDirty(false);
         setSaveMsg('Saved ✓'); setTimeout(()=>setSaveMsg(''),2500);
       } catch(e) { setSaveMsg('Error: '+e.message); }
@@ -944,6 +1140,33 @@
       return true;
     });
 
+    // Reset page on filter/search/env change — skip on mount (page starts at 1 already)
+    useEffect(() => {
+      if (!mountedRef.current) { mountedRef.current = true; return; }
+      setPage(1);
+    }, [search, fStatus, env]);
+
+    // Infinite scroll via IntersectionObserver
+    // Guard: skip the very first observation to prevent immediate fire on mount
+    const obsReadyRef = useRef(false);
+    useEffect(() => {
+      const el = loadMoreRef.current;
+      if (!el) return;
+      obsReadyRef.current = false;  // reset on each dep change
+      const obs = new IntersectionObserver(entries => {
+        if (!obsReadyRef.current) { obsReadyRef.current = true; return; } // skip first callback
+        if (entries[0].isIntersecting && page * 30 < filtered.length) {
+          setPage(p => p + 1);
+        }
+      }, { threshold: 0.1 });
+      obs.observe(el);
+      return () => obs.disconnect();
+    }, [page, filtered.length]);
+
+    const PAGE_SIZE = 30;
+    const visible = filtered.slice(0, page * PAGE_SIZE);
+    const hasMore = visible.length < filtered.length;
+
     return (
       <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
 
@@ -955,14 +1178,14 @@
         )}
 
         {/* Toolbar */}
-        <div style={{ padding:'8px 14px', borderBottom:'1px solid #1e293b', background:'#06090f', display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', flexShrink:0 }}>
+        <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border-1)', background:'var(--sidebar-bg)', display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', flexShrink:0 }}>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search ID / scenario..."
-            style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', width:200 }} />
+            style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', width:200 }} />
           <div style={{ display:'flex', gap:3 }}>
             {['All','Passed','Failed','Need to Test','On Test'].map(s=>(
               <button key={s} onClick={()=>setFStatus(s===fStatus?'All':s)}
                 style={{ fontSize:10, padding:'3px 9px', borderRadius:12, border:'1px solid', cursor:'pointer',
-                  background:fStatus===s?'#3b82f6':'transparent', borderColor:fStatus===s?'#3b82f6':'#1e293b', color:fStatus===s?'#fff':'#475569' }}>
+                  background:fStatus===s?'#3b82f6':'transparent', borderColor:fStatus===s?'#3b82f6':'var(--border-1)', color:fStatus===s?'#fff':'var(--text-3)' }}>
                 {s}{s!=='All'?` ${counts[s]||0}`:` ${cases.length}`}
               </button>
             ))}
@@ -971,19 +1194,19 @@
             {ENV.map(e=>(
               <button key={e} onClick={()=>setEnv(e)}
                 style={{ fontSize:10, padding:'3px 9px', borderRadius:12, border:'1px solid', cursor:'pointer',
-                  background:env===e?'#7c3aed':'transparent', borderColor:env===e?'#7c3aed':'#1e293b', color:env===e?'#fff':'#475569' }}>
+                  background:env===e?'#7c3aed':'transparent', borderColor:env===e?'#7c3aed':'var(--border-1)', color:env===e?'#fff':'var(--text-3)' }}>
                 {e}
               </button>
             ))}
           </div>
 
-          {/* ── Version picker ── */}
-          <div style={{ display:'flex', gap:5, alignItems:'center', borderLeft:'1px solid #1e293b', paddingLeft:8 }}>
-            <span style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>VER</span>
+          {/* Version picker */}
+          <div style={{ display:'flex', gap:5, alignItems:'center', borderLeft:'1px solid var(--border-1)', paddingLeft:8 }}>
+            <span style={{ fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1 }}>VER</span>
             <select
               value={activeVersion}
               onChange={e=>switchVersion(e.target.value)}
-              style={{ fontSize:11, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'#0f172a', color:'#2dd4bf', outline:'none', cursor:'pointer', fontFamily:'inherit' }}>
+              style={{ fontSize:11, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'var(--elevated-bg)', color:'#2dd4bf', outline:'none', cursor:'pointer', fontFamily:'inherit' }}>
               {allVersionNames().map(ver=>(
                 <option key={ver} value={ver}>{ver}{stashRef.current[ver] ? ' *' : ''}</option>
               ))}
@@ -996,25 +1219,25 @@
                   onKeyDown={e=>{ if(e.key==='Enter') confirmAddVer(); if(e.key==='Escape') setAddingVer(false); }}
                   autoFocus
                   placeholder="nama version..."
-                  style={{ fontSize:10, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'#0f172a', color:'#e2e8f0', outline:'none', width:100, fontFamily:'inherit' }}
+                  style={{ fontSize:10, padding:'3px 8px', borderRadius:6, border:'1px solid #0d9488', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', width:100, fontFamily:'inherit' }}
                 />
                 <button onClick={confirmAddVer} style={{ fontSize:12, background:'none', border:'none', color:'#4ade80', cursor:'pointer', padding:0 }}>✓</button>
                 <button onClick={()=>setAddingVer(false)} style={{ fontSize:12, background:'none', border:'none', color:'#f87171', cursor:'pointer', padding:0 }}>✕</button>
               </div>
             ) : (
               <button onClick={openAddVer}
-                style={{ fontSize:11, padding:'2px 9px', borderRadius:6, border:'1px solid #1e293b', background:'transparent', color:'#475569', cursor:'pointer' }}>
+                style={{ fontSize:11, padding:'2px 9px', borderRadius:6, border:'1px solid var(--border-1)', background:'transparent', color:'var(--text-4)', cursor:'pointer' }}>
                 + New
               </button>
             )}
           </div>
 
-          <span style={{ fontSize:10, color:'#334155' }}>{filtered.length}/{cases.length}</span>
+          <span style={{ fontSize:10, color:'var(--text-4)' }}>{filtered.length}/{cases.length}</span>
           <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
             {saveMsg && <span style={{ fontSize:11, color:saveMsg.startsWith('Error')?'#f87171':'#4ade80' }}>{saveMsg}</span>}
-            <Btn onClick={copyTSV} color='#334155'>📋 Copy TSV</Btn>
+            <Btn onClick={copyTSV} color='var(--text-5)'>📋 Copy TSV</Btn>
             {fileHandle && (
-              <Btn onClick={save} bg={dirty?'#3b82f6':'#1e293b'} color={dirty?'#3b82f6':'#334155'}>
+              <Btn onClick={save} bg={dirty?'#3b82f6':'var(--border-1)'} color={dirty?'#3b82f6':'var(--text-5)'}>
                 {saving?'Saving…':dirty?'💾 Save':'✓ Saved'}
               </Btn>
             )}
@@ -1023,94 +1246,84 @@
         </div>
 
         {/* Stats bar */}
-        <div style={{ display:'flex', borderBottom:'1px solid #0f172a', flexShrink:0 }}>
+        <div style={{ display:'flex', borderBottom:'1px solid var(--elevated-bg)', flexShrink:0 }}>
           {[['Passed','#4ade80'],['Failed','#f87171'],['On Test','#60a5fa'],['Need to Test','#fbbf24']].map(([k,c])=>(
             <div key={k} style={{ flex:1, padding:'7px 4px', textAlign:'center' }}>
               <div style={{ fontSize:16, fontWeight:700, color:c }}>{counts[k]||0}</div>
-              <div style={{ fontSize:9, color:'#334155' }}>{k}</div>
+              <div style={{ fontSize:9, color:'var(--text-3)' }}>{k}</div>
             </div>
           ))}
           <div style={{ flex:1, padding:'7px 4px', textAlign:'center' }}>
-            <div style={{ fontSize:16, fontWeight:700, color:'#e2e8f0' }}>{cases.length}</div>
-            <div style={{ fontSize:9, color:'#334155' }}>Total</div>
+            <div style={{ fontSize:16, fontWeight:700, color:'var(--text-1)' }}>{cases.length}</div>
+            <div style={{ fontSize:9, color:'var(--text-3)' }}>Total</div>
           </div>
         </div>
 
         {/* Table header */}
-        <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 120px 36px', padding:'5px 14px', fontSize:10, color:'#334155', textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid #1e293b', background:'#0a0f1a', flexShrink:0 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 120px 36px', padding:'5px 14px', fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)', flexShrink:0 }}>
           <div>Test ID</div><div>Scenario</div><div>Status ({env})</div><div>Updated</div><div></div>
         </div>
 
         {/* Rows */}
         <div style={{ flex:1, overflowY:'auto' }}>
-          {filtered.map(tc => {
+          {visible.map(tc => {
             const gi = cases.indexOf(tc);
             const isOpen = expanded===gi;
             const oSt = tc.exec?.overallStatus?.[env]||'';
             return (
-              <div key={gi} style={{ borderBottom:'1px solid #0a0f1a' }}>
-                {/* Compact row */}
+              <div key={gi} style={{ borderBottom:'1px solid var(--deep-bg)' }}>
                 <div onClick={()=>setExpanded(isOpen?null:gi)}
                   style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 120px 36px', padding:'7px 14px', alignItems:'center', cursor:'pointer',
                     background:isOpen?'#0d1b30':'transparent', borderLeft:isOpen?'2px solid #3b82f6':'2px solid transparent' }}>
                   <div style={{ fontSize:11, color:'#60a5fa', fontWeight:600 }}>{tc.id||'—'}</div>
-                  <div style={{ fontSize:12, color:'#e2e8f0', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:12 }}>
+                  <div style={{ fontSize:12, color:'var(--text-1)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:12 }}>
                     {tc.scenario||tc.description||'—'}
                     {tc.exec?.notes && <span style={{ fontSize:10, color:'#fbbf24', marginLeft:8 }}>⚠ {tc.exec.notes}</span>}
                   </div>
                   <div onClick={e=>e.stopPropagation()}>
                     <StatusSelect value={oSt} onChange={v=>updOverall(gi,env,v)} />
                   </div>
-                  <div style={{ fontSize:9, color:'#334155' }}>{fmtDate(tc.exec?.updatedAt)}</div>
-                  <div style={{ fontSize:11, color:'#334155', textAlign:'center', userSelect:'none' }}>{isOpen?'▲':'▼'}</div>
+                  <div style={{ fontSize:9, color:'var(--text-4)' }}>{fmtDate(tc.exec?.updatedAt)}</div>
+                  <div style={{ fontSize:11, color:'var(--text-4)', textAlign:'center', userSelect:'none' }}>{isOpen?'▲':'▼'}</div>
                 </div>
 
-                {/* Expanded */}
                 {isOpen && (
                   <div style={{ background:'#0c1524', padding:'16px 18px', borderLeft:'2px solid #3b82f6', borderTop:'1px solid #1e2d45' }}>
-
-                    {/* ── DEFINITION ── */}
                     <div style={{ fontSize:9, color:'#1e4d8c', textTransform:'uppercase', letterSpacing:1, marginBottom:10, padding:'3px 9px', background:'#060d1c', borderRadius:4, display:'inline-block', border:'1px solid #0c2044' }}>
                       📋 Definition
                     </div>
-
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:12, marginBottom:12 }}>
                       <Field label="Test ID"><TInput value={tc.id} onChange={v=>updDef(gi,'id',v)}/></Field>
                       <Field label="Test Type"><TInput value={tc.testType} onChange={v=>updDef(gi,'testType',v)}/></Field>
                       <Field label="Tester"><TInput value={tc.tester} onChange={v=>updDef(gi,'tester',v)}/></Field>
                       <Field label="Date"><TInput value={tc.createDate} onChange={v=>updDef(gi,'createDate',v)}/></Field>
                     </div>
-
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12, marginBottom:12 }}>
                       <Field label="Scenario"><TArea value={tc.scenario} onChange={v=>updDef(gi,'scenario',v)} rows={2}/></Field>
                       <Field label="Pre-Condition"><TArea value={tc.precondition} onChange={v=>updDef(gi,'precondition',v)} rows={2}/></Field>
                       <Field label="Description"><TArea value={tc.description} onChange={v=>updDef(gi,'description',v)} rows={2}/></Field>
                     </div>
-
-                    {/* Steps */}
                     <div style={{ marginBottom:12 }}>
                       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
-                        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>Steps</div>
+                        <div style={{ fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1 }}>Steps</div>
                         <button onClick={()=>addStep(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Step</button>
                       </div>
                       {tc.steps.map((s,si)=>(
                         <div key={si} style={{ display:'flex', gap:6, alignItems:'center', marginBottom:4 }}>
-                          <span style={{ fontSize:10, color:'#334155', width:18, flexShrink:0 }}>{si+1}.</span>
+                          <span style={{ fontSize:10, color:'var(--text-4)', width:18, flexShrink:0 }}>{si+1}.</span>
                           <input value={s} onChange={e=>updStep(gi,si,e.target.value)}
-                            style={{ flex:1, fontSize:12, padding:'4px 8px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none' }}/>
+                            style={{ flex:1, fontSize:12, padding:'4px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none' }}/>
                           <button onClick={()=>delStep(gi,si)} style={{ fontSize:12, background:'none', border:'none', color:'#7f1d1d', cursor:'pointer' }}>✕</button>
                         </div>
                       ))}
                     </div>
-
-                    {/* Expected + Actual */}
                     <div style={{ marginBottom:14 }}>
                       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
-                        <div style={{ fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1 }}>Expected Result & Actual</div>
+                        <div style={{ fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1 }}>Expected Result & Actual</div>
                         <button onClick={()=>addExpected(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Row</button>
                       </div>
-                      <div style={{ border:'1px solid #1e293b', borderRadius:6, overflow:'hidden' }}>
-                        <div style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', background:'#0a0f1a', fontSize:9, color:'#334155', textTransform:'uppercase', letterSpacing:1, gap:6 }}>
+                      <div style={{ border:'1px solid var(--border-1)', borderRadius:6, overflow:'hidden' }}>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', background:'var(--deep-bg)', fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1, gap:6 }}>
                           <div>Expected <span style={{color:'#1e4d8c'}}>(definition)</span></div>
                           <div>Actual / Bug Link <span style={{color:'#1a3a1a'}}>(exec)</span></div>
                           <div>DEV</div><div>Staging</div><div>Prod</div><div></div>
@@ -1118,11 +1331,11 @@
                         {tc.expectedResults.map((er, ri)=>{
                           const execR = tc.exec?.results?.[ri] || EMPTY_EXEC_ROW(er.key);
                           return (
-                            <div key={ri} style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', borderTop:'1px solid #0a0f1a', gap:6, alignItems:'center' }}>
+                            <div key={ri} style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', borderTop:'1px solid var(--deep-bg)', gap:6, alignItems:'center' }}>
                               <input value={er.expected} onChange={e=>updExpected(gi,ri,e.target.value)}
                                 style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid #0c2044', background:'#060d1c', color:'#60a5fa', outline:'none', width:'100%' }}/>
                               <input value={execR.actual||''} onChange={e=>updActual(gi,ri,e.target.value)} placeholder="actual / url"
-                                style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid #1e293b', background:'#080c14', color:(execR.actual||'').startsWith('http')?'#60a5fa':'#e2e8f0', outline:'none', width:'100%' }}/>
+                                style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid var(--border-1)', background:'var(--app-bg)', color:(execR.actual||'').startsWith('http')?'#60a5fa':'var(--text-1)', outline:'none', width:'100%' }}/>
                               {ENV.map(e=>(
                                 <StatusSelect key={e} value={execR.status?.[e]||''} onChange={v=>updResultStatus(gi,ri,e,v)}/>
                               ))}
@@ -1132,19 +1345,17 @@
                         })}
                       </div>
                     </div>
-
-                    {/* ── EXECUTION ── */}
                     <div style={{ marginBottom:14 }}>
                       <div style={{ fontSize:9, color:'#14532d', textTransform:'uppercase', letterSpacing:1, marginBottom:8, padding:'3px 9px', background:'#061209', borderRadius:4, display:'inline-block', border:'1px solid #0a2918' }}>
                         🔬 Execution
-                        {tc.exec?.updatedAt && <span style={{ marginLeft:10, color:'#334155', fontWeight:400 }}>last updated: {fmtDate(tc.exec.updatedAt)}</span>}
+                        {tc.exec?.updatedAt && <span style={{ marginLeft:10, color:'var(--text-4)', fontWeight:400 }}>last updated: {fmtDate(tc.exec.updatedAt)}</span>}
                       </div>
-                      <div style={{ padding:'10px 12px', background:'#080c14', borderRadius:6, border:'1px solid #1e293b' }}>
+                      <div style={{ padding:'10px 12px', background:'var(--app-bg)', borderRadius:6, border:'1px solid var(--border-1)' }}>
                         <div style={{ display:'flex', gap:12, marginBottom:10, alignItems:'center', flexWrap:'wrap' }}>
-                          <div style={{ fontSize:10, color:'#334155', marginRight:4 }}>Overall:</div>
+                          <div style={{ fontSize:10, color:'var(--text-4)', marginRight:4 }}>Overall:</div>
                           {ENV.map(e=>(
                             <div key={e} style={{ display:'flex', alignItems:'center', gap:6 }}>
-                              <span style={{ fontSize:10, color:'#475569' }}>{e}</span>
+                              <span style={{ fontSize:10, color:'var(--text-4)' }}>{e}</span>
                               <StatusSelect value={tc.exec?.overallStatus?.[e]||''} onChange={v=>updOverall(gi,e,v)}/>
                             </div>
                           ))}
@@ -1154,11 +1365,7 @@
                         </Field>
                       </div>
                     </div>
-
-                    {/* History */}
                     <HistoryPanel history={tc.history} currentSnapshot={tcToSnapshot(tc)}/>
-
-                    {/* Actions */}
                     <div style={{ display:'flex', justifyContent:'space-between', marginTop:14 }}>
                       <button onClick={()=>setResetIdx(gi)}
                         style={{ fontSize:11, padding:'4px 14px', borderRadius:6, border:'1px solid #713f12', background:'#150d02', color:'#fbbf24', cursor:'pointer' }}>
@@ -1174,7 +1381,23 @@
               </div>
             );
           })}
-          {filtered.length===0 && <div style={{ padding:40, textAlign:'center', color:'#1e293b', fontSize:13 }}>No test cases found.</div>}
+          {filtered.length===0 && <div style={{ padding:40, textAlign:'center', color:'var(--border-1)', fontSize:13 }}>No test cases found.</div>}
+
+          {/* Load more sentinel — auto-loads next batch when scrolled into view */}
+          {hasMore && (
+            <div ref={loadMoreRef} style={{ padding:'12px 14px', textAlign:'center' }}>
+              <button onClick={() => setPage(p => p + 1)}
+                style={{ fontSize:11, color:'var(--text-3)', background:'var(--elevated-bg)', border:'1px solid var(--border-1)',
+                  borderRadius:6, padding:'5px 16px', cursor:'pointer' }}>
+                Load more ({visible.length} / {filtered.length})
+              </button>
+            </div>
+          )}
+          {!hasMore && filtered.length > PAGE_SIZE && (
+            <div style={{ padding:'10px 14px', textAlign:'center', fontSize:10, color:'var(--text-5)' }}>
+              All {filtered.length} test cases loaded
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1186,17 +1409,17 @@
     const filtered = rows.filter(r=>!search||r.some(c=>c.toLowerCase().includes(search.toLowerCase())));
     return (
       <div>
-        <div style={{ padding:'8px 14px', borderBottom:'1px solid #1e293b', background:'#06090f' }}>
+        <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border-1)', background:'var(--sidebar-bg)' }}>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..."
-            style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid #1e293b', background:'#0f172a', color:'#e2e8f0', outline:'none', width:240 }}/>
-          <span style={{ fontSize:10, color:'#334155', marginLeft:12 }}>{filtered.length} rows</span>
+            style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', width:240 }}/>
+          <span style={{ fontSize:10, color:'var(--text-4)', marginLeft:12 }}>{filtered.length} rows</span>
         </div>
         <div style={{ overflowX:'auto' }}>
           <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
-            <thead><tr>{headers.map((h,i)=><th key={i} style={{ padding:'6px 12px', textAlign:'left', fontSize:10, color:'#475569', fontWeight:600, textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid #1e293b', background:'#0a0f1a', whiteSpace:'nowrap' }}>{h}</th>)}</tr></thead>
+            <thead><tr>{headers.map((h,i)=><th key={i} style={{ padding:'6px 12px', textAlign:'left', fontSize:10, color:'var(--text-4)', fontWeight:600, textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)', whiteSpace:'nowrap' }}>{h}</th>)}</tr></thead>
             <tbody>{filtered.map((row,ri)=>(
-              <tr key={ri} style={{ borderBottom:'1px solid #0a0f1a', background:ri%2===0?'transparent':'#06090f' }}>
-                {headers.map((_,ci)=>{ const v=row[ci]||''; const isSt=/^(passed|failed|on test|need to test)$/i.test(v.trim()); return <td key={ci} style={{ padding:'5px 12px', color:'#94a3b8', whiteSpace:'pre-wrap', verticalAlign:'top' }}>{isSt?<span style={sStyle(v)}>{v}</span>:v}</td>; })}
+              <tr key={ri} style={{ borderBottom:'1px solid var(--deep-bg)', background:ri%2===0?'transparent':'var(--sidebar-bg)' }}>
+                {headers.map((_,ci)=>{ const v=row[ci]||''; const isSt=/^(passed|failed|on test|need to test)$/i.test(v.trim()); return <td key={ci} style={{ padding:'5px 12px', color:'var(--text-2)', whiteSpace:'pre-wrap', verticalAlign:'top' }}>{isSt?<span style={sStyle(v)}>{v}</span>:v}</td>; })}
               </tr>
             ))}</tbody>
           </table>
@@ -1205,87 +1428,224 @@
     );
   }
 
-  function MarkdownViewer({ content }) {
-    return <div className="md" style={{ padding:'24px 32px', maxWidth:860 }} dangerouslySetInnerHTML={{ __html: marked.parse(content) }} />;
+  function MarkdownViewer({ content, fileHandle }) {
+    const [editMode, setEditMode] = useState(false);
+    const [draft, setDraft]       = useState(content);
+    const [saving, setSaving]     = useState(false);
+    const [saveErr, setSaveErr]   = useState(null);
+
+    async function handleSave() {
+      if (!fileHandle) return;
+      setSaving(true); setSaveErr(null);
+      try {
+        const w = await fileHandle.createWritable();
+        await w.write(draft);
+        await w.close();
+        setEditMode(false);
+      } catch(e) {
+        setSaveErr(e.message || 'Save failed');
+      }
+      setSaving(false);
+    }
+
+    return (
+      <div style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
+        {/* Toolbar */}
+        <div style={{ padding:'5px 14px', borderBottom:'1px solid var(--elevated-bg)', background:'var(--sidebar-bg)',
+          display:'flex', alignItems:'center', justifyContent:'flex-end', gap:6, flexShrink:0 }}>
+          {saveErr && <span style={{ fontSize:10, color:'#f87171', flex:1 }}>⚠ {saveErr}</span>}
+          {editMode ? (
+            <>
+              <button onClick={() => { setEditMode(false); setDraft(draft); setSaveErr(null); }}
+                style={{ fontSize:10, color:'var(--text-3)', background:'transparent', border:'1px solid var(--border-1)',
+                  borderRadius:4, padding:'3px 10px', cursor:'pointer' }}>
+                Cancel
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                style={{ fontSize:10, color:'#fff', background: saving ? 'var(--text-5)' : '#3b82f6',
+                  border:'none', borderRadius:4, padding:'3px 10px', cursor: saving ? 'default' : 'pointer' }}>
+                {saving ? 'Saving…' : '✓ Save'}
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setEditMode(true)}
+              style={{ fontSize:10, color:'var(--text-3)', background:'transparent', border:'1px solid var(--border-1)',
+                borderRadius:4, padding:'3px 10px', cursor:'pointer' }}>
+              ✎ Edit
+            </button>
+          )}
+        </div>
+
+        {/* Body */}
+        {editMode ? (
+          <textarea value={draft} onChange={e => setDraft(e.target.value)}
+            style={{ flex:1, padding:'24px 32px', background:'var(--deep-bg)', color:'var(--text-1)',
+              border:'none', outline:'none', resize:'none', fontSize:13, lineHeight:1.8,
+              fontFamily:'IBM Plex Mono, monospace' }} />
+        ) : (
+          <div style={{ overflowY:'auto', flex:1, display:'flex', justifyContent:'center' }}>
+            <div className="md" style={{ padding:'32px 40px', width:'100%', maxWidth:860 }}
+              dangerouslySetInnerHTML={{ __html: marked.parse(draft) }} />
+          </div>
+        )}
+      </div>
+    );
   }
+
+  // ─── THEME SWITCHER (isolated component — only this re-renders on theme change)
+  const ThemeSwitcher = React.forwardRef(function ThemeSwitcher({ onSwitch }, ref) {
+    const [activeTheme, setActiveTheme] = useState('navy');
+    React.useImperativeHandle(ref, () => ({ setTheme: setActiveTheme }), []);
+    return (
+      <div style={{ display:'flex', gap:3, alignItems:'center', paddingRight:8, borderRight:'1px solid var(--border-2)', flexShrink:0 }}>
+        {THEMES.map(t => {
+          const isActive = activeTheme === t.id;
+          return (
+            <button key={t.id} onClick={() => onSwitch(t.id)} title={t.name}
+              style={{ width:22, height:14, borderRadius:7, padding:0, cursor:'pointer',
+                background: t.swatch[0],
+                border: isActive ? `2px solid ${t.swatch[1]}` : '1px solid rgba(255,255,255,0.1)',
+                display:'flex', gap:2, alignItems:'center', justifyContent:'center',
+                outline:'none', flexShrink:0 }}>
+              {t.swatch.slice(1).map((c, i) => (
+                <div key={i} style={{ width:3, height:3, borderRadius:'50%', background:c, flexShrink:0 }} />
+              ))}
+            </button>
+          );
+        })}
+      </div>
+    );
+  });
 
   // ─── APP ──────────────────────────────────────────────────────────────────────
   function App() {
-    const [tree, setTree]             = useState(null);
-    const [dirName, setDirName]       = useState('');
-    const [rootHandle, setRootHandle] = useState(null);
-    const [selected, setSelected]     = useState(null);
-    const [fileData, setFileData]     = useState(null);
-    const [loading, setLoading]       = useState(false);
-    const [error, setError]           = useState(null);
-    const [savedHandle, setSavedHandle] = useState(null);
+    const [dirName, setDirName]           = useState('');
+    const [sectionTrees, setSectionTrees] = useState({});
+    const [sectionHandles, setSH]         = useState({});
+    const [selected, setSelected]         = useState(null); // { node, sectionId }
+    const [fileData, setFileData]         = useState(null);
+    const [loading, setLoading]           = useState(false);
+    const [scanning, setScanning]         = useState(false);
+    const [error, setError]               = useState(null);
+    const [savedHandle, setSavedHandle]   = useState(null);
+    const [sideSearch, setSideSearch]     = useState('');
+    const themeRef = useRef(null);  // ref to ThemeSwitcher — only it re-renders on theme change
     const supported = 'showDirectoryPicker' in window;
 
-    useEffect(()=>{
-      if(!supported) return;
-      (async()=>{
-        const h = await loadHandleIDB();
-        if(!h) return;
+    function switchTheme(id) {
+      const t = THEMES.find(x => x.id === id);
+      if (!t) return;
+      applyThemeVars(t);       // immediate CSS paint, no React involved
+      saveThemeIDB(id);
+      // Double-RAF: swatch indicator update hanya terjadi setelah browser commit paint CSS vars
+      // Only ThemeSwitcher (6 buttons) re-renders — NOT the entire App tree
+      requestAnimationFrame(() => requestAnimationFrame(() => themeRef.current?.setTheme(id)));
+    }
+
+    async function loadSections(handle) {
+      setScanning(true);
+      const handles = {}, trees = {};
+      for (const sec of SECTIONS) {
         try {
-          const perm = await h.queryPermission({ mode:'readwrite' });
-          if(perm==='granted') {
-            setRootHandle(h); setDirName(h.name); setLoading(true);
-            const newTree = await scanDir(h);
-            setTree(newTree); setLoading(false);
-            // Auto-reopen last file after page reload (e.g. triggered by Live Server)
-            const lastPath = await loadLastFileIDB();
-            if (lastPath) {
-              const node = findNodeByPath(newTree, lastPath);
-              if (node) openFile(node, h);
-            }
-          } else {
-            setSavedHandle(h);
-          }
-        } catch(e){}
-      })();
-    },[]);
+          const h = await handle.getDirectoryHandle(sec.folderName);
+          handles[sec.id] = h;
+          trees[sec.id] = await scanDir(h);
+        } catch {
+          handles[sec.id] = null;
+          trees[sec.id] = null;
+        }
+      }
+      // Fallback: if user opened a section folder directly (e.g., Test/)
+      const anyFound = Object.values(handles).some(h => h !== null);
+      if (!anyFound) {
+        const matched = SECTIONS.find(s => s.folderName.toLowerCase() === handle.name.toLowerCase());
+        if (matched) {
+          handles[matched.id] = handle;
+          trees[matched.id] = await scanDir(handle);
+        }
+      }
+      setSH(handles);
+      setSectionTrees(trees);
+      setScanning(false);
+      return { handles, trees };
+    }
 
     async function doOpen(handle) {
       await saveHandleIDB(handle);
-      setRootHandle(handle); setSavedHandle(null);
-      setDirName(handle.name); setLoading(true);
-      const newTree = await scanDir(handle);
-      setTree(newTree);
-      setSelected(null); setFileData(null); setLoading(false);
-      // Auto-reopen last file if available
-      const lastPath = await loadLastFileIDB();
-      if (lastPath) {
-        const node = findNodeByPath(newTree, lastPath);
-        if (node) openFile(node, handle);
+      setDirName(handle.name);
+      setSavedHandle(null);
+      setSelected(null);
+      setFileData(null);
+      const { handles, trees } = await loadSections(handle);
+
+      // Restore last file
+      const lastRaw = await loadLastFileIDB();
+      if (lastRaw) {
+        let info = null;
+        try { info = JSON.parse(lastRaw); } catch {}
+        if (info?.sectionId && info?.path) {
+          const tree = trees[info.sectionId];
+          if (tree) {
+            const node = findNodeByPath(tree, info.path);
+            if (node) openFile(node, info.sectionId, handles);
+          }
+        }
       }
     }
 
+    useEffect(() => {
+      // Restore saved theme
+      (async () => {
+        const tid = await loadThemeIDB();
+        if (tid) {
+          const t = THEMES.find(x => x.id === tid);
+          if (t) { applyThemeVars(t); themeRef.current?.setTheme(tid); }
+        }
+      })();
+
+      if (!supported) return;
+      (async () => {
+        const h = await loadHandleIDB();
+        if (!h) return;
+        try {
+          const perm = await h.queryPermission({ mode:'readwrite' });
+          if (perm === 'granted') await doOpen(h);
+          else setSavedHandle(h);
+        } catch {}
+      })();
+    }, []);
+
     async function openFolder() {
-      if(!supported) { setError('Gunakan Chrome atau Edge versi terbaru.'); return; }
+      if (!supported) { setError('Gunakan Chrome atau Edge versi terbaru.'); return; }
       try { await doOpen(await window.showDirectoryPicker({ mode:'readwrite' })); }
-      catch(e) { if(e.name!=='AbortError') setError(e.message); setLoading(false); }
+      catch(e) { if (e.name !== 'AbortError') setError(e.message); }
     }
 
     async function restoreFolder() {
-      try { const p=await savedHandle.requestPermission({ mode:'readwrite' }); if(p==='granted') await doOpen(savedHandle); }
-      catch(e) { if(e.name!=='AbortError') setError(e.message); }
+      try {
+        const p = await savedHandle.requestPermission({ mode:'readwrite' });
+        if (p === 'granted') await doOpen(savedHandle);
+      } catch(e) { if (e.name !== 'AbortError') setError(e.message); }
     }
 
-    async function openFile(node, rootHandleOverride) {
-      const effRoot = rootHandleOverride || rootHandle;
-      setSelected(node); setFileData(null); setLoading(true);
-      await saveLastFileIDB(node.path);
+    async function openFile(node, sectionId, handlesOv) {
+      const eff = handlesOv || sectionHandles;
+      setSelected({ node, sectionId });
+      setFileData(null);
+      setLoading(true);
+      await saveLastFileIDB(JSON.stringify({ path: node.path, sectionId }));
       try {
         const text = await (await node.handle.getFile()).text();
-        if(node.ext==='md'||node.ext==='txt') {
+        if (node.ext === 'md' || node.ext === 'txt') {
           setFileData({ type:'md', content:text });
         } else {
           const parsed = parseFile(text, node.ext);
-          if(parsed.type==='card' && effRoot) {
-            const execData = await loadExecFile(effRoot, node.path);
-            const activeVersion = getActiveVersion(execData);
-            const mergedCases = mergeExecIntoCases(parsed.cases, execData, activeVersion);
-            setFileData({ ...parsed, cases:mergedCases, execData:execData||null, activeVersion });
+          const testH = eff.test;
+          if (parsed.type === 'card' && sectionId === 'test' && testH) {
+            const execData = await loadExecFile(testH, node.path);
+            const av = getActiveVersion(execData);
+            const merged = mergeExecIntoCases(parsed.cases, execData, av);
+            setFileData({ ...parsed, cases:merged, execData:execData||null, activeVersion:av });
           } else {
             setFileData(parsed);
           }
@@ -1294,112 +1654,232 @@
       setLoading(false);
     }
 
+    async function createFolder(sectionId, parentHandle, name) {
+      try {
+        await parentHandle.getDirectoryHandle(name, { create:true });
+        const secH = sectionHandles[sectionId];
+        if (secH) {
+          const newTree = await scanDir(secH);
+          setSectionTrees(prev => ({ ...prev, [sectionId]: newTree }));
+        }
+      } catch(e) { setError(`Gagal buat folder: ${e.message}`); }
+    }
+
+    function filterTree(nodes, q) {
+      if (!nodes || !q) return nodes;
+      const lo = q.toLowerCase();
+      return nodes.reduce((acc, node) => {
+        if (node.kind === 'dir') {
+          const ch = filterTree(node.children, lo);
+          if (ch.length) acc.push({ ...node, children: ch });
+        } else if (node.name.toLowerCase().includes(lo)) {
+          acc.push(node);
+        }
+        return acc;
+      }, []);
+    }
+
+    const hasContent = Object.values(sectionTrees).some(t => t !== null);
+    const curSec = SECTIONS.find(s => s.id === selected?.sectionId);
+    const noSearchResults = sideSearch && SECTIONS.every(s => (filterTree(sectionTrees[s.id], sideSearch) || []).length === 0);
 
     return (
-      <div style={{ display:'flex', flexDirection:'column', height:'100vh', color:'#e2e8f0', background:'#080c14' }}>
+      <div style={{ display:'flex', flexDirection:'column', height:'100vh', color:'var(--text-1)', background:'var(--app-bg)' }}>
 
         {/* Header */}
-        <div style={{ borderBottom:'1px solid #1e293b', padding:'10px 18px', display:'flex', alignItems:'center', gap:10, background:'#080c14', flexShrink:0, zIndex:10 }}>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:10, color:'#334155', letterSpacing:2, textTransform:'uppercase' }}>SatuInbox</div>
-            <div style={{ fontSize:16, fontWeight:600, color:'#f1f5f9' }}>
-              Test Case Browser
-              {dirName && <span style={{ fontSize:11, color:'#334155', fontWeight:400, marginLeft:10 }}>/ {dirName}</span>}
-              {selected && <span style={{ fontSize:11, color:'#475569', fontWeight:400, marginLeft:6 }}>/ {selected.path}</span>}
-            </div>
+        <div style={{ borderBottom:'1px solid var(--elevated-bg)', padding:'0 16px', display:'flex', alignItems:'center', gap:10, background:'var(--sidebar-bg)', flexShrink:0, height:44, zIndex:10 }}>
+          <div style={{ flex:1, display:'flex', alignItems:'center', gap:6, overflow:'hidden', minWidth:0 }}>
+            <span style={{ fontSize:11, fontWeight:600, color:'var(--text-3)', flexShrink:0 }}>SatuInbox</span>
+            <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
+            <span style={{ fontSize:11, color: hasContent ? 'var(--text-3)' : 'var(--text-4)', flexShrink:0 }}>QA Browser</span>
+            {dirName && (
+              <>
+                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
+                <span style={{ fontSize:11, color:'var(--text-3)', flexShrink:0 }}>{dirName}</span>
+              </>
+            )}
+            {curSec && selected && (
+              <>
+                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
+                <span style={{ fontSize:11, color:curSec.color, flexShrink:0 }}>{curSec.label}</span>
+                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
+                <span style={{ fontSize:11, color:'var(--text-3)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {selected.node.path}
+                </span>
+              </>
+            )}
           </div>
-          {savedHandle && !tree && (
+          {/* Theme picker — isolated component, does NOT trigger App re-render */}
+          <ThemeSwitcher ref={themeRef} onSwitch={switchTheme} />
+          {savedHandle && !hasContent && (
             <button onClick={restoreFolder}
-              style={{ fontSize:11, fontWeight:600, padding:'5px 14px', borderRadius:6, border:'1px solid #7c3aed', background:'#1e0b3a', color:'#a78bfa', cursor:'pointer' }}>
+              style={{ fontSize:11, padding:'4px 12px', borderRadius:6, border:'1px solid #7c3aed', background:'#130726', color:'#a78bfa', cursor:'pointer', flexShrink:0 }}>
               🔑 Restore: /{savedHandle.name}
             </button>
           )}
           <button onClick={openFolder}
-            style={{ fontSize:11, fontWeight:600, padding:'5px 14px', borderRadius:6, border:'1px solid', cursor:'pointer',
-              background:tree?'transparent':'#3b82f6', borderColor:tree?'#334155':'#3b82f6', color:tree?'#64748b':'#fff' }}>
-            {tree?'📂 Change Folder':'📂 Open Folder'}
+            style={{ fontSize:11, padding:'4px 12px', borderRadius:6, border:'1px solid', cursor:'pointer', flexShrink:0,
+              background: hasContent ? 'transparent' : '#3b82f6',
+              borderColor: hasContent ? 'var(--border-1)' : '#3b82f6',
+              color: hasContent ? 'var(--text-5)' : '#fff' }}>
+            {hasContent ? '📂 Change' : '📂 Open Folder'}
           </button>
         </div>
 
         <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
 
           {/* Sidebar */}
-          <div style={{ width:230, borderRight:'1px solid #1e293b', overflowY:'auto', flexShrink:0, background:'#06090f' }}>
-            {!tree && !loading && (
-              <div style={{ padding:'32px 16px', textAlign:'center', color:'#1e293b' }}>
-                <div style={{ fontSize:32, marginBottom:10 }}>📁</div>
-                {savedHandle
-                  ? <div style={{ fontSize:11, color:'#475569' }}>Klik <strong style={{color:'#a78bfa'}}>Restore</strong> di atas</div>
-                  : <div style={{ fontSize:11 }}>Klik <strong>Open Folder</strong><br/>pilih folder Test</div>
-                }
-                {!supported && <div style={{ marginTop:10, color:'#7f1d1d', fontSize:10 }}>Butuh Chrome / Edge</div>}
+          <div style={{ width:256, borderRight:'1px solid var(--elevated-bg)', display:'flex', flexDirection:'column', flexShrink:0, background:'var(--sidebar-bg)' }}>
+
+            {/* Search bar */}
+            {hasContent && (
+              <div style={{ padding:'8px 10px', borderBottom:'1px solid var(--deep-bg)', flexShrink:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:6, background:'var(--app-bg)', borderRadius:6, border:'1px solid var(--border-1)', padding:'4px 8px' }}>
+                  <span style={{ fontSize:12, color:'var(--text-4)', flexShrink:0 }}>⌕</span>
+                  <input
+                    value={sideSearch}
+                    onChange={e => setSideSearch(e.target.value)}
+                    placeholder="Search files..."
+                    style={{ flex:1, fontSize:11, background:'none', border:'none', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}
+                  />
+                  {sideSearch && (
+                    <button onClick={() => setSideSearch('')}
+                      style={{ background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', fontSize:11, padding:0, lineHeight:1, flexShrink:0 }}>
+                      ✕
+                    </button>
+                  )}
+                </div>
               </div>
             )}
-            {loading && !tree && <div style={{ padding:24, textAlign:'center', color:'#334155', fontSize:11 }}>Scanning…</div>}
-            {tree && (
-              <div style={{ padding:'6px 0' }}>
-                {tree.length===0 && <div style={{ padding:16, fontSize:11, color:'#334155' }}>Tidak ada file ditemukan.</div>}
-                {tree.map(n=><FileNode key={n.path} node={n} selected={selected?.path} onSelect={openFile}/>)}
+
+            {/* Empty / onboarding state */}
+            {!hasContent && !scanning && (
+              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:24, textAlign:'center', gap:10 }}>
+                <div style={{ fontSize:26, color:'var(--border-1)' }}>◈</div>
+                {savedHandle ? (
+                  <div style={{ fontSize:11, color:'var(--text-4)' }}>Klik <strong style={{color:'#a78bfa'}}>Restore</strong> di atas</div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize:11, color:'var(--text-4)', lineHeight:1.8 }}>
+                      Buka folder root<br/><strong style={{color:'var(--text-1)'}}>PRDanalisis</strong>
+                    </div>
+                    <div style={{ fontSize:10, color:'var(--text-4)', marginTop:8, lineHeight:1.8 }}>
+                      Otomatis mendeteksi<br/>BRD / PRD / Test Cases
+                    </div>
+                    <div style={{ marginTop:14, display:'flex', flexDirection:'column', gap:4 }}>
+                      {SECTIONS.map(s => (
+                        <div key={s.id} style={{ fontSize:10, color:s.color, opacity:0.4 }}>/{s.folderName}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {!supported && <div style={{ fontSize:10, color:'#7f1d1d', marginTop:8 }}>Butuh Chrome / Edge</div>}
+              </div>
+            )}
+
+            {scanning && (
+              <div style={{ padding:24, textAlign:'center', color:'var(--text-4)', fontSize:11 }}>Scanning…</div>
+            )}
+
+            {/* Section tree */}
+            {hasContent && !scanning && (
+              <div style={{ flex:1, overflowY:'auto', padding:'6px 0 16px' }}>
+                {noSearchResults && (
+                  <div style={{ padding:'20px 16px', textAlign:'center', fontSize:11, color:'var(--text-4)' }}>
+                    No results for "{sideSearch}"
+                  </div>
+                )}
+                {SECTIONS.map(sec => (
+                  <SidebarSection
+                    key={sec.id}
+                    section={sec}
+                    tree={sideSearch ? filterTree(sectionTrees[sec.id], sideSearch) : sectionTrees[sec.id]}
+                    sectionHandle={sectionHandles[sec.id]}
+                    selected={selected?.sectionId === sec.id ? selected.node.path : null}
+                    onSelect={openFile}
+                    onCreateFolder={createFolder}
+                  />
+                ))}
               </div>
             )}
           </div>
 
-          {/* Content */}
+          {/* Content area */}
           <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+
             {error && (
-              <div style={{ margin:12, padding:10, background:'#2d0e0e', border:'1px solid #7f1d1d', borderRadius:6, fontSize:11, color:'#f87171', display:'flex', gap:8, flexShrink:0 }}>
+              <div style={{ margin:10, padding:'8px 12px', background:'#2d0e0e', border:'1px solid #7f1d1d', borderRadius:6, fontSize:11, color:'#f87171', display:'flex', gap:8, flexShrink:0 }}>
                 <span style={{ flex:1 }}>⚠ {error}</span>
-                <button onClick={()=>setError(null)} style={{ background:'none', border:'none', color:'#f87171', cursor:'pointer' }}>✕</button>
+                <button onClick={() => setError(null)} style={{ background:'none', border:'none', color:'#f87171', cursor:'pointer' }}>✕</button>
               </div>
             )}
 
             {!selected && !loading && !error && (
-              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', color:'#1e293b' }}>
-                <div style={{ fontSize:48, marginBottom:12 }}>📄</div>
-                <div style={{ fontSize:14, color:'#334155' }}>Pilih file dari sidebar</div>
-                <div style={{ fontSize:11, marginTop:4, color:'#1e293b' }}>Support .tsv .csv .md .txt</div>
-                <div style={{ fontSize:10, marginTop:12, color:'#1e2d3a', textAlign:'center', lineHeight:1.7 }}>
-                  Execution data tersimpan di <code style={{color:'#1e4d8c'}}>.tcdata/</code><br/>
-                  Folder <code style={{color:'#1e293b'}}>.tcdata</code> tidak tampil di sidebar (hidden)
+              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8 }}>
+                <div style={{ fontSize:36, color:'var(--border-1)' }}>◉</div>
+                <div style={{ fontSize:13, color:'var(--text-4)' }}>Pilih file dari sidebar</div>
+                <div style={{ fontSize:10, color:'var(--border-1)', textAlign:'center', lineHeight:1.9, marginTop:4 }}>
+                  .tsv .csv → Test Case Editor<br/>
+                  .md .txt → Markdown Viewer
                 </div>
+                {!hasContent && (
+                  <div style={{ marginTop:10, fontSize:11, color:'var(--text-4)' }}>
+                    atau klik <strong style={{color:'#3b82f6'}}>Open Folder</strong> untuk memulai
+                  </div>
+                )}
               </div>
             )}
 
-            {selected && loading && <div style={{ padding:32, textAlign:'center', color:'#334155', fontSize:11 }}>Loading {selected.name}…</div>}
+            {loading && (
+              <div style={{ padding:32, textAlign:'center', color:'var(--text-4)', fontSize:11 }}>
+                Loading{selected ? ` ${selected.node.name}` : ''}…
+              </div>
+            )}
 
             {selected && fileData && !loading && (
               <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-                {/* Breadcrumb */}
-                <div style={{ padding:'6px 14px', borderBottom:'1px solid #1e293b', background:'#06090f', display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-                  <span style={{ fontSize:11, color:'#60a5fa', fontWeight:600 }}>{selected.name}</span>
-                  {fileData.type==='card' && (
+                {/* File bar */}
+                <div style={{ padding:'6px 14px', borderBottom:'1px solid var(--elevated-bg)', background:'var(--sidebar-bg)', display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                  {curSec && (
+                    <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10,
+                      background: curSec.dimBg, color: curSec.color, border:`1px solid ${curSec.dimBd}`,
+                      fontWeight:700, textTransform:'uppercase', letterSpacing:1, flexShrink:0 }}>
+                      {curSec.label}
+                    </span>
+                  )}
+                  <span style={{ fontSize:11, color:'var(--text-2)', fontWeight:600 }}>{selected.node.name}</span>
+                  {fileData.type === 'card' && (
                     <>
-                      <span style={{ fontSize:10, color:'#334155' }}>{fileData.cases.length} test cases · editable</span>
+                      <span style={{ fontSize:10, color:'var(--text-4)' }}>{fileData.cases.length} test cases · editable</span>
                       {fileData.execData
-                        ? <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#052e16', color:'#4ade80', border:'1px solid #166534' }}>✓ {fileData.activeVersion || 'v1'} · {Object.keys(fileData.execData?.versions || {}).length || 1} version(s)</span>
-                        : <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#2a1a04', color:'#fbbf24', border:'1px solid #713f12' }}>TSV only — save to create JSON</span>
+                        ? <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#052e16', color:'#4ade80', border:'1px solid #166534' }}>
+                            ✓ {fileData.activeVersion||'v1'} · {Object.keys(fileData.execData?.versions||{}).length||1} version(s)
+                          </span>
+                        : <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#2a1a04', color:'#fbbf24', border:'1px solid #713f12' }}>
+                            TSV only — save to create JSON
+                          </span>
                       }
                     </>
                   )}
-                  {fileData.type==='flat' && <span style={{ fontSize:10, color:'#334155' }}>{fileData.rows.length} rows</span>}
-                  {fileData.type==='md'   && <span style={{ fontSize:10, color:'#334155' }}>markdown</span>}
+                  {fileData.type === 'flat' && <span style={{ fontSize:10, color:'var(--text-4)' }}>{fileData.rows.length} rows</span>}
+                  {fileData.type === 'md'   && <span style={{ fontSize:10, color:'var(--text-4)' }}>markdown</span>}
                 </div>
 
                 <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-                  {fileData.type==='card' && (
+                  {fileData.type === 'card' && (
                     <CardEditor
-                      key={selected?.path}
+                      key={selected.node.path}
                       cases={fileData.cases}
                       execData={fileData.execData}
                       initialVersion={fileData.activeVersion || 'v1'}
-                      fileHandle={selected.handle}
-                      rootHandle={rootHandle}
-                      filePath={selected.path}
+                      fileHandle={selected.node.handle}
+                      rootHandle={sectionHandles.test}
+                      filePath={selected.node.path}
                     />
                   )}
-                  {fileData.type==='flat' && <div style={{ overflowY:'auto', flex:1 }}><FlatViewer headers={fileData.headers} rows={fileData.rows}/></div>}
-                  {fileData.type==='md'   && <div style={{ overflowY:'auto', flex:1 }}><MarkdownViewer content={fileData.content}/></div>}
-                  {fileData.type==='empty'&& <div style={{ padding:40, textAlign:'center', color:'#334155', fontSize:13 }}>File kosong.</div>}
+                  {fileData.type === 'flat'  && <div style={{ overflowY:'auto', flex:1 }}><FlatViewer headers={fileData.headers} rows={fileData.rows}/></div>}
+                  {fileData.type === 'md'    && <MarkdownViewer content={fileData.content} fileHandle={selected.node.handle}/>}
+                  {fileData.type === 'empty' && <div style={{ padding:40, textAlign:'center', color:'var(--text-4)', fontSize:13 }}>File kosong.</div>}
                 </div>
               </div>
             )}

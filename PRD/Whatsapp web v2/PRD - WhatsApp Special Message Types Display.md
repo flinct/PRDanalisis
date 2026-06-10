@@ -1,19 +1,19 @@
 # **PRODUCT REQUIREMENT DOCUMENT**
 
-**Feature**: WhatsApp Special Message Types Display (Contact, Poll, Event, Shared Link, Account Detail, Order)
-**Product Manager**: TBD
-**Engineering Lead**: TBD
-**Design Lead**: TBD
+**Feature**: WhatsApp Special Message Types Display (Contact, Poll, Event, Shared Link, Account Detail, Order)  
+**Product Lead**: Dany Christian  
+**Engineering Lead**: Naftal Yunior  
+**Design Lead**:  
 **Version**: v1.1
 
 ---
 
 ## **1. Revision History**
 
-| Version | Date       | Author                 | Changes                                                                                                                                                                        |
-| ------- | ---------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| v1.0    | 2026-06-08 | Claude (AI QA Analyst) | Initial PRD — inbound display untuk Contact Card, Poll, Event, dan Link Preview dari WhatsApp.                                                                                 |
-| v1.1    | 2026-06-08 | Claude (AI QA Analyst) | Tambah 2 tipe baru: Account Detail dan Order. Update Overview, Scope, OKR, User Stories, FR, EH, EC, UI/UX, Field & Validation, API Contract, Dependencies, Metrics, Appendix. |
+| Version | Date       | Author         | Changes                                                                                                                                                                        |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v1.0    | 2026-06-08 | Dany Christian | Initial PRD — inbound display untuk Contact Card, Poll, Event, dan Link Preview dari WhatsApp.                                                                                 |
+| v1.1    | 2026-06-08 | Dany Christian | Tambah 2 tipe baru: Account Detail dan Order. Update Overview, Scope, OKR, User Stories, FR, EH, EC, UI/UX, Field & Validation, API Contract, Dependencies, Metrics, Appendix. |
 
 ---
 

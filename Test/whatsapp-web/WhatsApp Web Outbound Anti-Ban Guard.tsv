@@ -1,0 +1,391 @@
+total cases =			24							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			24	Need to test		24	Need to test	24		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+Test ID	SIX-WAAB-001									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Duplicate manual send via double click		Pre-Condition	Operator logged in. Sender account connected and eligible. Conversation with recipient exists.	DATE			
+Url			/conversation		Description	Verify system suppresses duplicate manual send when send button clicked twice quickly	ENV	DEV	STAGGING	PROD
+Steps		1	Open conversation room for recipient R1		test type	NEGATIVE				
+		2	Paste message "Halo Kak, ini pesan uji anti-ban."							
+		3	Click Send twice within 500 ms		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Duplicate-safe handling	Only one logical send is processed		Need to Test	Need to Test	Need to Test
+		5				UI protection	Send button becomes disabled/loading after first click		Need to Test	Need to Test	Need to Test
+		6				Audit trail	If second attempt is stored, reason code is DUPLICATE_SUPPRESSED		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-002									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Duplicate manual send from two tabs		Pre-Condition	Same operator session opened in two tabs on the same conversation. Sender account healthy.	DATE			
+Url			/conversation		Description	Verify server-side idempotency blocks duplicate delivery from two browser tabs	ENV	DEV	STAGGING	PROD
+Steps		1	Open the same conversation in Tab A and Tab B		test type	NEGATIVE				
+		2	Input identical message in both tabs							
+		3	Click Send in both tabs within 1 second		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Delivery result	Recipient receives only one message		Need to Test	Need to Test	Need to Test
+		5				Request handling	One request wins and the other resolves as duplicate-safe result		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Original and suppressed attempt linkage is preserved when implemented		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-003									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Broadcast recipient overlap dedupe		Pre-Condition	Recipient R1 belongs to two overlapping audience segments in the same campaign.	DATE			
+Url			/broadcast		Description	Verify one recipient does not receive duplicate broadcast from overlapping audience segments	ENV	DEV	STAGGING	PROD
+Steps		1	Create broadcast campaign with Segment A and Segment B		test type	NEGATIVE				
+		2	Ensure recipient R1 exists in both segments							
+		3	Start campaign using an eligible sender account		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Recipient scope	R1 is processed once for the same campaign scope		Need to Test	Need to Test	Need to Test
+		5				Delivery result	Only one broadcast chain is delivered to R1		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Logs show one winning attempt for the overlapped recipient		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-004									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Recipient lock on worker collision		Pre-Condition	Two workers can be triggered against the same recipient and logical outbound context.	DATE			
+Url			/api/wa/outbound/validate		Description	Verify recipient-level locking allows only one active dispatch path	ENV	DEV	STAGGING	PROD
+Steps		1	Trigger Worker A and Worker B for the same recipient and same scope		test type	NEGATIVE				
+		2	Run both workers at nearly the same time							
+		3	Capture lock acquisition and dispatch outcomes		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Lock behavior	Only one worker acquires the recipient lock		Need to Test	Need to Test	Need to Test
+		5				Collision handling	The losing worker backs off or resolves as duplicate or lock conflict		Need to Test	Need to Test	Need to Test
+		6				Delivery result	Only one outbound delivery occurs		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-005									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Unknown status becomes reconciliation pending		Pre-Condition	System can simulate timeout after dispatch but before final local status persistence.	DATE			
+Url			/api/wa/outbound/validate		Description	Verify timeout after dispatch does not trigger blind resend	ENV	DEV	STAGGING	PROD
+Steps		1	Start outbound send to recipient R1		test type	NEGATIVE				
+		2	Force timeout immediately after downstream dispatch attempt							
+		3	Observe stored attempt status and retry scheduler		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				State transition	Attempt status becomes RECONCILIATION_PENDING		Need to Test	Need to Test	Need to Test
+		5				Retry safety	Retry scheduler does not resend blindly while status is unresolved		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Pending reconciliation reason is logged		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-006									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Reconciliation confirms already sent		Pre-Condition	An attempt already exists in RECONCILIATION_PENDING and success evidence is available.	DATE			
+Url			/api/wa/outbound/reconciliation		Description	Verify reconciliation closes pending attempt as sent without duplicate resend	ENV	DEV	STAGGING	PROD
+Steps		1	Load a pending attempt with downstream success evidence		test type	POSITIVE				
+		2	Run reconciliation process							
+		3	Observe final status and retry linkage		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Final status	Attempt resolves to SENT or confirmed sent state		Need to Test	Need to Test	Need to Test
+		5				Duplicate protection	No second message is sent during reconciliation		Need to Test	Need to Test	Need to Test
+		6				History linkage	Original attempt and reconciliation result remain linked		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-007									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Reconciliation confirms failed		Pre-Condition	An attempt already exists in RECONCILIATION_PENDING and failure evidence is available.	DATE			
+Url			/api/wa/outbound/reconciliation		Description	Verify reconciliation closes pending attempt as failed without delivery ambiguity	ENV	DEV	STAGGING	PROD
+Steps		1	Load a pending attempt with downstream failure evidence		test type	NEGATIVE				
+		2	Run reconciliation process							
+		3	Observe final state and retry history		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Final status	Attempt resolves to failed state according to implementation		Need to Test	Need to Test	Need to Test
+		5				Retry identity	Retry remains linked to the same logical send identity		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Failure resolution is logged with evidence type		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-008									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Paste-heavy detection in warning mode		Pre-Condition	Tenant anti-ban mode is warning-only. Operator starts below risk threshold.	DATE			
+Url			/conversation		Description	Verify paste-heavy behavior triggers warning events without blocking in warning-only mode	ENV	DEV	STAGGING	PROD
+Steps		1	Set anti-ban mode to warning-only		test type	NEGATIVE				
+		2	Paste and send similar messages rapidly across conversations							
+		3	Observe warning UI and related audit logs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Policy behavior	System records paste or burst risk events		Need to Test	Need to Test	Need to Test
+		5				User feedback	Operator sees warning without internal score details		Need to Test	Need to Test	Need to Test
+		6				Delivery result	Messages continue because mode is warning-only		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-009									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Paste-heavy detection in strict mode		Pre-Condition	Tenant anti-ban mode is strict and thresholds are configured to trigger during the test.	DATE			
+Url			/conversation		Description	Verify strict mode blocks or delays risky repetitive copy-paste sending	ENV	DEV	STAGGING	PROD
+Steps		1	Set anti-ban mode to strict		test type	NEGATIVE				
+		2	Paste and send near-identical messages rapidly							
+		3	Attempt one more send after threshold is crossed		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Policy behavior	Additional send is blocked or delayed according to strict policy		Need to Test	Need to Test	Need to Test
+		5				User feedback	Operator sees Bahasa Indonesia block message		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Reason code such as PASTE_RISK or BURST_RISK is stored		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-010									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Cooldown enforcement after risky sequence		Pre-Condition	Operator already triggered a cooldown by exceeding configured threshold.	DATE			
+Url			/conversation		Description	Verify send attempts are blocked until cooldown period finishes	ENV	DEV	STAGGING	PROD
+Steps		1	Trigger risky sequence until cooldown activates		test type	NEGATIVE				
+		2	Attempt another send during cooldown							
+		3	Attempt send again after cooldown expires		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Cooldown active	Sends during cooldown are blocked with cooldown message		Need to Test	Need to Test	Need to Test
+		5				Recovery behavior	Send after cooldown can proceed if risk condition is cleared		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Cooldown activation and expiry are traceable		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-011									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Safe normal send path		Pre-Condition	Operator is below all risk thresholds and uses normal cadence.	DATE			
+Url			/conversation		Description	Verify anti-ban protection does not disturb safe normal sending	ENV	DEV	STAGGING	PROD
+Steps		1	Open conversation room for recipient R1		test type	POSITIVE				
+		2	Type a short custom message manually without paste							
+		3	Click Send once		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Delivery result	Message is sent successfully		Need to Test	Need to Test	Need to Test
+		5				User experience	No unnecessary anti-ban warning or block appears		Need to Test	Need to Test	Need to Test
+		6				Security behavior	Internal numeric score or formula is not exposed to operator		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-012									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Sender safe mode on restriction event		Pre-Condition	A sender account is actively used and restriction or safe-mode event can be simulated.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify restricted sender account stops new outbound attempts immediately	ENV	DEV	STAGGING	PROD
+Steps		1	Start a small outbound queue using sender S1		test type	NEGATIVE				
+		2	Trigger restriction or safe-mode event for S1 during execution							
+		3	Attempt a new outbound send through S1		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Sender protection	New sends from S1 stop within expected reaction time		Need to Test	Need to Test	Need to Test
+		5				State visibility	Sender state changes to safe mode or restricted state		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Account protection reason code is logged		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-013									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Sender ineligible by outbound limit		Pre-Condition	Sender account S1 is at or above outbound eligibility threshold.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify ineligible sender is not used for new outbound send attempts	ENV	DEV	STAGGING	PROD
+Steps		1	Set sender S1 outbound usage above allowed threshold		test type	NEGATIVE				
+		2	Attempt manual send and broadcast send that would normally use S1							
+		3	Observe sender selection result		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Eligibility enforcement	S1 is not used for new outbound attempts		Need to Test	Need to Test	Need to Test
+		5				Fallback behavior	System fails or falls back according to existing sender-selection policy		Need to Test	Need to Test	Need to Test
+		6				Regression safety	Existing outbound limit protection remains authoritative		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-014									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Invalid config falls back safely		Pre-Condition	Admin access is available to anti-ban settings.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify invalid anti-ban configuration is rejected or replaced by safe defaults	ENV	DEV	STAGGING	PROD
+Steps		1	Open anti-ban settings as Admin		test type	NEGATIVE				
+		2	Attempt to save invalid config values such as dedupeWindowSeconds = 0							
+		3	If harness supports it, simulate runtime load of invalid stored config		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Validation behavior	UI or API rejects invalid settings values		Need to Test	Need to Test	Need to Test
+		5				Runtime safety	If invalid config is loaded, system falls back to safe default profile		Need to Test	Need to Test	Need to Test
+		6				Observability	Configuration issue raises alert or diagnostic log		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-015									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Monitor-only mode logs without blocking		Pre-Condition	Tenant anti-ban mode is set to monitor-only.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify risky behavior is logged but not blocked in monitor-only rollout mode	ENV	DEV	STAGGING	PROD
+Steps		1	Set anti-ban mode to monitor-only		test type	POSITIVE				
+		2	Run a risky operator sequence that would block under strict mode							
+		3	Observe send outcome and logs		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Policy behavior	Send is not blocked solely because mode is monitor-only		Need to Test	Need to Test	Need to Test
+		5				Observability	All relevant risk events are still logged		Need to Test	Need to Test	Need to Test
+		6				Rollout safety	Monitor-only mode supports staged deployment safely		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-016									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Audit log visibility and masking		Pre-Condition	Audit events already exist. Admin, Supervisor, and Operator roles are available.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify audit logs are visible only to allowed roles and sensitive fields are masked	ENV	DEV	STAGGING	PROD
+Steps		1	Open anti-ban logs as Admin and Supervisor		test type	POSITIVE				
+		2	Attempt to open anti-ban logs as Operator							
+		3	Inspect recipient and content fingerprint display		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				RBAC behavior	Only allowed roles can access anti-ban logs		Need to Test	Need to Test	Need to Test
+		5				Privacy behavior	Recipient identity is masked where applicable		Need to Test	Need to Test	Need to Test
+		6				Support visibility	Reason codes and key audit fields are visible to support roles		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-017									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Stale lock recovery after worker crash		Pre-Condition	Worker can be crashed after lock acquisition and before normal completion.	DATE			
+Url			/api/wa/outbound/validate		Description	Verify stale recipient lock recovers safely without duplicate dispatch	ENV	DEV	STAGGING	PROD
+Steps		1	Acquire recipient lock for a logical outbound attempt		test type	NEGATIVE				
+		2	Crash worker before normal completion							
+		3	Wait for lock TTL or run recovery and resubmit the same logical attempt		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Recovery behavior	Stale lock is recovered safely		Need to Test	Need to Test	Need to Test
+		5				Dispatch safety	Recovery does not cause duplicate send amplification		Need to Test	Need to Test	Need to Test
+		6				Operational visibility	Recovery path is visible in logs		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-018									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Multipart partial-stop safety		Pre-Condition	Logical outbound send contains multiple ordered parts and a non-recoverable part failure can be injected.	DATE			
+Url			/broadcast		Description	Verify later parts stop after non-recoverable failure in multipart logical send	ENV	DEV	STAGGING	PROD
+Steps		1	Start multipart logical outbound send with 3 parts		test type	NEGATIVE				
+		2	Force non-recoverable failure on part 2							
+		3	Observe whether later part is attempted		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Ordering safety	Part 3 is not sent after hard failure on part 2		Need to Test	Need to Test	Need to Test
+		5				Recipient experience	Recipient does not receive fragmented continuation after failure		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Partial-stop decision is recorded		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-019									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Sender stickiness in healthy session		Pre-Condition	Active conversation session already uses sender S1 and S1 remains healthy.	DATE			
+Url			/conversation		Description	Verify sender remains stable in an active healthy conversation session	ENV	DEV	STAGGING	PROD
+Steps		1	Send the first reply using sender S1		test type	POSITIVE				
+		2	Send follow-up replies in the same session							
+		3	Inspect sender attribution for each reply		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Sender behavior	All replies continue using sender S1		Need to Test	Need to Test	Need to Test
+		5				Regression safety	Anti-ban guard does not force unnecessary sender switch		Need to Test	Need to Test	Need to Test
+		6				Audit behavior	No false failover event is logged		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-020									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Sender failover only on real ineligibility		Pre-Condition	Active session exists. Sender S1 starts healthy. Alternate sender S2 is available if policy allows failover.	DATE			
+Url			/conversation		Description	Verify sender changes only when current sender becomes ineligible and failover is allowed	ENV	DEV	STAGGING	PROD
+Steps		1	Begin session using sender S1		test type	NEGATIVE				
+		2	Mark S1 ineligible or restricted during active session							
+		3	Attempt next outbound reply and inspect sender selection		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Failover boundary	Sender changes only after real ineligibility occurs		Need to Test	Need to Test	Need to Test
+		5				Policy consistency	Failover follows approved sender policy		Need to Test	Need to Test	Need to Test
+		6				Audit trail	Reason for sender change is logged		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-021									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Pre-send validation performance target		Pre-Condition	Performance environment and representative validation dataset are available.	DATE			
+Url			/api/wa/outbound/validate		Description	Verify pre-send validation meets target latency under representative load	ENV	DEV	STAGGING	PROD
+Steps		1	Prepare representative validation request mix		test type	POSITIVE				
+		2	Execute validation API load test							
+		3	Record p50 p95 and p99 latency excluding downstream WA dispatch		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Performance target	Validation meets <= 100 ms p95 target or documented exception is raised		Need to Test	Need to Test	Need to Test
+		5				System stability	No abnormal error spike occurs during the load window		Need to Test	Need to Test	Need to Test
+		6				Evidence	Performance report is archived for release review		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-022									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Safe degradation when audit persistence fails		Pre-Condition	Audit persistence dependency can be degraded while safety evaluation path still runs.	DATE			
+Url			/api/wa/outbound/anti-ban/logs		Description	Verify audit persistence failure does not create duplicate-send amplification	ENV	DEV	STAGGING	PROD
+Steps		1	Fail the audit persistence dependency		test type	NEGATIVE				
+		2	Trigger a safe outbound send							
+		3	Observe send result and degraded-mode alert path		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Availability behavior	System degrades safely without amplifying duplicate sends		Need to Test	Need to Test	Need to Test
+		5				Result integrity	Canonical send result remains traceable through fallback or degraded alert		Need to Test	Need to Test	Need to Test
+		6				Observability	Failure of audit persistence is surfaced operationally		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-023									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			RBAC masking and Bahasa UX		Pre-Condition	Admin, Supervisor, and Operator roles are available and anti-ban events already exist.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify internal formulas stay hidden, masked identity is preserved, and user-facing messages use Bahasa Indonesia	ENV	DEV	STAGGING	PROD
+Steps		1	Verify Admin and Supervisor views of anti-ban logs		test type	POSITIVE				
+		2	Verify Operator cannot access internal formula or raw score details							
+		3	Trigger one user-facing warning or block message		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Security behavior	Internal formula and sensitive implementation detail are not exposed to operator		Need to Test	Need to Test	Need to Test
+		5				Localization	User-facing warnings appear in Bahasa Indonesia		Need to Test	Need to Test	Need to Test
+		6				Privacy behavior	Masked identity remains protected in allowed views		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										
+Test ID	SIX-WAAB-024									
+Create at			10/06/2026		created by	Hermes Agent	Tester			
+Scenario			Cross-tenant isolation for logs and settings		Pre-Condition	Tenant A and Tenant B exist. Anti-ban events and settings exist for Tenant A. Tenant B comparable role is available.	DATE			
+Url			/settings/channels/whatsapp-web		Description	Verify foreign-tenant anti-ban logs and settings cannot be read or changed across tenant boundary	ENV	DEV	STAGGING	PROD
+Steps		1	Log in as Tenant B user with comparable Admin or Supervisor role		test type	NEGATIVE				
+		2	Attempt to query Tenant A anti-ban logs							
+		3	Attempt to load or mutate Tenant A anti-ban settings		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				Tenant isolation	Cross-tenant access is denied or scoped to Tenant B only		Need to Test	Need to Test	Need to Test
+		5				Data protection	No Tenant A anti-ban event or settings value is exposed to Tenant B user		Need to Test	Need to Test	Need to Test
+		6				Security regression	Tenant boundary remains enforced server-side		Need to Test	Need to Test	Need to Test
+		7									
+		8									
+		9									
+										
+										
+										

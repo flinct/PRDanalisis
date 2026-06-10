@@ -30,14 +30,15 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 ### Untuk SEMUA tipe tugas (wajib):
 
 1. `Rules/workflow-rule.md` — execution order dan prioritas
-2. `Rules/structure-rule.md` — repository structure, di mana file harus ditaruh
+2. `Rules/structure-rule.md` — repository structure, termasuk lokasi artefak permanen di `Assessments/` dan script helper di `Scripts/`
 3. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
 
 ### ANALYSIS / PRD / FEATURE DEV:
 
 ```
-Rules/qa-analysis-rule.md         → WAJIB. Full methodology.
+Rules/qa-analysis-rule.md         → WAJIB. Full methodology + QA Assessment Report format + decision enum.
 Rules/impact-analysis-rule.md     → Untuk cek blast radius.
+Assessments/templates/qa-assessment-report-template.md → Template artefak permanen assessment.
 ```
 
 ### PRD WRITING:
@@ -124,6 +125,7 @@ Muat jika tugas menyentuh salah satu dari:
 Gunakan rule yang sudah dimuat sebagai **metodologi kerja**, bukan sekadar referensi.
 
 - Output harus sesuai struktur yang ditentukan rule
+- Hasil analisis yang bersifat decision-bearing harus dipermanenkan sebagai QA Assessment Report di `Assessments/`
 - Jangan lewati section impact/risk/regression
 - Jika ada kontradiksi antara input user dan rule, ikuti rule
 

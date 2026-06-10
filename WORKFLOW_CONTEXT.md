@@ -26,10 +26,15 @@ PRD V2 Writing (Conversationv2/, ticketv2/, Whatsapp web v2/)
     │   - Referensi: Memory/CLAUDE-be.md, CLAUDE-fe.md (implementasi existing)
     │
     ▼
-PRD Analysis (QA Analysis)
+PRD Analysis (QA Assessment)
     │   - Mengikuti Rules/qa-analysis-rule.md (3 tipe: Feature Dev, Bug Fix, Interconnection)
-    │   - Output: Requirement Summary, Flow Analysis, Impact Analysis, Dependency Mapping
-    │   - Output: Risk Matrix, Test Strategy, Traceability Matrix
+    │   - Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+    │   - Versioning: versi sebelumnya dipindah ke `versions/` + ringkasan perubahan analisa wajib diisi
+    │   - Output: Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis
+    │   - Output: Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
+    │
+    ▼
+Decision
     │
     ▼
 Test Case Writing (Manual TSV + Automation Mapping)
@@ -60,8 +65,9 @@ Execution & Maintenance
 ```
 PRDanalisis/Rules/agent-instruction.md        ← ENTRY POINT: deteksi tipe tugas → load rule sesuai
 PRDanalisis/Rules/workflow-rule.md            ← Urutan eksekusi: Rule → Global Memory → Feature Memory → Execute
-PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Test/, Rules/, Memory/, Temp Analysis/
+PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Assessments/, Scripts/, Test/, Rules/, Memory/
 PRDanalisis/Memory/README.md                  ← Index memory files, routing guide, deprecated notices
+PRDanalisis/Assessments/templates/qa-assessment-report-template.md ← Template assessment permanen
 ```
 
 ### **PRD Writing & Analysis**
@@ -152,7 +158,7 @@ playwright/tests/e2e/conversation/
 ### **Sync Trigger (Otomatis di agent)**
 ```
 WHEN Conversation.tsv changes:
-  1. Re-run parsing/generation scripts (Temp Analysis/scripts/)
+  1. Re-run parsing/generation scripts (`Scripts/analysis/`)
   2. Refresh automation input JSON
   3. Regenerate/patch Playwright specs in sixV2Automation
   4. Update sixV2Automation/AGENTS.md (test counts, page objects, conventions)
@@ -173,7 +179,10 @@ WHEN Conversation.tsv changes:
 1. Baca `qa-analysis-rule.md` (Type 1: Feature Development Analysis)
 2. Baca `impact-analysis-rule.md` (blast radius)
 3. Baca `global-memory.md` + feature memory relevan
-4. Output: Overview, Requirement Summary, Flow Analysis, Impact Analysis (9 dimensi), Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
+4. Gunakan template `Assessments/templates/qa-assessment-report-template.md`
+5. Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+6. Simpan versi sebelumnya ke `versions/` jika analisa direvisi, lalu isi ringkasan perubahan analisa
+7. Isi minimal: Overview, Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis, Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
 
 ### **Bug Fix Analysis**
 1. Baca `qa-analysis-rule.md` (Type 2: Bug Fix Analysis)

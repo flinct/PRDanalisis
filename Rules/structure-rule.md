@@ -11,10 +11,11 @@ Only permanent project-wide files live here:
 | Item | Description |
 |------|-------------|
 | `PRD/` | Product Requirement Documents (organized by feature domain) |
+| `Assessments/` | Permanent QA Assessment Reports, version history, and templates |
+| `Scripts/` | Reusable analysis, parsing, migration, and automation helper scripts |
 | `Test/` | Test cases, test data, test scripts, automation outputs |
 | `Rules/` | Agent workflow and methodology rules |
 | `Memory/` | Agent persistent memory (global + feature-specific) |
-| `Temp Analysis/` | Temporary analysis reports (see below) |
 | `BRD/` | Business Requirement Documents |
 | `Feature List/` | Feature inventory and roadmap |
 | `Portfolio/` | Project portfolio documents |
@@ -24,18 +25,36 @@ Only permanent project-wide files live here:
 
 ---
 
-## `Temp Analysis/` — Temporary Analysis Reports
+## `Assessments/` — Permanent QA Assessment Artifacts
 
-All analysis documents, gap analyses, mapping reports go here:
+All formal QA assessment outputs live here:
 
-- `Temp Analysis/*.md` — single analysis report
-- `Temp Analysis/scripts/*.py` — any script written specifically for a one-time analysis or migration task
-- `Temp Analysis/references/*` — reference data used during analysis
+- `Assessments/templates/qa-assessment-report-template.md` — canonical template for new assessment reports
+- `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md` — latest approved/current assessment artifact for a feature
+- `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-qa-assessment-v1.0.md` — immutable historical versions
+- `Assessments/archive/legacy-temp-analysis/` — migrated historical analysis documents from the removed `Temp Analysis/` folder
 
 ### Convention:
-- **File naming:** lowercase, hyphens, no spaces: `analisis-prd-vs-testcase.md`
-- **Script naming:** `Temp Analysis/scripts/<descriptive-name>.py`
-- After analysis is complete and no longer needed, scripts may be deleted
+- **Use `Assessments/` for all persisted analysis documents**
+- **Domain folders** should mirror the PRD source area when practical (`conversation/`, `ticket/`, `whatsapp-web/`, etc.)
+- **Feature folders** should be lowercase, hyphenated, and stable over time
+- **Latest report path** should stay stable; revisions go into `versions/`
+- Every updated assessment must include a **version value**, **previous version reference**, and **ringkasan perubahan analisa**
+- The report must follow the template in `Assessments/templates/qa-assessment-report-template.md`
+
+---
+
+## `Scripts/` — Analysis and Automation Helper Scripts
+
+All reusable scripts for analysis, parsing, migration, and automation support live here:
+
+- `Scripts/analysis/*.py` — active analysis/parsing/migration helpers
+- `Scripts/analysis/legacy-temp-analysis/*.py` — scripts migrated from the removed `Temp Analysis/scripts/`
+
+### Convention:
+- **Script naming:** lowercase, hyphen-separated, descriptive
+- Scripts should not be stored in root or mixed into assessment folders
+- One-off logic should still prefer a reusable script if it may be needed again
 
 ---
 
@@ -52,7 +71,7 @@ All analysis documents, gap analyses, mapping reports go here:
 - Every test TSV lives in `Test/<feature>/`, never in root
 - JSON files derived from TSV live alongside their TSV source
 - Gap/supplement files share the same folder as the main file
-- Scripts that generate/modify test artifacts go in `Temp Analysis/scripts/`, **not** in `Test/`
+- Scripts that generate/modify test artifacts go in `Scripts/analysis/`, **not** in `Test/`
 
 ---
 
@@ -73,7 +92,7 @@ All analysis documents, gap analyses, mapping reports go here:
 
 When creating files for automation script consumption:
 - TSV files go to `Test/<feature>/`
-- Scripts that read/parse these files go to `Temp Analysis/scripts/`
+- Scripts that read/parse these files go to `Scripts/analysis/`
 - The Conversation.tsv file uses format compatible with script parsing:
   - Tab-separated
   - Header rows 1-7 (summary + env status)
@@ -85,7 +104,8 @@ When creating files for automation script consumption:
 
 | ❌ Don't | ✅ Do Instead |
 |----------|--------------|
-| Drop analysis `.md` in root | Put in `Temp Analysis/` |
-| Drop scripts in root | Put in `Temp Analysis/scripts/` |
+| Drop persisted analysis `.md` in root | Put it in `Assessments/<domain>/<feature-slug>/` |
+| Keep ad-hoc analysis docs in a deprecated temp folder | Version the assessment in `Assessments/.../versions/` and summarize changes |
+| Drop scripts in root | Put them in `Scripts/analysis/` |
 | Drop JSON near TSV but in wrong folder | Keep in `Test/<feature>/` alongside TSV |
-| Create new top-level folders for one-off work | Use existing `Temp Analysis/` or `Test/` |
+| Create new top-level folders for one-off work | Use existing `Assessments/`, `Scripts/`, or `Test/` |

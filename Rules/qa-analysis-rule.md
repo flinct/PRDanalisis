@@ -34,6 +34,56 @@ Always think:
 
 ---
 
+# Assessment Artifact Standard
+
+Every formal QA analysis that drives a real decision MUST be captured as a **QA Assessment Report**.
+
+## Permanent Artifact Rules
+
+- Save the final report in `Assessments/<domain>/<feature-slug>/`
+- Use the canonical template at `Assessments/templates/qa-assessment-report-template.md`
+- Keep the latest report in a stable path and store immutable prior revisions in `versions/`
+- Use lowercase, hyphenated filenames ending with `-qa-assessment.md`
+- Persist the change summary inside the report whenever the analysis is revised
+
+## Mandatory Header Metadata
+
+Every QA Assessment Report should declare at least:
+
+- assessment type
+- source PRD or source issue path
+- assessment artifact path
+- version
+- previous version reference (if any)
+- rules applied
+- reference memory used
+- analysis date
+- status (`Draft`, `Reviewed`, `Approved`, `Superseded`)
+
+## Standard Decision Enum
+
+Every final recommendation MUST use exactly one of these enums:
+
+| Decision Enum | Decision Class | Meaning |
+|---------------|----------------|---------|
+| `PROCEED` | `GO` | Requirement is sufficiently clear and safe to move into development. |
+| `PROCEED_WITH_CAUTION` | `CONDITIONAL_GO` | Development may continue, but specific risks, controls, or follow-up actions are mandatory. |
+| `REVISE_PRD` | `NO_GO` | Requirement quality is not yet sufficient; PRD or acceptance criteria must be revised before implementation. |
+| `SPLIT_FEATURE` | `NO_GO` | Current scope is too broad or risky; split into smaller phases before development. |
+| `HOLD_FEATURE` | `NO_GO` | Do not proceed due to unresolved risk, dependency, readiness, or strategic concern. |
+
+The recommendation section must state:
+
+- final decision enum
+- decision class
+- concise decision statement
+- required actions before development
+- key blocking reasons or conditions
+- suggested next step / delivery strategy
+- ringkasan perubahan analisa jika ini revisi dari versi sebelumnya
+
+---
+
 # Analysis Types
 
 ## Type 1: Feature Development Analysis
@@ -592,21 +642,35 @@ Jika ada satu saja tidak terpenuhi → `Manual Only` — dokumentasikan blocking
 
 # Output Document Structure
 
-Every QA analysis MUST produce structured output:
+Every decision-bearing QA analysis MUST produce a **QA Assessment Report** using the permanent artifact format below:
 
 ## 1. Overview
 
-Feature name, objective, scope, business context.
+Feature / issue name, objective, business context, in-scope items, out-of-scope items.
 
-## 2. Requirement Summary
+## 2. Decision Summary
 
-Business rules, acceptance criteria, assumptions, open clarifications.
+This section is mandatory and comes before detailed analysis so PM, QA Lead, and Engineering can see the actionable outcome immediately.
 
-## 3. Flow Analysis
+Minimum fields:
+- final decision enum
+- decision class
+- concise decision statement
+- required actions before development
+- key blocking reasons or conditions
+- complexity level snapshot
+- risk level snapshot
+- primary impact areas
 
-Current flow (as-is) vs proposed flow (to-be). Include diagrams when possible: flowchart, sequence diagram, state transition.
+## 3. Requirement Summary
 
-## 4. Impact Analysis
+Business rules, acceptance criteria, assumptions, and clarifications needed.
+
+## 4. Current State vs Proposed State
+
+Current flow (as-is) vs proposed flow (to-be). Include diagrams when possible: flowchart, sequence diagram, state transition, or data flow.
+
+## 5. Impact Analysis
 
 For each impact dimension (Module, DB, API, UI, Security, Performance, Integration, Reporting, Financial), list:
 
@@ -615,19 +679,19 @@ For each impact dimension (Module, DB, API, UI, Security, Performance, Integrati
 - impact level (LOW / MEDIUM / HIGH)
 - mitigation if HIGH
 
-## 5. Dependency Analysis
+## 6. Dependency Analysis
 
 - dependency matrix
 - event mapping
 - shared resource identification
 
-## 6. Risk Analysis
+## 7. Risk Analysis
 
 - risk matrix
 - worst-case scenarios
 - mitigation plan
 
-## 7. Test Strategy
+## 8. Test Strategy
 
 - functional test scope
 - regression test scope
@@ -636,7 +700,7 @@ For each impact dimension (Module, DB, API, UI, Security, Performance, Integrati
 - smoke test scope
 - automation candidates
 
-## 8. Production Safety
+## 9. Production Safety
 
 - rollback strategy
 - feature toggle requirement
@@ -645,15 +709,23 @@ For each impact dimension (Module, DB, API, UI, Security, Performance, Integrati
 - monitoring and alerting needs
 - logging and audit gaps
 
-## 9. Open Questions
+## 10. Open Questions
 
-List all ambiguities, assumptions, and clarifications needed.
+List all ambiguities, assumptions, and clarifications needed, and mark which ones are blocking.
 
-## 10. Recommendation
+## 11. Recommendation
 
-Summary of key findings, critical risks, and go/no-go assessment.
+Summarize key findings, critical risks, and operational recommendation.
 
-## 11. Traceability Matrix
+Mandatory fields:
+- `Final Decision Enum`
+- `Decision Class`
+- `Owner for Follow-up`
+- `Required Revisions / Conditions`
+- `Suggested Delivery Strategy`
+- `Earliest Safe Next Step`
+
+## 12. Traceability Matrix
 
 Maintain end-to-end traceability chain:
 
@@ -670,11 +742,15 @@ This ensures:
 - no orphan test case (tested but no requirement)
 - coverage gaps are visible immediately
 
+## 13. Change Log
+
+Track major updates to the assessment artifact when the decision or risk posture changes.
+
 ---
 
-# Bug Fix Analysis Output
+# Bug Fix Analysis Supplement
 
-Separate but structured output for bug scenarios:
+Bug scenarios still use the standard QA Assessment Report structure above. The following sections are additional emphasis areas for bug-fix assessments:
 
 ## Root Cause
 
@@ -733,7 +809,8 @@ Before finalizing any analysis, verify:
 - [ ] Production safety assessed
 - [ ] Edge cases documented
 - [ ] Open questions captured
-- [ ] Recommendation stated
+- [ ] Decision Summary completed with standardized enum
+- [ ] Recommendation stated with operational next step
 
 ---
 
@@ -761,9 +838,11 @@ Analysis is complete only when:
 - [ ] dependencies mapped (direct, indirect, async, shared)
 - [ ] edge cases and failure scenarios documented
 - [ ] all open questions captured
-- [ ] recommendation stated (go / conditional go / no-go)
+- [ ] final decision enum stated (`PROCEED`, `PROCEED_WITH_CAUTION`, `REVISE_PRD`, `SPLIT_FEATURE`, or `HOLD_FEATURE`)
+- [ ] decision statement and required actions captured in Decision Summary
 - [ ] traceability matrix populated (at minimum: req → finding → test case)
 - [ ] production safety assessed (rollback, feature toggle, monitoring)
+- [ ] permanent QA Assessment Report saved in `Assessments/` when the analysis is a decision-bearing artifact
 
 ---
 

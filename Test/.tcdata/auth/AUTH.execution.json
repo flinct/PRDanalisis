@@ -3,7 +3,7 @@
   "sourceFile": "auth/AUTH.tsv",
   "sourceFileName": "AUTH.tsv",
   "createdAt": "2026-06-07T14:58:08.215Z",
-  "updatedAt": "2026-06-08T06:38:24.428Z",
+  "updatedAt": "2026-06-10T08:34:38.415Z",
   "activeVersion": "v2.6.0",
   "versions": {
     "v1": {
@@ -9577,7 +9577,7 @@
     },
     "v2.6.0": {
       "createdAt": "2026-06-08T06:38:24.428Z",
-      "updatedAt": "2026-06-08T06:38:24.428Z",
+      "updatedAt": "2026-06-10T08:34:38.415Z",
       "cases": {
         "SIX-Test-001": {
           "testcaseId": "SIX-Test-001",
@@ -9614,7 +9614,7 @@
             ],
             "notes": "",
             "overallStatus": {
-              "DEV": "Passed",
+              "DEV": "",
               "Staging": "",
               "Prod": ""
             },
@@ -9648,7 +9648,7 @@
               },
               {
                 "rowKey": "4",
-                "actual": "tested",
+                "actual": "tested 2",
                 "status": {
                   "DEV": "",
                   "Staging": "",
@@ -9656,9 +9656,502 @@
                 }
               }
             ],
-            "updatedAt": "2026-06-08T06:38:24.428Z"
+            "updatedAt": "2026-06-10T08:34:38.415Z"
           },
-          "history": []
+          "history": [
+            {
+              "eventId": "evt_1781080094561_r1v2c",
+              "action": "update",
+              "at": "2026-06-10T08:28:14.561Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "Passed",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-08T06:38:24.428Z"
+              }
+            },
+            {
+              "eventId": "evt_1781080151622_ofd40",
+              "action": "update",
+              "at": "2026-06-10T08:29:11.621Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-10T08:28:14.561Z"
+              }
+            },
+            {
+              "eventId": "evt_1781080167311_unu7g",
+              "action": "update",
+              "at": "2026-06-10T08:29:27.311Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "Failed",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-10T08:29:11.621Z"
+              }
+            },
+            {
+              "eventId": "evt_1781080359678_ufr4e",
+              "action": "update",
+              "at": "2026-06-10T08:32:39.678Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "Failed",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested 2",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-10T08:29:27.311Z"
+              }
+            },
+            {
+              "eventId": "evt_1781080369905_mh8e8",
+              "action": "update",
+              "at": "2026-06-10T08:32:49.905Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested 2",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-10T08:32:39.678Z"
+              }
+            },
+            {
+              "eventId": "evt_1781080478415_hnja3",
+              "action": "update",
+              "at": "2026-06-10T08:34:38.415Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "On Test",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "tested 2",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-10T08:32:49.905Z"
+              }
+            }
+          ]
         },
         "SIX-Test-002": {
           "testcaseId": "SIX-Test-002",
