@@ -157,6 +157,17 @@ README ini harus konsisten dengan aturan di `Rules/`:
   - Recommended development sequence (4 phases)
 - Pakai saat butuh referensi implementasi patch linked chat bubble, test plan, impact estimation
 
+### `qa-tooling.md`
+- Fungsi: dokumentasi state terkini QA Browser tool dan QA Agent infrastructure
+- Isi utama:
+  - Fitur aktif `testcase-browser.html` (sidebar, markdown viewer/editor, test case editor, agent panel)
+  - Setup + endpoints `server.js` (Express, SSE, Claude tool use)
+  - Agent tools: read_file, list_files, search_in_file, write_note, run_automation
+  - SSE event format, context injection pattern
+  - Roadmap pending items
+- Pakai saat butuh referensi tooling QA Browser, cara setup agent server, atau status fitur tool
+- Update setiap ada perubahan signifikan pada `testcase-browser.html` atau `server.js`
+
 ### `CLAUDE-be.md`
 - Fungsi: canonical reference untuk BE repo `omnichannel-satuinbox-be`
 - Isi utama:

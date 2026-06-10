@@ -91,11 +91,21 @@ sixV2Automation/memory/rbac-memory.md         ← RBAC matrix untuk test (role, 
 PRDanalisis/Memory/global-memory.md           ← Canonical product rules (Conversation, Ticket, WA Web, SLA, RBAC, Open Risks)
 PRDanalisis/Memory/CLAUDE-be.md               ← BE Architecture: NestJS, 20 microservices, gRPC, RabbitMQ, MongoDB per service
 PRDanalisis/Memory/CLAUDE-fe.md               ← FE Architecture: Next.js 16, Turborepo, Zustand, React Query, Socket.IO
+PRDanalisis/Memory/qa-tooling.md              ← QA Browser + QA Agent: fitur aktif, setup server, tools, SSE format, roadmap
 PRDanalisis/Memory/conversation-prd-cross-analysis.md
 PRDanalisis/Memory/conversation-sla-rlt-frt-ttc-analysis.md
 PRDanalisis/Memory/conversation-undeveloped-features-analysis.md
 PRDanalisis/Memory/comprehensive-undeveloped-features-analysis.md
 ... (file analysis lain di Memory/)
+```
+
+### **QA Agent (AI-Assisted)**
+```
+PRDanalisis/server.js                         ← QA Agent backend (Express + Claude claude-sonnet-4-6 + SSE streaming)
+PRDanalisis/package.json                      ← Node.js deps: @anthropic-ai/sdk, express, cors, dotenv
+PRDanalisis/.env                              ← ANTHROPIC_API_KEY, PORT, AUTOMATION_ROOT (jangan di-commit)
+PRDanalisis/Chat/                             ← Chat history per session (auto-generated JSON)
+PRDanalisis/AgentNotes/                       ← Hasil analisa agent (auto-generated MD)
 ```
 
 ---
@@ -414,6 +424,13 @@ cd "C:\Users\MyBook SAGA 12\Desktop\PRDanalisis"
 
 # Search file/content
 # Gunakan search_files tool (ripgrep) bukan grep/ls
+
+# QA Agent Server
+npm install                  # Sekali saja — install deps
+node server.js               # Jalankan server (port 3001)
+node --watch server.js       # Dev mode (auto-restart on file change)
+# Butuh .env dengan ANTHROPIC_API_KEY sebelum run
+# Optional: AUTOMATION_ROOT=/path/to/sixV2Automation untuk enable run_automation tool
 ```
 
 ### **sixV2Automation**
@@ -454,6 +471,7 @@ npm run build                # Production build
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-06-09 | Initial creation - full workflow context documented |
+| 1.1 | 2026-06-10 | Tambah QA Agent infrastructure: server.js (Express+Claude+SSE), AgentPanel di testcase-browser.html, Memory/qa-tooling.md. Update Section 3 (File Kunci) + Section 14 (Commands). |
 
 **Update file ini saat:**
 - Repo structure berubah
