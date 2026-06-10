@@ -1,5 +1,13 @@
 # QA Test Specification - WhatsApp Web Outbound Anti-Ban Guard
 
+> **Artifact Type:** QA Test Specification  
+> **Source PRD:** `PRD/Whatsapp web v2/PRD WA Web Outbound Anti-Ban Guard.md`  
+> **Artifact Path:** `Test/whatsapp-web/wa-outbound-anti-ban-qa-test-spec.md`  
+> **Companion Artifact:** `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`  
+> **Version:** `v1.1`  
+> **Status:** Reviewed — automation status aligned to current sixV2Automation candidate mapping
+
+---
 ## 1. Overview
 
 | Item | Description |
@@ -132,7 +140,7 @@
 | Expected Result | Send button becomes disabled/loading after the first click. Only one message is sent to R1. A second logical attempt is either not created or is stored as suppressed duplicate with reason code `DUPLICATE_SUPPRESSED`. |
 | Postcondition | Clear test message if environment requires cleanup. |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-002
 
@@ -151,7 +159,7 @@
 | Expected Result | Only one logical send reaches R1. The other request resolves as duplicate-safe result and does not create a second delivery. Audit trail links the losing attempt to the winning attempt where implemented. |
 | Postcondition | None |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-003
 
@@ -169,8 +177,8 @@
 | Steps | 1. Create a broadcast campaign containing Segment A and Segment B where R1 appears in both. 2. Start campaign with sender account S1. 3. Observe per-recipient dispatch records and final delivery count for R1. |
 | Expected Result | R1 receives one logical broadcast chain only. Audit logs show one winner attempt for R1 within the campaign scope. |
 | Postcondition | Cancel or complete campaign cleanup as needed. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-broadcast.spec.js |
 
 ### TC-WA-ABG-004
 
@@ -188,8 +196,8 @@
 | Steps | 1. Trigger Worker A and Worker B to process the same logical outbound attempt at nearly the same time. 2. Capture lock acquisition outcomes. 3. Check resulting dispatch actions and audit logs. |
 | Expected Result | Exactly one worker acquires the recipient lock and continues dispatch. The other worker backs off or resolves as duplicate/lock conflict. Only one delivery occurs. |
 | Postcondition | Release any synthetic lock state. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - backend worker / integration harness |
 
 ### TC-WA-ABG-005
 
@@ -207,8 +215,8 @@
 | Steps | 1. Start outbound send to R1. 2. Force timeout immediately after downstream dispatch is attempted. 3. Observe stored attempt status. 4. Trigger retry scheduler. |
 | Expected Result | Attempt status becomes `RECONCILIATION_PENDING`. Retry scheduler does not send another message blindly while the attempt remains unresolved. |
 | Postcondition | Resolve synthetic timeout flags. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - backend reconciliation harness |
 
 ### TC-WA-ABG-006
 
@@ -226,8 +234,8 @@
 | Steps | 1. Load a pending attempt. 2. Run reconciliation using proof that downstream send succeeded. 3. Observe final status and retry linkage. |
 | Expected Result | Final status becomes `SENT`. No duplicate resend occurs. Attempt history keeps original attempt and reconciliation confirmation linked. |
 | Postcondition | None |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - backend reconciliation harness |
 
 ### TC-WA-ABG-007
 
@@ -245,8 +253,8 @@
 | Steps | 1. Load a pending attempt. 2. Run reconciliation with failure evidence. 3. Observe final status and retry chain. |
 | Expected Result | Attempt resolves to `CONFIRMED_FAILED` or mapped final failure state per implementation. Retry behavior remains linked to the original logical send identity without duplicate-effect ambiguity. |
 | Postcondition | None |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - backend reconciliation harness |
 
 ### TC-WA-ABG-008
 
@@ -264,8 +272,8 @@
 | Steps | 1. Set tenant anti-ban mode to warning-only. 2. Paste and send similar content rapidly across multiple conversations. 3. Observe operator-facing warnings and audit logs. |
 | Expected Result | System raises warning(s), records paste/burst risk events, but allows sends to continue because mode is warning-only. Internal risk score is not shown to operator. |
 | Postcondition | Reset operator risk score if needed. |
-| Automation Status | Manual Only |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-009
 
@@ -283,8 +291,8 @@
 | Steps | 1. Set tenant anti-ban mode to strict. 2. Send near-identical pasted messages rapidly. 3. Attempt one additional send after threshold is crossed. 4. Check logs. |
 | Expected Result | Additional send is blocked or queued according to strict policy. User sees Bahasa Indonesia block message. Audit log stores `PASTE_RISK` or `BURST_RISK` with action result. |
 | Postcondition | Reset anti-ban mode after test. |
-| Automation Status | Manual Only |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-010
 
@@ -302,8 +310,8 @@
 | Steps | 1. Trigger risky sequence until cooldown activates. 2. Immediately attempt another send. 3. Attempt again before cooldown expires. 4. Attempt once more after cooldown expires. |
 | Expected Result | Sends attempted during cooldown are blocked with cooldown message. Send after cooldown expiration is processed normally if risk score is below blocking threshold. |
 | Postcondition | Wait for cooldown to expire or reset state. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-011
 
@@ -322,7 +330,7 @@
 | Expected Result | Message is sent with no unnecessary anti-ban warning or block. Operator does not see internal numeric score or sensitive implementation detail. |
 | Postcondition | None |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js |
 
 ### TC-WA-ABG-012
 
@@ -340,8 +348,8 @@
 | Steps | 1. Start a small outbound queue using S1. 2. During queue execution, emit sender restriction/safe-mode signal. 3. Observe queue handling and new send attempts. |
 | Expected Result | New sends from S1 stop within expected reaction window. Audit logs capture `ACCOUNT_SAFE_MODE` or restriction event. |
 | Postcondition | Restore sender state to normal after test. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - sender-state event / backend harness |
 
 ### TC-WA-ABG-013
 
@@ -359,8 +367,8 @@
 | Steps | 1. Set S1 outbound usage above allowed threshold. 2. Attempt manual send and broadcast send that would normally pick S1. 3. Observe selection and result. |
 | Expected Result | S1 is not used for new outbound attempts. Send either fails with ineligible message or falls back according to existing sender-selection policy. Existing outbound-limit protections remain intact. |
 | Postcondition | Restore outbound counters. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js |
 
 ### TC-WA-ABG-014
 
@@ -379,7 +387,7 @@
 | Expected Result | UI/API rejects invalid values with validation error. If invalid config is loaded at runtime, system falls back to safe default profile and raises observability alert. |
 | Postcondition | Restore valid tenant settings. |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-settings.spec.js |
 
 ### TC-WA-ABG-015
 
@@ -398,7 +406,7 @@
 | Expected Result | Sends are not blocked solely because of monitor-only mode. All relevant risk events are still logged with reason codes. |
 | Postcondition | Restore previous anti-ban mode. |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-settings.spec.js |
 
 ### TC-WA-ABG-016
 
@@ -416,8 +424,8 @@
 | Steps | 1. Open audit log as Admin and verify visible fields. 2. Open audit log as Supervisor and verify read-only access. 3. Attempt to open log as Operator. 4. Review masked recipient and content fingerprint display. 5. Verify Bahasa Indonesia wording in user-facing states. |
 | Expected Result | Admin/Supervisor can view permitted log fields. Operator cannot access internal audit log. Recipient identity is masked where applicable. Reason codes are visible to support roles. Internal numeric risk formula is never exposed to operator. |
 | Postcondition | None |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js |
 
 ### TC-WA-ABG-017
 
@@ -435,8 +443,8 @@
 | Steps | 1. Acquire recipient lock for an outbound attempt. 2. Crash the worker before normal completion. 3. Wait for lock TTL or invoke recovery job. 4. Re-submit the same logical outbound attempt. |
 | Expected Result | Lock is recovered safely. Subsequent evaluation does not create duplicate send amplification. Attempt either resumes safely or restarts through normal validation path. |
 | Postcondition | Clear recovered lock artifacts. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - worker crash / TTL recovery harness |
 
 ### TC-WA-ABG-018
 
@@ -454,8 +462,8 @@
 | Steps | 1. Start multipart logical send. 2. Force non-recoverable failure on part 2. 3. Observe whether part 3 is attempted. 4. Check logs. |
 | Expected Result | Part 3 is not sent after non-recoverable failure on part 2. Logs record partial-stop decision and affected parts. Recipient does not receive fragmented continuation after hard failure. |
 | Postcondition | Clean up partial conversation evidence if required. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - backend multipart failure harness |
 
 ### TC-WA-ABG-019
 
@@ -473,8 +481,8 @@
 | Steps | 1. Send first message using S1. 2. Send two follow-up replies in the same active session. 3. Inspect sender attribution for each reply. |
 | Expected Result | All replies continue using S1 while S1 remains eligible. Anti-ban guard does not force unnecessary sender change. |
 | Postcondition | None |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js |
 
 ### TC-WA-ABG-020
 
@@ -492,8 +500,8 @@
 | Steps | 1. Begin session using S1. 2. Mark S1 ineligible or restricted. 3. Attempt next outbound reply. 4. Inspect sender selection and audit log. |
 | Expected Result | Sender changes only after S1 becomes ineligible and only according to approved failover logic. Audit log records the reason for sender change. |
 | Postcondition | Restore sender states. |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js |
 
 ### TC-WA-ABG-021
 
@@ -512,7 +520,7 @@
 | Expected Result | Pre-send validation meets <= 100 ms p95 target or a documented, reviewable exception is raised. |
 | Postcondition | Archive performance report. |
 | Automation Status | Pending |
-| Automation ID | N/A |
+| Automation ID | N/A - API / performance automation lane |
 
 ### TC-WA-ABG-022
 
@@ -530,8 +538,8 @@
 | Steps | 1. Disable or fail the audit persistence dependency. 2. Trigger a safe outbound send. 3. Observe send behavior, result persistence, and alerts. |
 | Expected Result | System degrades safely without creating duplicate send amplification. Canonical send result remains traceable through fallback/degraded alert path. |
 | Postcondition | Restore audit persistence dependency. |
-| Automation Status | Pending |
-| Automation ID | N/A |
+| Automation Status | Manual Only |
+| Automation ID | N/A - degraded dependency / backend harness |
 
 ### TC-WA-ABG-023
 
@@ -550,7 +558,7 @@
 | Expected Result | Server-side RBAC is enforced. Sensitive fields remain masked in allowed views. User-facing warnings remain in Bahasa Indonesia. Internal formulas are not exposed. |
 | Postcondition | None |
 | Automation Status | Ready |
-| Automation ID | N/A |
+| Automation ID | playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js |
 
 ### TC-WA-ABG-024
 
@@ -568,8 +576,8 @@
 | Steps | 1. Log in as Tenant B user with comparable role. 2. Attempt to query Tenant A anti-ban logs through UI or API. 3. Attempt to load or mutate Tenant A anti-ban settings. 4. Inspect response and returned payload. |
 | Expected Result | Cross-tenant requests are denied or scoped to Tenant B only. No Tenant A anti-ban event, sender data, or settings value is exposed to Tenant B user. |
 | Postcondition | None |
-| Automation Status | Ready |
-| Automation ID | N/A |
+| Automation Status | Pending |
+| Automation ID | playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js |
 
 ---
 

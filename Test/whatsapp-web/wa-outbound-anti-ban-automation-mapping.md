@@ -1,5 +1,13 @@
 # Automation Mapping - WhatsApp Web Outbound Anti-Ban Guard
 
+> **Artifact Type:** Automation Mapping  
+> **Source PRD:** `PRD/Whatsapp web v2/PRD WA Web Outbound Anti-Ban Guard.md`  
+> **Artifact Path:** `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`  
+> **Companion Artifact:** `Test/whatsapp-web/wa-outbound-anti-ban-qa-test-spec.md`  
+> **Version:** `v1.1`  
+> **Status:** Reviewed — candidate mapping synchronized with QA test spec automation fields
+
+---
 ## Recommendation
 
 Automation in `sixV2Automation` is best focused on stable UI/E2E coverage. Concurrency, worker crash, reconciliation, degraded dependency, and performance cases should stay in backend or integration harnesses.
@@ -45,7 +53,13 @@ Automation in `sixV2Automation` is best focused on stable UI/E2E coverage. Concu
 
 ## Summary
 
-- **Ready now in Playwright:** 7 cases (`001, 002, 011, 014, 015, 023` plus `016` if anti-ban log UI exists immediately).
-- **Conditional/Pending UI automation:** 9 cases that need deterministic fixtures or new UI surface.
-- **Not suitable for sixV2Automation alone:** backend-heavy concurrency, retry, reconciliation, resilience, and performance cases.
+- **Ready now in Playwright:** 6 cases (`001, 002, 011, 014, 015, 023`).
+- **Near-ready / conditional UI automation:** 1 case (`016`) if anti-ban log UI exists immediately, plus 8 additional pending cases that still need deterministic fixtures or UI surface.
+- **Not suitable for sixV2Automation alone:** 9 backend-heavy cases covering concurrency, retry, reconciliation, resilience, and performance.
 
+
+## Alignment Notes
+
+- QA test spec automation fields now mirror this mapping file.
+- Manual TSV remains the execution artifact and intentionally does not carry automation metadata.
+- Playwright-ready coverage is limited to deterministic UI/E2E cases; backend-heavy cases stay outside sixV2Automation.

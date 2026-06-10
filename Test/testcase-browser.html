@@ -52,6 +52,8 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/turndown@7/dist/turndown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1/dist/turndown-plugin-gfm.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style id="theme-vars">
     :root {
@@ -92,7 +94,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-  const { useState, useEffect, useRef, startTransition } = React;
+  const { useState, useEffect, useLayoutEffect, useRef, startTransition } = React;
 
   // ─── THEMES ───────────────────────────────────────────────────────────────────
   /* eslint-disable */
@@ -638,9 +640,15 @@
     return <input value={value||''} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
       style={{ width:'100%', fontSize:12, padding:'5px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none' }} />;
   }
-  function TArea({ value, onChange, rows=3, placeholder }) {
-    return <textarea value={value||''} onChange={e=>onChange(e.target.value)} rows={rows} placeholder={placeholder}
-      style={{ width:'100%', fontSize:12, padding:'6px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', resize:'vertical', fontFamily:'inherit' }} />;
+  function TArea({ value, onChange, placeholder, extraStyle }) {
+    const ref = useRef(null);
+    useLayoutEffect(() => {
+      if (!ref.current) return;
+      ref.current.style.height = 'auto';
+      ref.current.style.height = ref.current.scrollHeight + 'px';
+    }, [value]);
+    return <textarea ref={ref} value={value||''} onChange={e=>onChange(e.target.value)} rows={1} placeholder={placeholder}
+      style={{ width:'100%', fontSize:12, padding:'6px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', resize:'none', fontFamily:'inherit', overflow:'hidden', display:'block', ...extraStyle }} />;
   }
 
   // ─── HISTORY PANEL ────────────────────────────────────────────────────────────
@@ -1299,9 +1307,9 @@
                       <Field label="Date"><TInput value={tc.createDate} onChange={v=>updDef(gi,'createDate',v)}/></Field>
                     </div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12, marginBottom:12 }}>
-                      <Field label="Scenario"><TArea value={tc.scenario} onChange={v=>updDef(gi,'scenario',v)} rows={2}/></Field>
-                      <Field label="Pre-Condition"><TArea value={tc.precondition} onChange={v=>updDef(gi,'precondition',v)} rows={2}/></Field>
-                      <Field label="Description"><TArea value={tc.description} onChange={v=>updDef(gi,'description',v)} rows={2}/></Field>
+                      <Field label="Scenario"><TArea value={tc.scenario} onChange={v=>updDef(gi,'scenario',v)}/></Field>
+                      <Field label="Pre-Condition"><TArea value={tc.precondition} onChange={v=>updDef(gi,'precondition',v)}/></Field>
+                      <Field label="Description"><TArea value={tc.description} onChange={v=>updDef(gi,'description',v)}/></Field>
                     </div>
                     <div style={{ marginBottom:12 }}>
                       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
@@ -1309,11 +1317,10 @@
                         <button onClick={()=>addStep(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Step</button>
                       </div>
                       {tc.steps.map((s,si)=>(
-                        <div key={si} style={{ display:'flex', gap:6, alignItems:'center', marginBottom:4 }}>
-                          <span style={{ fontSize:10, color:'var(--text-4)', width:18, flexShrink:0 }}>{si+1}.</span>
-                          <input value={s} onChange={e=>updStep(gi,si,e.target.value)}
-                            style={{ flex:1, fontSize:12, padding:'4px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none' }}/>
-                          <button onClick={()=>delStep(gi,si)} style={{ fontSize:12, background:'none', border:'none', color:'#7f1d1d', cursor:'pointer' }}>✕</button>
+                        <div key={si} style={{ display:'flex', gap:6, alignItems:'flex-start', marginBottom:4 }}>
+                          <span style={{ fontSize:10, color:'var(--text-4)', width:18, flexShrink:0, paddingTop:6 }}>{si+1}.</span>
+                          <div style={{ flex:1 }}><TArea value={s} onChange={v=>updStep(gi,si,v)} extraStyle={{ fontSize:12, padding:'4px 8px' }}/></div>
+                          <button onClick={()=>delStep(gi,si)} style={{ fontSize:12, background:'none', border:'none', color:'#7f1d1d', cursor:'pointer', paddingTop:4, flexShrink:0 }}>✕</button>
                         </div>
                       ))}
                     </div>
@@ -1323,7 +1330,7 @@
                         <button onClick={()=>addExpected(gi)} style={{ fontSize:10, padding:'1px 8px', borderRadius:6, border:'1px solid #1e3a5f', background:'transparent', color:'#60a5fa', cursor:'pointer' }}>+ Row</button>
                       </div>
                       <div style={{ border:'1px solid var(--border-1)', borderRadius:6, overflow:'hidden' }}>
-                        <div style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', background:'var(--deep-bg)', fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1, gap:6 }}>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 90px 90px 90px 24px', padding:'5px 10px', background:'var(--deep-bg)', fontSize:9, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:1, gap:6 }}>
                           <div>Expected <span style={{color:'#1e4d8c'}}>(definition)</span></div>
                           <div>Actual / Bug Link <span style={{color:'#1a3a1a'}}>(exec)</span></div>
                           <div>DEV</div><div>Staging</div><div>Prod</div><div></div>
@@ -1331,11 +1338,11 @@
                         {tc.expectedResults.map((er, ri)=>{
                           const execR = tc.exec?.results?.[ri] || EMPTY_EXEC_ROW(er.key);
                           return (
-                            <div key={ri} style={{ display:'grid', gridTemplateColumns:'1fr 160px 90px 90px 90px 24px', padding:'5px 10px', borderTop:'1px solid var(--deep-bg)', gap:6, alignItems:'center' }}>
-                              <input value={er.expected} onChange={e=>updExpected(gi,ri,e.target.value)}
-                                style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid #0c2044', background:'#060d1c', color:'#60a5fa', outline:'none', width:'100%' }}/>
-                              <input value={execR.actual||''} onChange={e=>updActual(gi,ri,e.target.value)} placeholder="actual / url"
-                                style={{ fontSize:11, padding:'3px 6px', borderRadius:4, border:'1px solid var(--border-1)', background:'var(--app-bg)', color:(execR.actual||'').startsWith('http')?'#60a5fa':'var(--text-1)', outline:'none', width:'100%' }}/>
+                            <div key={ri} style={{ display:'grid', gridTemplateColumns:'1fr 1fr 90px 90px 90px 24px', padding:'5px 10px', borderTop:'1px solid var(--deep-bg)', gap:6, alignItems:'start' }}>
+                              <TArea value={er.expected} onChange={v=>updExpected(gi,ri,v)}
+                                extraStyle={{ fontSize:11, padding:'3px 6px', border:'1px solid #0c2044', background:'#060d1c', color:'#60a5fa' }}/>
+                              <TArea value={execR.actual||''} onChange={v=>updActual(gi,ri,v)} placeholder="actual / url"
+                                extraStyle={{ fontSize:11, padding:'3px 6px', border:'1px solid var(--border-1)', background:'var(--app-bg)', color:(execR.actual||'').startsWith('http')?'#60a5fa':'var(--text-1)' }}/>
                               {ENV.map(e=>(
                                 <StatusSelect key={e} value={execR.status?.[e]||''} onChange={v=>updResultStatus(gi,ri,e,v)}/>
                               ))}
@@ -1433,19 +1440,37 @@
     const [draft, setDraft]       = useState(content);
     const [saving, setSaving]     = useState(false);
     const [saveErr, setSaveErr]   = useState(null);
+    const mdRef                   = useRef(null);
+
+    // Set innerHTML from draft — on mount and after save.
+    // We never touch innerHTML while the user is editing (editMode=true),
+    // so React never clobbers in-progress edits.
+    useLayoutEffect(() => {
+      if (mdRef.current) mdRef.current.innerHTML = marked.parse(draft);
+    }, [draft]);
 
     async function handleSave() {
-      if (!fileHandle) return;
+      if (!fileHandle || !mdRef.current) return;
       setSaving(true); setSaveErr(null);
       try {
+        const td = new TurndownService({ headingStyle: 'atx', hr: '---', codeBlockStyle: 'fenced' });
+        td.use(turndownPluginGfm.gfm);
+        const markdown = td.turndown(mdRef.current.innerHTML);
         const w = await fileHandle.createWritable();
-        await w.write(draft);
+        await w.write(markdown);
         await w.close();
+        setDraft(markdown);   // triggers useLayoutEffect → re-renders innerHTML
         setEditMode(false);
       } catch(e) {
         setSaveErr(e.message || 'Save failed');
       }
       setSaving(false);
+    }
+
+    function handleCancel() {
+      if (mdRef.current) mdRef.current.innerHTML = marked.parse(draft); // discard edits
+      setEditMode(false);
+      setSaveErr(null);
     }
 
     return (
@@ -1456,7 +1481,8 @@
           {saveErr && <span style={{ fontSize:10, color:'#f87171', flex:1 }}>⚠ {saveErr}</span>}
           {editMode ? (
             <>
-              <button onClick={() => { setEditMode(false); setDraft(draft); setSaveErr(null); }}
+              <span style={{ fontSize:10, color:'var(--text-4)', flex:1 }}>✎ editing</span>
+              <button onClick={handleCancel}
                 style={{ fontSize:10, color:'var(--text-3)', background:'transparent', border:'1px solid var(--border-1)',
                   borderRadius:4, padding:'3px 10px', cursor:'pointer' }}>
                 Cancel
@@ -1476,18 +1502,21 @@
           )}
         </div>
 
-        {/* Body */}
-        {editMode ? (
-          <textarea value={draft} onChange={e => setDraft(e.target.value)}
-            style={{ flex:1, padding:'24px 32px', background:'var(--deep-bg)', color:'var(--text-1)',
-              border:'none', outline:'none', resize:'none', fontSize:13, lineHeight:1.8,
-              fontFamily:'IBM Plex Mono, monospace' }} />
-        ) : (
-          <div style={{ overflowY:'auto', flex:1, display:'flex', justifyContent:'center' }}>
-            <div className="md" style={{ padding:'32px 40px', width:'100%', maxWidth:860 }}
-              dangerouslySetInnerHTML={{ __html: marked.parse(draft) }} />
-          </div>
-        )}
+        {/* Body — single persistent div, never unmounted → scroll position never resets */}
+        <div style={{ overflowY:'auto', flex:1, display:'flex', justifyContent:'center' }}>
+          <div
+            ref={mdRef}
+            className="md"
+            contentEditable={editMode}
+            suppressContentEditableWarning={true}
+            spellCheck={false}
+            style={{ padding:'32px 40px', width:'100%', maxWidth:860,
+              outline:'none',
+              cursor: editMode ? 'text' : 'default',
+              borderLeft: editMode ? '2px solid var(--sec-prd)' : '2px solid transparent',
+            }}
+          />
+        </div>
       </div>
     );
   }
