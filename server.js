@@ -136,6 +136,60 @@ app.put('/api/files/content', (req, res) => {
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
+// ─── API: GOOGLE (OAuth login) + DOCS + MIRROR ───────────────────────────────
+const gdocs  = require('./scripts/gdocs.js');
+const gauth  = require('./scripts/google-auth.js');
+const mirror = require('./scripts/mirror.js');
+
+// OAuth: status / login / callback / logout
+app.get('/api/google/status', (_req, res) => res.json(gdocs.status(BASE)));
+
+app.get('/api/google/login', (_req, res) => {
+  try { res.redirect(gauth.getAuthUrl(BASE)); }
+  catch (e) { res.status(e.status || 500).send('OAuth not configured: ' + e.message); }
+});
+
+app.get('/oauth2callback', async (req, res) => {
+  try {
+    if (req.query.error) throw new Error(String(req.query.error));
+    await gauth.handleCallback(BASE, req.query.code);
+    res.send('<html><body style="font-family:sans-serif;background:#0f172a;color:#e2e8f0;padding:40px">'
+      + '<h3>✓ Connected to Google</h3><p>You can close this tab and return to QA Browser.</p>'
+      + '<script>setTimeout(function(){location.href="/"},1200)</script></body></html>');
+  } catch (e) { res.status(500).send('Login failed: ' + e.message); }
+});
+
+app.post('/api/google/logout', (_req, res) => res.json(gauth.logout(BASE)));
+
+// Mirror: push local PRD .md → Google Docs (manual trigger)
+app.post('/api/mirror', async (_req, res) => {
+  try { res.json(await mirror.mirrorAll(BASE)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+// NOTE: /status must be declared before /:id so it isn't captured as an id.
+app.get('/api/gdocs/status', (_req, res) => res.json(gdocs.status(BASE)));
+
+app.get('/api/gdocs', async (_req, res) => {
+  try { res.json(await gdocs.listTree(BASE)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+app.post('/api/gdocs', async (req, res) => {
+  try { res.json(await gdocs.createDoc(BASE, req.body || {})); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+app.get('/api/gdocs/:id', async (req, res) => {
+  try { res.json(await gdocs.readDoc(BASE, req.params.id)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+app.put('/api/gdocs/:id', async (req, res) => {
+  try { res.json(await gdocs.updateDoc(BASE, req.params.id, req.body || {})); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
 // ─── API: TEST CASES ─────────────────────────────────────────────────────────
 app.get('/api/testcases', (req, res) => {
   const { module, tc_type, search, limit = 500, offset = 0 } = req.query;
@@ -348,11 +402,29 @@ function startWatcher() {
     }, 800)); // wait 800ms after last write before importing
   }
 
+  // Auto-mirror PRD .md → Google Docs (only if logged in; skip quietly otherwise)
+  const PRD_DIR     = path.join(BASE, mirror.SRC_DIR);
+  const mirrorPend  = new Map(); // relPath → timer
+  function scheduleMirror(relPath) {
+    if (mirrorPend.has(relPath)) clearTimeout(mirrorPend.get(relPath));
+    mirrorPend.set(relPath, setTimeout(async () => {
+      mirrorPend.delete(relPath);
+      try {
+        const r = await mirror.mirrorFile(BASE, relPath);
+        if (r && !r.skipped) console.log(`  ☁ mirror  ${relPath}  → gdoc ${r.action || ''} ${r.docId || ''}`);
+      } catch (e) {
+        if (e.status === 401) { /* not connected — skip */ }
+        else console.error(`  ⚠ mirror error (${relPath}): ${e.message}`);
+      }
+    }, 1200));
+  }
+
   for (const dir of WATCH_DIRS) {
     fs.watch(dir, { recursive: true }, (event, filename) => {
       if (!filename) return;
-      if (!/\.(tsv|md)$/i.test(filename)) return;
-      scheduleImport(path.join(dir, filename));
+      if (/\.(tsv|md)$/i.test(filename)) scheduleImport(path.join(dir, filename));
+      // mirror only markdown files living under the PRD source dir
+      if (dir === PRD_DIR && mirror.isMirrorable(filename)) scheduleMirror(String(filename).replace(/\\/g, '/'));
     });
   }
 

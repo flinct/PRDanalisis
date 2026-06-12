@@ -1566,13 +1566,34 @@
     );
   }
 
-  function MarkdownViewer({ content, fileHandle, filePath }) {
+  function MarkdownViewer({ content, fileHandle, filePath, gdocsEnabled, readOnly, docTitle }) {
     const [editMode, setEditMode] = useState(false);
     const [draft, setDraft]       = useState(content);
     const [saving, setSaving]     = useState(false);
     const [saveErr, setSaveErr]   = useState(null);
     const [copied, setCopied]     = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const [exported, setExported]   = useState(null); // webViewLink
     const mdRef                   = useRef(null);
+
+    // Export current content as a NEW Google Doc (non-destructive write path)
+    async function handleExportGDoc() {
+      setExporting(true); setSaveErr(null); setExported(null);
+      try {
+        const base  = docTitle || (filePath ? filePath.split(/[\\/]/).pop() : '') || 'QA Browser Export';
+        const title = base.replace(/\.(md|txt)$/i, '');
+        const r = await fetch('/api/gdocs', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content: draft }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Export failed');
+        setExported(data.webViewLink);
+        window.open(data.webViewLink, '_blank');
+        setTimeout(() => setExported(null), 6000);
+      } catch (e) { setSaveErr(e.message || 'Export failed'); }
+      setExporting(false);
+    }
 
     function handleCopy() {
       if (!mdRef.current) return;
@@ -1650,12 +1671,21 @@
         <div style={{ padding:'5px 14px', borderBottom:'1px solid var(--elevated-bg)', background:'var(--sidebar-bg)',
           display:'flex', alignItems:'center', justifyContent:'flex-end', gap:6, flexShrink:0 }}>
           {saveErr && <span style={{ fontSize:10, color:'#f87171', flex:1 }}>⚠ {saveErr}</span>}
+          {exported && <span style={{ fontSize:10, color:'#4ade80', flex:1 }}>✓ Exported — opened in new tab</span>}
+          {readOnly && !saveErr && !exported && <span style={{ fontSize:10, color:'var(--text-5)', flex:1 }}>☁ Google Doc · read-only</span>}
           <button onClick={handleCopy}
             style={{ fontSize:10, color: copied ? '#22c55e' : 'var(--text-3)', background:'transparent',
               border:'1px solid var(--border-1)', borderRadius:4, padding:'3px 10px', cursor:'pointer',
               transition:'color 0.2s' }}>
             {copied ? '✓ Copied!' : '⎘ Copy'}
           </button>
+          {gdocsEnabled && !editMode && (
+            <button onClick={handleExportGDoc} disabled={exporting} title="Create a new Google Doc from this content"
+              style={{ fontSize:10, color: exporting ? 'var(--text-5)' : '#4ade80', background:'transparent',
+                border:'1px solid var(--border-1)', borderRadius:4, padding:'3px 10px', cursor: exporting ? 'default' : 'pointer' }}>
+              {exporting ? 'Exporting…' : '⇪ Export to GDocs'}
+            </button>
+          )}
           {editMode ? (
             <>
               <span style={{ fontSize:10, color:'var(--text-4)', flex:1 }}>✎ editing</span>
@@ -1670,13 +1700,13 @@
                 {saving ? 'Saving…' : '✓ Save'}
               </button>
             </>
-          ) : (
+          ) : (!readOnly && (
             <button onClick={() => setEditMode(true)}
               style={{ fontSize:10, color:'var(--text-3)', background:'transparent', border:'1px solid var(--border-1)',
                 borderRadius:4, padding:'3px 10px', cursor:'pointer' }}>
               ✎ Edit
             </button>
-          )}
+          ))}
         </div>
 
         {/* Body — single persistent div, never unmounted → scroll position never resets */}
@@ -1821,6 +1851,96 @@
   }
 
   // ─── APP ──────────────────────────────────────────────────────────────────────
+  // ─── SETTINGS PAGE ─────────────────────────────────────────────────────────
+  function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, onImport, importing, importMsg }) {
+    const [busy, setBusy] = useState(false);
+    const [msg, setMsg]   = useState('');
+    const connected  = status && status.connected;
+    const configured = status && status.oauthConfigured;
+
+    async function logout() {
+      setBusy(true); setMsg('');
+      try { await fetch('/api/google/logout', { method:'POST' }); await onRefreshStatus(); setMsg('Disconnected.'); }
+      catch(e){ setMsg('⚠ ' + e.message); }
+      setBusy(false);
+    }
+    async function mirrorNow() {
+      setBusy(true); setMsg('Mirroring all PRD files…');
+      try {
+        const r = await fetch('/api/mirror', { method:'POST' });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'mirror failed');
+        setMsg(`✓ Mirror selesai — created ${d.created}, updated ${d.updated}, skipped ${d.skipped}` + (d.errors && d.errors.length ? `, ${d.errors.length} error` : ''));
+      } catch(e){ setMsg('⚠ ' + e.message); }
+      setBusy(false);
+    }
+
+    const card = { background:'var(--elevated-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:'16px 18px', marginBottom:16 };
+    const hd   = { fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:1, color:'var(--text-3)', marginBottom:12 };
+    const btn  = bg => ({ fontSize:11, padding:'6px 14px', borderRadius:6, border:'none', background:bg, color:'#fff', cursor: busy ? 'default' : 'pointer' });
+
+    return (
+      <div style={{ flex:1, overflowY:'auto', padding:'24px 32px' }}>
+        <div style={{ maxWidth:680, margin:'0 auto' }}>
+          <div style={{ fontSize:16, fontWeight:700, color:'var(--text-1)', marginBottom:20 }}>⚙ Settings</div>
+
+          {/* 1 · Google */}
+          <div style={card}>
+            <div style={hd}>1 · Google Connection</div>
+            {!configured && (
+              <div style={{ fontSize:12, color:'var(--text-3)', lineHeight:1.6 }}>
+                OAuth belum dikonfigurasi. Tambahkan <code>oauth-credentials.json</code> ke root project
+                (lihat <strong>GDOCS-SETUP.md</strong>), lalu restart server.
+              </div>
+            )}
+            {configured && !connected && (
+              <div>
+                <div style={{ fontSize:12, color:'var(--text-3)', marginBottom:12 }}>Belum terhubung ke Google.</div>
+                <a href="/api/google/login" style={{ ...btn('#3b82f6'), textDecoration:'none', display:'inline-block' }}>Login with Google</a>
+              </div>
+            )}
+            {connected && (
+              <div>
+                <div style={{ fontSize:12, color:'var(--text-2)', marginBottom:4 }}>✓ Connected{status.email ? ` — ${status.email}` : ''}</div>
+                <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:14 }}>Mirror folder: {status.folderName || status.folderId || 'PRD (auto-created)'}</div>
+                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                  <button onClick={mirrorNow} disabled={busy} style={btn('#0369a1')}>{busy ? '…' : '⇪ Mirror all PRD now'}</button>
+                  <button onClick={logout} disabled={busy} style={{ ...btn('transparent'), color:'var(--text-3)', border:'1px solid var(--border-1)' }}>Disconnect</button>
+                </div>
+              </div>
+            )}
+            {msg && <div style={{ fontSize:11, color: msg.startsWith('⚠') ? '#f87171' : '#4ade80', marginTop:12 }}>{msg}</div>}
+          </div>
+
+          {/* 2 · Theme */}
+          <div style={card}>
+            <div style={hd}>2 · Theme</div>
+            <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+              {THEMES.map(t => (
+                <button key={t.id} onClick={() => onSwitchTheme(t.id)} title={t.name}
+                  style={{ display:'flex', alignItems:'center', gap:6, padding:'5px 10px', borderRadius:6, cursor:'pointer',
+                    border:`1px solid ${currentTheme === t.id ? '#3b82f6' : 'var(--border-1)'}`, background:'var(--app-bg)', color:'var(--text-2)', fontSize:11 }}>
+                  <span style={{ display:'flex' }}>
+                    {t.swatch.map((c, i) => <span key={i} style={{ width:10, height:10, background:c, borderRadius:2, marginLeft:i ? -2 : 0, border:'1px solid rgba(0,0,0,.3)' }}/>)}
+                  </span>
+                  {t.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3 · Manual import */}
+          <div style={card}>
+            <div style={hd}>3 · Manual Import</div>
+            <div style={{ fontSize:12, color:'var(--text-3)', marginBottom:12 }}>Re-scan workspace & reindex semua TSV/MD ke database.</div>
+            <button onClick={onImport} disabled={importing} style={btn('#0369a1')}>{importing ? 'Importing…' : '⟳ Import TSV/MD'}</button>
+            {importMsg && <div style={{ fontSize:11, color: importMsg.startsWith('⚠') ? '#f87171' : '#4ade80', marginTop:10 }}>{importMsg}</div>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function App() {
     const [sections, setSections]     = useState([]);
     const [selected, setSelected]     = useState(null); // { path, sectionId, name, ext }
@@ -1834,6 +1954,10 @@
     const [runCase, setRunCase]       = useState(null); // { caseId, specFile, grepPattern }
     const [importing, setImporting]   = useState(false);
     const [importMsg, setImportMsg]   = useState('');
+    const [gdocs, setGdocs]           = useState([]);    // node-shaped tree from /api/gdocs
+    const [gdocsStatus, setGdocsStatus] = useState(null); // { oauthConfigured, connected, email, folderName }
+    const [view, setView]             = useState('files'); // 'files' | 'settings'
+    const [themeId, setThemeId]       = useState('navy');
     const themeRef  = useRef(null);
     const isDraggingRef = useRef(false);
     const dragStartXRef = useRef(0);
@@ -1868,6 +1992,7 @@
       if (!t) return;
       applyThemeVars(t);
       saveThemeIDB(id);
+      setThemeId(id);
       requestAnimationFrame(() => requestAnimationFrame(() => themeRef.current?.setTheme(id)));
     }
 
@@ -1881,6 +2006,20 @@
         const first = data.find(s => s.tree?.length > 0);
         if (first && !activeSection) setActiveSection(first.id);
       } catch(e) { setError('Cannot reach server: ' + e.message); }
+    }
+
+    // ── Load Google Docs (service-account, via server.js) ────────────────────────
+    async function loadGDocs(q) {
+      try {
+        const st = await fetch('/api/gdocs/status').then(r => r.json());
+        setGdocsStatus(st);
+        if (!st.configured) { setGdocs([]); return; }
+        const list = await fetch('/api/gdocs' + (q ? '?q=' + encodeURIComponent(q) : '')).then(r => r.ok ? r.json() : []);
+        setGdocs(Array.isArray(list) ? list : []);
+      } catch (e) {
+        setGdocsStatus({ configured: false, error: 'Cannot reach server: ' + e.message });
+        setGdocs([]);
+      }
     }
 
     // ── Load automation map for a file's test cases ──────────────────────────────
@@ -1904,24 +2043,30 @@
     // ── Open a file ─────────────────────────────────────────────────────────────
     async function openFile(node, sectionId) {
       if (node.kind !== 'file') return;
-      setSelected({ path: node.path, sectionId, name: node.name, ext: node.ext });
+      setView('files');
+      setSelected({ path: node.path, sectionId, name: node.name, ext: node.ext, gdocId: node.gdocId });
       setActiveSection(sectionId);
       setLoading(true);
       setFileData(null);
       setError(null);
       try {
+        // Google Doc → fetch via /api/gdocs, render as read-only markdown
+        if (node.ext === 'gdoc') {
+          const r = await fetch('/api/gdocs/' + encodeURIComponent(node.gdocId));
+          if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Failed to read Google Doc');
+          const d = await r.json();
+          setFileData({ type: 'md', content: d.markdown, path: node.path, gdocId: node.gdocId, title: d.title });
+          setLoading(false);
+          return;
+        }
         const text = await fetch('/api/files/content?path=' + encodeURIComponent(node.path)).then(r => r.text());
-        const ne = text.split('\n');
         if (node.ext === 'md') {
           setFileData({ type: 'md', content: text, path: node.path });
         } else {
-          // Try card format
-          function isCardFmt(lines) {
-            const first10 = lines.slice(0, 10).join('\t');
-            return /Test ID/i.test(first10) || /Scenario/i.test(first10);
-          }
-          if (isCardFmt(ne)) {
-            const cases = parseCardFormat(ne);
+          // parseFile splits each line into columns first, then checks card format
+          const parsed = parseFile(text, node.ext || 'tsv');
+          if (parsed.type === 'card') {
+            const cases = parsed.cases;
             // try to get exec data from companion JSON
             const execPath = node.path.replace(/\.tsv$/i, '.exec.json').replace(/\.csv$/i, '.exec.json');
             let execData = null;
@@ -1980,10 +2125,11 @@
         const tid = await loadThemeIDB();
         if (tid) {
           const t = THEMES.find(x => x.id === tid);
-          if (t) { applyThemeVars(t); themeRef.current?.setTheme(tid); }
+          if (t) { applyThemeVars(t); setThemeId(tid); themeRef.current?.setTheme(tid); }
         }
       })();
       loadTree();
+      loadGDocs();
     }, []);
 
     // Sync activeSection when selected changes
@@ -2014,14 +2160,15 @@
             </div>
           );
         }
-        const extColor = node.ext === 'md' ? 'var(--sec-prd)' : node.ext === 'tsv' ? 'var(--sec-test)' : 'var(--text-4)';
+        const extColor = node.ext === 'md' ? 'var(--sec-prd)' : node.ext === 'tsv' ? 'var(--sec-test)' : node.ext === 'gdoc' ? '#4ade80' : 'var(--text-4)';
+        const extLabel = node.ext === 'gdoc' ? 'DOC' : node.ext?.toUpperCase();
         return (
           <div key={node.path} onClick={() => openFile(node, sectionId)}
             style={{ padding:`5px 8px 5px ${pad}px`, cursor:'pointer', display:'flex', alignItems:'center', gap:6,
               background: isSelected ? 'rgba(255,255,255,0.06)' : 'transparent',
               borderLeft: isSelected ? `2px solid ${extColor}` : '2px solid transparent',
               fontSize:11, color: isSelected ? 'var(--text-1)' : 'var(--text-3)' }}>
-            <span style={{ fontSize:9, color: extColor, flexShrink:0 }}>{node.ext?.toUpperCase()}</span>
+            <span style={{ fontSize:9, color: extColor, flexShrink:0 }}>{extLabel}</span>
             <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{node.name}</span>
           </div>
         );
@@ -2030,6 +2177,17 @@
 
     // ── Main content area ────────────────────────────────────────────────────────
     function renderContent() {
+      if (view === 'settings') return (
+        <SettingsPage
+          status={gdocsStatus}
+          onRefreshStatus={loadGDocs}
+          onSwitchTheme={switchTheme}
+          currentTheme={themeId}
+          onImport={handleImport}
+          importing={importing}
+          importMsg={importMsg}
+        />
+      );
       if (!selected) return (
         <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center',
           flexDirection:'column', gap:12, color:'var(--text-5)' }}>
@@ -2074,8 +2232,11 @@
           <MarkdownViewer
             key={fileData.path}
             content={fileData.content}
-            filePath={fileData.path}
+            filePath={fileData.gdocId ? null : fileData.path}
             fileHandle={null}
+            gdocsEnabled={!!(gdocsStatus && gdocsStatus.configured)}
+            readOnly={!!fileData.gdocId}
+            docTitle={fileData.title || (selected && selected.name)}
           />
         );
       }
@@ -2086,6 +2247,14 @@
         </div>
       );
     }
+
+    // Google Docs as a virtual sidebar section (each doc = a file node)
+    const gdocsSection = gdocsStatus ? {
+      id: 'gdocs', label: 'Google Docs', color: '#4ade80', remote: true,
+      configured: gdocsStatus.configured, statusError: gdocsStatus.error,
+      tree: gdocs, // node-shaped tree (dirs + gdoc files) straight from /api/gdocs
+    } : null;
+    const allSections = gdocsSection ? [...sections, gdocsSection] : sections;
 
     return (
       <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
@@ -2101,6 +2270,11 @@
             style={{ fontSize:10, padding:'3px 10px', borderRadius:4, border:'1px solid var(--border-1)',
               background:'var(--elevated-bg)', color:'var(--text-3)', cursor: importing ? 'default' : 'pointer' }}>
             {importing ? 'Importing…' : '⟳ Import TSV/MD'}
+          </button>
+          <button onClick={() => setView(v => v === 'settings' ? 'files' : 'settings')} title="Settings"
+            style={{ fontSize:13, lineHeight:1, padding:'3px 9px', borderRadius:4, border:'1px solid var(--border-1)',
+              background: view === 'settings' ? 'var(--elevated-bg)' : 'transparent', color:'var(--text-3)', cursor:'pointer' }}>
+            ⚙
           </button>
           <ThemeSwitcher ref={themeRef} onSwitch={switchTheme} />
         </div>
@@ -2121,36 +2295,69 @@
             </div>
 
             {/* File tree */}
-            <div style={{ flex:1, overflowY:'auto' }}>
-              {sections.length === 0 && (
+            <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+              {allSections.length === 0 && (
                 <div style={{ padding:20, fontSize:11, color:'var(--text-5)', textAlign:'center' }}>
                   {error ? error : 'Loading files…'}
                 </div>
               )}
-              {sections.map(sec => {
-                const isActive = activeSection === sec.id;
-                const hasFiles = sec.tree?.length > 0;
-                return (
-                  <div key={sec.id}>
-                    <div onClick={() => setActiveSection(isActive ? null : sec.id)}
-                      style={{ padding:'6px 10px', display:'flex', alignItems:'center', gap:6,
+              {allSections.length > 0 && (() => {
+                // Section header — reused for active (pinned top) + others (sticky bottom)
+                const SectionHeader = (sec, isActive) => {
+                  const count = sec.tree ? sec.tree.reduce((s, n) => s + countFiles(n), 0) : 0;
+                  return (
+                    <div key={sec.id} onClick={() => setActiveSection(isActive ? null : sec.id)}
+                      style={{ padding:'6px 10px', display:'flex', alignItems:'center', gap:6, flexShrink:0,
                         cursor:'pointer', borderBottom:'1px solid var(--border-2)',
                         background: isActive ? 'rgba(255,255,255,0.03)' : 'transparent' }}>
                       <span style={{ width:3, height:3, borderRadius:'50%', background: sec.color, flexShrink:0 }}/>
                       <span style={{ flex:1, fontSize:10, fontWeight:600, color: sec.color, textTransform:'uppercase', letterSpacing:0.5 }}>{sec.label}</span>
-                      <span style={{ fontSize:9, color:'var(--text-5)' }}>{isActive ? '▾' : '▸'}</span>
+                      {sec.remote && <span title="Google Docs" style={{ fontSize:9, color:'var(--text-5)' }}>☁</span>}
+                      {count > 0 && <span style={{ fontSize:9, color:'var(--text-5)' }}>{count}</span>}
+                      <span style={{ fontSize:9, color:'var(--text-5)', marginLeft:2 }}>{isActive ? '▾' : '▸'}</span>
                     </div>
-                    {isActive && hasFiles && (
-                      <div style={{ paddingBottom:4 }}>
-                        {renderTree(sec.tree, sec.id)}
+                  );
+                };
+
+                // Body for the active section — handles remote (gdocs) not-configured / empty states
+                const SectionBody = (sec) => {
+                  if (sec.remote && !sec.configured) {
+                    return <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)', lineHeight:1.5 }}>
+                      ⚠ Not configured.<br/>{sec.statusError || 'Set up the service account — see GDOCS-SETUP.md'}
+                    </div>;
+                  }
+                  return sec.tree?.length > 0
+                    ? <div style={{ paddingBottom:4 }}>{renderTree(sec.tree, sec.id)}</div>
+                    : <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>{sec.remote ? 'No docs shared with the service account yet' : 'No files'}</div>;
+                };
+
+                const active = allSections.find(s => s.id === activeSection);
+
+                // Nothing expanded → plain stacked list of all section headers
+                if (!active) {
+                  return (
+                    <div style={{ flex:1, overflowY:'auto' }}>
+                      {allSections.map(sec => SectionHeader(sec, false))}
+                    </div>
+                  );
+                }
+
+                // A section is open → its header pinned top, files scroll, other selectors sticky bottom
+                const others = allSections.filter(s => s.id !== active.id);
+                return (
+                  <React.Fragment>
+                    {SectionHeader(active, true)}
+                    <div style={{ flex:1, overflowY:'auto' }}>
+                      {SectionBody(active)}
+                    </div>
+                    {others.length > 0 && (
+                      <div style={{ flexShrink:0, borderTop:'1px solid var(--border-1)' }}>
+                        {others.map(sec => SectionHeader(sec, false))}
                       </div>
                     )}
-                    {isActive && !hasFiles && (
-                      <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>No files</div>
-                    )}
-                  </div>
+                  </React.Fragment>
                 );
-              })}
+              })()}
             </div>
           </div>
 

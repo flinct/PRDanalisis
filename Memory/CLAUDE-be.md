@@ -4,6 +4,7 @@
 > **Package name:** `@omnichannel-satuinbox-be/source`
 > **Product:** Omnichannel CRM — unified inbox for WhatsApp, Instagram, Messenger, Email, Live Chat.
 > **Architecture:** NestJS microservices (Nx monorepo). Each service owns its own MongoDB database. Services communicate via **gRPC** (sync) and **RabbitMQ** (async).
+> **Source-of-truth release:** **v2.7.0** (branch `v2.7.0`). Verified against repo working tree on **2026-06-12**. See §14 for the v2.7.0 changelog.
 
 ---
 
@@ -26,7 +27,7 @@
 | Hashing         | argon2 / bcrypt                                            | `^0.44.0` / `^6.0.0`                                 |
 | Validation      | class-validator, Joi                                       | `^0.14.2`                                            |
 | Object storage  | AWS S3 + CloudFront                                        | `@aws-sdk/client-s3 ^3.913.0`                        |
-| Channel SDKs    | Baileys (WA), Meta Graph (IG/Messenger), IMAP/SMTP (Email) |                                                      |
+| Channel SDKs    | Baileys (WA), Meta Graph (IG/Messenger), IMAP/SMTP (Email) | Baileys `7.0.0-rc13` (pinned, updated in v2.7.0)     |
 | Security        | mTLS, mongoose-encryption, crypto                          | `libs/security`                                      |
 | API docs        | Swagger                                                    | `@nestjs/swagger ^11.2.0` at `/docs`                 |
 | Scheduling      | `@nestjs/schedule ^6.0.1` + RabbitMQ delayed queues        |                                                      |
@@ -303,6 +304,7 @@ When adding a new service: copy bootstrap, add `PROTO` + `GRPC_ENV` entry, add `
 - Pause reasons: `agent_away`, `pending_customer_initiation`, `waiting_on_customer`
 - SLA states: `RUNNING`, `PAUSED`, `STOPPED`, `MISSED`
 - Settings: per-channel with tenant default fallback, office-hours support
+- **Assignment source tracking (v2.7.0, feat #2112):** conversation schema carries `assignSource?: AssignmentSourceEnum` — `manual` (supervisor/operator assigns via UI), `self_pull` (agent claims themselves), `system` (auto round-robin / auto-pull), `bulk` (bulk assignment op). Surfaced to FE and to in-app notifications.
 
 ### Ticket Service
 
@@ -313,8 +315,10 @@ When adding a new service: copy bootstrap, add `PROTO` + `GRPC_ENV` entry, add `
 
 ### WhatsApp Web Service
 
-- Baileys: QR login, encrypted credential persistence, auto-restore, human-like send (typing indicators, random delays)
+- Baileys `7.0.0-rc13` (v2.7.0): QR login, encrypted credential persistence, auto-restore, human-like send (typing indicators, random delays)
 - Key files: `baileys.service.ts`, `baileys.factory.ts`, `session.service.ts`, `whatsapp-connection.service.ts`, `whatsapp-message.service.ts`
+- **Account Channel Event Log (v2.7.0, feat #2004):** immutable lifecycle event log for WA Web accounts → `AccountChannelEventLog` schema (`account-channel-event-log.schema.ts`). Fields: `accountChannelId`, `eventType` (enum), `idempotencyKey` (unique), `occurredAt`, `connectionSessionId`, `durationMs`, `phoneNumber`, `reason`, `actor`, `metadata`, `sourceService`. TTL retention (`ACCOUNT_CHANNEL_EVENT_LOG_RETENTION_SECONDS`); index `{accountChannelId:1, occurredAt:-1}`. Intended for Redash analytics on connect/disconnect/pairing lifecycle.
+- **Startup status reconcile (v2.7.0, fix #2052):** on service startup, reconciles stale WhatsApp Web account-channel status so DB no longer reports paired/connected accounts that are actually dead.
 
 ### Features NOT implemented in BE
 
@@ -340,3 +344,24 @@ When adding a new service: copy bootstrap, add `PROTO` + `GRPC_ENV` entry, add `
 - `ANALYTICS_PREAGGREGATION_IMPLEMENTATION_PLAN.md`
 - `contact-area-context-rbac-spec.md` / `contact-area-context-rbac-implementation-plan.md`
 - `development.md`, `deployment.md`
+
+---
+
+## 14. v2.7.0 Changelog (BE — branch `v2.7.0`, verified 2026-06-12)
+
+New since v2.5.0/v2.6.0 baseline. All confirmed against repo working tree.
+
+| Area | Change | Ref |
+| ---- | ------ | --- |
+| conversation-service | **Assignment source** — `assignSource` field + `AssignmentSourceEnum` (`manual` / `self_pull` / `system` / `bulk`); propagated to in-app notifications | feat #2112 |
+| whatsapp (WA Web) | **Baileys → `7.0.0-rc13`** (pinned) | feat #1820 |
+| whatsapp (WA Web) | **Account Channel Event Log** — immutable lifecycle event log schema with idempotency + TTL retention, for Redash analytics | feat #2004 |
+| whatsapp (WA Web) | **Startup reconcile** of stale account-channel connection status | fix #2052 |
+| people-service | **Member active/deactivate** — `auths.isActive` toggle + `AuthActiveFilterEnum` (`ACTIVE` / `INACTIVE` / `ALL`) member-listing filter | feat #1934 |
+| ticket-service / conversation-service | **Sync & add ticket message** from conversation linked-chat bubble (linked bubble append/sync) | feat #1613 |
+| media-service / api-gateway | **HEIC/HEIF** file support | fix #1959 |
+| company-service | **Shift cache invalidation on update** — fixes stale office-hours after shift edit | fix #1975 |
+
+### Still NOT implemented in shipped v2.7.0
+
+The undeveloped-feature set from §12 is unchanged. Note: **WA Group Mention** has an active feature branch `feat/266-group-mention-v2.7.0` (present in both BE and FE remotes) but it is **not merged** into `v2.7.0` — so it remains out of the shipped release. Collaborator role, Snooze Conversation, Related/Relational Conversations, Related Tickets & Merge, Auto-reply, WA Import Modes, Anti-spam system, Room Reminder, and conversation Hold state all remain 0%.

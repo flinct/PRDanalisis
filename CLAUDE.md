@@ -1,7 +1,7 @@
 # CLAUDE.md — PRDanalisis Workspace Context
 
 > File ini dibaca otomatis oleh Claude di setiap session baru.
-> Workspace: `C:\Users\flinc\Desktop\PRDanalisis`
+> Workspace: `C:\Users\MyBook SAGA 12\Desktop\PRDanalisis`
 > Project: **SatuInbox** — Omnichannel Customer Service Platform
 
 ---
@@ -118,6 +118,15 @@ PRDanalisis/
 4. **Load sesuai domain:** lihat `Memory/README.md` untuk navigasi
 
 ---
+
+## ⚡ Baca Juga
+
+Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding lengkap yang mencakup:
+- Arsitektur 3-repo (PRDanalisis ↔ sixV2Automation ↔ omnichannel-satuinbox-fe)
+- Automation bridge pipeline detail (Conversation.tsv → JSON → Playwright specs)
+- Environment & accounts (dev test accounts, env vars)
+- Page Objects index lengkap (18 page objects dari sixV2Automation)
+- Commands cheatsheet untuk 3 repo
 
 ## Aturan Kritis
 

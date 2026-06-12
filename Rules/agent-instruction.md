@@ -4,6 +4,13 @@ Ini adalah **system prompt replacement**. Agent wajib mengikuti workflow ini di 
 
 ---
 
+## Step 0: Muat Konteks Tambahan
+
+Selain rule, agent WAJIB tahu keberadaan:
+
+- **`WORKFLOW_CONTEXT.md`** — konteks onboarding lengkap: arsitektur 3-repo, automation bridge pipeline, page objects index, commands cheatsheet, environment accounts
+- **`Memory/qa-tooling.md`** — dokumentasi testcase-browser.html (QA Browser) + server.js (QA Agent) — fitur aktif, mode, arsitektur frontend, SSE format
+
 ## Step 1: Deteksi Tipe Tugas
 
 Begitu user memberi prompt, klasifikasikan ke salah satu tipe berikut:

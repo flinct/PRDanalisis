@@ -1,0 +1,17 @@
+# Secrets — never commit
+service-account.json
+*.sa.json
+oauth-credentials.json
+google-token.json
+.env
+
+# Mirror state (local↔Google Docs map)
+.gdocs-mirror.json
+
+# Node
+node_modules/
+
+# QA DB / WAL
+qa.db
+qa.db-wal
+qa.db-shm

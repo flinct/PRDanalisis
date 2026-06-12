@@ -101,13 +101,16 @@ PRDanalisis/Memory/comprehensive-undeveloped-features-analysis.md
 ... (file analysis lain di Memory/)
 ```
 
-### **QA Agent (AI-Assisted)**
+### **QA Browser & Server (Manual QA + Automation Bridge)**
 ```
-PRDanalisis/server.js                         ← QA Agent backend (Express + Claude claude-sonnet-4-6 + SSE streaming)
-PRDanalisis/package.json                      ← Node.js deps: @anthropic-ai/sdk, express, cors, dotenv
-PRDanalisis/.env                              ← ANTHROPIC_API_KEY, PORT, AUTOMATION_ROOT (jangan di-commit)
-PRDanalisis/Chat/                             ← Chat history per session (auto-generated JSON)
-PRDanalisis/AgentNotes/                       ← Hasil analisa agent (auto-generated MD)
+PRDanalisis/server.js                         ← Express server (369 lines): file tree API, SQLite, TSV/MD import, Playwright run
+PRDanalisis/Test/testcase-browser.html        ← Single-file React 18 QA Browser (2195 lines): TC editor, versioning, execution tracking, history, automation mapping, Playwright run panel
+PRDanalisis/qa.db                             ← SQLite WAL: test_cases, automation_map, test_runs, prd_files
+PRDanalisis/Memory/qa-tooling.md              ← Dokumentasi arsitektur testcase-browser + server.js (selalu update setelah code review)
+PRDanalisis/notes.md                          ← Wishlist user untuk fitur browser (versioning, updateAt, reset all fields)
+PRDanalisis/package.json                      ← Express, cors, nodemon
+PRDanalisis/Chat/                             ← Chat history per session (legacy — tidak aktif di versi saat ini)
+PRDanalisis/AgentNotes/                       ← Hasil analisa agent (legacy — tidak aktif di versi saat ini)
 ```
 
 ---
@@ -447,12 +450,12 @@ cd "C:\Users\MyBook SAGA 12\Desktop\PRDanalisis"
 # Search file/content
 # Gunakan search_files tool (ripgrep) bukan grep/ls
 
-# QA Agent Server
-npm install                  # Sekali saja — install deps
-node server.js               # Jalankan server (port 3001)
+# QA Browser Server
+npm install                  # Sekali saja — install deps (express, cors, nodemon)
+node server.js               # Jalankan server (port 3001), serves testcase-browser.html
 node --watch server.js       # Dev mode (auto-restart on file change)
-# Butuh .env dengan ANTHROPIC_API_KEY sebelum run
-# Optional: AUTOMATION_ROOT=/path/to/sixV2Automation untuk enable run_automation tool
+# Optional: AUTOMATION_ROOT=/path/to/sixV2Automation untuk enable Playwright run button
+# Tidak butuh ANTHROPIC_API_KEY — server saat ini pure QA tool tanpa AI agent
 ```
 
 ### **sixV2Automation**
@@ -494,7 +497,7 @@ npm run build                # Production build
 |---------|------|---------|
 | 1.0 | 2026-06-09 | Initial creation - full workflow context documented |
 | 1.1 | 2026-06-10 | Tambah QA Agent infrastructure: server.js (Express+Claude+SSE), AgentPanel di testcase-browser.html, Memory/qa-tooling.md. Update Section 3 (File Kunci) + Section 14 (Commands). |
-| 1.2 | 2026-06-10 | Sinkron dengan roadmap-plan: QA Assessment + Decision layer jadi first-class workflow, tambah referensi `Assessments/README.md`, generalisasi output test ke `Test/<domain>/` dengan companion QA spec + automation mapping, dan tambahkan contoh artefak WhatsApp Web Outbound Anti-Ban Guard. |
+| 1.3 | 2026-06-12 | Full code review testcase-browser.html (2195 lines) + server.js (369 lines). Update Section 3 (QA Browser section rewrite — AI agent removed, server is pure QA tool). Update Memory/qa-tooling.md with full architecture (component tree, DB schema, endpoints, version system). Fix CLAUDE.md path (flinc→MyBook SAGA 12) + tambah referensi WORKFLOW_CONTEXT.md di CLAUDE.md dan agent-instruction.md. |
 
 **Update file ini saat:**
 - Repo structure berubah

@@ -3,6 +3,7 @@
 > **Repo path:** `C:\Users\MyBook SAGA 12\Desktop\FE satuinbox\omnichannel-satuinbox-fe`
 > **Product:** Omnichannel CRM — agent dashboard + embeddable live-chat widget.
 > **Backend:** NestJS microservices via API Gateway at port `3000`.
+> **Source-of-truth release:** **v2.7.0** (branch `v2.7.0`; working tree `main` ≈ prod-2.6.0 + heic/offline-report/leads fixes). Verified against repo working tree on **2026-06-12**. See §16 for the v2.7.0 changelog.
 
 ---
 
@@ -34,8 +35,10 @@
 | Tables | TanStack Table | `^8.21.3` + React Virtual |
 | Animation | Motion | `^12.23.24` |
 | Build | Turbo | `^2.5.6` |
-| Lint / format | ESLint 9, Prettier 3 | |
-| Testing | Vitest | |
+| Lint / format | ESLint 9 (`^9.33.0`), Prettier 3 (`^3.6.0`) | |
+| Drag & drop | `@dnd-kit/core` `^6.3.1` + `@dnd-kit/sortable` `^10.0.0` | omnichannel app |
+| Audio | `wavesurfer.js` `^7.12.6` + `@wavesurfer/react` | voice note playback |
+| Testing | _None configured_ — no `vitest`/`jest` dep or config; quality gate is `lint` + `check-types` + `prettier` only (per root `package.json` scripts) | as of v2.7.0 |
 
 ---
 
@@ -415,13 +418,15 @@ CI/CD: GitLab CI (`.gitlab-ci.yml`), SonarQube, Husky, commitlint, lint-staged.
 
 ### Conversation
 
-**Implemented:** chat list (open/closed), nav (inbox/channel/team), room CRUD, detail panel, SLA metrics (FRT/TTC/RLT/wait time), multiple ticket from bubble, team member presence, reassign account channel.
+**Implemented:** chat list (open/closed), nav (inbox/channel/team), room CRUD, detail panel, SLA metrics (FRT/TTC/RLT/wait time), **RLT + wait time in queue metrics (v2.7.0, #1755)**, multiple ticket from bubble, team member presence, reassign account channel, **inbound notification sound (v2.7.0)**, **assignment-source surfaced from BE (manual / self-pull / system / bulk)**.
 
 **Not implemented:** collaborator role UI, snooze conversation, related conversations, WA group mention picker, auto-reply templates, room reminder, hold/resume, collections (custom attributes beyond current single).
 
+> **WA group mention:** an active branch `feat/266-group-mention-v2.7.0` exists but is **not merged** into `v2.7.0` — so the group mention picker stays out of the shipped release for now.
+
 ### Ticket
 
-**Implemented:** ticket list (tabs/columns/KPI), detail drawer + SLA, room/chat/mention, bulk reply (XLSX + async), export XLSX, snooze (single + bulk), ticket type settings + custom fields, RBAC view scope (8 views), search relevance + out-of-filter guidance, create ticket dynamic form.
+**Implemented:** ticket list (tabs/columns/KPI), **channel name column on ticket list table (v2.7.0)**, detail drawer + SLA, room/chat/mention, **linked ticket bubble interactions improved + sync & add ticket message (v2.7.0, #1613)**, bulk reply (XLSX + async), export XLSX, snooze (single + bulk), ticket type settings + custom fields, RBAC view scope (8 views), search relevance + out-of-filter guidance, create ticket dynamic form.
 
 **Not implemented:** related tickets + merge UI.
 
@@ -441,3 +446,23 @@ CI/CD: GitLab CI (`.gitlab-ci.yml`), SonarQube, Husky, commitlint, lint-staged.
 | Ticket SLA per-stage | ✅ State machine, cycleId, pause on waiting customer |
 | Basic conversation + ticket features | ✅ Both sides |
 | V2 undeveloped features | Same set on both sides — no asymmetry |
+
+---
+
+## 16. v2.7.0 Changelog (FE — branch `v2.7.0`, verified 2026-06-12)
+
+New since v2.5.0/v2.6.0 baseline. Confirmed against repo working tree.
+
+| Area | Change | Ref |
+| ---- | ------ | --- |
+| Conversation | RLT + wait time added to queue metrics | #1755 |
+| Conversation | Inbound notification sound (`IncomingMessageNotificationProvider` + conversation socket event) | — |
+| Conversation | Assignment source surfaced from BE (manual / self-pull / system / bulk) | (BE #2112) |
+| Ticketing | Linked ticket bubble interactions improved + sync & add ticket message | #1613 |
+| Ticketing | Channel name displayed on channel column of ticket list table | — |
+| Broadcast | Offline report (status no longer stale on navigation/pagination) | #557 / #1708 |
+| Settings → Member | Member table UI adjustments + active/inactive member handling | #1934 |
+| Media | HEIC/HEIF upload support | #1959 |
+| Analytics | Filter by logged-in user and role | #1886 |
+
+> **Tech stack note:** FE dependency versions are unchanged from the prior baseline (Next.js `^16.0.10`, React `^19.2.3`, Zustand `^5.0.8`, TanStack Query `^5.89.0`, Tailwind `^4.1.5`, Socket.IO client `^4.8.1`, TypeScript `5.9.2`). The only correction is the Testing row — no test runner is configured (see §2).
