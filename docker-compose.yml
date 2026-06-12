@@ -1,0 +1,24 @@
+services:
+  qa-dashboard:
+    build: .
+    container_name: satainbox-qa
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_PATH=/data/qa.db
+      - NODE_ENV=production
+    volumes:
+      # Persistent SQLite DB
+      - db-data:/data
+      # Mount workspace so server can read PRD/Test files
+      # Change the left side to the actual path on the host machine
+      - ./:/app/workspace:ro
+    working_dir: /app
+    # After first deploy, run import once:
+    #   docker compose exec qa-dashboard node scripts/import.js
+
+volumes:
+  db-data:
+    driver: local

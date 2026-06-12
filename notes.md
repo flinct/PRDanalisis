@@ -7,3 +7,5 @@ saya perlu ada
 - menyimpan tanggal, ketika test dilakukan, kemungkinan 1 set testcase tidak akan beres di hari yang sama, jadi ada data updateAt nya
 - reset all field, ini untuk mereset field actual, dev/stag/prod status, overall status dan notes, perubahan ini juga akan ddisimpan updateAt nya
 - ketika ada updateAt, data lama tetap di simpan
+
+sk-17bcfb7a9fca4fe598779cd21ff98381

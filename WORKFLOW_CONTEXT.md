@@ -1,4 +1,4 @@
-# WORKFLOW CONTEXT — BRD → PRD → Testcase → Automation Script
+# WORKFLOW CONTEXT — BRD → PRD → QA Assessment → Decision → Testcase → Automation Script
 
 > **File ini = konteks kerja permanen.** Baca di awal setiap session baru (termasuk di PC lain) agar agent langsung paham struktur, rules, dan alur kerja tanpa perlu eksplorasi ulang.
 
@@ -37,11 +37,12 @@ PRD Analysis (QA Assessment)
 Decision
     │
     ▼
-Test Case Writing (Manual TSV + Automation Mapping)
+Test Case Writing (Manual TSV + QA Spec + Automation Mapping)
     │   - Mengikuti Rules/test-case-rule.md
-    │   - Format: SatuInbox Test Case Scenario V2 (Conversation.tsv)
+    │   - Output permanen: `Test/<domain>/<Feature>.tsv`
+    │   - Companion docs: `Test/<domain>/<feature>-qa-test-spec.md`, `Test/<domain>/<feature>-automation-mapping.md`
     │   - Coverage: 100% FR, EH, EC, State, RBAC, API, Migration, NFR
-    │   - Bridge: Rules/automation-bridge-rule.md
+    │   - Bridge: Rules/automation-bridge-rule.md (jika feature punya sync ke sixV2Automation)
     │
     ▼
 Automation Script Generation (Playwright)
@@ -67,6 +68,7 @@ PRDanalisis/Rules/agent-instruction.md        ← ENTRY POINT: deteksi tipe tuga
 PRDanalisis/Rules/workflow-rule.md            ← Urutan eksekusi: Rule → Global Memory → Feature Memory → Execute
 PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Assessments/, Scripts/, Test/, Rules/, Memory/
 PRDanalisis/Memory/README.md                  ← Index memory files, routing guide, deprecated notices
+PRDanalisis/Assessments/README.md             ← Aturan artefak analisa permanen + versioning
 PRDanalisis/Assessments/templates/qa-assessment-report-template.md ← Template assessment permanen
 ```
 
@@ -118,7 +120,9 @@ PRDanalisis/AgentNotes/                       ← Hasil analisa agent (auto-gene
 | **Ticket** | `PRD/ticketv2/` | `PRD/Ticket/` |
 | **WhatsApp Web** | `PRD/Whatsapp web v2/` | `PRD/Whatsapp web/` |
 | **SLA Conversation & Ticket** | `PRD/SLA conversation n ticket/` | — |
-| **Test Cases** | `Test/conversation/Conversation.tsv` | — |
+| **QA Assessments** | `Assessments/<domain>/<feature-slug>/` | — |
+| **Test Cases (generic)** | `Test/<domain>/` | — |
+| **Conversation automation source** | `Test/conversation/Conversation.tsv` | — |
 
 > **Rule:** Selalu gunakan V2. V1 hanya untuk referensi historis (lihat comparison files di Memory/).
 
@@ -138,6 +142,8 @@ PRDanalisis/AgentNotes/                       ← Hasil analisa agent (auto-gene
 
 ## 6. AUTOMATION BRIDGE PIPELINE (DETAIL)
 
+> **Catatan:** Bridge generator yang paling matang saat ini ada di domain **Conversation**. Domain lain boleh memakai pola `manual TSV + QA spec + automation mapping` di `Test/<domain>/` sampai generator khususnya dibutuhkan.
+
 ### **Source Files (PRDanalisis)**
 ```
 Test/conversation/
@@ -152,6 +158,21 @@ Test/conversation/
 playwright/support/config/
 ├── conversation-testcases.generated.json   ← Sync payload consumed by automation
 ├── conversation-testcases.generated.js     ← CommonJS export of sync payload
+```
+
+### **Example Current Feature Artifacts (WhatsApp Web)**
+```
+PRD/Whatsapp web v2/
+├── PRD WA Web Outbound Anti-Ban Guard.md
+
+Assessments/whatsapp-web/wa-outbound-anti-ban-guard/
+├── wa-outbound-anti-ban-guard-qa-assessment.md
+├── wa-outbound-anti-ban-final-gap-review.md
+
+Test/whatsapp-web/
+├── WhatsApp Web Outbound Anti-Ban Guard.tsv
+├── wa-outbound-anti-ban-qa-test-spec.md
+├── wa-outbound-anti-ban-automation-mapping.md
 ```
 
 ### **Playwright Specs (Target Buckets)**
@@ -204,8 +225,9 @@ WHEN Conversation.tsv changes:
 1. Baca `test-case-rule.md` + `qa-analysis-rule.md` (Test Specification Layer)
 2. Baca PRD analysis output + impact analysis
 3. Baca existing test cases di scope terkait
-4. Output: Test Plan / Test Scenario List / Detailed Test Case Spec / Regression Suite / UAT Script
+4. Output: Test Plan / Test Scenario List / Detailed Test Case Spec / Regression Suite / UAT Script / Automation Mapping
 5. Format TSV: gunakan Manual TSV Output Mode di `test-case-rule.md` (SatuInbox Test Case Scenario V2)
+6. Jika feature belum punya generator bridge, simpan companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md` dan `*-automation-mapping.md`
 
 ### **Impact Analysis**
 1. Baca `impact-analysis-rule.md` + PRD analysis output
@@ -472,6 +494,7 @@ npm run build                # Production build
 |---------|------|---------|
 | 1.0 | 2026-06-09 | Initial creation - full workflow context documented |
 | 1.1 | 2026-06-10 | Tambah QA Agent infrastructure: server.js (Express+Claude+SSE), AgentPanel di testcase-browser.html, Memory/qa-tooling.md. Update Section 3 (File Kunci) + Section 14 (Commands). |
+| 1.2 | 2026-06-10 | Sinkron dengan roadmap-plan: QA Assessment + Decision layer jadi first-class workflow, tambah referensi `Assessments/README.md`, generalisasi output test ke `Test/<domain>/` dengan companion QA spec + automation mapping, dan tambahkan contoh artefak WhatsApp Web Outbound Anti-Ban Guard. |
 
 **Update file ini saat:**
 - Repo structure berubah

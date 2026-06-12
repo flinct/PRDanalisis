@@ -4,21 +4,20 @@
 > **Source PRD:** `PRD/Whatsapp web v2/PRD WA Web Outbound Anti-Ban Guard.md`  
 > **Artifact Path:** `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`  
 > **Companion Artifact:** `Test/whatsapp-web/wa-outbound-anti-ban-qa-test-spec.md`  
-> **Version:** `v1.1`  
-> **Status:** Reviewed — candidate mapping synchronized with QA test spec automation fields
+> **Version:** `v1.3`  
+> **Status:** Reviewed — synchronized to PRD v0.3 and QA test spec v1.3
 
 ---
 ## Recommendation
 
-Automation in `sixV2Automation` is best focused on stable UI/E2E coverage. Concurrency, worker crash, reconciliation, degraded dependency, and performance cases should stay in backend or integration harnesses.
+Automation in `sixV2Automation` is best focused on stable UI/E2E coverage for **text-only protected manual resend guard** and dashboard-visible auditability. Concurrency, worker crash, reconciliation, degraded dependency, and performance cases should stay in backend or integration harnesses.
 
 ## Proposed Playwright Spec Split
 
 | Proposed File | Main Scope | Suggested Page Objects |
 | ----- | ----- | ----- |
-| `playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js` | Manual room send duplicate, warning, cooldown, safe normal path | `AuthPage`, `InboxPage` |
-| `playwright/tests/e2e/conversation/wa-outbound-anti-ban-broadcast.spec.js` | Broadcast overlap dedupe and rollout-safe broadcast checks | `AuthPage`, `BroadcastPage`, optionally `InboxPage` |
-| `playwright/tests/e2e/conversation/wa-outbound-anti-ban-settings.spec.js` | Anti-ban settings validation and monitor-only rollout | `AuthPage`, `AccountWhatsappPage` |
+| `playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js` | Manual room send duplicate, protected resend warning/block, cooldown/re-evaluation, safe normal path | `AuthPage`, `InboxPage` |
+| `playwright/tests/e2e/conversation/wa-outbound-anti-ban-broadcast.spec.js` | Broadcast overlap dedupe, related broadcast fixture setup, and rollout-safe broadcast checks | `AuthPage`, `BroadcastPage`, optionally `InboxPage` |
 | `playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js` | Audit visibility, masking, tenant isolation, role access | `AuthPage`, `AccountWhatsappPage` |
 | `playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js` | Sender eligibility, stickiness, and failover if fixture support exists | `AuthPage`, `InboxPage`, `AccountWhatsappPage` |
 
@@ -33,17 +32,17 @@ Automation in `sixV2Automation` is best focused on stable UI/E2E coverage. Concu
 | TC-WA-ABG-005 | Reconciliation pending | No | N/A | N/A | Manual / Backend Harness | Needs downstream timeout injection |
 | TC-WA-ABG-006 | Reconciliation confirms sent | No | N/A | N/A | Manual / Backend Harness | Better as API/integration test |
 | TC-WA-ABG-007 | Reconciliation confirms failed | No | N/A | N/A | Manual / Backend Harness | Better as API/integration test |
-| TC-WA-ABG-008 | Paste-heavy warning mode | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Needs paste event instrumentation and stable thresholds |
-| TC-WA-ABG-009 | Paste-heavy strict mode | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Possible if policy UI + thresholds are testable |
-| TC-WA-ABG-010 | Cooldown enforcement | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Depends on deterministic cooldown trigger |
+| TC-WA-ABG-008 | Protected manual resend warning mode | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Needs stable fixture for active/recent broadcast reference and exact same text |
+| TC-WA-ABG-009 | Protected manual resend strict block | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Possible if related broadcast fixture and strict policy state are deterministic |
+| TC-WA-ABG-010 | Protected resend cooldown and re-evaluation | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Depends on deterministic cooldown trigger and controllable broadcast recency window |
 | TC-WA-ABG-011 | Safe normal send path | Yes | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Ready | High-value regression candidate |
 | TC-WA-ABG-012 | Sender safe mode on restriction | No | N/A | N/A | Manual / Backend Harness | Needs account-state event injection |
 | TC-WA-ABG-013 | Sender ineligible by outbound limit | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js | AuthPage, AccountWhatsappPage, InboxPage | Pending | Candidate if sender eligibility can be arranged by fixture |
-| TC-WA-ABG-014 | Invalid config safe fallback | Yes | playwright/tests/e2e/conversation/wa-outbound-anti-ban-settings.spec.js | AuthPage, AccountWhatsappPage | Ready | UI/API setting validation candidate |
-| TC-WA-ABG-015 | Monitor-only mode | Yes | playwright/tests/e2e/conversation/wa-outbound-anti-ban-settings.spec.js | AuthPage, AccountWhatsappPage, InboxPage | Ready | Good rollout regression candidate |
-| TC-WA-ABG-016 | Audit log visibility and masking | Conditional | playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js | AuthPage, AccountWhatsappPage | Pending | Assumes anti-ban log UI exists |
+| TC-WA-ABG-014 | Invalid config safe fallback | No | N/A | N/A | Manual / Backend Harness | Internal config / feature-flag validation, not a tenant-facing settings page |
+| TC-WA-ABG-015 | Monitor-only mode | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-manual.spec.js | AuthPage, InboxPage | Pending | Candidate only if monitor-only mode can be controlled deterministically via fixture or internal flag |
+| TC-WA-ABG-016 | Audit log visibility, dispatch lineage, and masking | Conditional | playwright/tests/e2e/rbac/wa-outbound-anti-ban-rbac.spec.js | AuthPage, AccountWhatsappPage | Pending | Assumes anti-ban log UI exposes correlation ID, dispatch source, and related broadcast reference |
 | TC-WA-ABG-017 | Stale lock recovery | No | N/A | N/A | Manual / Backend Harness | Worker crash / TTL recovery not suited to Playwright |
-| TC-WA-ABG-018 | Multipart partial-stop | No | N/A | N/A | Manual / Backend Harness | Needs multi-part logical send failure injection |
+| TC-WA-ABG-018 | Duplicate investigation resolution states | No | N/A | N/A | Manual / Backend Harness | Needs backend investigation / trace review harness |
 | TC-WA-ABG-019 | Sender stickiness healthy session | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js | AuthPage, InboxPage | Pending | Needs sender attribution visible and stable setup |
 | TC-WA-ABG-020 | Failover only on ineligibility | Conditional | playwright/tests/e2e/conversation/wa-outbound-anti-ban-account-guard.spec.js | AuthPage, AccountWhatsappPage, InboxPage | Pending | Needs deterministic failover fixture |
 | TC-WA-ABG-021 | Validation performance | No | N/A | N/A | Not for Playwright | Use API/performance tool |
@@ -53,13 +52,13 @@ Automation in `sixV2Automation` is best focused on stable UI/E2E coverage. Concu
 
 ## Summary
 
-- **Ready now in Playwright:** 6 cases (`001, 002, 011, 014, 015, 023`).
-- **Near-ready / conditional UI automation:** 1 case (`016`) if anti-ban log UI exists immediately, plus 8 additional pending cases that still need deterministic fixtures or UI surface.
-- **Not suitable for sixV2Automation alone:** 9 backend-heavy cases covering concurrency, retry, reconciliation, resilience, and performance.
+- **Ready now in Playwright:** 4 cases (`001, 002, 011, 023`).
+- **Near-ready / conditional UI automation:** 2 cases (`015, 016`) plus additional pending cases that still need deterministic fixtures or UI surface.
+- **Not suitable for sixV2Automation alone:** backend-heavy cases covering concurrency, retry, reconciliation, internal config validation, resilience, and performance.
 
 
 ## Alignment Notes
 
-- QA test spec automation fields now mirror this mapping file.
+- QA test spec automation fields now mirror this mapping file and the PRD v0.3 protected resend scope.
 - Manual TSV remains the execution artifact and intentionally does not carry automation metadata.
 - Playwright-ready coverage is limited to deterministic UI/E2E cases; backend-heavy cases stay outside sixV2Automation.

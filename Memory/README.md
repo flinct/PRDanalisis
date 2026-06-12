@@ -4,6 +4,8 @@
 
 Folder `Memory` menyimpan context kerja persisten untuk domain PRD Analysis.
 
+> **IMPORTANT:** Artefak analisa permanen yang bersifat decision-bearing sekarang disimpan di `Assessments/`, bukan di `Memory/`. Folder `Memory/` hanya menyimpan canonical rules, deep-dive analysis, architecture reference, dan reusable knowledge.
+
 > **IMPORTANT:** Per 2026-05-25:
 > - **Conversation:** V2 (`PRD/Conversationv2/`) adalah source of truth. V1 (`PRD/Conversation/`) deprecated.
 > - **Ticket:** V2 (`PRD/ticketv2/`) adalah source of truth. V1 (`PRD/Ticket/`) deprecated.
@@ -19,6 +21,8 @@ README ini harus konsisten dengan aturan di `Rules/`:
 - `prd-writing-rule.md` — Framework penulisan PRD dengan Lite/Standard/Full mode, conditional sections, dan quality gate berbasis Conversation V2 dan Ticket V2.
 - `test-case-rule.md` — Framework penulisan QA test plan, test cases, test steps, coverage matrix, execution runbook, automation mapping berbasis hasil PRD analysis, dan output manual TSV `SatuInbox Test Case Scenario V2`.
 - `qa-analysis-rule.md` — **WAJIB.** Framework metodologi analisa QA senior untuk semua skenario: PRD analysis, feature dev, bug fix, interconnection, impact, risk. Merged from deprecated `analisa-prd-rule.md`.
+- `Assessments/README.md` — aturan penyimpanan artefak analisa permanen, latest/current vs `versions/`, dan archive historis.
+- `Assessments/templates/qa-assessment-report-template.md` — template baku QA Assessment Report permanen.
 - ~~`analisa-prd-rule.md`~~ — **DEPRECATED.** Semua konten sudah di-merge ke `qa-analysis-rule.md`. Jangan gunakan untuk analisa baru.
 
 ## Files
@@ -168,6 +172,30 @@ README ini harus konsisten dengan aturan di `Rules/`:
 - Pakai saat butuh referensi tooling QA Browser, cara setup agent server, atau status fitur tool
 - Update setiap ada perubahan signifikan pada `testcase-browser.html` atau `server.js`
 
+## Companion Artifacts Outside Memory
+
+Gunakan artefak di luar `Memory/` untuk kebutuhan berikut:
+
+### `Assessments/`
+- Simpan **hasil analisa permanen** yang mengandung decision, recommendation, dan histori revisi.
+- Format baku: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+- Gunakan `versions/` untuk histori immutable.
+
+### `Test/<domain>/`
+- Simpan **manual TSV**, **QA test spec**, dan **automation mapping**.
+- Pattern yang dipakai sekarang:
+  - `<Feature>.tsv`
+  - `<feature>-qa-test-spec.md`
+  - `<feature>-automation-mapping.md`
+
+### Current Example — WhatsApp Web Outbound Anti-Ban Guard
+- PRD: `PRD/Whatsapp web v2/PRD WA Web Outbound Anti-Ban Guard.md`
+- Assessment: `Assessments/whatsapp-web/wa-outbound-anti-ban-guard/wa-outbound-anti-ban-guard-qa-assessment.md`
+- Gap review: `Assessments/whatsapp-web/wa-outbound-anti-ban-guard/wa-outbound-anti-ban-final-gap-review.md`
+- Manual TSV: `Test/whatsapp-web/WhatsApp Web Outbound Anti-Ban Guard.tsv`
+- QA test spec: `Test/whatsapp-web/wa-outbound-anti-ban-qa-test-spec.md`
+- Automation mapping: `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`
+
 ### `CLAUDE-be.md`
 - Fungsi: canonical reference untuk BE repo `omnichannel-satuinbox-be`
 - Isi utama:
@@ -225,3 +253,5 @@ Sebelum melakukan tugas apapun, baca `Rules/agent-instruction.md` — ini adalah
 - temporary assumption
 - one-off exception
 - implementation noise
+- decision-bearing assessment drafts that belong in `Assessments/`
+- companion QA artifacts that belong in `Test/<domain>/`

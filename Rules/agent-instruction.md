@@ -32,6 +32,7 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 1. `Rules/workflow-rule.md` — execution order dan prioritas
 2. `Rules/structure-rule.md` — repository structure, termasuk lokasi artefak permanen di `Assessments/` dan script helper di `Scripts/`
 3. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
+4. `Assessments/README.md` — aturan artefak analisa permanen dan versioning bila tugas menyentuh hasil analisa yang ingin dipersist
 
 ### ANALYSIS / PRD / FEATURE DEV:
 
@@ -78,6 +79,8 @@ Rules/qa-analysis-rule.md         → WAJIB. Source analysis dan Test Specificat
 Rules/impact-analysis-rule.md     → Jika test perlu regression, rollout, rollback, atau cross-feature coverage.
 Rules/automation-bridge-rule.md   → Jika test case TSV akan disinkronkan ke repo automation.
 ```
+
+Output test case tidak terbatas pada TSV. Jika feature belum punya generator bridge, simpan juga companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md` dan `*-automation-mapping.md`.
 
 ### MEMORY WRITE:
 

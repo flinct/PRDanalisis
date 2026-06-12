@@ -125,11 +125,20 @@
   }
 
   // ─── SECTION CONFIG ───────────────────────────────────────────────────────────
-  const SECTIONS = [
+  const KNOWN_SECTIONS = [
     { id:'brd',  label:'BRD',        folderName:'BRD',  color:'var(--sec-brd)',  dimBg:'var(--sec-brd-bg)',  dimBd:'var(--sec-brd-bd)'  },
     { id:'prd',  label:'PRD',        folderName:'PRD',  color:'var(--sec-prd)',  dimBg:'var(--sec-prd-bg)',  dimBd:'var(--sec-prd-bd)'  },
     { id:'test', label:'Test Cases', folderName:'Test', color:'var(--sec-test)', dimBg:'var(--sec-test-bg)', dimBd:'var(--sec-test-bd)' },
   ];
+  const EXTRA_COLORS = [
+    { color:'#f59e0b', dimBg:'#1a0f00', dimBd:'#92400e' },
+    { color:'#ec4899', dimBg:'#1a001a', dimBd:'#831843' },
+    { color:'#06b6d4', dimBg:'#001a1e', dimBd:'#0e7490' },
+    { color:'#84cc16', dimBg:'#0d1a00', dimBd:'#365314' },
+    { color:'#f97316', dimBg:'#1a0800', dimBd:'#9a3412' },
+    { color:'#a78bfa', dimBg:'#0d0720', dimBd:'#4c1d95' },
+  ];
+  const EXCLUDED_FOLDERS = new Set(['port', 'node_modules']);
 
   // ─── CONSTANTS ───────────────────────────────────────────────────────────────
   const STATUS_OPTIONS = ['Passed', 'Failed', 'On Test', 'Need to Test', ''];
@@ -818,14 +827,22 @@
   }
 
   // ─── FILE NODE ────────────────────────────────────────────────────────────────
-  function FileNode({ node, depth=0, selected, onSelect, sectionColor, onCreateFolder }) {
+  function FileNode({ node, depth=0, selected, onSelect, sectionColor, onCreateFolder, activePath, forceOpen }) {
     const [open, setOpen]       = useState(depth < 2);
     const [showAdd, setShowAdd] = useState(false);
     const [hover, setHover]     = useState(false);
     const pl = 10 + depth * 16;
 
+    // Auto-expand if the selected file is inside this folder
+    useEffect(() => {
+      if (node.kind === 'dir' && activePath && activePath.startsWith(node.path + '\\')) {
+        setOpen(true);
+      }
+    }, [activePath]);
+
     if (node.kind === 'dir') {
       const fc = countFiles(node);
+      const isOpen = forceOpen || open;
       return (
         <div>
           <div
@@ -843,23 +860,22 @@
               onClick={() => setOpen(o => !o)}
               style={{ color:'var(--text-4)', fontSize:10, width:14, flexShrink:0, display:'inline-block', textAlign:'center' }}
             >
-              {open ? '▾' : '▸'}
+              {isOpen ? '▾' : '▸'}
             </span>
             <span
               onClick={() => setOpen(o => !o)}
-              style={{ fontSize:11, color: open ? 'var(--text-2)' : 'var(--text-4)', flex:1, marginLeft:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}
+              title={node.name}
+              style={{ fontSize:11, fontWeight:600, color: isOpen ? 'var(--text-2)' : 'var(--text-4)', flex:1, marginLeft:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}
             >
               {node.name}
             </span>
-            {hover && (
-              <button
-                onClick={e => { e.stopPropagation(); setShowAdd(true); }}
-                title="New subfolder"
-                style={{ fontSize:13, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 3px', flexShrink:0 }}
-              >
-                +
-              </button>
-            )}
+            <button
+              onClick={e => { e.stopPropagation(); setShowAdd(true); }}
+              title="New subfolder"
+              style={{ fontSize:13, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 3px', flexShrink:0, visibility: hover ? 'visible' : 'hidden' }}
+            >
+              +
+            </button>
             <span style={{ fontSize:9, color:'var(--border-1)', flexShrink:0, marginLeft:2 }}>{fc}</span>
           </div>
           {showAdd && (
@@ -869,11 +885,12 @@
               onCancel={() => setShowAdd(false)}
             />
           )}
-          {open && node.children.map(c => (
+          {isOpen && node.children.map(c => (
             <FileNode
               key={c.path} node={c} depth={depth + 1}
               selected={selected} onSelect={onSelect}
               sectionColor={sectionColor} onCreateFolder={onCreateFolder}
+              activePath={activePath} forceOpen={forceOpen}
             />
           ))}
         </div>
@@ -905,7 +922,7 @@
         }}/>
         <span style={{
           fontSize: active ? 12 : 11,
-          fontWeight: active ? 700 : 500,
+          fontWeight: active ? 700 : 600,
           color: active ? 'var(--text-1)' : 'var(--text-3)',
           flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
         }}>
@@ -917,11 +934,11 @@
   }
 
   // ─── SIDEBAR SECTION ─────────────────────────────────────────────────────────
-  function SidebarSection({ section, tree, sectionHandle, selected, onSelect, onCreateFolder }) {
-    const [expanded, setExpanded] = useState(true);
-    const [showAdd, setShowAdd]   = useState(false);
-    const [hover, setHover]       = useState(false);
+  function SidebarSection({ section, tree, sectionHandle, selected, onSelect, onCreateFolder, expanded, onToggle, forceOpen }) {
+    const [showAdd, setShowAdd] = useState(false);
+    const [hover, setHover]     = useState(false);
     const totalFiles = tree ? tree.reduce((s, n) => s + countFiles(n), 0) : 0;
+    const isExpanded = forceOpen || expanded;
 
     return (
       <div>
@@ -930,29 +947,29 @@
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           style={{ display:'flex', alignItems:'center', padding:'8px 10px 5px', userSelect:'none', cursor:'pointer' }}
-          onClick={() => setExpanded(e => !e)}
+          onClick={onToggle}
         >
           <span style={{ color:'var(--border-1)', fontSize:9, width:12, flexShrink:0, marginRight:5, display:'inline-block', textAlign:'center' }}>
-            {expanded ? '▾' : '▸'}
+            {isExpanded ? '▾' : '▸'}
           </span>
           <span style={{ fontSize:9, fontWeight:700, color: section.color, textTransform:'uppercase', letterSpacing:'0.1em', flex:1 }}>
             {section.label}
           </span>
-          {!expanded && totalFiles > 0 && (
+          {!isExpanded && totalFiles > 0 && (
             <span style={{ fontSize:9, color:'var(--text-4)', marginRight:4 }}>{totalFiles}</span>
           )}
-          {hover && sectionHandle && (
+          {sectionHandle && (
             <button
               onClick={e => { e.stopPropagation(); setShowAdd(s => !s); }}
               title={`New folder in ${section.label}`}
-              style={{ fontSize:14, lineHeight:1, background:'none', border:'none', color:hover?'var(--text-4)':'var(--text-5)', cursor:'pointer', padding:'0 3px', flexShrink:0 }}
+              style={{ fontSize:14, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 3px', flexShrink:0, visibility: hover ? 'visible' : 'hidden' }}
             >
               +
             </button>
           )}
         </div>
 
-        {expanded && (
+        {isExpanded && (
           <div style={{ paddingBottom:4 }}>
             {showAdd && sectionHandle && (
               <InlineFolderInput
@@ -976,6 +993,8 @@
                 onSelect={n => onSelect(n, section.id)}
                 sectionColor={section.color}
                 onCreateFolder={(parentHandle, name) => onCreateFolder(section.id, parentHandle, name)}
+                activePath={selected}
+                forceOpen={forceOpen}
               />
             ))}
           </div>
@@ -987,7 +1006,83 @@
   }
 
   // ─── CARD EDITOR ─────────────────────────────────────────────────────────────
-  function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath }) {
+  // ─── AUTOMAP ROW — extracted to avoid hooks-in-IIFE violation ───────────────
+  function AutomapRow({ caseId, autoMap, onSaveMap, onRunCase }) {
+    const am = autoMap[caseId] || {};
+    const [localMap, setLocalMap] = useState({
+      tc_type:      am.tc_type      || 'manual',
+      spec_file:    am.spec_file    || '',
+      grep_pattern: am.grep_pattern || '',
+    });
+    const [saved, setSaved] = useState(false);
+
+    // Sync if parent autoMap changes (e.g. after initial load)
+    useEffect(() => {
+      const a = autoMap[caseId] || {};
+      setLocalMap({ tc_type: a.tc_type || 'manual', spec_file: a.spec_file || '', grep_pattern: a.grep_pattern || '' });
+    }, [autoMap, caseId]);
+
+    function doSave() {
+      onSaveMap && onSaveMap(caseId, localMap);
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    }
+
+    return (
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontSize:9, color:'#0e7490', textTransform:'uppercase', letterSpacing:1, marginBottom:8,
+          padding:'3px 9px', background:'#001a1e', borderRadius:4, display:'inline-block', border:'1px solid #155e75' }}>
+          🤖 Automation Mapping
+        </div>
+        <div style={{ padding:'10px 12px', background:'var(--app-bg)', borderRadius:6,
+          border:'1px solid var(--border-1)', display:'flex', flexDirection:'column', gap:10 }}>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap', alignItems:'flex-end' }}>
+            <div>
+              <div style={{ fontSize:9, color:'var(--text-4)', marginBottom:4 }}>TYPE</div>
+              <select value={localMap.tc_type} onChange={e=>setLocalMap(p=>({...p,tc_type:e.target.value}))}
+                style={{ fontSize:11, padding:'4px 10px', borderRadius:6, border:'1px solid var(--border-1)',
+                  background:'var(--elevated-bg)', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}>
+                <option value="manual">manual</option>
+                <option value="automation">automation</option>
+                <option value="special">special</option>
+              </select>
+            </div>
+            <div style={{ flex:1, minWidth:200 }}>
+              <div style={{ fontSize:9, color:'var(--text-4)', marginBottom:4 }}>SPEC FILE</div>
+              <input value={localMap.spec_file} onChange={e=>setLocalMap(p=>({...p,spec_file:e.target.value}))}
+                placeholder="e.g. tests/conversation/chat.spec.ts"
+                style={{ width:'100%', fontSize:11, padding:'4px 10px', borderRadius:6,
+                  border:'1px solid var(--border-1)', background:'var(--elevated-bg)',
+                  color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}/>
+            </div>
+            <div style={{ flex:1, minWidth:150 }}>
+              <div style={{ fontSize:9, color:'var(--text-4)', marginBottom:4 }}>GREP PATTERN (optional)</div>
+              <input value={localMap.grep_pattern} onChange={e=>setLocalMap(p=>({...p,grep_pattern:e.target.value}))}
+                placeholder="e.g. SIX-Convo-001"
+                style={{ width:'100%', fontSize:11, padding:'4px 10px', borderRadius:6,
+                  border:'1px solid var(--border-1)', background:'var(--elevated-bg)',
+                  color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}/>
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <button onClick={doSave}
+              style={{ fontSize:11, padding:'4px 14px', borderRadius:6, border:'none',
+                background:'#0369a1', color:'#fff', cursor:'pointer' }}>
+              {saved ? '✓ Saved' : 'Save Mapping'}
+            </button>
+            {localMap.spec_file && (
+              <button onClick={()=>onRunCase && onRunCase(caseId, localMap.spec_file, localMap.grep_pattern)}
+                style={{ fontSize:11, padding:'4px 14px', borderRadius:6,
+                  border:'1px solid #065f46', background:'#022c22', color:'#4ade80', cursor:'pointer' }}>
+                ▶ Run Test
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath, autoMap={}, onSaveMap, onRunCase }) {
     const [cases, setCases]               = useState(initCases);
     const [execData, setExecData]         = useState(initExecData);
     const [activeVersion, setActiveVersion] = useState(initialVersion || 'v1');
@@ -1116,13 +1211,30 @@
     async function save() {
       setSaving(true);
       try {
-        await writeFile(fileHandle, serializeCardToTSV(cases));
-        if (rootHandle && filePath) {
+        // Save TSV via API (filePath) or legacy fileHandle
+        const tsvContent = serializeCardToTSV(cases);
+        if (filePath) {
+          const r = await fetch('/api/files/content?path=' + encodeURIComponent(filePath), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: tsvContent }),
+          });
+          if (!r.ok) throw new Error(await r.text());
+        } else if (fileHandle) {
+          await writeFile(fileHandle, tsvContent);
+        }
+        // Save exec JSON
+        if (filePath) {
           const srcName = filePath.split('/').pop();
           const newExec = buildExecJSON(cases, execData, filePath, srcName, activeVersion);
-          await saveExecFile(rootHandle, filePath, newExec);
-          const updCases = applyExecDataToCases(cases, newExec, activeVersion);
-          setCases(updCases);
+          const execPath = filePath.replace(/\.tsv$/i, '.exec.json').replace(/\.csv$/i, '.exec.json');
+          const r2 = await fetch('/api/files/content?path=' + encodeURIComponent(execPath), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: JSON.stringify(newExec, null, 2) }),
+          });
+          if (!r2.ok) throw new Error(await r2.text());
+          setCases(applyExecDataToCases(cases, newExec, activeVersion));
           setExecData(newExec);
         } else {
           setCases(p=>p.map(tc=>{ const {_isReset,_resetReason,_legacyExec,...r}=tc; return r; }));
@@ -1268,8 +1380,8 @@
         </div>
 
         {/* Table header */}
-        <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 120px 36px', padding:'5px 14px', fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)', flexShrink:0 }}>
-          <div>Test ID</div><div>Scenario</div><div>Status ({env})</div><div>Updated</div><div></div>
+        <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 70px 150px 120px 46px', padding:'5px 14px', fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:1, borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)', flexShrink:0 }}>
+          <div>Test ID</div><div>Scenario</div><div>Type</div><div>Status ({env})</div><div>Updated</div><div></div>
         </div>
 
         {/* Rows */}
@@ -1281,18 +1393,36 @@
             return (
               <div key={gi} style={{ borderBottom:'1px solid var(--deep-bg)' }}>
                 <div onClick={()=>setExpanded(isOpen?null:gi)}
-                  style={{ display:'grid', gridTemplateColumns:'110px 1fr 150px 120px 36px', padding:'7px 14px', alignItems:'center', cursor:'pointer',
+                  style={{ display:'grid', gridTemplateColumns:'110px 1fr 70px 150px 120px 46px', padding:'7px 14px', alignItems:'center', cursor:'pointer',
                     background:isOpen?'#0d1b30':'transparent', borderLeft:isOpen?'2px solid #3b82f6':'2px solid transparent' }}>
                   <div style={{ fontSize:11, color:'#60a5fa', fontWeight:600 }}>{tc.id||'—'}</div>
                   <div style={{ fontSize:12, color:'var(--text-1)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:12 }}>
                     {tc.scenario||tc.description||'—'}
                     {tc.exec?.notes && <span style={{ fontSize:10, color:'#fbbf24', marginLeft:8 }}>⚠ {tc.exec.notes}</span>}
                   </div>
+                  {/* Automation type badge */}
+                  <div onClick={e=>e.stopPropagation()}>
+                    {(() => {
+                      const am = autoMap[tc.id] || {};
+                      const t  = am.tc_type || 'manual';
+                      const cfg = { automation:{c:'#4ade80',bg:'#052e16',bd:'#14532d'}, manual:{c:'#94a3b8',bg:'#1e293b',bd:'#334155'}, special:{c:'#fbbf24',bg:'#1c1000',bd:'#92400e'} }[t] || {};
+                      return <span style={{ fontSize:9, padding:'2px 7px', borderRadius:10, border:`1px solid ${cfg.bd}`, background:cfg.bg, color:cfg.c, whiteSpace:'nowrap' }}>{t}</span>;
+                    })()}
+                  </div>
                   <div onClick={e=>e.stopPropagation()}>
                     <StatusSelect value={oSt} onChange={v=>updOverall(gi,env,v)} />
                   </div>
                   <div style={{ fontSize:9, color:'var(--text-4)' }}>{fmtDate(tc.exec?.updatedAt)}</div>
-                  <div style={{ fontSize:11, color:'var(--text-4)', textAlign:'center', userSelect:'none' }}>{isOpen?'▲':'▼'}</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:4, justifyContent:'flex-end' }}>
+                    {autoMap[tc.id]?.spec_file && (
+                      <button onClick={e=>{ e.stopPropagation(); onRunCase && onRunCase(tc.id, autoMap[tc.id]?.spec_file, autoMap[tc.id]?.grep_pattern); }}
+                        title="Run Playwright test"
+                        style={{ fontSize:10, padding:'2px 5px', borderRadius:4, border:'1px solid #065f46', background:'#022c22', color:'#4ade80', cursor:'pointer' }}>
+                        ▶
+                      </button>
+                    )}
+                    <span style={{ fontSize:11, color:'var(--text-4)', userSelect:'none' }}>{isOpen?'▲':'▼'}</span>
+                  </div>
                 </div>
 
                 {isOpen && (
@@ -1372,6 +1502,7 @@
                         </Field>
                       </div>
                     </div>
+                    <AutomapRow caseId={tc.id} autoMap={autoMap} onSaveMap={onSaveMap} onRunCase={onRunCase} />
                     <HistoryPanel history={tc.history} currentSnapshot={tcToSnapshot(tc)}/>
                     <div style={{ display:'flex', justifyContent:'space-between', marginTop:14 }}>
                       <button onClick={()=>setResetIdx(gi)}
@@ -1435,12 +1566,39 @@
     );
   }
 
-  function MarkdownViewer({ content, fileHandle }) {
+  function MarkdownViewer({ content, fileHandle, filePath }) {
     const [editMode, setEditMode] = useState(false);
     const [draft, setDraft]       = useState(content);
     const [saving, setSaving]     = useState(false);
     const [saveErr, setSaveErr]   = useState(null);
+    const [copied, setCopied]     = useState(false);
     const mdRef                   = useRef(null);
+
+    function handleCopy() {
+      if (!mdRef.current) return;
+      const html = mdRef.current.innerHTML;
+      try {
+        const item = new ClipboardItem({
+          'text/html':  new Blob([html],  { type: 'text/html' }),
+          'text/plain': new Blob([draft], { type: 'text/plain' }),
+        });
+        navigator.clipboard.write([item]).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }).catch(() => {
+          // fallback: plain text
+          navigator.clipboard.writeText(draft).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          });
+        });
+      } catch {
+        navigator.clipboard.writeText(draft).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        });
+      }
+    }
 
     // Set innerHTML from draft — on mount and after save.
     // We never touch innerHTML while the user is editing (editMode=true),
@@ -1450,16 +1608,29 @@
     }, [draft]);
 
     async function handleSave() {
-      if (!fileHandle || !mdRef.current) return;
+      if (!mdRef.current) return;
       setSaving(true); setSaveErr(null);
       try {
         const td = new TurndownService({ headingStyle: 'atx', hr: '---', codeBlockStyle: 'fenced' });
         td.use(turndownPluginGfm.gfm);
         const markdown = td.turndown(mdRef.current.innerHTML);
-        const w = await fileHandle.createWritable();
-        await w.write(markdown);
-        await w.close();
-        setDraft(markdown);   // triggers useLayoutEffect → re-renders innerHTML
+        if (filePath) {
+          // API-based save (server mode)
+          const r = await fetch('/api/files/content?path=' + encodeURIComponent(filePath), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: markdown }),
+          });
+          if (!r.ok) throw new Error(await r.text());
+        } else if (fileHandle) {
+          // Legacy File System Access API fallback
+          const w = await fileHandle.createWritable();
+          await w.write(markdown);
+          await w.close();
+        } else {
+          throw new Error('No save target — filePath or fileHandle required');
+        }
+        setDraft(markdown);
         setEditMode(false);
       } catch(e) {
         setSaveErr(e.message || 'Save failed');
@@ -1479,6 +1650,12 @@
         <div style={{ padding:'5px 14px', borderBottom:'1px solid var(--elevated-bg)', background:'var(--sidebar-bg)',
           display:'flex', alignItems:'center', justifyContent:'flex-end', gap:6, flexShrink:0 }}>
           {saveErr && <span style={{ fontSize:10, color:'#f87171', flex:1 }}>⚠ {saveErr}</span>}
+          <button onClick={handleCopy}
+            style={{ fontSize:10, color: copied ? '#22c55e' : 'var(--text-3)', background:'transparent',
+              border:'1px solid var(--border-1)', borderRadius:4, padding:'3px 10px', cursor:'pointer',
+              transition:'color 0.2s' }}>
+            {copied ? '✓ Copied!' : '⎘ Copy'}
+          </button>
           {editMode ? (
             <>
               <span style={{ fontSize:10, color:'var(--text-4)', flex:1 }}>✎ editing</span>
@@ -1521,239 +1698,6 @@
     );
   }
 
-  // ─── AGENT PANEL ──────────────────────────────────────────────────────────────
-  const AGENT_URL = 'http://localhost:3001';
-
-  function AgentPanel({ context, onClose }) {
-    const [messages,  setMessages]  = useState([]);
-    const [input,     setInput]     = useState('');
-    const [streaming, setStreaming] = useState(false);
-    const [serverOk,  setServerOk]  = useState(null); // null=checking, true, false
-    const [sessionId] = useState(() => `s-${Date.now()}`);
-    const bottomRef   = useRef(null);
-    const inputRef    = useRef(null);
-
-    // Check server health on mount
-    useEffect(() => {
-      fetch(`${AGENT_URL}/health`).then(r => r.ok ? setServerOk(true) : setServerOk(false)).catch(() => setServerOk(false));
-    }, []);
-
-    // Auto-scroll to latest message
-    useEffect(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    async function sendMessage() {
-      const text = input.trim();
-      if (!text || streaming || !serverOk) return;
-
-      const userMsg = { role: 'user', content: text };
-      setMessages(prev => [...prev, userMsg, { role: 'assistant', content: '', toolCalls: [], _streaming: true }]);
-      setInput('');
-      setStreaming(true);
-
-      try {
-        const apiMsgs = [...messages, userMsg].map(m => ({ role: m.role, content: m.content || '' }));
-
-        const resp = await fetch(`${AGENT_URL}/chat`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ messages: apiMsgs, context, sessionId }),
-        });
-
-        if (!resp.ok) throw new Error(`Server error ${resp.status}`);
-
-        const reader  = resp.body.getReader();
-        const decoder = new TextDecoder();
-        let buf = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += decoder.decode(value, { stream: true });
-
-          // consume complete SSE lines
-          const parts = buf.split('\n');
-          buf = parts.pop();
-
-          for (const line of parts) {
-            if (!line.startsWith('data: ')) continue;
-            let evt;
-            try { evt = JSON.parse(line.slice(6)); } catch { continue; }
-
-            setMessages(prev => {
-              const next = [...prev];
-              const last = { ...next[next.length - 1] };
-
-              if (evt.type === 'text') {
-                last.content = (last.content || '') + evt.content;
-              } else if (evt.type === 'tool_call') {
-                last.toolCalls = [...(last.toolCalls || []), {
-                  id: evt.id, tool: evt.tool, input: evt.input, result: null,
-                }];
-              } else if (evt.type === 'tool_result') {
-                last.toolCalls = (last.toolCalls || []).map(tc =>
-                  tc.id === evt.id ? { ...tc, result: evt.preview } : tc
-                );
-              } else if (evt.type === 'error') {
-                last.content = `⚠ ${evt.message}`;
-              } else if (evt.type === 'done') {
-                last._streaming = false;
-              }
-
-              next[next.length - 1] = last;
-              return next;
-            });
-          }
-        }
-      } catch (e) {
-        setMessages(prev => {
-          const next = [...prev];
-          next[next.length - 1] = { ...next[next.length - 1], content: `⚠ ${e.message}`, _streaming: false };
-          return next;
-        });
-      } finally {
-        setStreaming(false);
-      }
-    }
-
-    function handleKey(e) {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-    }
-
-    const btnStyle = (active) => ({
-      fontSize: 10, padding: '2px 8px', borderRadius: 4, cursor: 'pointer', border: 'none',
-      background: active ? '#6d28d9' : 'var(--elevated-bg)', color: active ? '#fff' : 'var(--text-3)',
-    });
-
-    return (
-      <div style={{
-        position: 'fixed', top: 44, right: 0, bottom: 0, width: 400, zIndex: 100,
-        background: 'var(--sidebar-bg)', borderLeft: '1px solid var(--border-1)',
-        display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.4)',
-      }}>
-
-        {/* Header */}
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--elevated-bg)', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#a78bfa', flex: 1 }}>◈ QA Agent</span>
-          <span style={{
-            fontSize: 9, padding: '1px 6px', borderRadius: 10, fontWeight: 600,
-            background: serverOk === null ? 'var(--elevated-bg)' : serverOk ? '#052e16' : '#2d0e0e',
-            color:      serverOk === null ? 'var(--text-4)'      : serverOk ? '#4ade80' : '#f87171',
-            border:     `1px solid ${serverOk === null ? 'var(--border-1)' : serverOk ? '#166534' : '#7f1d1d'}`,
-          }}>
-            {serverOk === null ? 'connecting…' : serverOk ? '● online' : '● offline — jalankan server.js'}
-          </span>
-          <button onClick={() => setMessages([])} title="New session"
-            style={{ fontSize: 11, background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '0 4px' }}>
-            ⊕
-          </button>
-          <button onClick={onClose}
-            style={{ fontSize: 13, background: 'none', border: 'none', color: 'var(--text-4)', cursor: 'pointer', padding: '0 4px' }}>
-            ✕
-          </button>
-        </div>
-
-        {/* Context badge */}
-        {context && (
-          <div style={{ padding: '4px 12px', borderBottom: '1px solid var(--elevated-bg)', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, background: 'var(--deep-bg)' }}>
-            <span style={{ fontSize: 9, color: 'var(--text-4)', textTransform: 'uppercase', letterSpacing: 1 }}>Context:</span>
-            <span style={{ fontSize: 10, color: 'var(--text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{context.filename}</span>
-            <span style={{ fontSize: 9, color: 'var(--text-5)', flexShrink: 0 }}>{context.type}</span>
-          </div>
-        )}
-
-        {/* Messages */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-          {messages.length === 0 && (
-            <div style={{ textAlign: 'center', marginTop: 40, color: 'var(--text-4)', fontSize: 11 }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>◈</div>
-              <div>Tanya agent tentang PRD, test case, atau analisa coverage.</div>
-              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
-                {[
-                  'Analisa coverage PRD ini',
-                  'Cari gap test case vs PRD',
-                  'Buat ringkasan test case yang ada',
-                  'Run automation untuk TC ini',
-                ].map(s => (
-                  <button key={s} onClick={() => { setInput(s); inputRef.current?.focus(); }}
-                    style={{ fontSize: 10, padding: '4px 12px', borderRadius: 6, cursor: 'pointer',
-                      background: 'var(--elevated-bg)', border: '1px solid var(--border-1)', color: 'var(--text-3)' }}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {messages.map((msg, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4,
-              alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-
-              {/* Tool calls */}
-              {msg.role === 'assistant' && (msg.toolCalls || []).map((tc, j) => (
-                <div key={j} style={{ fontSize: 10, padding: '4px 8px', borderRadius: 6, maxWidth: '90%',
-                  background: 'var(--deep-bg)', border: '1px solid var(--border-1)', color: 'var(--text-4)' }}>
-                  <div style={{ color: '#a78bfa', fontWeight: 600, marginBottom: 2 }}>
-                    🔧 {tc.tool}({Object.keys(tc.input || {}).map(k => `${k}: "${String(tc.input[k]).slice(0, 30)}"`).join(', ')})
-                  </div>
-                  {tc.result !== null && (
-                    <div style={{ color: 'var(--text-5)', fontStyle: 'italic' }}>{tc.result}</div>
-                  )}
-                </div>
-              ))}
-
-              {/* Message bubble */}
-              {(msg.content || msg._streaming) && (
-                <div style={{
-                  maxWidth: '92%', padding: '8px 12px', borderRadius: 8, fontSize: 12, lineHeight: 1.7,
-                  background: msg.role === 'user' ? '#2d1b69' : 'var(--elevated-bg)',
-                  border: `1px solid ${msg.role === 'user' ? '#4c1d95' : 'var(--border-1)'}`,
-                  color: msg.role === 'user' ? '#ddd6fe' : 'var(--text-2)',
-                }}>
-                  {msg.role === 'assistant'
-                    ? <div className="md" style={{ fontSize: 12 }} dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || '') }} />
-                    : msg.content
-                  }
-                  {msg._streaming && !msg.content && (
-                    <span style={{ color: 'var(--text-5)', animation: 'pulse 1s infinite' }}>▍</span>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Input */}
-        <div style={{ padding: '8px 12px', borderTop: '1px solid var(--elevated-bg)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder={serverOk ? 'Tanya agent… (Enter kirim, Shift+Enter newline)' : 'Server offline — jalankan: node server.js'}
-              disabled={!serverOk || streaming}
-              rows={1}
-              style={{ flex: 1, fontSize: 12, padding: '6px 10px', borderRadius: 6, resize: 'none', overflow: 'hidden',
-                border: '1px solid var(--border-1)', background: 'var(--elevated-bg)', color: 'var(--text-1)',
-                outline: 'none', fontFamily: 'inherit', opacity: serverOk ? 1 : 0.5 }}
-              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
-            />
-            <button onClick={sendMessage} disabled={!input.trim() || streaming || !serverOk}
-              style={{ fontSize: 12, padding: '6px 12px', borderRadius: 6, cursor: 'pointer', flexShrink: 0, border: 'none',
-                background: streaming ? 'var(--text-5)' : '#6d28d9', color: '#fff',
-                opacity: (!input.trim() || !serverOk) ? 0.4 : 1 }}>
-              {streaming ? '…' : '↑'}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // ─── THEME SWITCHER (isolated component — only this re-renders on theme change)
   const ThemeSwitcher = React.forwardRef(function ThemeSwitcher({ onSwitch }, ref) {
     const [activeTheme, setActiveTheme] = useState('navy');
@@ -1779,98 +1723,259 @@
     );
   });
 
+  // ─── RUN PANEL ────────────────────────────────────────────────────────────────
+  function RunPanel({ caseId, specFile, grepPattern, onClose }) {
+    const [lines, setLines]   = useState([]);
+    const [status, setStatus] = useState('running'); // running | pass | fail | error
+    const [elapsed, setElapsed] = useState(0);
+    const abortRef = useRef(null);
+    const bodyRef  = useRef(null);
+    const timerRef = useRef(null);
+
+    useEffect(() => {
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+      const t0 = Date.now();
+      timerRef.current = setInterval(() => setElapsed(Math.floor((Date.now()-t0)/1000)), 500);
+
+      fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseId, spec_file: specFile, grep_pattern: grepPattern }),
+        signal: ctrl.signal,
+      }).then(async res => {
+        const reader = res.body.getReader();
+        const dec    = new TextDecoder();
+        let   buf    = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const parts = buf.split('\n\n');
+          buf = parts.pop();
+          for (const part of parts) {
+            const dataLine = part.split('\n').find(l => l.startsWith('data:'));
+            if (!dataLine) continue;
+            try {
+              const evt = JSON.parse(dataLine.slice(5));
+              if (evt.type === 'output') {
+                setLines(prev => [...prev, ...evt.text.split('\n').filter(Boolean)]);
+                setTimeout(() => bodyRef.current?.scrollTo(0, bodyRef.current.scrollHeight), 30);
+              } else if (evt.type === 'run_end') {
+                setStatus(evt.status);
+                clearInterval(timerRef.current);
+                setElapsed(Math.round(evt.duration_ms / 1000));
+              }
+            } catch {}
+          }
+        }
+      }).catch(e => {
+        if (e.name !== 'AbortError') { setStatus('error'); clearInterval(timerRef.current); }
+      });
+
+      return () => {
+        ctrl.abort();
+        clearInterval(timerRef.current);
+      };
+    }, []);
+
+    const statusColor = { running:'#60a5fa', pass:'#4ade80', fail:'#f87171', error:'#fbbf24' }[status] || '#888';
+
+    return (
+      <div style={{ position:'fixed', bottom:0, right:0, width:600, height:380, zIndex:200,
+        background:'var(--sidebar-bg)', border:'1px solid var(--border-1)',
+        borderBottom:'none', borderRight:'none', borderRadius:'8px 0 0 0',
+        display:'flex', flexDirection:'column', fontFamily:'inherit' }}>
+        {/* Header */}
+        <div style={{ padding:'7px 12px', borderBottom:'1px solid var(--border-1)',
+          display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+          <span style={{ fontSize:10, color:statusColor, fontWeight:700 }}>
+            {status === 'running' ? '● Running…' : status === 'pass' ? '✓ Passed' : status === 'fail' ? '✗ Failed' : '⚠ Error'}
+          </span>
+          <span style={{ fontSize:10, color:'var(--text-4)', flex:1 }}>{caseId} · {specFile}{grepPattern ? ` --grep "${grepPattern}"` : ''}</span>
+          <span style={{ fontSize:10, color:'var(--text-5)' }}>{elapsed}s</span>
+          {status === 'running' && (
+            <button onClick={() => abortRef.current?.abort()}
+              style={{ fontSize:10, padding:'2px 8px', borderRadius:4, border:'1px solid #7f1d1d', background:'#1c0a0a', color:'#f87171', cursor:'pointer' }}>
+              ■ Stop
+            </button>
+          )}
+          <button onClick={onClose}
+            style={{ fontSize:12, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 2px' }}>✕</button>
+        </div>
+        {/* Output */}
+        <div ref={bodyRef} style={{ flex:1, overflowY:'auto', padding:'8px 12px', fontSize:11, lineHeight:1.6, color:'var(--text-2)' }}>
+          {lines.map((l, i) => {
+            const col = /\bPASS\b|✓|passed/i.test(l) ? '#4ade80'
+                      : /\bFAIL\b|✗|failed|error/i.test(l) ? '#f87171'
+                      : /^\s+\d+ (passed|failed)/i.test(l) ? '#fbbf24'
+                      : 'var(--text-2)';
+            return <div key={i} style={{ color: col, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>{l}</div>;
+          })}
+          {lines.length === 0 && status === 'running' && (
+            <div style={{ color:'var(--text-5)', fontStyle:'italic' }}>Starting Playwright…</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // ─── APP ──────────────────────────────────────────────────────────────────────
   function App() {
-    const [dirName, setDirName]           = useState('');
-    const [sectionTrees, setSectionTrees] = useState({});
-    const [sectionHandles, setSH]         = useState({});
-    const [selected, setSelected]         = useState(null); // { node, sectionId }
-    const [fileData, setFileData]         = useState(null);
-    const [loading, setLoading]           = useState(false);
-    const [scanning, setScanning]         = useState(false);
-    const [error, setError]               = useState(null);
-    const [savedHandle, setSavedHandle]   = useState(null);
-    const [sideSearch, setSideSearch]     = useState('');
-    const themeRef  = useRef(null);  // ref to ThemeSwitcher — only it re-renders on theme change
-    const [agentOpen, setAgentOpen] = useState(false);
-    const supported = 'showDirectoryPicker' in window;
+    const [sections, setSections]     = useState([]);
+    const [selected, setSelected]     = useState(null); // { path, sectionId, name, ext }
+    const [fileData, setFileData]     = useState(null);
+    const [loading, setLoading]       = useState(false);
+    const [error, setError]           = useState(null);
+    const [sideSearch, setSideSearch] = useState('');
+    const [sidebarWidth, setSidebarWidth] = useState(256);
+    const [activeSection, setActiveSection] = useState(null);
+    const [autoMap, setAutoMap]       = useState({});
+    const [runCase, setRunCase]       = useState(null); // { caseId, specFile, grepPattern }
+    const [importing, setImporting]   = useState(false);
+    const [importMsg, setImportMsg]   = useState('');
+    const themeRef  = useRef(null);
+    const isDraggingRef = useRef(false);
+    const dragStartXRef = useRef(0);
+    const dragStartWRef = useRef(0);
 
-    // Context injected into every AI agent request — built from currently open file
-    const agentContext = selected && fileData ? {
-      filename:  selected.node.name,
-      path:      selected.node.path,
-      sectionId: selected.sectionId,
-      type:      fileData.type,
-      content:   fileData.type === 'md'
-        ? fileData.content?.slice(0, 3000)
-        : fileData.type === 'card'
-          ? fileData.cases?.slice(0, 15).map(tc => `${tc.id}: ${tc.scenario}`).join('\n')
-          : null,
-    } : null;
+    // ── Sidebar resize ──────────────────────────────────────────────────────────
+    function onResizeStart(e) {
+      isDraggingRef.current = true;
+      dragStartXRef.current = e.clientX;
+      dragStartWRef.current = sidebarWidth;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      const onMove = ev => {
+        if (!isDraggingRef.current) return;
+        const next = Math.min(480, Math.max(160, dragStartWRef.current + ev.clientX - dragStartXRef.current));
+        setSidebarWidth(next);
+      };
+      const onUp = () => {
+        isDraggingRef.current = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    }
 
+    // ── Theme ───────────────────────────────────────────────────────────────────
     function switchTheme(id) {
       const t = THEMES.find(x => x.id === id);
       if (!t) return;
-      applyThemeVars(t);       // immediate CSS paint, no React involved
+      applyThemeVars(t);
       saveThemeIDB(id);
-      // Double-RAF: swatch indicator update hanya terjadi setelah browser commit paint CSS vars
-      // Only ThemeSwitcher (6 buttons) re-renders — NOT the entire App tree
       requestAnimationFrame(() => requestAnimationFrame(() => themeRef.current?.setTheme(id)));
     }
 
-    async function loadSections(handle) {
-      setScanning(true);
-      const handles = {}, trees = {};
-      for (const sec of SECTIONS) {
-        try {
-          const h = await handle.getDirectoryHandle(sec.folderName);
-          handles[sec.id] = h;
-          trees[sec.id] = await scanDir(h);
-        } catch {
-          handles[sec.id] = null;
-          trees[sec.id] = null;
-        }
-      }
-      // Fallback: if user opened a section folder directly (e.g., Test/)
-      const anyFound = Object.values(handles).some(h => h !== null);
-      if (!anyFound) {
-        const matched = SECTIONS.find(s => s.folderName.toLowerCase() === handle.name.toLowerCase());
-        if (matched) {
-          handles[matched.id] = handle;
-          trees[matched.id] = await scanDir(handle);
-        }
-      }
-      setSH(handles);
-      setSectionTrees(trees);
-      setScanning(false);
-      return { handles, trees };
+    // ── Load file tree from API ──────────────────────────────────────────────────
+    async function loadTree() {
+      try {
+        const res = await fetch('/api/files');
+        const data = await res.json();
+        setSections(data);
+        // expand first section that has content
+        const first = data.find(s => s.tree?.length > 0);
+        if (first && !activeSection) setActiveSection(first.id);
+      } catch(e) { setError('Cannot reach server: ' + e.message); }
     }
 
-    async function doOpen(handle) {
-      await saveHandleIDB(handle);
-      setDirName(handle.name);
-      setSavedHandle(null);
-      setSelected(null);
-      setFileData(null);
-      const { handles, trees } = await loadSections(handle);
-
-      // Restore last file
-      const lastRaw = await loadLastFileIDB();
-      if (lastRaw) {
-        let info = null;
-        try { info = JSON.parse(lastRaw); } catch {}
-        if (info?.sectionId && info?.path) {
-          const tree = trees[info.sectionId];
-          if (tree) {
-            const node = findNodeByPath(tree, info.path);
-            if (node) openFile(node, info.sectionId, handles);
+    // ── Load automation map for a file's test cases ──────────────────────────────
+    async function loadAutoMap(cases) {
+      if (!cases?.length) return;
+      const ids = cases.map(c => c.id).filter(Boolean);
+      if (!ids.length) return;
+      try {
+        const rows = await fetch('/api/testcases?' + new URLSearchParams({ limit: 500 }))
+          .then(r => r.json());
+        const map = {};
+        for (const row of rows) {
+          if (row.tc_type || row.spec_file) {
+            map[row.id] = { tc_type: row.tc_type || 'manual', spec_file: row.spec_file || '', grep_pattern: row.grep_pattern || '' };
           }
         }
-      }
+        setAutoMap(map);
+      } catch {}
     }
 
+    // ── Open a file ─────────────────────────────────────────────────────────────
+    async function openFile(node, sectionId) {
+      if (node.kind !== 'file') return;
+      setSelected({ path: node.path, sectionId, name: node.name, ext: node.ext });
+      setActiveSection(sectionId);
+      setLoading(true);
+      setFileData(null);
+      setError(null);
+      try {
+        const text = await fetch('/api/files/content?path=' + encodeURIComponent(node.path)).then(r => r.text());
+        const ne = text.split('\n');
+        if (node.ext === 'md') {
+          setFileData({ type: 'md', content: text, path: node.path });
+        } else {
+          // Try card format
+          function isCardFmt(lines) {
+            const first10 = lines.slice(0, 10).join('\t');
+            return /Test ID/i.test(first10) || /Scenario/i.test(first10);
+          }
+          if (isCardFmt(ne)) {
+            const cases = parseCardFormat(ne);
+            // try to get exec data from companion JSON
+            const execPath = node.path.replace(/\.tsv$/i, '.exec.json').replace(/\.csv$/i, '.exec.json');
+            let execData = null;
+            try {
+              const ejson = await fetch('/api/files/content?path=' + encodeURIComponent(execPath)).then(r => r.ok ? r.json() : null);
+              execData = ejson;
+            } catch {}
+            setFileData({ type: 'card', cases, execData, path: node.path });
+            await loadAutoMap(cases);
+          } else {
+            setFileData({ type: 'text', content: text, path: node.path });
+          }
+        }
+      } catch(e) { setError(e.message); }
+      setLoading(false);
+    }
+
+    // ── Save exec JSON via API ───────────────────────────────────────────────────
+    async function saveExecViaAPI(tsvPath, execData) {
+      const execPath = tsvPath.replace(/\.tsv$/i, '.exec.json').replace(/\.csv$/i, '.exec.json');
+      await fetch('/api/files/content?path=' + encodeURIComponent(execPath), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: JSON.stringify(execData, null, 2) }),
+      });
+    }
+
+    // ── Save automation mapping ──────────────────────────────────────────────────
+    async function handleSaveMap(caseId, mapData) {
+      try {
+        await fetch(`/api/testcases/${caseId}/map`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mapData),
+        });
+        setAutoMap(prev => ({ ...prev, [caseId]: { tc_type: mapData.tc_type || 'manual', spec_file: mapData.spec_file || '', grep_pattern: mapData.grep_pattern || '' } }));
+      } catch(e) { alert('Save mapping failed: ' + e.message); }
+    }
+
+    // ── Import TSV/MD files into DB ──────────────────────────────────────────────
+    async function handleImport() {
+      setImporting(true); setImportMsg('');
+      try {
+        const r = await fetch('/api/import', { method: 'POST' }).then(r => r.json());
+        setImportMsg(`✓ Imported ${r.test_cases} test cases, ${r.prd_files} PRD files`);
+        setTimeout(() => setImportMsg(''), 4000);
+        // Reload automap if a card file is open
+        if (fileData?.cases) loadAutoMap(fileData.cases);
+      } catch(e) { setImportMsg('⚠ ' + e.message); }
+      setImporting(false);
+    }
+
+    // ── Restore theme on mount + load tree ───────────────────────────────────────
     useEffect(() => {
-      // Restore saved theme
       (async () => {
         const tid = await loadThemeIDB();
         if (tid) {
@@ -1878,303 +1983,217 @@
           if (t) { applyThemeVars(t); themeRef.current?.setTheme(tid); }
         }
       })();
-
-      if (!supported) return;
-      (async () => {
-        const h = await loadHandleIDB();
-        if (!h) return;
-        try {
-          const perm = await h.queryPermission({ mode:'readwrite' });
-          if (perm === 'granted') await doOpen(h);
-          else setSavedHandle(h);
-        } catch {}
-      })();
+      loadTree();
     }, []);
 
-    async function openFolder() {
-      if (!supported) { setError('Gunakan Chrome atau Edge versi terbaru.'); return; }
-      try { await doOpen(await window.showDirectoryPicker({ mode:'readwrite' })); }
-      catch(e) { if (e.name !== 'AbortError') setError(e.message); }
-    }
+    // Sync activeSection when selected changes
+    useEffect(() => {
+      if (selected?.sectionId) setActiveSection(selected.sectionId);
+    }, [selected?.sectionId]);
 
-    async function restoreFolder() {
-      try {
-        const p = await savedHandle.requestPermission({ mode:'readwrite' });
-        if (p === 'granted') await doOpen(savedHandle);
-      } catch(e) { if (e.name !== 'AbortError') setError(e.message); }
-    }
-
-    async function openFile(node, sectionId, handlesOv) {
-      const eff = handlesOv || sectionHandles;
-      setSelected({ node, sectionId });
-      setFileData(null);
-      setLoading(true);
-      await saveLastFileIDB(JSON.stringify({ path: node.path, sectionId }));
-      try {
-        const text = await (await node.handle.getFile()).text();
-        if (node.ext === 'md' || node.ext === 'txt') {
-          setFileData({ type:'md', content:text });
-        } else {
-          const parsed = parseFile(text, node.ext);
-          const testH = eff.test;
-          if (parsed.type === 'card' && sectionId === 'test' && testH) {
-            const execData = await loadExecFile(testH, node.path);
-            const av = getActiveVersion(execData);
-            const merged = mergeExecIntoCases(parsed.cases, execData, av);
-            setFileData({ ...parsed, cases:merged, execData:execData||null, activeVersion:av });
-          } else {
-            setFileData(parsed);
-          }
-        }
-      } catch(e) { setError(e.message); }
-      setLoading(false);
-    }
-
-    async function createFolder(sectionId, parentHandle, name) {
-      try {
-        await parentHandle.getDirectoryHandle(name, { create:true });
-        const secH = sectionHandles[sectionId];
-        if (secH) {
-          const newTree = await scanDir(secH);
-          setSectionTrees(prev => ({ ...prev, [sectionId]: newTree }));
-        }
-      } catch(e) { setError(`Gagal buat folder: ${e.message}`); }
-    }
-
-    function filterTree(nodes, q) {
-      if (!nodes || !q) return nodes;
-      const lo = q.toLowerCase();
-      return nodes.reduce((acc, node) => {
+    // ── Render sidebar tree nodes ────────────────────────────────────────────────
+    function renderTree(nodes, sectionId, depth = 0) {
+      if (!nodes) return null;
+      const filtered = sideSearch
+        ? nodes.filter(n => n.name.toLowerCase().includes(sideSearch.toLowerCase()) || n.kind === 'dir')
+        : nodes;
+      return filtered.map(node => {
+        const isSelected = selected?.path === node.path;
+        const pad = 12 + depth * 14;
         if (node.kind === 'dir') {
-          const ch = filterTree(node.children, lo);
-          if (ch.length) acc.push({ ...node, children: ch });
-        } else if (node.name.toLowerCase().includes(lo)) {
-          acc.push(node);
+          const sub = renderTree(node.children, sectionId, depth + 1);
+          if (sideSearch && !sub?.length) return null;
+          return (
+            <div key={node.path}>
+              <div style={{ padding:`4px 8px 4px ${pad}px`, fontSize:10, color:'var(--text-4)',
+                fontWeight:600, textTransform:'uppercase', letterSpacing:0.5,
+                display:'flex', alignItems:'center', gap:5, cursor:'default' }}>
+                <span style={{ opacity:0.5 }}>📁</span>{node.name}
+              </div>
+              {sub}
+            </div>
+          );
         }
-        return acc;
-      }, []);
+        const extColor = node.ext === 'md' ? 'var(--sec-prd)' : node.ext === 'tsv' ? 'var(--sec-test)' : 'var(--text-4)';
+        return (
+          <div key={node.path} onClick={() => openFile(node, sectionId)}
+            style={{ padding:`5px 8px 5px ${pad}px`, cursor:'pointer', display:'flex', alignItems:'center', gap:6,
+              background: isSelected ? 'rgba(255,255,255,0.06)' : 'transparent',
+              borderLeft: isSelected ? `2px solid ${extColor}` : '2px solid transparent',
+              fontSize:11, color: isSelected ? 'var(--text-1)' : 'var(--text-3)' }}>
+            <span style={{ fontSize:9, color: extColor, flexShrink:0 }}>{node.ext?.toUpperCase()}</span>
+            <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{node.name}</span>
+          </div>
+        );
+      });
     }
 
-    const hasContent = Object.values(sectionTrees).some(t => t !== null);
-    const curSec = SECTIONS.find(s => s.id === selected?.sectionId);
-    const noSearchResults = sideSearch && SECTIONS.every(s => (filterTree(sectionTrees[s.id], sideSearch) || []).length === 0);
+    // ── Main content area ────────────────────────────────────────────────────────
+    function renderContent() {
+      if (!selected) return (
+        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center',
+          flexDirection:'column', gap:12, color:'var(--text-5)' }}>
+          <div style={{ fontSize:28, opacity:0.3 }}>◈</div>
+          <div style={{ fontSize:12 }}>Select a file from the sidebar</div>
+          <div style={{ fontSize:11, opacity:0.6 }}>Supported: TSV test cases, Markdown PRD/BRD</div>
+        </div>
+      );
+
+      if (loading) return (
+        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--text-5)' }}>
+          <div style={{ fontSize:12 }}>Loading…</div>
+        </div>
+      );
+
+      if (error) return (
+        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ fontSize:12, color:'#f87171', maxWidth:400, textAlign:'center' }}>⚠ {error}</div>
+        </div>
+      );
+
+      if (!fileData) return null;
+
+      if (fileData.type === 'card') {
+        return (
+          <CardEditor
+            key={fileData.path}
+            cases={fileData.cases}
+            execData={fileData.execData}
+            filePath={fileData.path}
+            fileHandle={null}
+            rootHandle={null}
+            autoMap={autoMap}
+            onSaveMap={handleSaveMap}
+            onRunCase={(caseId, specFile, grepPattern) => setRunCase({ caseId, specFile, grepPattern })}
+          />
+        );
+      }
+
+      if (fileData.type === 'md') {
+        return (
+          <MarkdownViewer
+            key={fileData.path}
+            content={fileData.content}
+            filePath={fileData.path}
+            fileHandle={null}
+          />
+        );
+      }
+
+      return (
+        <div style={{ flex:1, overflowY:'auto', padding:'24px 32px' }}>
+          <pre style={{ fontSize:12, color:'var(--text-3)', lineHeight:1.6, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>{fileData.content}</pre>
+        </div>
+      );
+    }
 
     return (
-      <div style={{ display:'flex', flexDirection:'column', height:'100vh', color:'var(--text-1)', background:'var(--app-bg)' }}>
-
-        {/* Header */}
-        <div style={{ borderBottom:'1px solid var(--elevated-bg)', padding:'0 16px', display:'flex', alignItems:'center', gap:10, background:'var(--sidebar-bg)', flexShrink:0, height:44, zIndex:10 }}>
-          <div style={{ flex:1, display:'flex', alignItems:'center', gap:6, overflow:'hidden', minWidth:0 }}>
-            <span style={{ fontSize:11, fontWeight:600, color:'var(--text-3)', flexShrink:0 }}>SatuInbox</span>
-            <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
-            <span style={{ fontSize:11, color: hasContent ? 'var(--text-3)' : 'var(--text-4)', flexShrink:0 }}>QA Browser</span>
-            {dirName && (
-              <>
-                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
-                <span style={{ fontSize:11, color:'var(--text-3)', flexShrink:0 }}>{dirName}</span>
-              </>
-            )}
-            {curSec && selected && (
-              <>
-                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
-                <span style={{ fontSize:11, color:curSec.color, flexShrink:0 }}>{curSec.label}</span>
-                <span style={{ color:'var(--text-4)', flexShrink:0 }}>/</span>
-                <span style={{ fontSize:11, color:'var(--text-3)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {selected.node.path}
-                </span>
-              </>
-            )}
-          </div>
-          {/* AI Agent toggle */}
-          <button onClick={() => setAgentOpen(o => !o)} title="QA Agent"
-            style={{ fontSize:11, padding:'3px 10px', borderRadius:6, cursor:'pointer', flexShrink:0,
-              border: agentOpen ? 'none' : '1px solid var(--border-1)',
-              background: agentOpen ? '#6d28d9' : 'transparent',
-              color: agentOpen ? '#fff' : 'var(--text-3)' }}>
-            ◈ Agent
+      <div style={{ height:'100vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+        {/* ── Top bar ────────────────────────────────────────────────── */}
+        <div style={{ height:38, flexShrink:0, background:'var(--sidebar-bg)',
+          borderBottom:'1px solid var(--border-1)', display:'flex', alignItems:'center',
+          paddingLeft:14, paddingRight:10, gap:10, zIndex:10 }}>
+          <span style={{ fontSize:13, color:'var(--text-2)', fontWeight:700, letterSpacing:0.5 }}>◈ QA Browser</span>
+          <span style={{ fontSize:9, color:'var(--text-5)', marginTop:1 }}>SatuInbox</span>
+          <div style={{ flex:1 }} />
+          {importMsg && <span style={{ fontSize:10, color: importMsg.startsWith('⚠') ? '#f87171' : '#4ade80' }}>{importMsg}</span>}
+          <button onClick={handleImport} disabled={importing}
+            style={{ fontSize:10, padding:'3px 10px', borderRadius:4, border:'1px solid var(--border-1)',
+              background:'var(--elevated-bg)', color:'var(--text-3)', cursor: importing ? 'default' : 'pointer' }}>
+            {importing ? 'Importing…' : '⟳ Import TSV/MD'}
           </button>
-          {/* Theme picker — isolated component, does NOT trigger App re-render */}
           <ThemeSwitcher ref={themeRef} onSwitch={switchTheme} />
-          {savedHandle && !hasContent && (
-            <button onClick={restoreFolder}
-              style={{ fontSize:11, padding:'4px 12px', borderRadius:6, border:'1px solid #7c3aed', background:'#130726', color:'#a78bfa', cursor:'pointer', flexShrink:0 }}>
-              🔑 Restore: /{savedHandle.name}
-            </button>
-          )}
-          <button onClick={openFolder}
-            style={{ fontSize:11, padding:'4px 12px', borderRadius:6, border:'1px solid', cursor:'pointer', flexShrink:0,
-              background: hasContent ? 'transparent' : '#3b82f6',
-              borderColor: hasContent ? 'var(--border-1)' : '#3b82f6',
-              color: hasContent ? 'var(--text-5)' : '#fff' }}>
-            {hasContent ? '📂 Change' : '📂 Open Folder'}
-          </button>
         </div>
 
-        {agentOpen && <AgentPanel context={agentContext} onClose={() => setAgentOpen(false)} />}
-        <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
+        {/* ── Body (sidebar + content) ────────────────────────────────── */}
+        <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
 
           {/* Sidebar */}
-          <div style={{ width:256, borderRight:'1px solid var(--elevated-bg)', display:'flex', flexDirection:'column', flexShrink:0, background:'var(--sidebar-bg)' }}>
+          <div style={{ width: sidebarWidth, flexShrink:0, display:'flex', flexDirection:'column',
+            background:'var(--sidebar-bg)', borderRight:'1px solid var(--border-1)', overflow:'hidden' }}>
+            {/* Search */}
+            <div style={{ padding:'6px 8px', borderBottom:'1px solid var(--border-1)', flexShrink:0 }}>
+              <input value={sideSearch} onChange={e=>setSideSearch(e.target.value)}
+                placeholder="filter files…"
+                style={{ width:'100%', background:'var(--elevated-bg)', border:'1px solid var(--border-1)',
+                  borderRadius:4, padding:'4px 8px', fontSize:11, color:'var(--text-2)',
+                  outline:'none', fontFamily:'inherit' }}/>
+            </div>
 
-            {/* Search bar */}
-            {hasContent && (
-              <div style={{ padding:'8px 10px', borderBottom:'1px solid var(--deep-bg)', flexShrink:0 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:6, background:'var(--app-bg)', borderRadius:6, border:'1px solid var(--border-1)', padding:'4px 8px' }}>
-                  <span style={{ fontSize:12, color:'var(--text-4)', flexShrink:0 }}>⌕</span>
-                  <input
-                    value={sideSearch}
-                    onChange={e => setSideSearch(e.target.value)}
-                    placeholder="Search files..."
-                    style={{ flex:1, fontSize:11, background:'none', border:'none', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }}
-                  />
-                  {sideSearch && (
-                    <button onClick={() => setSideSearch('')}
-                      style={{ background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', fontSize:11, padding:0, lineHeight:1, flexShrink:0 }}>
-                      ✕
-                    </button>
-                  )}
+            {/* File tree */}
+            <div style={{ flex:1, overflowY:'auto' }}>
+              {sections.length === 0 && (
+                <div style={{ padding:20, fontSize:11, color:'var(--text-5)', textAlign:'center' }}>
+                  {error ? error : 'Loading files…'}
                 </div>
-              </div>
-            )}
-
-            {/* Empty / onboarding state */}
-            {!hasContent && !scanning && (
-              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:24, textAlign:'center', gap:10 }}>
-                <div style={{ fontSize:26, color:'var(--border-1)' }}>◈</div>
-                {savedHandle ? (
-                  <div style={{ fontSize:11, color:'var(--text-4)' }}>Klik <strong style={{color:'#a78bfa'}}>Restore</strong> di atas</div>
-                ) : (
-                  <div>
-                    <div style={{ fontSize:11, color:'var(--text-4)', lineHeight:1.8 }}>
-                      Buka folder root<br/><strong style={{color:'var(--text-1)'}}>PRDanalisis</strong>
+              )}
+              {sections.map(sec => {
+                const isActive = activeSection === sec.id;
+                const hasFiles = sec.tree?.length > 0;
+                return (
+                  <div key={sec.id}>
+                    <div onClick={() => setActiveSection(isActive ? null : sec.id)}
+                      style={{ padding:'6px 10px', display:'flex', alignItems:'center', gap:6,
+                        cursor:'pointer', borderBottom:'1px solid var(--border-2)',
+                        background: isActive ? 'rgba(255,255,255,0.03)' : 'transparent' }}>
+                      <span style={{ width:3, height:3, borderRadius:'50%', background: sec.color, flexShrink:0 }}/>
+                      <span style={{ flex:1, fontSize:10, fontWeight:600, color: sec.color, textTransform:'uppercase', letterSpacing:0.5 }}>{sec.label}</span>
+                      <span style={{ fontSize:9, color:'var(--text-5)' }}>{isActive ? '▾' : '▸'}</span>
                     </div>
-                    <div style={{ fontSize:10, color:'var(--text-4)', marginTop:8, lineHeight:1.8 }}>
-                      Otomatis mendeteksi<br/>BRD / PRD / Test Cases
-                    </div>
-                    <div style={{ marginTop:14, display:'flex', flexDirection:'column', gap:4 }}>
-                      {SECTIONS.map(s => (
-                        <div key={s.id} style={{ fontSize:10, color:s.color, opacity:0.4 }}>/{s.folderName}</div>
-                      ))}
-                    </div>
+                    {isActive && hasFiles && (
+                      <div style={{ paddingBottom:4 }}>
+                        {renderTree(sec.tree, sec.id)}
+                      </div>
+                    )}
+                    {isActive && !hasFiles && (
+                      <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>No files</div>
+                    )}
                   </div>
-                )}
-                {!supported && <div style={{ fontSize:10, color:'#7f1d1d', marginTop:8 }}>Butuh Chrome / Edge</div>}
-              </div>
-            )}
-
-            {scanning && (
-              <div style={{ padding:24, textAlign:'center', color:'var(--text-4)', fontSize:11 }}>Scanning…</div>
-            )}
-
-            {/* Section tree */}
-            {hasContent && !scanning && (
-              <div style={{ flex:1, overflowY:'auto', padding:'6px 0 16px' }}>
-                {noSearchResults && (
-                  <div style={{ padding:'20px 16px', textAlign:'center', fontSize:11, color:'var(--text-4)' }}>
-                    No results for "{sideSearch}"
-                  </div>
-                )}
-                {SECTIONS.map(sec => (
-                  <SidebarSection
-                    key={sec.id}
-                    section={sec}
-                    tree={sideSearch ? filterTree(sectionTrees[sec.id], sideSearch) : sectionTrees[sec.id]}
-                    sectionHandle={sectionHandles[sec.id]}
-                    selected={selected?.sectionId === sec.id ? selected.node.path : null}
-                    onSelect={openFile}
-                    onCreateFolder={createFolder}
-                  />
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
+
+          {/* Resize handle */}
+          <div onMouseDown={onResizeStart}
+            style={{ width:4, cursor:'col-resize', flexShrink:0, background:'transparent',
+              borderRight:'1px solid var(--border-1)' }}
+            onMouseEnter={e=>e.target.style.background='var(--border-1)'}
+            onMouseLeave={e=>e.target.style.background='transparent'} />
 
           {/* Content area */}
-          <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-
-            {error && (
-              <div style={{ margin:10, padding:'8px 12px', background:'#2d0e0e', border:'1px solid #7f1d1d', borderRadius:6, fontSize:11, color:'#f87171', display:'flex', gap:8, flexShrink:0 }}>
-                <span style={{ flex:1 }}>⚠ {error}</span>
-                <button onClick={() => setError(null)} style={{ background:'none', border:'none', color:'#f87171', cursor:'pointer' }}>✕</button>
+          <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', background:'var(--app-bg)' }}>
+            {/* Breadcrumb */}
+            {selected && (
+              <div style={{ padding:'5px 14px', borderBottom:'1px solid var(--border-1)',
+                background:'var(--sidebar-bg)', flexShrink:0,
+                fontSize:10, color:'var(--text-4)', display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ color:'var(--text-5)' }}>{selected.sectionId}</span>
+                <span style={{ color:'var(--text-6)' }}>/</span>
+                <span style={{ color:'var(--text-3)' }}>{selected.name}</span>
               </div>
             )}
-
-            {!selected && !loading && !error && (
-              <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8 }}>
-                <div style={{ fontSize:36, color:'var(--border-1)' }}>◉</div>
-                <div style={{ fontSize:13, color:'var(--text-4)' }}>Pilih file dari sidebar</div>
-                <div style={{ fontSize:10, color:'var(--border-1)', textAlign:'center', lineHeight:1.9, marginTop:4 }}>
-                  .tsv .csv → Test Case Editor<br/>
-                  .md .txt → Markdown Viewer
-                </div>
-                {!hasContent && (
-                  <div style={{ marginTop:10, fontSize:11, color:'var(--text-4)' }}>
-                    atau klik <strong style={{color:'#3b82f6'}}>Open Folder</strong> untuk memulai
-                  </div>
-                )}
-              </div>
-            )}
-
-            {loading && (
-              <div style={{ padding:32, textAlign:'center', color:'var(--text-4)', fontSize:11 }}>
-                Loading{selected ? ` ${selected.node.name}` : ''}…
-              </div>
-            )}
-
-            {selected && fileData && !loading && (
-              <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-                {/* File bar */}
-                <div style={{ padding:'6px 14px', borderBottom:'1px solid var(--elevated-bg)', background:'var(--sidebar-bg)', display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-                  {curSec && (
-                    <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10,
-                      background: curSec.dimBg, color: curSec.color, border:`1px solid ${curSec.dimBd}`,
-                      fontWeight:700, textTransform:'uppercase', letterSpacing:1, flexShrink:0 }}>
-                      {curSec.label}
-                    </span>
-                  )}
-                  <span style={{ fontSize:11, color:'var(--text-2)', fontWeight:600 }}>{selected.node.name}</span>
-                  {fileData.type === 'card' && (
-                    <>
-                      <span style={{ fontSize:10, color:'var(--text-4)' }}>{fileData.cases.length} test cases · editable</span>
-                      {fileData.execData
-                        ? <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#052e16', color:'#4ade80', border:'1px solid #166534' }}>
-                            ✓ {fileData.activeVersion||'v1'} · {Object.keys(fileData.execData?.versions||{}).length||1} version(s)
-                          </span>
-                        : <span style={{ fontSize:9, padding:'1px 8px', borderRadius:10, background:'#2a1a04', color:'#fbbf24', border:'1px solid #713f12' }}>
-                            TSV only — save to create JSON
-                          </span>
-                      }
-                    </>
-                  )}
-                  {fileData.type === 'flat' && <span style={{ fontSize:10, color:'var(--text-4)' }}>{fileData.rows.length} rows</span>}
-                  {fileData.type === 'md'   && <span style={{ fontSize:10, color:'var(--text-4)' }}>markdown</span>}
-                </div>
-
-                <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
-                  {fileData.type === 'card' && (
-                    <CardEditor
-                      key={selected.node.path}
-                      cases={fileData.cases}
-                      execData={fileData.execData}
-                      initialVersion={fileData.activeVersion || 'v1'}
-                      fileHandle={selected.node.handle}
-                      rootHandle={sectionHandles.test}
-                      filePath={selected.node.path}
-                    />
-                  )}
-                  {fileData.type === 'flat'  && <div style={{ overflowY:'auto', flex:1 }}><FlatViewer headers={fileData.headers} rows={fileData.rows}/></div>}
-                  {fileData.type === 'md'    && <MarkdownViewer content={fileData.content} fileHandle={selected.node.handle}/>}
-                  {fileData.type === 'empty' && <div style={{ padding:40, textAlign:'center', color:'var(--text-4)', fontSize:13 }}>File kosong.</div>}
-                </div>
-              </div>
-            )}
+            {renderContent()}
           </div>
         </div>
+
+        {/* Run Panel overlay */}
+        {runCase && (
+          <RunPanel
+            caseId={runCase.caseId}
+            specFile={runCase.specFile}
+            grepPattern={runCase.grepPattern}
+            onClose={() => setRunCase(null)}
+          />
+        )}
       </div>
     );
   }
 
-  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-</script>
+  // ─── BOOTSTRAP ────────────────────────────────────────────────────────────────
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+
+  </script>
 </body>
 </html>
