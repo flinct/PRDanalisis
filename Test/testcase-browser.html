@@ -1385,7 +1385,7 @@
         </div>
 
         {/* Rows */}
-        <div style={{ flex:1, overflowY:'auto' }}>
+        <div style={{ flex:1, overflowY:'auto', paddingBottom:'5vh' }}>
           {visible.map(tc => {
             const gi = cases.indexOf(tc);
             const isOpen = expanded===gi;
@@ -1717,7 +1717,7 @@
             contentEditable={editMode}
             suppressContentEditableWarning={true}
             spellCheck={false}
-            style={{ padding:'32px 40px', width:'100%', maxWidth:860,
+            style={{ padding:'32px 40px 5vh', width:'100%', maxWidth:860,
               outline:'none',
               cursor: editMode ? 'text' : 'default',
               borderLeft: editMode ? '2px solid var(--sec-prd)' : '2px solid transparent',
@@ -2008,16 +2008,16 @@
       } catch(e) { setError('Cannot reach server: ' + e.message); }
     }
 
-    // ── Load Google Docs (service-account, via server.js) ────────────────────────
-    async function loadGDocs(q) {
+    // ── Load Google Docs (OAuth, via server.js) ──────────────────────────────────
+    async function loadGDocs() {
       try {
         const st = await fetch('/api/gdocs/status').then(r => r.json());
         setGdocsStatus(st);
-        if (!st.configured) { setGdocs([]); return; }
-        const list = await fetch('/api/gdocs' + (q ? '?q=' + encodeURIComponent(q) : '')).then(r => r.ok ? r.json() : []);
+        if (!st.connected) { setGdocs([]); return; }  // not logged in → tree needs auth
+        const list = await fetch('/api/gdocs').then(r => r.ok ? r.json() : []);
         setGdocs(Array.isArray(list) ? list : []);
       } catch (e) {
-        setGdocsStatus({ configured: false, error: 'Cannot reach server: ' + e.message });
+        setGdocsStatus({ oauthConfigured: false, connected: false, error: 'Cannot reach server: ' + e.message });
         setGdocs([]);
       }
     }
@@ -2251,7 +2251,11 @@
     // Google Docs as a virtual sidebar section (each doc = a file node)
     const gdocsSection = gdocsStatus ? {
       id: 'gdocs', label: 'Google Docs', color: '#4ade80', remote: true,
-      configured: gdocsStatus.configured, statusError: gdocsStatus.error,
+      configured: gdocsStatus.connected, // "configured" here = logged in & tree loadable
+      statusError: gdocsStatus.error
+        || (gdocsStatus.connected ? null
+            : gdocsStatus.oauthConfigured ? 'Belum login — buka ⚙ Settings → Login with Google.'
+            : 'OAuth belum di-set — lihat GDOCS-SETUP.md.'),
       tree: gdocs, // node-shaped tree (dirs + gdoc files) straight from /api/gdocs
     } : null;
     const allSections = gdocsSection ? [...sections, gdocsSection] : sections;
@@ -2265,18 +2269,11 @@
           <span style={{ fontSize:13, color:'var(--text-2)', fontWeight:700, letterSpacing:0.5 }}>◈ QA Browser</span>
           <span style={{ fontSize:9, color:'var(--text-5)', marginTop:1 }}>SatuInbox</span>
           <div style={{ flex:1 }} />
-          {importMsg && <span style={{ fontSize:10, color: importMsg.startsWith('⚠') ? '#f87171' : '#4ade80' }}>{importMsg}</span>}
-          <button onClick={handleImport} disabled={importing}
-            style={{ fontSize:10, padding:'3px 10px', borderRadius:4, border:'1px solid var(--border-1)',
-              background:'var(--elevated-bg)', color:'var(--text-3)', cursor: importing ? 'default' : 'pointer' }}>
-            {importing ? 'Importing…' : '⟳ Import TSV/MD'}
-          </button>
           <button onClick={() => setView(v => v === 'settings' ? 'files' : 'settings')} title="Settings"
             style={{ fontSize:13, lineHeight:1, padding:'3px 9px', borderRadius:4, border:'1px solid var(--border-1)',
               background: view === 'settings' ? 'var(--elevated-bg)' : 'transparent', color:'var(--text-3)', cursor:'pointer' }}>
             ⚙
           </button>
-          <ThemeSwitcher ref={themeRef} onSwitch={switchTheme} />
         </div>
 
         {/* ── Body (sidebar + content) ────────────────────────────────── */}
@@ -2296,6 +2293,12 @@
 
             {/* File tree */}
             <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+              {error && (
+                <div style={{ padding:'8px 12px', margin:'6px 8px', fontSize:10, color:'#f87171',
+                  background:'#2d0e0e', border:'1px solid #7f1d1d', borderRadius:4, lineHeight:1.5, flexShrink:0 }}>
+                  ⚠ {error}
+                </div>
+              )}
               {allSections.length === 0 && (
                 <div style={{ padding:20, fontSize:11, color:'var(--text-5)', textAlign:'center' }}>
                   {error ? error : 'Loading files…'}
@@ -2323,12 +2326,12 @@
                 const SectionBody = (sec) => {
                   if (sec.remote && !sec.configured) {
                     return <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)', lineHeight:1.5 }}>
-                      ⚠ Not configured.<br/>{sec.statusError || 'Set up the service account — see GDOCS-SETUP.md'}
+                      {sec.statusError || '⚠ Belum terhubung — buka ⚙ Settings.'}
                     </div>;
                   }
                   return sec.tree?.length > 0
                     ? <div style={{ paddingBottom:4 }}>{renderTree(sec.tree, sec.id)}</div>
-                    : <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>{sec.remote ? 'No docs shared with the service account yet' : 'No files'}</div>;
+                    : <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>{sec.remote ? 'Belum ada dokumen di folder mirror' : 'No files'}</div>;
                 };
 
                 const active = allSections.find(s => s.id === activeSection);

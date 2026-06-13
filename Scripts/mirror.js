@@ -19,6 +19,12 @@ function loadMap(BASE) {
 function saveMap(BASE, m) { fs.writeFileSync(mapPath(BASE), JSON.stringify(m, null, 2)); }
 function hash(s) { return crypto.createHash('md5').update(s).digest('hex'); }
 
+// True for Drive "File not found" / 404 (stale id in the map after a delete in Drive)
+function isNotFound(e) {
+  const code = e && (e.code || (e.response && e.response.status));
+  return code === 404 || /File not found|not ?found/i.test((e && e.message) || '');
+}
+
 // All .md files under <BASE>/<SRC_DIR>, as '/'-separated paths relative to SRC_DIR.
 function listMd(BASE) {
   const root = path.join(BASE, SRC_DIR);
@@ -68,7 +74,7 @@ function enqueue(fn) {
 }
 
 // Mirror a single file (relPath relative to SRC_DIR, '/'-separated).
-async function _mirrorFileInner(BASE, relPath) {
+async function _mirrorFileInner(BASE, relPath, _healed = false) {
   relPath = String(relPath).replace(/\\/g, '/').replace(/^\/+/, '');
   const abs = path.join(BASE, SRC_DIR, relPath.split('/').join(path.sep));
   if (!fs.existsSync(abs)) return { relPath, skipped: 'missing' };
@@ -77,27 +83,38 @@ async function _mirrorFileInner(BASE, relPath) {
   const h = hash(content);
   const map = loadMap(BASE);
   const rec = map.docs[relPath];
-  if (rec && rec.hash === h && rec.docId) return { relPath, skipped: 'unchanged', docId: rec.docId };
+  if (rec && rec.hash === h && rec.docId && !_healed) return { relPath, skipped: 'unchanged', docId: rec.docId };
 
-  await ensureRoot(BASE, map);
-  const relDir   = relPath.includes('/') ? relPath.slice(0, relPath.lastIndexOf('/')) : '';
-  const folderId = await ensureDir(BASE, map, relDir);
-  const title    = relPath.split('/').pop().replace(/\.md$/i, '');
+  const relDir = relPath.includes('/') ? relPath.slice(0, relPath.lastIndexOf('/')) : '';
+  const title  = relPath.split('/').pop().replace(/\.md$/i, '');
 
-  let docId = rec && rec.docId, action = 'updated';
-  if (docId) {
-    try { await gdocs.overwriteStyledDoc(BASE, docId, content); }
-    catch (e) {
-      const code = e.code || (e.response && e.response.status);
-      if (code === 404 || /not found|notFound/i.test(e.message || '')) docId = null; // recreate
-      else throw e;
+  try {
+    await ensureRoot(BASE, map);
+    const folderId = await ensureDir(BASE, map, relDir);
+
+    let docId = rec && rec.docId, action = 'updated';
+    if (docId) {
+      try { await gdocs.overwriteStyledDoc(BASE, docId, content); }
+      catch (e) { if (isNotFound(e)) docId = null; else throw e; } // doc deleted → recreate
     }
-  }
-  if (!docId) { const r = await gdocs.createDoc(BASE, { title, content, folderId }); docId = r.id; action = 'created'; }
+    if (!docId) { const r = await gdocs.createDoc(BASE, { title, content, folderId }); docId = r.id; action = 'created'; }
 
-  map.docs[relPath] = { docId, hash: h, title, updatedAt: new Date().toISOString() };
-  saveMap(BASE, map);
-  return { relPath, docId, action };
+    map.docs[relPath] = { docId, hash: h, title, updatedAt: new Date().toISOString() };
+    saveMap(BASE, map);
+    return { relPath, docId, action };
+  } catch (e) {
+    // Stale folder/root id (deleted in Drive) → purge folder cache + retry once
+    if (isNotFound(e) && !_healed) {
+      const m = loadMap(BASE);
+      const badId = (/File not found:?\s*([A-Za-z0-9_\-]+)/.exec(e.message || '') || [])[1];
+      if (badId && m.rootFolderId === badId) m.rootFolderId = null;
+      m.folders = {};            // rebuild the whole folder tree from Drive
+      delete m.docs[relPath];    // force recreate this doc
+      saveMap(BASE, m);
+      return _mirrorFileInner(BASE, relPath, true);
+    }
+    throw e;
+  }
 }
 
 // Mirror every .md under SRC_DIR (runs inside one queued task → no folder races).
