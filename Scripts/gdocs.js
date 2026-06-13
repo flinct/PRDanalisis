@@ -221,15 +221,17 @@ async function overwriteStyledDoc(BASE, docId, md) {
 
 // ─── CREATE / UPDATE ─────────────────────────────────────────────────────────
 async function createDoc(BASE, { title, content = '', folderId } = {}) {
-  const { docs, drive } = clients(BASE);
-  const created = await docs.documents.create({ requestBody: { title: title || 'Untitled (QA Browser)' } });
-  const docId = created.data.documentId;
+  const { drive } = clients(BASE);
+  const name   = title || 'Untitled (QA Browser)';
+  const target = folderId || await resolveRootFolderId(drive) || undefined;
+  // Create the Doc directly inside the target folder (avoids a stray copy in My Drive root).
+  const file = await drive.files.create({
+    requestBody: { name, mimeType: DOC_MIME, parents: target ? [target] : undefined },
+    fields: 'id',
+  });
+  const docId = file.data.id;
   if (content) await applyStyled(BASE, docId, content);
-  try {
-    const target = folderId || await resolveRootFolderId(drive);
-    if (target) await drive.files.update({ fileId: docId, addParents: target, fields: 'id' });
-  } catch {}
-  return webLink(docId, created.data.title);
+  return webLink(docId, name);
 }
 
 async function updateDoc(BASE, docId, { content = '', mode = 'overwrite' } = {}) {

@@ -57,8 +57,18 @@ async function ensureDir(BASE, map, relDir) {
   return parent;
 }
 
+// ─── SERIALIZATION ──────────────────────────────────────────────────────────
+// All mirror work runs through one queue so concurrent file-watcher events can
+// NEVER create the same Drive folder twice (the root cause of duplicate folders).
+let _queue = Promise.resolve();
+function enqueue(fn) {
+  const run = _queue.then(fn, fn);
+  _queue = run.then(() => {}, () => {});
+  return run;
+}
+
 // Mirror a single file (relPath relative to SRC_DIR, '/'-separated).
-async function mirrorFile(BASE, relPath) {
+async function _mirrorFileInner(BASE, relPath) {
   relPath = String(relPath).replace(/\\/g, '/').replace(/^\/+/, '');
   const abs = path.join(BASE, SRC_DIR, relPath.split('/').join(path.sep));
   if (!fs.existsSync(abs)) return { relPath, skipped: 'missing' };
@@ -90,13 +100,13 @@ async function mirrorFile(BASE, relPath) {
   return { relPath, docId, action };
 }
 
-// Mirror every .md under SRC_DIR.
-async function mirrorAll(BASE) {
+// Mirror every .md under SRC_DIR (runs inside one queued task → no folder races).
+async function _mirrorAllInner(BASE) {
   const files = listMd(BASE);
   let created = 0, updated = 0, skipped = 0, errors = [];
   for (const rel of files) {
     try {
-      const r = await mirrorFile(BASE, rel);
+      const r = await _mirrorFileInner(BASE, rel); // direct call (already serialized by caller)
       if (r.skipped) skipped++;
       else if (r.action === 'created') created++;
       else updated++;
@@ -104,6 +114,10 @@ async function mirrorAll(BASE) {
   }
   return { total: files.length, created, updated, skipped, errors };
 }
+
+// Public, serialized entry points
+function mirrorFile(BASE, relPath) { return enqueue(() => _mirrorFileInner(BASE, relPath)); }
+function mirrorAll(BASE)           { return enqueue(() => _mirrorAllInner(BASE)); }
 
 // True if a watcher path (relative to the PRD watch dir) is a markdown file we mirror.
 function isMirrorable(filename) { return /\.md$/i.test(filename || ''); }
