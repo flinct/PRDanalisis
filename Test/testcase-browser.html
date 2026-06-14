@@ -1820,20 +1820,48 @@
     const timerRef = useRef(null);
 
     useEffect(() => {
+      const cfg = getExecCfg();
+      const t0  = Date.now();
+      timerRef.current = setInterval(() => setElapsed(Math.floor((Date.now()-t0)/1000)), 500);
+      const pushOut = text => { setLines(prev => [...prev, ...text.split('\n').filter(Boolean)]); setTimeout(() => bodyRef.current?.scrollTo(0, bodyRef.current.scrollHeight), 30); };
+
+      // ── LOCAL runner: start in background, then POLL (robust vs dropped cross-origin streams) ──
+      if (cfg.mode === 'local') {
+        let stopped = false, pollId = null, since = 0;
+        (async () => {
+          try {
+            const start = await fetch(cfg.runnerUrl + '/run', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ spec_file: specFile, grep_pattern: grepPattern, env: 'dev' }),
+            }).then(r => r.json());
+            if (start.error) throw new Error(start.error);
+            const runId = start.runId;
+            pollId = setInterval(async () => {
+              if (stopped) return;
+              try {
+                const s = await fetch(`${cfg.runnerUrl}/run/${runId}?since=${since}`).then(r => r.json());
+                if (s.total != null) since = s.total;
+                if (s.output) pushOut(s.output);
+                if (s.status && s.status !== 'running') {
+                  stopped = true; clearInterval(pollId); clearInterval(timerRef.current);
+                  setStatus(s.status);
+                  if (s.durationMs != null) setElapsed(Math.round(s.durationMs / 1000));
+                  if (s.message) setLines(prev => [...prev, '⚠ ' + s.message]);
+                }
+              } catch {}
+            }, 800);
+          } catch (e) { setStatus('error'); clearInterval(timerRef.current); setLines(prev => [...prev, '⚠ ' + e.message]); }
+        })();
+        return () => { stopped = true; if (pollId) clearInterval(pollId); clearInterval(timerRef.current); };
+      }
+
+      // ── HOST (central server): same-origin SSE stream ──
       const ctrl = new AbortController();
       abortRef.current = ctrl;
-      const t0 = Date.now();
-      timerRef.current = setInterval(() => setElapsed(Math.floor((Date.now()-t0)/1000)), 500);
-
-      const cfg     = getExecCfg();
-      const runUrl  = cfg.mode === 'local' ? cfg.runnerUrl + '/run' : '/api/run';
-      const runBody = cfg.mode === 'local'
-        ? { spec_file: specFile, grep_pattern: grepPattern, env: 'dev' }
-        : { case_id: caseId, spec_file: specFile, grep_pattern: grepPattern };
-      fetch(runUrl, {
+      fetch('/api/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(runBody),
+        body: JSON.stringify({ case_id: caseId, spec_file: specFile, grep_pattern: grepPattern }),
         signal: ctrl.signal,
       }).then(async res => {
         const reader = res.body.getReader();
@@ -1850,11 +1878,8 @@
             if (!dataLine) continue;
             try {
               const evt = JSON.parse(dataLine.slice(5));
-              if (evt.type === 'run_start') {
-                if (evt.cmd) setLines(prev => [...prev, '$ ' + evt.cmd, '']);
-              } else if (evt.type === 'output') {
-                setLines(prev => [...prev, ...evt.text.split('\n').filter(Boolean)]);
-                setTimeout(() => bodyRef.current?.scrollTo(0, bodyRef.current.scrollHeight), 30);
+              if (evt.type === 'output') {
+                pushOut(evt.text);
               } else if (evt.type === 'run_end') {
                 setStatus(evt.status);
                 clearInterval(timerRef.current);
@@ -1868,10 +1893,7 @@
         if (e.name !== 'AbortError') { setStatus('error'); clearInterval(timerRef.current); }
       });
 
-      return () => {
-        ctrl.abort();
-        clearInterval(timerRef.current);
-      };
+      return () => { ctrl.abort(); clearInterval(timerRef.current); };
     }, []);
 
     const statusColor = { running:'#60a5fa', pass:'#4ade80', fail:'#f87171', error:'#fbbf24' }[status] || '#888';

@@ -10,6 +10,10 @@
 //   3. In QA Browser → ⚙ Settings → Execution → "Run on this device",
 //      runner URL = http://localhost:9876
 //
+// Architecture: POST /run starts the test in the BACKGROUND and returns a runId.
+// Output is buffered; the dashboard POLLS GET /run/:id?since=N. The test process is
+// NOT tied to the HTTP connection (so a dropped cross-origin stream can't kill it).
+//
 // Zero dependencies (Node built-ins only).
 
 const http  = require('http');
@@ -20,8 +24,9 @@ const { spawn } = require('child_process');
 const PORT = process.env.RUNNER_PORT || 9876;
 const ROOT = process.env.AUTOMATION_ROOT || process.cwd();
 
+const runs = new Map(); // runId → { status, output, code, message, t0 }
+
 // Make spec_file forgiving: strip any repo prefix so it resolves under ROOT.
-// Accepts "playwright/...", "..\\sixV2Automation\\playwright\\...", "C:\\...\\sixV2Automation\\playwright\\...", etc.
 function normSpec(spec) {
   let s = String(spec || '').replace(/\\/g, '/');
   const i = s.toLowerCase().indexOf('playwright/');
@@ -36,9 +41,45 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Private-Network', 'true'); // Chrome LAN→localhost
 }
 
+function startRun(p) {
+  const runId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const specPath = path.resolve(ROOT, normSpec(p.spec_file));
+  const project  = process.env.PW_PROJECT || 'chromium';
+  const grep     = p.grep_pattern;
+  const env      = p.env || 'dev';
+  const cli = path.join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js');
+
+  let pw, cmd;
+  if (fs.existsSync(cli)) {
+    const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
+    if (grep) args.push('--grep', grep);
+    cmd = `node cli.js test "${specPath}" --project=${project}` + (grep ? ` --grep "${grep}"` : '');
+    pw = spawn(process.execPath, args, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: false });
+  } else {
+    const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
+    cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}` + (grep ? ` --grep ${q(grep)}` : '');
+    pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
+  }
+
+  const run = { status: 'running', output: '$ ' + cmd + '\n\n', code: null, message: '', t0: Date.now() };
+  runs.set(runId, run);
+  console.log(`\n  ▶ RUN ${runId}  ${cmd}`);
+
+  pw.stdout.on('data', d => { run.output += d.toString(); process.stdout.write(d); });
+  pw.stderr.on('data', d => { run.output += d.toString(); process.stderr.write(d); });
+  pw.on('close', code => { run.status = code === 0 ? 'pass' : 'fail'; run.code = code; run.durationMs = Date.now() - run.t0; console.log(`  ■ ${runId} done — exit ${code} (${run.durationMs}ms)`); });
+  pw.on('error', err => { run.status = 'error'; run.message = err.message; console.error(`  ⚠ ${runId} spawn error:`, err.message); });
+
+  // NOTE: deliberately NOT killed on client disconnect — the run finishes regardless.
+  // Drop old runs after 10 min to avoid unbounded memory.
+  setTimeout(() => runs.delete(runId), 10 * 60 * 1000);
+  return { runId, cmd };
+}
+
 const server = http.createServer((req, res) => {
   cors(res);
   const url = (req.url || '').split('?')[0];
+  const qs  = new URLSearchParams((req.url || '').split('?')[1] || '');
 
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
@@ -47,48 +88,34 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify({ ok: true, root: ROOT, exists: fs.existsSync(ROOT), port: Number(PORT) }));
   }
 
+  // Poll run output/status
+  if (req.method === 'GET' && url.startsWith('/run/')) {
+    const id = url.slice('/run/'.length);
+    const run = runs.get(id);
+    res.writeHead(run ? 200 : 404, { 'Content-Type': 'application/json' });
+    if (!run) return res.end(JSON.stringify({ error: 'unknown runId' }));
+    const since = Number(qs.get('since')) || 0;
+    return res.end(JSON.stringify({
+      status: run.status, output: run.output.slice(since), total: run.output.length,
+      exitCode: run.code, message: run.message, durationMs: run.durationMs || (Date.now() - run.t0),
+    }));
+  }
+
+  // Start a run (background) → returns { runId, cmd }
   if (req.method === 'POST' && url === '/run') {
     let body = '';
     req.on('data', c => { body += c; if (body.length > 1e6) req.destroy(); });
     req.on('end', () => {
       let p = {}; try { p = JSON.parse(body || '{}'); } catch {}
-      const specFile = p.spec_file, grep = p.grep_pattern, env = p.env || 'dev';
-
-      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
-      const send = o => { try { res.write(`data: ${JSON.stringify(o)}\n\n`); } catch {} };
-
-      if (!specFile) { send({ type: 'run_end', status: 'error', message: 'spec_file required' }); return res.end(); }
-
-      const specPath = path.resolve(ROOT, normSpec(specFile));
-      const project  = process.env.PW_PROJECT || 'chromium';
-      const cli = path.join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js');
-
-      const t0 = Date.now();
-      let pw;
-      if (fs.existsSync(cli)) {
-        // Preferred: run the local Playwright CLI via node with an args array (shell:false)
-        // → no shell quoting issues with spaces in paths/grep on Windows.
-        const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
-        if (grep) args.push('--grep', grep);
-        send({ type: 'run_start', cmd: `node cli.js test "${specPath}" --project=${project}` + (grep ? ` --grep "${grep}"` : '') });
-        pw = spawn(process.execPath, args, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: false });
-      } else {
-        // Fallback: npx via shell (repos without a local @playwright/test install)
-        const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
-        let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}`;
-        if (grep) cmd += ` --grep ${q(grep)}`;
-        send({ type: 'run_start', cmd });
-        pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
+      if (!p.spec_file) { res.writeHead(400, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ error: 'spec_file required' })); }
+      try {
+        const r = startRun(p);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(r));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
       }
-
-      console.log(`\n  ▶ RUN  cwd=${ROOT}\n    spec=${specPath}\n    project=${project}  grep=${grep || '(none)'}`);
-      let done = false;
-      pw.stdout.on('data', d => { process.stdout.write(d); send({ type: 'output', text: d.toString() }); });
-      pw.stderr.on('data', d => { process.stderr.write(d); send({ type: 'output', text: d.toString() }); });
-      pw.on('close', code => { done = true; console.log(`  ■ done — exit ${code} (${Date.now() - t0}ms)`); send({ type: 'run_end', status: code === 0 ? 'pass' : 'fail', duration_ms: Date.now() - t0, exit_code: code }); res.end(); });
-      pw.on('error', err => { done = true; console.error('  ⚠ spawn error:', err.message); send({ type: 'run_end', status: 'error', message: err.message }); res.end(); });
-      // Only kill on a genuine disconnect while still running; log it so we can see it.
-      req.on('close', () => { if (!done && pw.exitCode === null) { console.log(`  ⚠ client disconnected after ${Date.now() - t0}ms → killing test process`); pw.kill(); } });
     });
     return;
   }
