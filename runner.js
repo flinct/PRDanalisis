@@ -81,11 +81,14 @@ const server = http.createServer((req, res) => {
         pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
       }
 
-      pw.stdout.on('data', d => send({ type: 'output', text: d.toString() }));
-      pw.stderr.on('data', d => send({ type: 'output', text: d.toString() }));
-      pw.on('close', code => { send({ type: 'run_end', status: code === 0 ? 'pass' : 'fail', duration_ms: Date.now() - t0, exit_code: code }); res.end(); });
-      pw.on('error', err => { send({ type: 'run_end', status: 'error', message: err.message }); res.end(); });
-      req.on('close', () => { if (pw.exitCode === null) pw.kill(); });
+      console.log(`\n  ▶ RUN  cwd=${ROOT}\n    spec=${specPath}\n    project=${project}  grep=${grep || '(none)'}`);
+      let done = false;
+      pw.stdout.on('data', d => { process.stdout.write(d); send({ type: 'output', text: d.toString() }); });
+      pw.stderr.on('data', d => { process.stderr.write(d); send({ type: 'output', text: d.toString() }); });
+      pw.on('close', code => { done = true; console.log(`  ■ done — exit ${code} (${Date.now() - t0}ms)`); send({ type: 'run_end', status: code === 0 ? 'pass' : 'fail', duration_ms: Date.now() - t0, exit_code: code }); res.end(); });
+      pw.on('error', err => { done = true; console.error('  ⚠ spawn error:', err.message); send({ type: 'run_end', status: 'error', message: err.message }); res.end(); });
+      // Only kill on a genuine disconnect while still running; log it so we can see it.
+      req.on('close', () => { if (!done && pw.exitCode === null) { console.log(`  ⚠ client disconnected after ${Date.now() - t0}ms → killing test process`); pw.kill(); } });
     });
     return;
   }
