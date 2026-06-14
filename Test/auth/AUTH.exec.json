@@ -3,12 +3,12 @@
   "sourceFile": "Test/auth/AUTH.tsv",
   "sourceFileName": "AUTH.tsv",
   "createdAt": "2026-06-13T15:49:12.137Z",
-  "updatedAt": "2026-06-13T15:49:37.913Z",
+  "updatedAt": "2026-06-14T03:44:21.275Z",
   "activeVersion": "v2",
   "versions": {
     "v2": {
       "createdAt": "2026-06-13T15:49:12.137Z",
-      "updatedAt": "2026-06-13T15:49:37.913Z",
+      "updatedAt": "2026-06-14T03:44:21.275Z",
       "cases": {
         "SIX-Test-001": {
           "testcaseId": "SIX-Test-001",
@@ -37,10 +37,6 @@
               {
                 "key": "3",
                 "expected": "System will sent an email to verify register"
-              },
-              {
-                "key": "4",
-                "expected": "test 2"
               }
             ],
             "notes": "",
@@ -76,18 +72,9 @@
                   "Staging": "",
                   "Prod": ""
                 }
-              },
-              {
-                "rowKey": "4",
-                "actual": "",
-                "status": {
-                  "DEV": "",
-                  "Staging": "",
-                  "Prod": ""
-                }
               }
             ],
-            "updatedAt": "2026-06-13T15:49:37.913Z"
+            "updatedAt": "2026-06-14T03:44:21.275Z"
           },
           "history": [
             {
@@ -170,6 +157,88 @@
                   }
                 ],
                 "updatedAt": "2026-06-13T15:49:12.137Z"
+              }
+            },
+            {
+              "eventId": "evt_1781408661275_ldmia",
+              "action": "update",
+              "at": "2026-06-14T03:44:21.275Z",
+              "snapshot": {
+                "testType": "POSITIVE",
+                "tester": "dany",
+                "createDate": "12/12/2025",
+                "scenario": "Register with valid fullname, email, username, phone, password",
+                "precondition": "abcdefgh",
+                "description": "Verify user can register successfully with valid input",
+                "url": "dev-v2.satuinbox.com",
+                "steps": [
+                  "Open register page",
+                  "Input fullname “John Doe”",
+                  "test 2"
+                ],
+                "expectedResults": [
+                  {
+                    "key": "1",
+                    "expected": "Successfull register"
+                  },
+                  {
+                    "key": "2",
+                    "expected": "System will display success register page"
+                  },
+                  {
+                    "key": "3",
+                    "expected": "System will sent an email to verify register"
+                  },
+                  {
+                    "key": "4",
+                    "expected": "test 2"
+                  }
+                ],
+                "notes": "",
+                "overallStatus": {
+                  "DEV": "Passed",
+                  "Staging": "",
+                  "Prod": ""
+                },
+                "results": [
+                  {
+                    "rowKey": "1",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "2",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "3",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  },
+                  {
+                    "rowKey": "4",
+                    "actual": "",
+                    "status": {
+                      "DEV": "",
+                      "Staging": "",
+                      "Prod": ""
+                    }
+                  }
+                ],
+                "updatedAt": "2026-06-13T15:49:37.913Z"
               }
             }
           ]

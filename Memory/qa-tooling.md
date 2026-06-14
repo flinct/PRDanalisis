@@ -40,7 +40,12 @@ Single-file browser tool (2195 lines React 18 + Babel standalone) untuk QA SatuI
 | **History Panel** | ✅ | Per-TC execution history: diff display (old→new), event type (update/reset), timestamp, reason |
 | **Reset Modal** | ✅ | Reset Actual/Status/Notes dengan reason tracking, old state disimpan ke history |
 | **Automation Mapping** | ✅ | Per TC: tc_type (manual/automation/special), spec_file, grep_pattern. Save via `/api/testcases/:id/map` |
-| **Run Panel** | ✅ | Jalankan Playwright test dari browser via SSE `/api/run`, output streaming real-time, stop button |
+| **Run Panel** | ✅ | Jalankan Playwright test dari browser via SSE `/api/run`, output streaming real-time, stop button. **Eksekusi selalu di HOST** (server spawn `npx playwright test`); remote hanya trigger+nonton. `cwd` & resolusi spec pakai **AUTOMATION_ROOT** (dinamis via Settings). Dua mode: per-case (spec+`--grep "<scenario>"`) & run-all-file (spec/dir tanpa grep). |
+| **Auto-map (manifest)** | ✅ | Tombol "🤖 Auto-map" di CardEditor → `/api/automation/automap` isi spec_file+grep tiap case dari `conversation-automation-map.generated.json` (test_id→bucket+scenario). Catatan: test di sixV2Automation TIDAK bertag ID; grep pakai scenario/judul `describe`. Manifest lengkap hanya untuk conversation (725 item). |
+| **AUTOMATION_ROOT setting** | ✅ | ⚙ Settings §4: input path repo sixV2Automation di host. Engine `scripts/automation.js`, config di `automation-config.json`. Path relatif (mis. `..\sixV2Automation`) di-resolve thd folder PRDanalisis. |
+| **Per-device runner** | ✅ | `runner.js` (zero-dep, port 9876) dijalankan di tiap PC tester → Playwright jalan di PC itu pakai repo lokalnya, host tidak terbebani. ⚙ Settings §5 Execution: pilih "host" vs "perangkat ini" (disimpan di localStorage per-device); RunPanel arahkan SSE ke `http://localhost:9876/run` saat mode local. CORS + Private-Network header. Setup di `RUNNER-SETUP.md`. |
+| **FK resilience** | ✅ | `ensureCase()` di server: `INSERT OR IGNORE test_cases` sebelum tulis `automation_map`/`test_runs`, supaya map/run tidak FK-fail walau TSV belum di-import. |
+| **Spawn quoting** | ✅ | `/api/run` & runner pakai command string ber-quote (path & grep), bukan args array + shell:true — fix gagal-0-detik karena spasi & hilangkan DEP0190. |
 | **Infinite Scroll** | ✅ | 30 TC/page, IntersectionObserver auto-load next batch |
 | **Filter & Search** | ✅ | Search ID/scenario, filter by status (Passed/Failed/Need to Test/On Test), filter by env (DEV/Staging/Prod) |
 | **Stats Bar** | ✅ | Passed/Failed/On Test/Need to Test counters per environment |
@@ -163,6 +168,8 @@ Node.js Express server (369 lines) sebagai backend QA Browser.
 | `/oauth2callback` | GET | Tukar code → simpan `google-token.json` |
 | `/api/google/logout` | POST | Hapus token |
 | `/api/mirror` | POST | Mirror semua `PRD/*.md` → Docs |
+| `/api/automation/config` | GET/PUT | Baca/set `AUTOMATION_ROOT` (path repo sixV2Automation, disimpan di `automation-config.json`) |
+| `/api/automation/automap` | POST | Auto-map `{case_ids}` dari manifest `*-automation-map.generated.json` (test_id → spec bucket + scenario) |
 | `/api/gdocs` | GET/POST | Tree dokumen / create doc `{title, content}` |
 | `/api/gdocs/:id` | GET/PUT | Read doc → `{id,title,markdown}` / update `{content, mode}` |
 | `/health` | GET | Simple health check |

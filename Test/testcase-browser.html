@@ -1029,8 +1029,8 @@
 
     return (
       <div style={{ marginBottom:14 }}>
-        <div style={{ fontSize:9, color:'#0e7490', textTransform:'uppercase', letterSpacing:1, marginBottom:8,
-          padding:'3px 9px', background:'#001a1e', borderRadius:4, display:'inline-block', border:'1px solid #155e75' }}>
+        <div style={{ fontSize:9, color:'#67e8f9', textTransform:'uppercase', letterSpacing:1, marginBottom:8,
+          padding:'3px 9px', background:'#04282e', borderRadius:4, display:'inline-block', border:'1px solid #155e75' }}>
           🤖 Automation Mapping
         </div>
         <div style={{ padding:'10px 12px', background:'var(--app-bg)', borderRadius:6,
@@ -1069,20 +1069,24 @@
                 background:'#0369a1', color:'#fff', cursor:'pointer' }}>
               {saved ? '✓ Saved' : 'Save Mapping'}
             </button>
-            {localMap.spec_file && (
-              <button onClick={()=>onRunCase && onRunCase(caseId, localMap.spec_file, localMap.grep_pattern)}
-                style={{ fontSize:11, padding:'4px 14px', borderRadius:6,
-                  border:'1px solid #065f46', background:'#022c22', color:'#4ade80', cursor:'pointer' }}>
-                ▶ Run Test
-              </button>
-            )}
+            <button
+              onClick={()=>{
+                if (!localMap.spec_file) { alert('Set SPEC FILE dulu (atau klik 🤖 Auto-map) sebelum run.'); return; }
+                onRunCase && onRunCase(caseId, localMap.spec_file, localMap.grep_pattern);
+              }}
+              title={localMap.spec_file ? 'Run this test case' : 'Set spec / Auto-map dulu'}
+              style={{ fontSize:11, padding:'4px 14px', borderRadius:6,
+                border:'1px solid #065f46', background:localMap.spec_file ? '#022c22' : 'transparent',
+                color: localMap.spec_file ? '#4ade80' : 'var(--text-5)', cursor:'pointer' }}>
+              ▶ Run Test
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath, autoMap={}, onSaveMap, onRunCase }) {
+  function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath, autoMap={}, onSaveMap, onRunCase, onReloadMap }) {
     const _initVer = initialVersion || getActiveVersion(initExecData) || 'v1';
     // Merge exec data into cases up front so every tc.exec is non-null (fixes
     // "Cannot read properties of null (reading 'overallStatus')" on status change,
@@ -1254,6 +1258,38 @@
       setSaveMsg('Copied!'); setTimeout(()=>setSaveMsg(''),2000);
     }
 
+    // Auto-map every case in this file from the generated manifest in AUTOMATION_ROOT
+    async function autoMapFile() {
+      setSaveMsg('Auto-mapping…');
+      try {
+        const ids = cases.map(c=>c.id).filter(Boolean);
+        const r = await fetch('/api/automation/automap', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ case_ids: ids }) }).then(r=>r.json());
+        if (!r.ok) throw new Error(r.error || 'automap failed');
+        setSaveMsg(`✓ Auto-mapped ${r.mapped}/${r.total}` + (r.unmapped && r.unmapped.length ? ` (${r.unmapped.length} tak ada di manifest)` : ''));
+        onReloadMap && onReloadMap();
+        setTimeout(()=>setSaveMsg(''), 4000);
+      } catch(e){ setSaveMsg('Error: ' + e.message); }
+    }
+
+    // Common directory of mapped spec files (so "Run all" runs the whole domain/spec)
+    function commonSpecDir(paths) {
+      if (paths.length === 1) return paths[0];
+      const split = paths.map(p=>p.split('/'));
+      const min = Math.min(...split.map(s=>s.length));
+      const common = [];
+      for (let i=0;i<min;i++){ const seg=split[0][i]; if (split.every(s=>s[i]===seg)) common.push(seg); else break; }
+      return common.join('/') || paths[0];
+    }
+
+    // Run the whole file (all mapped specs, no grep)
+    function runAll() {
+      const specs = [...new Set(cases.map(c=>autoMap[c.id] && autoMap[c.id].spec_file).filter(Boolean))];
+      if (!specs.length) { setSaveMsg('Belum ada mapping — klik 🤖 Auto-map dulu'); setTimeout(()=>setSaveMsg(''),3500); return; }
+      const dir = commonSpecDir(specs);
+      const firstId = (cases.find(c=>autoMap[c.id] && autoMap[c.id].spec_file) || cases[0] || {}).id;
+      onRunCase && onRunCase(firstId, dir, ''); // no grep → run entire spec/dir
+    }
+
     const counts = STATUS_OPTIONS.filter(Boolean).reduce((acc,s)=>({
       ...acc,[s]:cases.filter(c=>(c.exec?.overallStatus?.[env]||'')===s).length,
     }),{});
@@ -1360,6 +1396,8 @@
           <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
             {saveMsg && <span style={{ fontSize:11, color:saveMsg.startsWith('Error')?'#f87171':'#4ade80' }}>{saveMsg}</span>}
             <Btn onClick={copyTSV} color='var(--text-5)'>📋 Copy TSV</Btn>
+            <Btn onClick={autoMapFile} color='#0e7490'>🤖 Auto-map</Btn>
+            <Btn onClick={runAll} bg='#065f46' color='#065f46'>▶ Run all</Btn>
             {(filePath || fileHandle) && (
               <Btn onClick={save} bg={dirty?'#3b82f6':'var(--border-1)'} color={dirty?'#3b82f6':'var(--text-5)'}>
                 {saving?'Saving…':dirty?'💾 Save':'✓ Saved'}
@@ -1418,13 +1456,17 @@
                   </div>
                   <div style={{ fontSize:9, color:'var(--text-4)' }}>{fmtDate(tc.exec?.updatedAt)}</div>
                   <div style={{ display:'flex', alignItems:'center', gap:4, justifyContent:'flex-end' }}>
-                    {autoMap[tc.id]?.spec_file && (
-                      <button onClick={e=>{ e.stopPropagation(); onRunCase && onRunCase(tc.id, autoMap[tc.id]?.spec_file, autoMap[tc.id]?.grep_pattern); }}
-                        title="Run Playwright test"
-                        style={{ fontSize:10, padding:'2px 5px', borderRadius:4, border:'1px solid #065f46', background:'#022c22', color:'#4ade80', cursor:'pointer' }}>
-                        ▶
-                      </button>
-                    )}
+                    <button onClick={e=>{ e.stopPropagation();
+                        const sf = autoMap[tc.id] && autoMap[tc.id].spec_file;
+                        if (!sf) { alert('Belum ada spec mapping untuk ' + (tc.id||'case ini') + '. Klik 🤖 Auto-map atau isi SPEC FILE dulu.'); return; }
+                        onRunCase && onRunCase(tc.id, sf, autoMap[tc.id] && autoMap[tc.id].grep_pattern);
+                      }}
+                      title={autoMap[tc.id] && autoMap[tc.id].spec_file ? 'Run Playwright test' : 'Set spec / Auto-map dulu'}
+                      style={{ fontSize:10, padding:'2px 5px', borderRadius:4, border:'1px solid #065f46',
+                        background: autoMap[tc.id] && autoMap[tc.id].spec_file ? '#022c22' : 'transparent',
+                        color: autoMap[tc.id] && autoMap[tc.id].spec_file ? '#4ade80' : 'var(--text-5)', cursor:'pointer' }}>
+                      ▶
+                    </button>
                     <span style={{ fontSize:11, color:'var(--text-4)', userSelect:'none' }}>{isOpen?'▲':'▼'}</span>
                   </div>
                 </div>
@@ -1758,6 +1800,17 @@
   });
 
   // ─── RUN PANEL ────────────────────────────────────────────────────────────────
+  // Execution target: 'host' (central /api/run) or 'local' (per-device runner agent).
+  // Stored per-device in localStorage so each PC can choose independently.
+  function getExecCfg() {
+    try {
+      return {
+        mode: localStorage.getItem('qa_exec_mode') || 'host',
+        runnerUrl: (localStorage.getItem('qa_runner_url') || 'http://localhost:9876').replace(/\/+$/, ''),
+      };
+    } catch { return { mode: 'host', runnerUrl: 'http://localhost:9876' }; }
+  }
+
   function RunPanel({ caseId, specFile, grepPattern, onClose }) {
     const [lines, setLines]   = useState([]);
     const [status, setStatus] = useState('running'); // running | pass | fail | error
@@ -1772,10 +1825,15 @@
       const t0 = Date.now();
       timerRef.current = setInterval(() => setElapsed(Math.floor((Date.now()-t0)/1000)), 500);
 
-      fetch('/api/run', {
+      const cfg     = getExecCfg();
+      const runUrl  = cfg.mode === 'local' ? cfg.runnerUrl + '/run' : '/api/run';
+      const runBody = cfg.mode === 'local'
+        ? { spec_file: specFile, grep_pattern: grepPattern, env: 'dev' }
+        : { case_id: caseId, spec_file: specFile, grep_pattern: grepPattern };
+      fetch(runUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ case_id: caseId, spec_file: specFile, grep_pattern: grepPattern }),
+        body: JSON.stringify(runBody),
         signal: ctrl.signal,
       }).then(async res => {
         const reader = res.body.getReader();
@@ -1880,6 +1938,27 @@
   function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, onImport, importing, importMsg }) {
     const [busy, setBusy] = useState(false);
     const [msg, setMsg]   = useState('');
+    const [autoCfg, setAutoCfg]   = useState(null);
+    const [autoPath, setAutoPath] = useState('');
+    const [autoMsg, setAutoMsg]   = useState('');
+    const [execMode, setExecMode]   = useState(()=>{ try { return localStorage.getItem('qa_exec_mode') || 'host'; } catch { return 'host'; } });
+    const [runnerUrl, setRunnerUrl] = useState(()=>{ try { return localStorage.getItem('qa_runner_url') || 'http://localhost:9876'; } catch { return 'http://localhost:9876'; } });
+    const [runnerHealth, setRunnerHealth] = useState(null);
+    function saveExec(mode, url) { try { localStorage.setItem('qa_exec_mode', mode); localStorage.setItem('qa_runner_url', url); } catch {} setExecMode(mode); setRunnerUrl(url); }
+    async function testRunner() {
+      setRunnerHealth('checking');
+      try { const h = await fetch(runnerUrl.replace(/\/+$/, '') + '/health').then(r=>r.json()); setRunnerHealth(h); }
+      catch(e){ setRunnerHealth({ ok:false, error:e.message }); }
+    }
+    useEffect(() => { fetch('/api/automation/config').then(r=>r.json()).then(c=>{ setAutoCfg(c); setAutoPath(c.automationRoot || ''); }).catch(()=>{}); }, []);
+    async function saveAuto() {
+      try {
+        const c = await fetch('/api/automation/config', { method:'PUT', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ automationRoot: autoPath }) }).then(r=>r.json());
+        setAutoCfg(c);
+        setAutoMsg(c.exists ? '✓ Tersimpan — folder ditemukan' : '⚠ Tersimpan, tapi folder tidak ditemukan di host');
+        setTimeout(()=>setAutoMsg(''), 4000);
+      } catch(e){ setAutoMsg('⚠ ' + e.message); }
+    }
     const connected  = status && status.connected;
     const configured = status && status.oauthConfigured;
 
@@ -1960,6 +2039,62 @@
             <div style={{ fontSize:12, color:'var(--text-3)', marginBottom:12 }}>Re-scan workspace & reindex semua TSV/MD ke database.</div>
             <button onClick={onImport} disabled={importing} style={btn('#0369a1')}>{importing ? 'Importing…' : '⟳ Import TSV/MD'}</button>
             {importMsg && <div style={{ fontSize:11, color: importMsg.startsWith('⚠') ? '#f87171' : '#4ade80', marginTop:10 }}>{importMsg}</div>}
+          </div>
+
+          {/* 4 · Automation (Playwright) */}
+          <div style={card}>
+            <div style={hd}>4 · Automation (Playwright)</div>
+            <div style={{ fontSize:12, color:'var(--text-3)', marginBottom:10, lineHeight:1.5 }}>
+              Path folder repo automation (sixV2Automation) di mesin <strong>host</strong> — tempat Playwright dijalankan.
+            </div>
+            <div style={{ display:'flex', gap:8 }}>
+              <input value={autoPath} onChange={e=>setAutoPath(e.target.value)} placeholder="C:\\Users\\…\\Desktop\\sixV2Automation"
+                style={{ flex:1, fontSize:11, padding:'6px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--deep-bg)', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }} />
+              <button onClick={saveAuto} style={btn('#0369a1')}>Save</button>
+            </div>
+            {autoCfg && <div style={{ fontSize:11, color: autoCfg.exists ? '#4ade80' : 'var(--text-5)', marginTop:8 }}>
+              {autoCfg.automationRoot ? (autoCfg.exists ? '✓ Folder ditemukan di host' : '⚠ Folder belum ada di host') : 'Belum diset'}
+            </div>}
+            {autoMsg && <div style={{ fontSize:11, color: autoMsg.startsWith('⚠') ? '#f87171' : '#4ade80', marginTop:6 }}>{autoMsg}</div>}
+          </div>
+
+          {/* 5 · Execution */}
+          <div style={card}>
+            <div style={hd}>5 · Execution (Playwright Run)</div>
+            <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+              <button onClick={()=>saveExec('host', runnerUrl)}
+                style={{ fontSize:11, padding:'5px 12px', borderRadius:6, cursor:'pointer',
+                  border:`1px solid ${execMode==='host' ? '#3b82f6' : 'var(--border-1)'}`,
+                  background: execMode==='host' ? '#3b82f6' : 'transparent', color: execMode==='host' ? '#fff' : 'var(--text-3)' }}>
+                Run di host (central)
+              </button>
+              <button onClick={()=>saveExec('local', runnerUrl)}
+                style={{ fontSize:11, padding:'5px 12px', borderRadius:6, cursor:'pointer',
+                  border:`1px solid ${execMode==='local' ? '#3b82f6' : 'var(--border-1)'}`,
+                  background: execMode==='local' ? '#3b82f6' : 'transparent', color: execMode==='local' ? '#fff' : 'var(--text-3)' }}>
+                Run di perangkat ini
+              </button>
+            </div>
+            {execMode === 'local' ? (
+              <div>
+                <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:6, lineHeight:1.5 }}>
+                  Jalankan <code>node runner.js</code> di PC ini (di dalam repo automation). Playwright akan jalan di sini, bukan di host.
+                </div>
+                <div style={{ display:'flex', gap:8 }}>
+                  <input value={runnerUrl} onChange={e=>setRunnerUrl(e.target.value)} onBlur={()=>saveExec('local', runnerUrl)} placeholder="http://localhost:9876"
+                    style={{ flex:1, fontSize:11, padding:'6px 8px', borderRadius:6, border:'1px solid var(--border-1)', background:'var(--deep-bg)', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }} />
+                  <button onClick={testRunner} style={btn('#0369a1')}>Test</button>
+                </div>
+                {runnerHealth === 'checking' && <div style={{ fontSize:11, color:'var(--text-4)', marginTop:8 }}>Mengecek…</div>}
+                {runnerHealth && runnerHealth !== 'checking' && (
+                  <div style={{ fontSize:11, marginTop:8, color: runnerHealth.ok ? '#4ade80' : '#f87171' }}>
+                    {runnerHealth.ok ? `✓ Runner aktif — root: ${runnerHealth.root}${runnerHealth.exists ? '' : ' (⚠ repo tidak ada)'}` : `⚠ Tidak terhubung: ${runnerHealth.error || 'error'}`}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ fontSize:11, color:'var(--text-4)', lineHeight:1.5 }}>Run dieksekusi di server host (pakai AUTOMATION_ROOT di atas). Cocok bila host yang punya repo + browser.</div>
+            )}
           </div>
         </div>
       </div>
@@ -2290,6 +2425,7 @@
             rootHandle={null}
             autoMap={autoMap}
             onSaveMap={handleSaveMap}
+            onReloadMap={() => fileData?.cases && loadAutoMap(fileData.cases)}
             onRunCase={(caseId, specFile, grepPattern) => setRunCase({ caseId, specFile, grepPattern })}
           />
         );

@@ -1,0 +1,16 @@
+total cases =			1							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			0	No Status		0	No Status	0		
+
+Test ID	TC-001									
+Create at					created by		Tester			
+Scenario					Pre-Condition		DATE			
+Url					Description		ENV	DEV	Staging	Prod
+		1			Status Response	Expected Result	Actual Result	Status		Status
+		2								
+
+

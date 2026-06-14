@@ -85,6 +85,14 @@ function safePath(rel) {
   return r;
 }
 
+// Ensure a minimal test_cases row exists so automation_map / test_runs FKs hold
+// even when the TSV hasn't been imported into the DB yet.
+function ensureCase(id, filePath) {
+  if (!id) return;
+  db.prepare("INSERT OR IGNORE INTO test_cases (id, file_path, created_at) VALUES (?, ?, datetime('now'))")
+    .run(String(id), filePath ? String(filePath) : '');
+}
+
 function walkDir(dir, base = '') {
   const results = [];
   let entries;
@@ -270,16 +278,19 @@ app.get('/api/testcases/:id', (req, res) => {
 
 // ─── API: AUTOMATION MAPPING ─────────────────────────────────────────────────
 app.put('/api/testcases/:id/map', (req, res) => {
-  const { tc_type = 'manual', spec_file = '', grep_pattern = '', notes = '' } = req.body;
-  db.prepare(`
-    INSERT INTO automation_map (case_id, tc_type, spec_file, grep_pattern, notes, updated_at)
-    VALUES (?, ?, ?, ?, ?, datetime('now'))
-    ON CONFLICT(case_id) DO UPDATE SET
-      tc_type=excluded.tc_type, spec_file=excluded.spec_file,
-      grep_pattern=excluded.grep_pattern, notes=excluded.notes,
-      updated_at=excluded.updated_at
-  `).run(req.params.id, tc_type, spec_file, grep_pattern, notes);
-  res.json({ ok: true });
+  try {
+    const { tc_type = 'manual', spec_file = '', grep_pattern = '', notes = '' } = req.body;
+    ensureCase(req.params.id);
+    db.prepare(`
+      INSERT INTO automation_map (case_id, tc_type, spec_file, grep_pattern, notes, updated_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'))
+      ON CONFLICT(case_id) DO UPDATE SET
+        tc_type=excluded.tc_type, spec_file=excluded.spec_file,
+        grep_pattern=excluded.grep_pattern, notes=excluded.notes,
+        updated_at=excluded.updated_at
+    `).run(req.params.id, tc_type, spec_file, grep_pattern, notes);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // Bulk update tc_type for multiple cases
@@ -295,7 +306,7 @@ app.put('/api/testcases/map/bulk', (req, res) => {
   `);
   db.exec('BEGIN');
   try {
-    for (const it of updates) stmt.run(it.case_id, it.tc_type || 'manual', it.spec_file || '', it.grep_pattern || '');
+    for (const it of updates) { ensureCase(it.case_id); stmt.run(it.case_id, it.tc_type || 'manual', it.spec_file || '', it.grep_pattern || ''); }
     db.exec('COMMIT');
   } catch(e) { db.exec('ROLLBACK'); return res.status(500).json({ error: e.message }); }
   res.json({ ok: true, count: updates.length });
@@ -317,6 +328,39 @@ app.get('/api/runs/recent', (req, res) => {
   res.json(runs);
 });
 
+// ─── API: AUTOMATION CONFIG + AUTO-MAP ───────────────────────────────────────
+const automation = require('./scripts/automation.js');
+
+app.get('/api/automation/config', (_req, res) => res.json(automation.getConfig(BASE)));
+app.put('/api/automation/config', (req, res) => {
+  try { res.json(automation.setConfig(BASE, req.body || {})); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Auto-map a set of test cases from the generated manifest(s) in AUTOMATION_ROOT
+app.post('/api/automation/automap', (req, res) => {
+  try {
+    const caseIds = (req.body && req.body.case_ids) || [];
+    const man = automation.buildManifestMap(automation.getConfig(BASE).resolved);
+    const stmt = db.prepare(`
+      INSERT INTO automation_map (case_id, tc_type, spec_file, grep_pattern, updated_at)
+      VALUES (?, 'automation', ?, ?, datetime('now'))
+      ON CONFLICT(case_id) DO UPDATE SET
+        tc_type='automation', spec_file=excluded.spec_file,
+        grep_pattern=excluded.grep_pattern, updated_at=excluded.updated_at
+    `);
+    let mapped = 0; const unmapped = [];
+    db.exec('BEGIN');
+    for (const id of caseIds) {
+      const m = man[id];
+      if (m && m.spec_file) { ensureCase(id); stmt.run(id, m.spec_file, m.grep || ''); mapped++; }
+      else unmapped.push(id);
+    }
+    db.exec('COMMIT');
+    res.json({ ok: true, mapped, unmapped, total: caseIds.length, manifestSize: Object.keys(man).length });
+  } catch (e) { try { db.exec('ROLLBACK'); } catch {} res.status(500).json({ error: e.message }); }
+});
+
 // ─── API: RUN TEST (Playwright) ──────────────────────────────────────────────
 app.post('/api/run', (req, res) => {
   const { case_id, spec_file, grep_pattern, env = 'dev', run_by = 'user' } = req.body;
@@ -332,7 +376,8 @@ app.post('/api/run', (req, res) => {
 
   const send = obj => { if (!res.writableEnded) res.write(`data: ${JSON.stringify(obj)}\n\n`); };
 
-  // Insert run record with status=running
+  // Insert run record with status=running (ensure the case exists for the FK first)
+  ensureCase(case_id);
   const runId = db.prepare(
     `INSERT INTO test_runs (case_id, env, status, output, run_by) VALUES (?, ?, 'running', '', ?) RETURNING id`
   ).get(case_id, env, run_by).id;
@@ -342,15 +387,20 @@ app.post('/api/run', (req, res) => {
   const startMs = Date.now();
   let   output  = '';
 
-  // Build playwright command
-  const specPath = path.resolve(BASE, spec_file);
-  const args = ['playwright', 'test', specPath, '--reporter=line'];
-  if (grep_pattern) args.push('--grep', grep_pattern);
+  // Run inside the automation repo (AUTOMATION_ROOT); spec_file is relative to it.
+  // spec_file may be a single .spec file (one feature) or a directory (whole TSV/domain).
+  const runRoot  = automation.getConfig(BASE).resolved || BASE;
+  const specPath = path.resolve(runRoot, spec_file);
+  // Build a single quoted command string so paths/grep with SPACES survive the shell
+  // (passing an args array with shell:true concatenates unquoted → breaks on spaces).
+  const q = s => '"' + String(s).replace(/"/g, '\\"') + '"'; // keep Windows backslashes intact
+  let cmd = `npx playwright test ${q(specPath)} --reporter=line`;
+  if (grep_pattern) cmd += ` --grep ${q(grep_pattern)}`; // omit grep → run the whole spec/dir
 
-  const pw = spawn('npx', args, {
-    cwd: BASE,
+  const pw = spawn(cmd, {
+    cwd: runRoot,
     env: { ...process.env, TEST_ENV: env },
-    shell: process.platform === 'win32',
+    shell: true,
   });
 
   pw.stdout.on('data', chunk => {

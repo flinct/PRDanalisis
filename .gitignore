@@ -8,6 +8,9 @@ google-token.json
 # Mirror state (local↔Google Docs map)
 .gdocs-mirror.json
 
+# Automation config (machine-specific path)
+automation-config.json
+
 # Node
 node_modules/
 
