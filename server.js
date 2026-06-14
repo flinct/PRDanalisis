@@ -136,6 +136,32 @@ app.put('/api/files/content', (req, res) => {
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
+// Create a folder (collection) from the dashboard
+app.post('/api/files/mkdir', (req, res) => {
+  try {
+    const dir = safePath(req.body && req.body.path || '');
+    fs.mkdirSync(dir, { recursive: true });
+    broadcastTreeChange();
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ─── Sidebar tree live updates (SSE) ─────────────────────────────────────────
+const treeClients = new Set();
+function broadcastTreeChange() {
+  for (const r of treeClients) { try { r.write('data: change\n\n'); } catch {} }
+}
+app.get('/api/files/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+  res.write('retry: 3000\n\n');
+  treeClients.add(res);
+  req.on('close', () => treeClients.delete(res));
+});
+
 // ─── API: GOOGLE (OAuth login) + DOCS + MIRROR ───────────────────────────────
 const gdocs  = require('./scripts/gdocs.js');
 const gauth  = require('./scripts/google-auth.js');
@@ -419,9 +445,17 @@ function startWatcher() {
     }, 1200));
   }
 
+  // Debounced "tree changed" ping to SSE clients (any add/remove/rename)
+  let treeTimer = null;
+  function scheduleTreeBroadcast() {
+    if (treeTimer) clearTimeout(treeTimer);
+    treeTimer = setTimeout(broadcastTreeChange, 500);
+  }
+
   for (const dir of WATCH_DIRS) {
     fs.watch(dir, { recursive: true }, (event, filename) => {
       if (!filename) return;
+      scheduleTreeBroadcast(); // refresh sidebar tree on any change
       if (/\.(tsv|md)$/i.test(filename)) scheduleImport(path.join(dir, filename));
       // mirror only markdown files living under the PRD source dir
       if (dir === PRD_DIR && mirror.isMirrorable(filename)) scheduleMirror(String(filename).replace(/\\/g, '/'));

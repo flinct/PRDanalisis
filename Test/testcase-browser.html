@@ -1083,9 +1083,13 @@
   }
 
   function CardEditor({ cases:initCases, execData:initExecData, initialVersion, fileHandle, rootHandle, filePath, autoMap={}, onSaveMap, onRunCase }) {
-    const [cases, setCases]               = useState(initCases);
+    const _initVer = initialVersion || getActiveVersion(initExecData) || 'v1';
+    // Merge exec data into cases up front so every tc.exec is non-null (fixes
+    // "Cannot read properties of null (reading 'overallStatus')" on status change,
+    // and ensures saved statuses show immediately on open).
+    const [cases, setCases]               = useState(() => mergeExecIntoCases(initCases, initExecData, _initVer));
     const [execData, setExecData]         = useState(initExecData);
-    const [activeVersion, setActiveVersion] = useState(initialVersion || 'v1');
+    const [activeVersion, setActiveVersion] = useState(_initVer);
     const [addingVer, setAddingVer]       = useState(false);
     const [newVerName, setNewVerName]     = useState('');
     const [expanded, setExpanded]         = useState(null);
@@ -1356,7 +1360,7 @@
           <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
             {saveMsg && <span style={{ fontSize:11, color:saveMsg.startsWith('Error')?'#f87171':'#4ade80' }}>{saveMsg}</span>}
             <Btn onClick={copyTSV} color='var(--text-5)'>📋 Copy TSV</Btn>
-            {fileHandle && (
+            {(filePath || fileHandle) && (
               <Btn onClick={save} bg={dirty?'#3b82f6':'var(--border-1)'} color={dirty?'#3b82f6':'var(--text-5)'}>
                 {saving?'Saving…':dirty?'💾 Save':'✓ Saved'}
               </Btn>
@@ -1851,6 +1855,27 @@
   }
 
   // ─── APP ──────────────────────────────────────────────────────────────────────
+  // ─── NEW ITEM (folder / TSV) INLINE FORM ─────────────────────────────────────
+  function NewItemForm({ pad = 12, busy, onCreate, onCancel }) {
+    const [name, setName] = useState('');
+    const ref = useRef(null);
+    useEffect(() => { const t = setTimeout(() => ref.current && ref.current.focus(), 30); return () => clearTimeout(t); }, []);
+    const mini = { fontSize:10, padding:'2px 8px', borderRadius:4, border:'1px solid var(--border-1)', background:'var(--elevated-bg)', color:'var(--text-2)', cursor: busy ? 'default' : 'pointer' };
+    return (
+      <div style={{ padding:`4px 8px 6px ${pad}px`, display:'flex', flexDirection:'column', gap:4 }}>
+        <input ref={ref} value={name} onChange={e=>setName(e.target.value)}
+          onKeyDown={e=>{ if (e.key === 'Escape') onCancel(); if (e.key === 'Enter' && name.trim()) onCreate(name.trim(), 'tsv'); }}
+          placeholder="nama…"
+          style={{ width:'100%', fontSize:11, padding:'3px 8px', borderRadius:4, border:'1px solid var(--border-1)', background:'var(--deep-bg)', color:'var(--text-1)', outline:'none', fontFamily:'inherit' }} />
+        <div style={{ display:'flex', gap:4 }}>
+          <button disabled={busy || !name.trim()} onClick={()=>onCreate(name.trim(), 'folder')} style={mini}>📁 Folder</button>
+          <button disabled={busy || !name.trim()} onClick={()=>onCreate(name.trim(), 'tsv')} style={mini}>📄 TSV</button>
+          <button onClick={onCancel} style={{ ...mini, color:'#f87171' }}>✕</button>
+        </div>
+      </div>
+    );
+  }
+
   // ─── SETTINGS PAGE ─────────────────────────────────────────────────────────
   function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, onImport, importing, importMsg }) {
     const [busy, setBusy] = useState(false);
@@ -1958,6 +1983,8 @@
     const [gdocsStatus, setGdocsStatus] = useState(null); // { oauthConfigured, connected, email, folderName }
     const [view, setView]             = useState('files'); // 'files' | 'settings'
     const [themeId, setThemeId]       = useState('navy');
+    const [creating, setCreating]     = useState(null);   // { path, sectionId }
+    const [creatingBusy, setCreatingBusy] = useState(false);
     const themeRef  = useRef(null);
     const isDraggingRef = useRef(false);
     const dragStartXRef = useRef(0);
@@ -2006,6 +2033,34 @@
         const first = data.find(s => s.tree?.length > 0);
         if (first && !activeSection) setActiveSection(first.id);
       } catch(e) { setError('Cannot reach server: ' + e.message); }
+    }
+
+    // ── Quiet tree refresh (sidebar only — never touches selection/open file) ─────
+    async function refreshTree() {
+      try { const data = await fetch('/api/files').then(r => r.json()); if (Array.isArray(data)) setSections(data); } catch {}
+    }
+
+    // ── Create a folder or new TSV from the sidebar ───────────────────────────────
+    async function createItem(name, type) {
+      if (!creating || !name) return;
+      setCreatingBusy(true);
+      try {
+        if (type === 'folder') {
+          const r = await fetch('/api/files/mkdir', { method:'POST', headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ path: `${creating.path}/${name}` }) });
+          if (!r.ok) throw new Error(await r.text());
+        } else {
+          const fp  = `${creating.path}/${name.replace(/\.tsv$/i, '')}.tsv`;
+          const tpl = serializeCardToTSV([{ ...EMPTY_TC(), id: 'TC-001' }]);
+          const r = await fetch('/api/files/content?path=' + encodeURIComponent(fp), { method:'PUT',
+            headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ content: tpl }) });
+          if (!r.ok) throw new Error(await r.text());
+        }
+        await refreshTree();
+        setActiveSection(creating.sectionId);
+        setCreating(null);
+      } catch (e) { alert('Create failed: ' + e.message); }
+      setCreatingBusy(false);
     }
 
     // ── Load Google Docs (OAuth, via server.js) ──────────────────────────────────
@@ -2132,6 +2187,13 @@
       loadGDocs();
     }, []);
 
+    // Live sidebar updates: server pings on any file/folder change → quiet tree refresh
+    useEffect(() => {
+      let es;
+      try { es = new EventSource('/api/files/events'); es.onmessage = () => refreshTree(); } catch {}
+      return () => { try { es && es.close(); } catch {} };
+    }, []);
+
     // Sync activeSection when selected changes
     useEffect(() => {
       if (selected?.sectionId) setActiveSection(selected.sectionId);
@@ -2154,8 +2216,14 @@
               <div style={{ padding:`4px 8px 4px ${pad}px`, fontSize:10, color:'var(--text-4)',
                 fontWeight:600, textTransform:'uppercase', letterSpacing:0.5,
                 display:'flex', alignItems:'center', gap:5, cursor:'default' }}>
-                <span style={{ opacity:0.5 }}>📁</span>{node.name}
+                <span style={{ opacity:0.5 }}>📁</span>
+                <span style={{ flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{node.name}</span>
+                <button onClick={e=>{ e.stopPropagation(); setCreating({ path: node.path, sectionId }); }} title="New folder / TSV"
+                  style={{ fontSize:12, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 4px' }}>+</button>
               </div>
+              {creating && creating.path === node.path && (
+                <NewItemForm pad={pad + 14} busy={creatingBusy} onCreate={createItem} onCancel={()=>setCreating(null)} />
+              )}
               {sub}
             </div>
           );
@@ -2315,6 +2383,11 @@
                         background: isActive ? 'rgba(255,255,255,0.03)' : 'transparent' }}>
                       <span style={{ width:3, height:3, borderRadius:'50%', background: sec.color, flexShrink:0 }}/>
                       <span style={{ flex:1, fontSize:10, fontWeight:600, color: sec.color, textTransform:'uppercase', letterSpacing:0.5 }}>{sec.label}</span>
+                      {!sec.remote && sec.folderName && (
+                        <button onClick={e=>{ e.stopPropagation(); setActiveSection(sec.id); setCreating({ path: sec.folderName, sectionId: sec.id }); }}
+                          title="New folder / TSV"
+                          style={{ fontSize:13, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 2px' }}>+</button>
+                      )}
                       {sec.remote && <span title="Google Docs" style={{ fontSize:9, color:'var(--text-5)' }}>☁</span>}
                       {count > 0 && <span style={{ fontSize:9, color:'var(--text-5)' }}>{count}</span>}
                       <span style={{ fontSize:9, color:'var(--text-5)', marginLeft:2 }}>{isActive ? '▾' : '▸'}</span>
@@ -2329,9 +2402,16 @@
                       {sec.statusError || '⚠ Belum terhubung — buka ⚙ Settings.'}
                     </div>;
                   }
-                  return sec.tree?.length > 0
-                    ? <div style={{ paddingBottom:4 }}>{renderTree(sec.tree, sec.id)}</div>
-                    : <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>{sec.remote ? 'Belum ada dokumen di folder mirror' : 'No files'}</div>;
+                  return (
+                    <React.Fragment>
+                      {creating && creating.path === sec.folderName && (
+                        <NewItemForm pad={20} busy={creatingBusy} onCreate={createItem} onCancel={()=>setCreating(null)} />
+                      )}
+                      {sec.tree?.length > 0
+                        ? <div style={{ paddingBottom:4 }}>{renderTree(sec.tree, sec.id)}</div>
+                        : <div style={{ padding:'8px 14px', fontSize:10, color:'var(--text-5)' }}>{sec.remote ? 'Belum ada dokumen di folder mirror' : 'No files'}</div>}
+                    </React.Fragment>
+                  );
                 };
 
                 const active = allSections.find(s => s.id === activeSection);
