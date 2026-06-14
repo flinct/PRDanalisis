@@ -64,13 +64,26 @@ const server = http.createServer((req, res) => {
       // if the mapping points to the wrong spec file in the same domain.
       if (grep && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
       const specPath = path.resolve(ROOT, target);
-      const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
-      let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${process.env.PW_PROJECT || 'chromium'}`;
-      if (grep) cmd += ` --grep ${q(grep)}`;
+      const project  = process.env.PW_PROJECT || 'chromium';
+      const cli = path.join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js');
 
-      send({ type: 'run_start', cmd });
       const t0 = Date.now();
-      const pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
+      let pw;
+      if (fs.existsSync(cli)) {
+        // Preferred: run the local Playwright CLI via node with an args array (shell:false)
+        // → no shell quoting issues with spaces in paths/grep on Windows.
+        const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
+        if (grep) args.push('--grep', grep);
+        send({ type: 'run_start', cmd: `node cli.js test "${specPath}" --project=${project}` + (grep ? ` --grep "${grep}"` : '') });
+        pw = spawn(process.execPath, args, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: false });
+      } else {
+        // Fallback: npx via shell (repos without a local @playwright/test install)
+        const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
+        let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}`;
+        if (grep) cmd += ` --grep ${q(grep)}`;
+        send({ type: 'run_start', cmd });
+        pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
+      }
 
       pw.stdout.on('data', d => send({ type: 'output', text: d.toString() }));
       pw.stderr.on('data', d => send({ type: 'output', text: d.toString() }));

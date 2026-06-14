@@ -397,17 +397,23 @@ app.post('/api/run', (req, res) => {
   // folder — handles manifests that bucket a scenario into the wrong spec file.
   if (grep_pattern && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
   const specPath = path.resolve(runRoot, target);
-  // Build a single quoted command string so paths/grep with SPACES survive the shell
-  // (passing an args array with shell:true concatenates unquoted → breaks on spaces).
-  const q = s => '"' + String(s).replace(/"/g, '\\"') + '"'; // keep Windows backslashes intact
-  let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${process.env.PW_PROJECT || 'chromium'}`;
-  if (grep_pattern) cmd += ` --grep ${q(grep_pattern)}`; // omit grep → run the whole spec/dir
+  const project  = process.env.PW_PROJECT || 'chromium';
+  const cli = path.join(runRoot, 'node_modules', '@playwright', 'test', 'cli.js');
 
-  const pw = spawn(cmd, {
-    cwd: runRoot,
-    env: { ...process.env, TEST_ENV: env },
-    shell: true,
-  });
+  let pw;
+  if (fs.existsSync(cli)) {
+    // Preferred: local Playwright CLI via node + args array (shell:false) → no Windows
+    // shell-quoting issues with spaces in paths/grep.
+    const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
+    if (grep_pattern) args.push('--grep', grep_pattern);
+    pw = spawn(process.execPath, args, { cwd: runRoot, env: { ...process.env, TEST_ENV: env }, shell: false });
+  } else {
+    // Fallback: npx via shell (no local @playwright/test install)
+    const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
+    let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}`;
+    if (grep_pattern) cmd += ` --grep ${q(grep_pattern)}`;
+    pw = spawn(cmd, { cwd: runRoot, env: { ...process.env, TEST_ENV: env }, shell: true });
+  }
 
   pw.stdout.on('data', chunk => {
     const text = chunk.toString();
