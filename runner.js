@@ -20,6 +20,15 @@ const { spawn } = require('child_process');
 const PORT = process.env.RUNNER_PORT || 9876;
 const ROOT = process.env.AUTOMATION_ROOT || process.cwd();
 
+// Make spec_file forgiving: strip any repo prefix so it resolves under ROOT.
+// Accepts "playwright/...", "..\\sixV2Automation\\playwright\\...", "C:\\...\\sixV2Automation\\playwright\\...", etc.
+function normSpec(spec) {
+  let s = String(spec || '').replace(/\\/g, '/');
+  const i = s.toLowerCase().indexOf('playwright/');
+  if (i >= 0) s = s.slice(i);
+  return s.replace(/^\/+/, '');
+}
+
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -50,9 +59,13 @@ const server = http.createServer((req, res) => {
 
       if (!specFile) { send({ type: 'run_end', status: 'error', message: 'spec_file required' }); return res.end(); }
 
-      const specPath = path.resolve(ROOT, specFile);
+      let target = normSpec(specFile);
+      // With a grep, widen a single .spec file to its folder so the test is found even
+      // if the mapping points to the wrong spec file in the same domain.
+      if (grep && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
+      const specPath = path.resolve(ROOT, target);
       const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
-      let cmd = `npx playwright test ${q(specPath)} --reporter=line`;
+      let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${process.env.PW_PROJECT || 'chromium'}`;
       if (grep) cmd += ` --grep ${q(grep)}`;
 
       send({ type: 'run_start', cmd });

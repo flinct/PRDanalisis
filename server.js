@@ -390,11 +390,17 @@ app.post('/api/run', (req, res) => {
   // Run inside the automation repo (AUTOMATION_ROOT); spec_file is relative to it.
   // spec_file may be a single .spec file (one feature) or a directory (whole TSV/domain).
   const runRoot  = automation.getConfig(BASE).resolved || BASE;
-  const specPath = path.resolve(runRoot, spec_file);
+  // Forgiving spec path: strip any repo prefix so it resolves under runRoot.
+  const normSpec = s => { s = String(s||'').replace(/\\/g,'/'); const i = s.toLowerCase().indexOf('playwright/'); if (i>=0) s = s.slice(i); return s.replace(/^\/+/,''); };
+  let target = normSpec(spec_file);
+  // With a grep, --grep locates the exact test, so widen a single .spec file to its
+  // folder — handles manifests that bucket a scenario into the wrong spec file.
+  if (grep_pattern && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
+  const specPath = path.resolve(runRoot, target);
   // Build a single quoted command string so paths/grep with SPACES survive the shell
   // (passing an args array with shell:true concatenates unquoted → breaks on spaces).
   const q = s => '"' + String(s).replace(/"/g, '\\"') + '"'; // keep Windows backslashes intact
-  let cmd = `npx playwright test ${q(specPath)} --reporter=line`;
+  let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${process.env.PW_PROJECT || 'chromium'}`;
   if (grep_pattern) cmd += ` --grep ${q(grep_pattern)}`; // omit grep → run the whole spec/dir
 
   const pw = spawn(cmd, {

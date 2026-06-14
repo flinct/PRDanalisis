@@ -37,11 +37,17 @@ function buildManifestMap(automationRoot) {
       const items = Array.isArray(j) ? j : (j.items || []);
       for (const it of items) {
         if (!it || !it.test_id) continue;
-        const bucket = it.automation_bucket
-          ? 'playwright/tests/e2e/' + String(it.automation_bucket).replace(/^\/+/, '')
-          : '';
+        // Manifest's automation_bucket sometimes points to a file where the scenario's
+        // describe doesn't actually live. So map to the DOMAIN DIRECTORY and let --grep
+        // (the scenario title) locate the test in whichever spec it resides.
+        let spec_file = '';
+        if (it.automation_bucket) {
+          const b = String(it.automation_bucket).replace(/^\/+/, '');
+          const domain = b.split('/')[0]; // e.g. "conversation"
+          spec_file = 'playwright/tests/e2e/' + (domain || b);
+        }
         out[it.test_id] = {
-          spec_file: bucket,
+          spec_file,
           grep: it.scenario || it.feature_group || '',
           developed: it.developed !== false && !it.undeveloped_label,
         };

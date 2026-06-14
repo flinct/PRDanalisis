@@ -1850,13 +1850,16 @@
             if (!dataLine) continue;
             try {
               const evt = JSON.parse(dataLine.slice(5));
-              if (evt.type === 'output') {
+              if (evt.type === 'run_start') {
+                if (evt.cmd) setLines(prev => [...prev, '$ ' + evt.cmd, '']);
+              } else if (evt.type === 'output') {
                 setLines(prev => [...prev, ...evt.text.split('\n').filter(Boolean)]);
                 setTimeout(() => bodyRef.current?.scrollTo(0, bodyRef.current.scrollHeight), 30);
               } else if (evt.type === 'run_end') {
                 setStatus(evt.status);
                 clearInterval(timerRef.current);
-                setElapsed(Math.round(evt.duration_ms / 1000));
+                if (evt.duration_ms != null) setElapsed(Math.round(evt.duration_ms / 1000));
+                if (evt.message) setLines(prev => [...prev, '⚠ ' + evt.message]);
               }
             } catch {}
           }
