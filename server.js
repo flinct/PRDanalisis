@@ -341,7 +341,9 @@ app.put('/api/automation/config', (req, res) => {
 app.post('/api/automation/automap', (req, res) => {
   try {
     const caseIds = (req.body && req.body.case_ids) || [];
-    const man = automation.buildManifestMap(automation.getConfig(BASE).resolved);
+    const root = automation.getConfig(BASE).resolved;
+    const idx = automation.buildSpecIndex(root);   // exact spec file per [ID]-tagged test
+    const man = automation.buildManifestMap(root);  // fallback: domain dir + scenario
     const stmt = db.prepare(`
       INSERT INTO automation_map (case_id, tc_type, spec_file, grep_pattern, updated_at)
       VALUES (?, 'automation', ?, ?, datetime('now'))
@@ -352,12 +354,14 @@ app.post('/api/automation/automap', (req, res) => {
     let mapped = 0; const unmapped = [];
     db.exec('BEGIN');
     for (const id of caseIds) {
-      const m = man[id];
-      if (m && m.spec_file) { ensureCase(id); stmt.run(id, m.spec_file, m.grep || ''); mapped++; }
+      let spec_file = '', grep = '';
+      if (idx[id])            { spec_file = idx[id];           grep = id; }            // precise: exact file + grep by id
+      else if (man[id] && man[id].spec_file) { spec_file = man[id].spec_file; grep = man[id].grep || ''; } // fallback
+      if (spec_file) { ensureCase(id); stmt.run(id, spec_file, grep); mapped++; }
       else unmapped.push(id);
     }
     db.exec('COMMIT');
-    res.json({ ok: true, mapped, unmapped, total: caseIds.length, manifestSize: Object.keys(man).length });
+    res.json({ ok: true, mapped, unmapped, total: caseIds.length, indexSize: Object.keys(idx).length, manifestSize: Object.keys(man).length });
   } catch (e) { try { db.exec('ROLLBACK'); } catch {} res.status(500).json({ error: e.message }); }
 });
 
@@ -392,11 +396,7 @@ app.post('/api/run', (req, res) => {
   const runRoot  = automation.getConfig(BASE).resolved || BASE;
   // Forgiving spec path: strip any repo prefix so it resolves under runRoot.
   const normSpec = s => { s = String(s||'').replace(/\\/g,'/'); const i = s.toLowerCase().indexOf('playwright/'); if (i>=0) s = s.slice(i); return s.replace(/^\/+/,''); };
-  let target = normSpec(spec_file);
-  // With a grep, --grep locates the exact test, so widen a single .spec file to its
-  // folder — handles manifests that bucket a scenario into the wrong spec file.
-  if (grep_pattern && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
-  const specPath = path.resolve(runRoot, target);
+  const specPath = path.resolve(runRoot, normSpec(spec_file));
   const project  = process.env.PW_PROJECT || 'chromium';
   const cli = path.join(runRoot, 'node_modules', '@playwright', 'test', 'cli.js');
 

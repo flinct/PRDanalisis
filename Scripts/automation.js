@@ -57,4 +57,28 @@ function buildManifestMap(automationRoot) {
   return out;
 }
 
-module.exports = { cfgPath, getConfig, setConfig, buildManifestMap };
+// Scan spec files for [TEST-ID] tags in test titles → { test_id: relativeSpecPath }.
+// This is the most reliable mapping: it points to the EXACT spec file that contains
+// the test, so we can run just that file + --grep by id (fast, precise).
+function buildSpecIndex(root) {
+  const idx = {};
+  if (!root) return idx;
+  const base = path.join(root, 'playwright', 'tests');
+  const RE = /\[([A-Za-z0-9]+-[A-Za-z0-9]+-\d+)\]/g;
+  (function walk(dir) {
+    let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of ents) {
+      if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) walk(full);
+      else if (/\.spec\.[jt]s$/i.test(e.name)) {
+        let txt; try { txt = fs.readFileSync(full, 'utf8'); } catch { continue; }
+        let m; RE.lastIndex = 0;
+        while ((m = RE.exec(txt))) { const id = m[1]; if (!idx[id]) idx[id] = path.relative(root, full).replace(/\\/g, '/'); }
+      }
+    }
+  })(base);
+  return idx;
+}
+
+module.exports = { cfgPath, getConfig, setConfig, buildManifestMap, buildSpecIndex };

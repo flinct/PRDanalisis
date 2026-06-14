@@ -59,11 +59,7 @@ const server = http.createServer((req, res) => {
 
       if (!specFile) { send({ type: 'run_end', status: 'error', message: 'spec_file required' }); return res.end(); }
 
-      let target = normSpec(specFile);
-      // With a grep, widen a single .spec file to its folder so the test is found even
-      // if the mapping points to the wrong spec file in the same domain.
-      if (grep && /\.(spec|test)\.[jt]s$/i.test(target)) target = target.replace(/\/[^/]+$/, '');
-      const specPath = path.resolve(ROOT, target);
+      const specPath = path.resolve(ROOT, normSpec(specFile));
       const project  = process.env.PW_PROJECT || 'chromium';
       const cli = path.join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js');
 
