@@ -43,7 +43,9 @@ function cors(res) {
 
 function startRun(p) {
   const runId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  const specPath = path.resolve(ROOT, normSpec(p.spec_file));
+  // Pass spec RELATIVE to the repo root: Playwright's positional arg is a file-path
+  // FILTER (regex). An absolute Windows path (backslashes, "C:") never matches → "No tests found".
+  const specArg = normSpec(p.spec_file);
   const project  = process.env.PW_PROJECT || 'chromium';
   const grep     = p.grep_pattern;
   const env      = p.env || 'dev';
@@ -51,13 +53,13 @@ function startRun(p) {
 
   let pw, cmd;
   if (fs.existsSync(cli)) {
-    const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
+    const args = [cli, 'test', specArg, '--reporter=line', '--project=' + project];
     if (grep) args.push('--grep', grep);
-    cmd = `node cli.js test "${specPath}" --project=${project}` + (grep ? ` --grep "${grep}"` : '');
+    cmd = `node cli.js test "${specArg}" --project=${project}` + (grep ? ` --grep "${grep}"` : '');
     pw = spawn(process.execPath, args, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: false });
   } else {
     const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
-    cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}` + (grep ? ` --grep ${q(grep)}` : '');
+    cmd = `npx playwright test ${q(specArg)} --reporter=line --project=${project}` + (grep ? ` --grep ${q(grep)}` : '');
     pw = spawn(cmd, { cwd: ROOT, env: { ...process.env, TEST_ENV: env }, shell: true });
   }
 

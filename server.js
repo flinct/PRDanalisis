@@ -17,6 +17,10 @@ app.use(express.json({ limit: '10mb' }));
 // Serve the QA dashboard HTML
 app.use(express.static(path.join(BASE, 'Test'), { index: 'testcase-browser.html' }));
 
+// Always serve the latest runner agent so tester PCs can self-update:
+//   curl http://<host>:3001/runner.js -o runner.js   (then: node runner.js)
+app.get('/runner.js', (_req, res) => res.sendFile(path.join(BASE, 'runner.js')));
+
 // ─── DATABASE SETUP ──────────────────────────────────────────────────────────
 const db = new DatabaseSync(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
@@ -396,7 +400,9 @@ app.post('/api/run', (req, res) => {
   const runRoot  = automation.getConfig(BASE).resolved || BASE;
   // Forgiving spec path: strip any repo prefix so it resolves under runRoot.
   const normSpec = s => { s = String(s||'').replace(/\\/g,'/'); const i = s.toLowerCase().indexOf('playwright/'); if (i>=0) s = s.slice(i); return s.replace(/^\/+/,''); };
-  const specPath = path.resolve(runRoot, normSpec(spec_file));
+  // RELATIVE spec arg: Playwright's positional arg is a file-path filter (regex);
+  // an absolute Windows path never matches → "No tests found". cwd is runRoot.
+  const specArg = normSpec(spec_file);
   const project  = process.env.PW_PROJECT || 'chromium';
   const cli = path.join(runRoot, 'node_modules', '@playwright', 'test', 'cli.js');
 
@@ -404,13 +410,13 @@ app.post('/api/run', (req, res) => {
   if (fs.existsSync(cli)) {
     // Preferred: local Playwright CLI via node + args array (shell:false) → no Windows
     // shell-quoting issues with spaces in paths/grep.
-    const args = [cli, 'test', specPath, '--reporter=line', '--project=' + project];
+    const args = [cli, 'test', specArg, '--reporter=line', '--project=' + project];
     if (grep_pattern) args.push('--grep', grep_pattern);
     pw = spawn(process.execPath, args, { cwd: runRoot, env: { ...process.env, TEST_ENV: env }, shell: false });
   } else {
     // Fallback: npx via shell (no local @playwright/test install)
     const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
-    let cmd = `npx playwright test ${q(specPath)} --reporter=line --project=${project}`;
+    let cmd = `npx playwright test ${q(specArg)} --reporter=line --project=${project}`;
     if (grep_pattern) cmd += ` --grep ${q(grep_pattern)}`;
     pw = spawn(cmd, { cwd: runRoot, env: { ...process.env, TEST_ENV: env }, shell: true });
   }

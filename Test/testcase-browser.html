@@ -1235,6 +1235,15 @@
         if (filePath) {
           const srcName = filePath.split('/').pop();
           const newExec = buildExecJSON(cases, execData, filePath, srcName, activeVersion);
+          // Also persist any in-memory (stashed) versions — e.g. v1 after you switched to a
+          // new v2 — so they aren't dropped on save and stay in the version list after refresh.
+          for (const ver of Object.keys(stashRef.current)) {
+            if (ver === activeVersion || newExec.versions[ver]) continue;
+            const vcases = stashRef.current[ver] || [];
+            const cmap = {};
+            for (const tc of vcases) { if (tc.id) cmap[tc.id] = { testcaseId: tc.id, current: tcToSnapshot(tc), history: tc.history || [] }; }
+            newExec.versions[ver] = { createdAt: nowISO(), updatedAt: nowISO(), cases: cmap };
+          }
           const execPath = filePath.replace(/\.tsv$/i, '.exec.json').replace(/\.csv$/i, '.exec.json');
           const r2 = await fetch('/api/files/content?path=' + encodeURIComponent(execPath), {
             method: 'PUT',
