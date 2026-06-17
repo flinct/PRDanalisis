@@ -1,114 +1,90 @@
 # Ticket — Page Selector Map (data-cy)
 
-> **Kontrak `data-cy` untuk diterapkan di FE (omnichannel-satuinbox-fe).**
-> Semua elemen ticket diseleksi via `data-cy`. `testIdAttribute = 'data-cy'` → `getByTestId('X')` = `[data-cy="X"]`.
-> Konvensi domain ticket: **kebab-case** (mengikuti yang sudah ada: `monitoring-ticket-*`, `ticket-list-*`).
-> Status: `ADA` = sudah ada di FE; **`TAMBAH`** = perlu ditambahkan.
+> **Kontrak `data-cy` untuk FE (omnichannel-satuinbox-fe).** `testIdAttribute = 'data-cy'`.
+> Konvensi: kebab-case (`monitoring-ticket-*`, `ticket-list-*`).
+> Status: `DONE` = ditambahkan pada perubahan ini · `ADA` = sudah ada sebelumnya · `TAMBAH` = masih perlu.
+> **Diperbarui & diverifikasi terhadap FE: 2026-06-15.**
+
+> ⚠️ **Koreksi penting:** versi sebelumnya menandai seluruh §1 sebagai "ADA". Faktanya FE ticketing **tidak punya `data-cy` sama sekali** (0) sebelum perubahan ini. Tabel ticket FE sekarang adalah **TanStack table generic** (kolom standar + custom-attribute dinamis), bukan UI kurir. Status di bawah sudah dikoreksi.
 
 ---
 
-## 1. Ticketing list — `/ticketing`  (ticketing.page.js) — mayoritas ADA
+## 1. Ticketing list — `/ticketing` (ticketing.page.js)
 
 | Elemen | `data-cy` | Status |
 |---|---|---|
-| Nav Ticketing | `nav-link-Ticket` | ADA |
-| Judul/head | `monitoring-ticket-head-label` | ADA |
-| Tombol more action | `monitoring-ticket-more-action` | ADA |
-| Tombol create ticket | `monitoring-ticket-create-ticket` | ADA |
-| Counter: New / All / Need Response / Being Handled / Over SLA / Solved | `monitoring-ticket-new-ticket` / `-all-ticket` / `-need-response` / `-being-handled` / `-over-sla` / `-solved` | ADA |
-| Searchbar | `searchbar-at-ticket` | ADA |
-| Filter courier / tanggal / list / kendala | `filter-by-courier` / `date-filter-ticket` / `filter-ticket-list` / `ticket-list-filter-kendala` | ADA |
-| Header tabel (checkbox/AWB/Kendala/SLA/Manifest/Destinasi/Tracking) | `ticket-list-table-heading-checkbox`, `ticket-list-awb`, `ticket-list-kendala`, `ticket-list-sla`, `ticket-list-manifest-date`, `ticket-list-destinasi`, `ticket-list-tracking` | ADA |
-| Item baris (checkbox, logo kurir, AWB, kendala, SLA, manifest, destinasi, last-tracking, seller name/phone, ticket id, priority, created at, agent handler) | `ticket-list-checkbox`, `ticket-list-kurir-logo`, `ticket-list-awb-number`, `ticket-list-deskripsi-kendala`, `ticket-list-sla-value`, `ticket-list-manifest-date-value`, `ticket-list-destinasi-value`, `ticket-list-last-tracking(-button)`, `ticket-list-seller-name`/`-seller-phone`, `ticket-list-ticket-id`, `ticket-list-priority`, `ticket-list-created-at`, `ticket-list-agent-handler` | ADA |
-| Aksi baris: Tindak Lanjuti / View / Solve | `ticket-list-button-tindak-lanjuti` / `-button-view-ticket` / `-button-solve` | ADA |
+| Nav Ticketing | `nav-link-Ticket` | ADA (side nav) |
+| KPI: All / New / Need Response / Being Handled / Over SLA / Solved / Snoozed | `monitoring-ticket-all-ticket` / `-new-ticket` / `-need-response` / `-being-handled` / `-over-sla` / `-solved` / `-snoozed` | **DONE** |
+| Tombol create ticket | `monitoring-ticket-create-ticket` | **DONE** |
+| Searchbar | `searchbar-at-ticket` | **DONE** |
+| Filter button | `filter-ticket-list` | **DONE** |
+| Date range filter | `date-filter-ticket` | **DONE** |
+| Sel: Ticket ID | `ticket-list-ticket-id` | **DONE** |
+| Sel: Priority | `ticket-list-priority` | **DONE** |
+| Sel: SLA | `ticket-list-sla` | **DONE** |
+| Sel: Created at | `ticket-list-created-at` | **DONE** |
+| Sel: Agent handler | `ticket-list-agent-handler` | **DONE** |
+| Kolom custom-attribute apa pun | `ticket-list-<columnKey>` | **DONE** (auto, via `CustomAttributeCell`) |
 
-## 2. Linked Chat Bubble & Ticket Detail  (ticket-linked-bubble.page.js) — mayoritas TAMBAH
+### Kolom kurir = custom-attribute (auto-match)
 
-### 2a. Chat bubble & seleksi pesan
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Container chatroom | `conversation-chatroom-container` | **TAMBAH** | `#conversation-chatroom-container` |
-| Container bubble | `conversation-bubble-container` | **TAMBAH** | `#conversation-buble` |
-| Satu bubble chat | `ticket-chat-bubble` | **TAMBAH** | `div.group` |
-| Bubble terpilih (state) | `ticket-chat-bubble` + `data-selected="true"` | **TAMBAH** | `div.border-blue-600.border-2` |
-| Bubble sudah punya ticket (state) | `ticket-chat-bubble` + `data-linked="true"` | **TAMBAH** | `div.bg-pink-100` |
-| Link "lihat ticket" | `bubble-see-ticket-link` | **TAMBAH** | `a[href*="ticketing?ticketId="]` |
-| Tombol menu (titik tiga) | `bubble-menu-button` | **TAMBAH** | `button[aria-haspopup="dialog"]` |
-| Menu: pilih pesan | `bubble-menu-select-messages` | **TAMBAH** | `role=button` |
-| Checkbox pilih bubble | `bubble-select-checkbox` | **TAMBAH** | `button[role="checkbox"]` |
-| Bar seleksi: Create Ticket | `selection-create-ticket-button` | **TAMBAH** | `role=button` |
-| Bar seleksi: Cancel | `selection-cancel-button` | **TAMBAH** | `role=button /cancel\|batal/` |
+`CustomAttributeCell` emit `ticket-list-<columnKey>` dengan `columnKey` = **title** custom attribute pada ticket type. Jadi bila tenant mengonfigurasi atribut berjudul `awb`, `destinasi`, `kendala`, `manifest-date`, `seller-name`, `seller-phone`, `kurir-logo`, `tracking` → otomatis jadi `ticket-list-awb`, `ticket-list-destinasi`, dst — **match automation**. (Match hanya jika title-nya persis slug tsb.)
 
-### 2b. Dialog create ticket
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Dialog create ticket | `create-ticket-dialog` | **TAMBAH** | `[role="dialog"]` |
-| Search ticket type | `create-ticket-type-search` | **TAMBAH** | `input[placeholder*="ticket"]` |
-| Opsi ticket type | `create-ticket-type-option` | **TAMBAH** | dropdown option |
-| Opsi priority | `create-ticket-priority-option` | **TAMBAH** | dropdown option |
-| Tombol konfirmasi create | `create-ticket-confirm-button` | **TAMBAH** | `role=button` |
-| Dialog review ticket dibuat | `created-ticket-review-dialog` | **TAMBAH** | `[role="dialog"]` |
-| Modal duplikat bubble | `duplicate-bubble-modal` | **TAMBAH** | `div.bg-orange-50` |
-| Tutup modal duplikat | `duplicate-bubble-modal-close` | **TAMBAH** | `role=button` |
+### ⚠️ Diharapkan automation tapi TIDAK ada elemen di FE generic sekarang
 
-### 2c. Ticket drawer & linked sections
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Ticket drawer | `ticket-drawer` | **TAMBAH** | `[role="dialog"]` |
-| Accordion: Linked Messages | `ticket-linked-messages-accordion` | **TAMBAH** | `role=button` |
-| Accordion: Linked Conversation | `ticket-linked-conversation-accordion` | **TAMBAH** | `role=button` |
-| Accordion: Linked Tickets (di conversation) | `conversation-linked-tickets-accordion` | **TAMBAH** | `getByText` |
-| Item linked ticket | `linked-ticket-item` | **TAMBAH** | `button[aria-label^="View ticket:"]` |
-| Badge SLA | `ticket-sla-badge` | **TAMBAH** | `[aria-label="sla duration"]` |
-| Tombol Close ticket | `ticket-close-button` | **TAMBAH** | `role=button /tutup\|close/` |
-| Tombol Reopen ticket | `ticket-reopen-button` | **TAMBAH** | `role=button /buka\|reopen/` |
+| `data-cy` | Catatan |
+|---|---|
+| `ticket-list-button-solve` / `-tindak-lanjuti` / `-view-ticket` | Tidak ada tombol per-baris (FE: row-click → drawer + popover snooze) |
+| `ticket-list-last-tracking` / `-last-tracking-button` | Kurir-specific, tak ada elemen |
+| `ticket-list-awb-number` / `-destinasi-value` / `-manifest-date-value` / `-sla-value` | Sel sekarang satu elemen, bukan label+value terpisah |
+| `ticket-list-checkbox` / `-table-heading-checkbox` | Dirender `molecules/table/Table.tsx` (generic, dipakai banyak domain) — perlu data-cy ber-scope ticket |
+| `filter-by-courier` / `ticket-list-filter-kendala` | Field filter custom — ada hanya bila dikonfigurasi sebagai custom attribute |
+| `monitoring-ticket-head-label` / `-more-action` | Tidak ada di header/KPI sekarang |
 
-### 2d. Append to ticket (ticket picker)
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Tombol Append to Ticket | `append-to-ticket-button` | **TAMBAH** | `role=button` |
-| Modal picker ticket | `ticket-picker-modal` | **TAMBAH** | `[role="dialog"]` |
-| Search di picker | `ticket-picker-search` | **TAMBAH** | `input` |
-| Opsi ticket di picker | `ticket-picker-option` | **TAMBAH** | `button` |
-| Konfirmasi / Batal picker | `ticket-picker-confirm-button` / `ticket-picker-cancel-button` | **TAMBAH** | `role=button` |
-| State kosong picker | `ticket-picker-empty` | **TAMBAH** | `getByText` |
-| Warning sudah ter-link | `ticket-picker-already-linked-warning` | **TAMBAH** | `getByText` |
-| Add dari panel LinkedConversation | `linked-panel-add-to-ticket-button` | **TAMBAH** | `role=button /add to ticket/` |
-
-### 2e. Remove linked bubble
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Tombol remove bubble | `remove-linked-bubble-button` | **TAMBAH** | `role=button /remove bubble/` |
-| Dialog konfirmasi remove | `remove-bubble-confirm-dialog` | **TAMBAH** | `[role="dialog"]` |
-| Konfirmasi / Batal remove | `remove-bubble-confirm-button` / `remove-bubble-cancel-button` | **TAMBAH** | `role=button` |
-
-### 2f. Linked Conversation panel & navigasi
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Link "show detail chat" | `bubble-show-detail-chat-link` | **TAMBAH** | `role=link` |
-| Panel Linked Conversation | `linked-conversation-panel` | **TAMBAH** | `#scrollableLinkedConversationPanel` |
-| Tombol back ke ticket detail | `back-to-ticket-detail-button` | **TAMBAH** | `role=button` |
-| Checkbox pesan di panel | `linked-panel-message-checkbox` | **TAMBAH** | `button[role="checkbox"]` |
-
-### 2g. Reply / Internal note & toast
-| Elemen | `data-cy` | Status | Ganti selector lama |
-|---|---|---|---|
-| Tab Reply to Customer | `ticket-reply-customer-tab` | **TAMBAH** | `role=button` |
-| Tab Internal Note | `ticket-internal-note-tab` | **TAMBAH** | `role=button` |
-| Tombol kirim reply | `ticket-reply-send-button` | **TAMBAH** | `role=button` |
-| Konfirmasi cross-send | `cross-send-confirm-button` | **TAMBAH** | `[role="dialog"] button /confirm\|kirim/` |
-| Toast (success/error) | `ticket-toast` | **TAMBAH** | `.Toastify__toast, [role="alert"]` |
+→ **Rekomendasi:** untuk baris di atas, perbarui `ticketing.page.js` (drop/ganti selector UI kurir lama) ATAU andalkan auto-match `ticket-list-<columnKey>` bila itu memang custom attribute.
 
 ---
 
-## Ringkasan untuk FE
+## 2. Linked Chat Bubble & Ticket Detail (ticket-linked-bubble.page.js) — masih TAMBAH
 
-- **ADA (langsung pakai):** seluruh **§1 Ticketing list** (`nav-link-Ticket`, `monitoring-ticket-*`, `searchbar-at-ticket`, `filter-*`, `ticket-list-*`).
-- **TAMBAH di FE:** hampir seluruh **§2 Linked Chat Bubble & Ticket Detail** — saat ini pakai class (`div.group`, `bg-pink-100`, `border-blue-600`), `role`, teks, atau id (`#conversation-buble`). Ini yang paling rawan gagal di automation; prioritaskan penambahan `data-cy`-nya.
-- Untuk **state** (terpilih / sudah ber-ticket), gunakan atribut tambahan `data-selected` / `data-linked` pada `ticket-chat-bubble` daripada mengandalkan warna/class.
-- Setelah `data-cy` ditanam, update `ticket-linked-bubble.page.js` agar semua locator pakai `getByTestId(...)`.
+(Belum diinstrumentasi — surface besar di ticket detail drawer / linked bubble. Dipertahankan sebagai kontrak untuk batch berikutnya.)
 
-## Pemetaan ke test case (Test/ticket/)
-- `Ticket lists.tsv` → §1 (`ticketing.spec.js` — Ticketing Smoke).
-- `Ticket Detail.tsv`, `Ticket Room Conversation.tsv`, `CRUD Ticket.tsv` → §2 (`linked-bubble.spec.js` — grup APP/REM/NAV/REG).
+### 2a. Chat bubble & seleksi pesan
+`conversation-chatroom-container`, `conversation-bubble-container`, `ticket-chat-bubble` (+ `data-selected` / `data-linked`), `bubble-see-ticket-link`, `bubble-menu-button`, `bubble-menu-select-messages`, `bubble-select-checkbox`, `selection-create-ticket-button`, `selection-cancel-button`.
+
+### 2b. Dialog create ticket
+`create-ticket-dialog`, `create-ticket-type-search`, `create-ticket-type-option`, `create-ticket-priority-option`, `create-ticket-confirm-button`, `created-ticket-review-dialog`, `duplicate-bubble-modal(-close)`.
+
+### 2c. Ticket drawer & linked sections
+`ticket-drawer`, `ticket-linked-messages-accordion`, `ticket-linked-conversation-accordion`, `conversation-linked-tickets-accordion`, `linked-ticket-item`, `ticket-sla-badge`, `ticket-close-button`, `ticket-reopen-button`.
+
+### 2d. Append to ticket (picker)
+`append-to-ticket-button`, `ticket-picker-modal`, `ticket-picker-search`, `ticket-picker-option`, `ticket-picker-confirm-button` / `-cancel-button`, `ticket-picker-empty`, `ticket-picker-already-linked-warning`, `linked-panel-add-to-ticket-button`.
+
+### 2e. Remove linked bubble
+`remove-linked-bubble-button`, `remove-bubble-confirm-dialog`, `remove-bubble-confirm-button` / `-cancel-button`.
+
+### 2f. Linked Conversation panel & navigasi
+`bubble-show-detail-chat-link`, `linked-conversation-panel`, `back-to-ticket-detail-button`, `linked-panel-message-checkbox`.
+
+### 2g. Reply / Internal note & toast
+`ticket-reply-customer-tab`, `ticket-internal-note-tab`, `ticket-reply-send-button`, `cross-send-confirm-button`, `ticket-toast`.
+
+---
+
+## 3. FE files instrumented (this change)
+
+```
+components/molecules/ticket/TicketKpiCards.tsx               → monitoring-ticket-* (KPI_DATA_CY map)
+components/molecules/ticketing/TicketPageHeader.tsx          → monitoring-ticket-create-ticket
+components/molecules/ticket/filter/TicketSearchWithField.tsx → searchbar-at-ticket
+components/molecules/ticket/TicketingFilter.tsx              → filter-ticket-list
+components/molecules/ticket/filter/TicketingDate.tsx         → date-filter-ticket
+components/molecules/ticketing/table/TicketTableColumn.tsx   → ticket-list-ticket-id/priority/sla/created-at/agent-handler
+components/molecules/ticketing/table/CustomAttributeCell.tsx → ticket-list-<columnKey>
+```
+
+## 4. Pemetaan ke test case (Test/ticket/)
+- `Ticket lists.tsv` → §1 (ticketing smoke).
+- `Ticket Detail.tsv`, `Ticket Room Conversation.tsv`, `CRUD Ticket.tsv` → §2 (linked bubble: APP/REM/NAV/REG).
 - `Ticket - Bulk Reply + Open API.tsv` → §2g (reply) + Open API.

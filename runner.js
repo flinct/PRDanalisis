@@ -122,6 +122,38 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Launch Playwright UI mode (interactive GUI on THIS machine). Fire-and-forget.
+  if (req.method === 'POST' && url === '/ui') {
+    let body = '';
+    req.on('data', c => { body += c; if (body.length > 1e6) req.destroy(); });
+    req.on('end', () => {
+      let p = {}; try { p = JSON.parse(body || '{}'); } catch {}
+      try {
+        const cli  = path.join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js');
+        const args = ['test', '--ui'];
+        if (p.spec_file)    args.push(normSpec(p.spec_file));
+        if (p.grep_pattern) args.push('--grep', p.grep_pattern);
+        let child, cmd;
+        if (fs.existsSync(cli)) {
+          cmd = 'node cli.js ' + args.join(' ');
+          child = spawn(process.execPath, [cli, ...args], { cwd: ROOT, env: process.env, detached: true, stdio: 'ignore' });
+        } else {
+          const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
+          cmd = 'npx playwright test --ui' + (p.spec_file ? ' ' + q(normSpec(p.spec_file)) : '') + (p.grep_pattern ? ' --grep ' + q(p.grep_pattern) : '');
+          child = spawn(cmd, { cwd: ROOT, env: process.env, detached: true, stdio: 'ignore', shell: true });
+        }
+        child.unref();
+        console.log('  🖥  Playwright UI launched:', cmd);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, cmd }));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ error: 'not found' }));
 });

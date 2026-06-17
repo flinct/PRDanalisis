@@ -369,6 +369,30 @@ app.post('/api/automation/automap', (req, res) => {
   } catch (e) { try { db.exec('ROLLBACK'); } catch {} res.status(500).json({ error: e.message }); }
 });
 
+// Launch Playwright UI mode on the HOST desktop (interactive). Fire-and-forget.
+app.post('/api/ui', (req, res) => {
+  try {
+    const runRoot  = automation.getConfig(BASE).resolved || BASE;
+    const norm = s => { s = String(s||'').replace(/\\/g,'/'); const i = s.toLowerCase().indexOf('playwright/'); if (i>=0) s = s.slice(i); return s.replace(/^\/+/,''); };
+    const { spec_file, grep_pattern } = req.body || {};
+    const cli = path.join(runRoot, 'node_modules', '@playwright', 'test', 'cli.js');
+    const args = ['test', '--ui'];
+    if (spec_file)    args.push(norm(spec_file));
+    if (grep_pattern) args.push('--grep', grep_pattern);
+    let child, cmd;
+    if (fs.existsSync(cli)) {
+      cmd = 'node cli.js ' + args.join(' ');
+      child = spawn(process.execPath, [cli, ...args], { cwd: runRoot, env: process.env, detached: true, stdio: 'ignore' });
+    } else {
+      const q = s => '"' + String(s).replace(/"/g, '\\"') + '"';
+      cmd = 'npx playwright test --ui' + (spec_file ? ' ' + q(norm(spec_file)) : '') + (grep_pattern ? ' --grep ' + q(grep_pattern) : '');
+      child = spawn(cmd, { cwd: runRoot, env: process.env, detached: true, stdio: 'ignore', shell: true });
+    }
+    child.unref();
+    res.json({ ok: true, cmd });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── API: RUN TEST (Playwright) ──────────────────────────────────────────────
 app.post('/api/run', (req, res) => {
   const { case_id, spec_file, grep_pattern, env = 'dev', run_by = 'user' } = req.body;

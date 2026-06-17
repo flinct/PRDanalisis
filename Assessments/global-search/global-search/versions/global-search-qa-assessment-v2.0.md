@@ -3,8 +3,8 @@
 > **Assessment Type:** Type 1 — Feature Development Analysis + Type 3 — Interconnection Analysis
 > **Source PRD / Source Input:** `PRD/Conversationv2/PRD - Global Search (Conversation + Ticket).md`
 > **Assessment Artifact Path:** `Assessments/global-search/global-search/global-search-qa-assessment.md`
-> **Version:** `v2.2`
-> **Previous Version:** `Assessments/global-search/global-search/versions/global-search-qa-assessment-v2.1.md`
+> **Version:** `v2.0`
+> **Previous Version:** `Assessments/global-search/global-search/versions/global-search-qa-assessment-v1.2.md`
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/prd-writing-rule.md`, `Rules/workflow-rule.md`, `Rules/structure-rule.md`
 > **Reference Memory:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/comprehensive-undeveloped-features-analysis.md`
 > **Tanggal Analisa:** 2026-06-15
@@ -16,8 +16,6 @@
 
 - **v1.0–v1.2:** fokus pada **generic Global Search** lintas Conversation + Ticket, termasuk message-body search, drawer UX, dan cross-collection search pipeline.
 - **v2.0:** feature direframe menjadi **shared-attribute discovery roadmap** berbasis identifier bisnis seperti `AWB`, `Order ID`, `Tracking Number`.
-- **v2.1:** UX surface diperjelas: hasil pencarian Phase 1 menggunakan **popup modal centered overlay** sebagai primary surface, bukan drawer.
-- **v2.2:** Diagram visual di Section 4 dikembalikan agar perbandingan **Current State vs Proposed State** lebih mudah dibaca. Diagram sekarang mencakup current fragmented state, phased target model, recommended delivery model, dan one-engine-many-consumers principle.
 - Generic search **bukan lagi tujuan utama**. Search sekarang diposisikan sebagai **Phase 1 discovery surface** untuk mendeteksi record terkait sebelum grouping/handling lanjutan.
 - Fase roadmap baru:
   - **Phase 1:** Global Search Suggestions lintas Ticket + Conversation berdasarkan shared attributes.
@@ -150,33 +148,6 @@ Memungkinkan agent menemukan, menghubungkan, dan memahami tiket/percakapan yang 
 - Tidak ada consistent cross-domain shared-attribute discovery surface.
 - Tidak ada automatic tagging system untuk shared-attribute grouping.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         CURRENT STATE (AS-IS)                        │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  Customer issue / business context                                   │
-│  e.g. AWB-1234, Order-7788, Tracking XYZ                             │
-│                  │                                                   │
-│                  ├──────────────────────┬──────────────────────┐     │
-│                  ▼                      ▼                      ▼     │
-│        Conversation System      Ticket System          Agent Handling │
-│        ┌──────────────────┐     ┌──────────────────┐   ┌───────────┐ │
-│        │ custom attrs     │     │ custom fields    │   │ Agent must│ │
-│        │ properties       │     │ title/desc       │   │ guess where│ │
-│        │ messages         │     │ replies          │   │ to search  │ │
-│        └──────────────────┘     └──────────────────┘   └───────────┘ │
-│                 │                       │                    │         │
-│        ❌ no shared discovery    ❌ no shared discovery      ❌ no     │
-│        ❌ no auto-tagging        ❌ no auto-tagging          unified   │
-│        ❌ related conversations  ❌ related tickets          context    │
-│           not implemented           not implemented                    │
-│                                                                      │
-│  Result: fragmented case context, duplicate handling, low traceability│
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
 ### 4.2 Proposed State (To-Be)
 
 #### Phase 1 — Shared Attribute Global Search Suggestions
@@ -188,36 +159,6 @@ Saat shared attribute terdeteksi di Ticket → system menghasilkan system-tag/de
 #### Phase 3 — Automatic Conversation Tagging + Related Conversation Visibility
 Saat shared attribute terdeteksi di Conversation → system menghasilkan system-tag/derived-tag → Conversation Module menampilkan related conversation context dan navigasi terkait.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                        PROPOSED STATE (TO-BE)                        │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  Shared business attribute                                            │
-│  e.g. AWB-1234                                                        │
-│                  │                                                   │
-│                  ▼                                                   │
-│        ┌──────────────────────────────┐                              │
-│        │ Shared Matching Engine       │                              │
-│        │ - exact normalized match     │                              │
-│        │ - same rules cross-domain    │                              │
-│        │ - same explanation source    │                              │
-│        └──────────────┬───────────────┘                              │
-│                       │                                              │
-│       ┌───────────────┼────────────────┬────────────────────────┐    │
-│       ▼               ▼                ▼                        ▼    │
-│  Phase 1         Phase 2          Phase 3                 Future     │
-│  Search          Ticket           Conversation            Consumers   │
-│  Suggestions     Auto-Tagging     Auto-Tagging            (analytics, │
-│  + popup         + grouped        + related visibility    audits, etc)│
-│  results         ticket context   + navigation                       │
-│                                                                      │
-│  Output principle:                                                   │
-│  matchedBy + matchedValue + RBAC-safe result + reusable logic        │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
 ### 4.3 Recommended Delivery Model
 
 | Phase | Goal | Delivery Shape |
@@ -225,30 +166,6 @@ Saat shared attribute terdeteksi di Conversation → system menghasilkan system-
 | Phase 1 | Discovery | Reframe current Global Search PRD menjadi attribute-centric search suggestions |
 | Phase 2 | Ticket actionability | Patch `Related Tickets and Ticket Merge Suggestion` + ticket tagging/display behavior |
 | Phase 3 | Conversation actionability | Patch `Related Conversations Grouping` + conversation tagging/display behavior |
-
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                      RECOMMENDED DELIVERY MODEL                      │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  Phase 1: DISCOVERY                                                  │
-│  Search popup / full-page fallback                                   │
-│  └─ goal: find related records before action                         │
-│                                                                      │
-│  Phase 2: TICKET ACTIONABILITY                                       │
-│  Patch Related Tickets PRD                                           │
-│  └─ goal: auto-tag + grouped/related ticket visibility               │
-│                                                                      │
-│  Phase 3: CONVERSATION ACTIONABILITY                                 │
-│  Patch Related Conversations PRD                                     │
-│  └─ goal: auto-tag + related conversation visibility                 │
-│                                                                      │
-│  Rule:                                                               │
-│  DO NOT build 3 separate matching logics.                            │
-│  Build 1 shared engine, then phase consumers on top.                 │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 4.4 Key Architectural Principle
 
@@ -263,27 +180,6 @@ Saat shared attribute terdeteksi di Conversation → system menghasilkan system-
 
 Jika tiap surface membuat logic matching sendiri, hasil relation akan saling bertentangan.
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                   ONE MATCHING ENGINE, MANY CONSUMERS               │
-├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│                    Shared Matching Engine                            │
-│         (normalization + approved keys + ranking policy)             │
-│                              │                                       │
-│      ┌───────────────────────┼───────────────────────┐               │
-│      ▼                       ▼                       ▼               │
-│  Search Suggestions     Ticket Auto-Tags      Conversation Auto-Tags │
-│      │                       │                       │               │
-│      ▼                       ▼                       ▼               │
-│ Related Search UI      Related Ticket UX      Related Conversation UX│
-│                                                                      │
-│  BAD PATTERN TO AVOID:                                               │
-│  Search logic A ≠ Ticket logic B ≠ Conversation logic C              │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
 ---
 
 ## 5. Impact Analysis
@@ -293,7 +189,7 @@ Jika tiap surface membuat logic matching sendiri, hasil relation akan saling ber
 | Module | Search bukan lagi surface generik; jadi consumer dari related-record discovery | Search UI, ticketing, conversation, detail surfaces | HIGH | Harus jelas boundary Phase 1 vs 2 vs 3 |
 | Database | Potensi field/tag derived baru dan index shared-attribute | tickets, conversations, custom attribute storage, custom field storage | HIGH | Jangan commit persistence model sebelum lifecycle tag diputuskan |
 | API | Search response perlu `matchFields`, `matchedBy`, `matchedValue`, mungkin `relatedCount` | API Gateway, ticket-service, conversation-service | HIGH | Gunakan schema konsisten lintas domain |
-| UI/UX | Result card bukan sekadar hasil search; harus menjelaskan relation reason | Search popup/page, ticket detail, conversation detail | HIGH | `Matched by` dan `Matched value` wajib konsisten; popup menghindari konflik dengan right-side drawers/widgets |
+| UI/UX | Result card bukan sekadar hasil search; harus menjelaskan relation reason | Search drawer/page, ticket detail, conversation detail | HIGH | `Matched by` dan `Matched value` wajib konsisten |
 | Security / RBAC | Related suggestions lintas domain tetap harus hormati visibility per domain | Search, ticket detail, conversation detail | HIGH | Jangan expose existence di luar scope role |
 | Performance | Matching shared attributes lebih murah daripada message-body search, tapi tagging/backfill bisa mahal | Search pipeline, indexing, migration jobs | MEDIUM | Prioritaskan exact indexed fields di Phase 1 |
 | Integration | Overlap langsung dengan existing related-ticket dan related-conversation PRDs | Product spec consistency | HIGH | Patch PRD domain, jangan diverge |
@@ -406,7 +302,7 @@ Potential event surfaces (future):
 ## 9. Production Safety
 
 - **Rollback Strategy:**
-  - Phase 1: disable shared-attribute suggestion popup via feature flag.
+  - Phase 1: disable shared-attribute suggestion surface via feature flag.
   - Phase 2/3: disable auto-tag generation independently per domain.
 - **Feature Toggle Requirement:**
   - `SHARED_ATTRIBUTE_DISCOVERY_ENABLED`

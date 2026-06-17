@@ -50,7 +50,7 @@
   </script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/turndown@7/dist/turndown.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1/dist/turndown-plugin-gfm.min.js"></script>
@@ -1407,6 +1407,7 @@
             <Btn onClick={copyTSV} color='var(--text-5)'>📋 Copy TSV</Btn>
             <Btn onClick={autoMapFile} color='#0e7490'>🤖 Auto-map</Btn>
             <Btn onClick={runAll} bg='#065f46' color='#065f46'>▶ Run all</Btn>
+            <Btn onClick={()=>openPlaywrightUI(null, null)} color='#a78bfa'>🖥 Playwright UI</Btn>
             {(filePath || fileHandle) && (
               <Btn onClick={save} bg={dirty?'#3b82f6':'var(--border-1)'} color={dirty?'#3b82f6':'var(--text-5)'}>
                 {saving?'Saving…':dirty?'💾 Save':'✓ Saved'}
@@ -1818,6 +1819,18 @@
         runnerUrl: (localStorage.getItem('qa_runner_url') || 'http://localhost:9876').replace(/\/+$/, ''),
       };
     } catch { return { mode: 'host', runnerUrl: 'http://localhost:9876' }; }
+  }
+
+  // Launch `playwright test --ui` on the runner (local) or host. GUI opens on THAT machine.
+  async function openPlaywrightUI(specFile, grepPattern) {
+    const cfg = getExecCfg();
+    const url = cfg.mode === 'local' ? cfg.runnerUrl + '/ui' : '/api/ui';
+    try {
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ spec_file: specFile || '', grep_pattern: grepPattern || '' }) });
+      const d = await r.json();
+      if (!r.ok || d.error) throw new Error(d.error || 'failed');
+      alert('Playwright UI diluncurkan di ' + (cfg.mode === 'local' ? 'perangkat ini' : 'host') + '.\nWindow-nya muncul di layar mesin itu (bukan di tab ini).\n\n' + (d.cmd || ''));
+    } catch (e) { alert('Gagal membuka Playwright UI: ' + e.message); }
   }
 
   function RunPanel({ caseId, specFile, grepPattern, onClose }) {
