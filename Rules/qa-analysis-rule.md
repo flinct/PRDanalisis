@@ -36,19 +36,21 @@ Always think:
 
 # Assessment Artifact Standard
 
-Every formal QA analysis that drives a real decision MUST be captured as a **QA Assessment Report**.
+Every formal analysis that drives a real decision MUST be captured as an **Assessment Report**.
+
+Ownership default untuk artefak ini adalah **Analyst**. QA dapat mereferensikan, mereview, atau memperluas temuan di dalamnya, tetapi baseline assessment ownership tetap berada di Analyst.
 
 ## Permanent Artifact Rules
 
 - Save the final report in `Assessments/<domain>/<feature-slug>/`
 - Use the canonical template at `Assessments/templates/qa-assessment-report-template.md`
 - Keep the latest report in a stable path and store immutable prior revisions in `versions/`
-- Use lowercase, hyphenated filenames ending with `-qa-assessment.md`
+- Use lowercase, hyphenated persisted filenames ending with `-qa-assessment.md` until a repo-wide migration changes the filesystem convention
 - Persist the change summary inside the report whenever the analysis is revised
 
 ## Mandatory Header Metadata
 
-Every QA Assessment Report should declare at least:
+Every Assessment Report should declare at least:
 
 - assessment type
 - source PRD or source issue path
@@ -642,7 +644,7 @@ Jika ada satu saja tidak terpenuhi → `Manual Only` — dokumentasikan blocking
 
 # Output Document Structure
 
-Every decision-bearing QA analysis MUST produce a **QA Assessment Report** using the permanent artifact format below:
+Every decision-bearing analysis MUST produce an **Assessment Report** using the permanent artifact format below:
 
 ## 1. Overview
 
@@ -750,7 +752,7 @@ Track major updates to the assessment artifact when the decision or risk posture
 
 # Bug Fix Analysis Supplement
 
-Bug scenarios still use the standard QA Assessment Report structure above. The following sections are additional emphasis areas for bug-fix assessments:
+Bug scenarios still use the standard Assessment Report structure above. The following sections are additional emphasis areas for bug-fix assessments:
 
 ## Root Cause
 
@@ -842,7 +844,7 @@ Analysis is complete only when:
 - [ ] decision statement and required actions captured in Decision Summary
 - [ ] traceability matrix populated (at minimum: req → finding → test case)
 - [ ] production safety assessed (rollback, feature toggle, monitoring)
-- [ ] permanent QA Assessment Report saved in `Assessments/` when the analysis is a decision-bearing artifact
+- [ ] permanent Assessment Report saved in `Assessments/` when the analysis is a decision-bearing artifact
 
 ---
 

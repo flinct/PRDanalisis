@@ -1,14 +1,23 @@
+# Assessment Report Template
+
+> **Owner:** Analyst  
+> **Purpose:** Artefak assessment awal untuk baseline risk, dependency, gap, dan impact sebelum PRD dibekukan untuk implementasi.  
+> **Derived From:** `Assessments/templates/qa-assessment-report-template.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
+> **Compatibility Note:** Untuk kompatibilitas dengan struktur repo saat ini, file final yang dipersist di `Assessments/` boleh tetap memakai naming path existing `*-qa-assessment.md` sampai ada migrasi naming filesystem repo-wide. Judul artefak ini tetap **Assessment Report** agar ownership Analyst jelas.
+
+---
+
 # Assessment Report: <Feature Name>
 
-> **Assessment Type:** Type 1 — Feature Development Analysis / Type 2 — Bug Fix Analysis / Type 3 — Interconnection Analysis
-> **Owner:** Analyst
-> **Source PRD / Source Input:** `<path-to-prd-or-bug-report>`
-> **Assessment Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
-> **Version:** `v1.0`
-> **Previous Version:** `none` / `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-qa-assessment-v0.9.md`
-> **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`
-> **Reference Memory:** `Memory/global-memory.md`, `<other-memory-files-if-used>`
-> **Tanggal Analisa:** YYYY-MM-DD
+> **Assessment Type:** Type 1 — Feature Development Analysis / Type 2 — Bug Fix Analysis / Type 3 — Interconnection Analysis  
+> **Owner:** Analyst  
+> **Source PRD / Source Input:** `<path-to-prd-or-request-or-bug-report>`  
+> **Assessment Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`  
+> **Version:** `v1.0`  
+> **Previous Version:** `none` / `<path-to-previous-version>`  
+> **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
+> **Reference Memory:** `Memory/global-memory.md`, `<other-memory-files-if-used>`  
+> **Tanggal Analisa:** YYYY-MM-DD  
 > **Status:** Draft / Reviewed / Approved / Superseded
 
 ---
@@ -98,7 +107,31 @@
 
 ---
 
-## 5. Impact Analysis
+## 5. Analyst Review Checklist
+
+Checklist minimum yang WAJIB dicek Analyst:
+
+- [ ] lifecycle / state impact
+- [ ] SLA impact
+- [ ] RBAC / permission impact
+- [ ] dependency impact
+- [ ] backward compatibility
+- [ ] edge-case / exception behavior
+
+### 5.1 Notes per Checklist Item
+
+| Area | Finding | Impact Level | Notes / Clarification Needed |
+|------|---------|--------------|-------------------------------|
+| Lifecycle / State |  | LOW / MEDIUM / HIGH |  |
+| SLA |  | LOW / MEDIUM / HIGH |  |
+| RBAC / Permission |  | LOW / MEDIUM / HIGH |  |
+| Dependency |  | LOW / MEDIUM / HIGH |  |
+| Backward Compatibility |  | LOW / MEDIUM / HIGH |  |
+| Edge / Exception |  | LOW / MEDIUM / HIGH |  |
+
+---
+
+## 6. Impact Analysis
 
 | Dimension | What Changes | What Is Affected | Impact Level | Mitigation / Notes |
 |----------|---------------|------------------|--------------|--------------------|
@@ -114,54 +147,54 @@
 
 ---
 
-## 6. Dependency Analysis
+## 7. Dependency Analysis
 
-### 6.1 Dependency Matrix
+### 7.1 Dependency Matrix
 
 | Feature / Module | Depends On | Dependency Type | Direction | Notes |
 |------------------|------------|-----------------|-----------|-------|
 |  |  |  |  |  |
 
-### 6.2 Shared Resources / Event Mapping
+### 7.2 Shared Resources / Event Mapping
 
 - 
 
 ---
 
-## 7. Risk Analysis
+## 8. Risk Analysis
 
-### 7.1 Risk Matrix
+### 8.1 Risk Matrix
 
 | Risk ID | Scenario | Likelihood | Severity | Level | Mitigation |
 |---------|----------|------------|----------|-------|------------|
 | R-01 |  | Low / Medium / High | Low / Medium / High / Critical | Low / Medium / High / Critical |  |
 
-### 7.2 Worst-Case Scenarios
+### 8.2 Worst-Case Scenarios
 
 - 
 
 ---
 
-## 8. Test Strategy
+## 9. Test Strategy Input for QA
 
-### 8.1 Functional Scope
+### 9.1 Functional Scope
 - 
 
-### 8.2 Regression Scope
+### 9.2 Regression Scope
 - 
 
-### 8.3 Integration Scope
+### 9.3 Integration Scope
 - 
 
-### 8.4 UAT / Business Validation
+### 9.4 UAT / Business Validation
 - 
 
-### 8.5 Automation Candidates
+### 9.5 Automation-Relevant Notes
 - 
 
 ---
 
-## 9. Production Safety
+## 10. Production Safety
 
 - **Rollback Strategy:**
 - **Feature Toggle Requirement:**
@@ -172,7 +205,7 @@
 
 ---
 
-## 10. Open Questions
+## 11. Open Questions
 
 | OQ ID | Question | Why It Matters | Blocking? |
 |------|----------|----------------|-----------|
@@ -180,13 +213,13 @@
 
 ---
 
-## 11. Recommendation
+## 12. Recommendation
 
-### 11.1 Recommendation Rationale
+### 12.1 Recommendation Rationale
 
 - 
 
-### 11.2 Operational Recommendation
+### 12.2 Operational Recommendation
 
 | Item | Value |
 |------|-------|
@@ -194,21 +227,21 @@
 | Owner for Follow-up | PM / Analyst / QA / FE / BE / Cross-team |
 | Required Revisions |  |
 | Suggested Delivery Strategy | Full scope / Phase split / Pilot / Hold |
-| Earliest Safe Next Step | Design review / PRD revision / Dev ready / Additional discovery |
+| Earliest Safe Next Step | PRD revision / Reviewer early review / Additional discovery |
 
 ---
 
-## 12. Traceability Matrix
+## 13. Traceability Matrix
 
-PRD Requirement → Analysis Finding → Impact Area → Test Case ID → Status
+PRD Requirement → Analysis Finding → Impact Area → QA Input Status
 
-| Req ID | Requirement | Finding | Impact Area | Test Case | Status |
-|--------|-------------|---------|-------------|-----------|--------|
-| FR-01 |  |  |  |  | Pending |
+| Req ID | Requirement | Finding | Impact Area | QA Input Status |
+|--------|-------------|---------|-------------|-----------------|
+| FR-01 |  |  |  | Pending |
 
 ---
 
-## 13. Change Log
+## 14. Change Log
 
 | Date | Change | Author |
 |------|--------|--------|

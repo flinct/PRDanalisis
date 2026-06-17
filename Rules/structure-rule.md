@@ -11,7 +11,7 @@ Only permanent project-wide files live here:
 | Item | Description |
 |------|-------------|
 | `PRD/` | Product Requirement Documents (organized by feature domain) |
-| `Assessments/` | Permanent QA Assessment Reports, version history, and templates |
+| `Assessments/` | Permanent assessment reports, version history, and templates |
 | `Scripts/` | Reusable analysis, parsing, migration, and automation helper scripts |
 | `Test/` | Test cases, test data, test scripts, automation outputs |
 | `Rules/` | Agent workflow and methodology rules |
@@ -32,6 +32,7 @@ All formal QA assessment outputs live here:
 - `Assessments/templates/qa-assessment-report-template.md` — canonical template for new assessment reports
 - `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md` — latest approved/current assessment artifact for a feature
 - `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-qa-assessment-v1.0.md` — immutable historical versions
+- `Assessments/templates/Setup/*.md` — reusable workflow templates for Assessment Report, QA pre/post validation, reviewer decision, and automation mapping
 - `Assessments/archive/legacy-temp-analysis/` — migrated historical analysis documents from the removed `Temp Analysis/` folder
 
 ### Convention:
@@ -40,6 +41,7 @@ All formal QA assessment outputs live here:
 - **Feature folders** should be lowercase, hyphenated, and stable over time
 - **Latest report path** should stay stable; revisions go into `versions/`
 - Every updated assessment must include a **version value**, **previous version reference**, and **ringkasan perubahan analisa**
+- The logical artifact name is **Assessment Report**; persisted filenames may continue using `-qa-assessment.md` until repo-wide migration
 - The report must follow the template in `Assessments/templates/qa-assessment-report-template.md`
 
 ---
@@ -66,11 +68,16 @@ All reusable scripts for analysis, parsing, migration, and automation support li
 | `Test/<feature>/<filename>.tsv` | Main test case file |
 | `Test/<feature>/<filename>.json` | Parsed/summary JSON auto-generated from TSV |
 | `Test/<feature>/<filename>_supplement.tsv` | Supplementary/gap test cases |
+| `Test/<feature>/<feature>-qa-test-spec.md` | Detailed QA test specification / companion doc |
+| `Test/<feature>/<feature>-automation-mapping.md` | Requirement-to-automation mapping companion doc |
+| `Test/<feature>/<feature>-qa-pre-implementation-review.md` | QA pre-implementation review companion doc |
+| `Test/<feature>/<feature>-qa-post-implementation-validation.md` | QA post-implementation validation companion doc |
 
 ### Convention:
 - Every test TSV lives in `Test/<feature>/`, never in root
 - JSON files derived from TSV live alongside their TSV source
 - Gap/supplement files share the same folder as the main file
+- Supporting QA markdown docs also live in `Test/<feature>/` when they are execution-facing artifacts
 - Scripts that generate/modify test artifacts go in `Scripts/analysis/`, **not** in `Test/`
 
 ---

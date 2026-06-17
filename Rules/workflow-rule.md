@@ -22,7 +22,7 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 
 # Before PRD Analysis
 
-1. Read `qa-analysis-rule.md` for full analysis methodology and QA Assessment Report requirements.
+1. Read `qa-analysis-rule.md` for full analysis methodology and Assessment Report requirements.
 2. Read global memory for shared entity lifecycle, RBAC, architecture constraints.
 3. Read existing feature memories affected.
 4. If comparing multiple PRDs, also read `prd-comparison-rule.md`.
@@ -46,7 +46,7 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 # Before Impact Analysis
 
 1. Perform PRD analysis or comparison first.
-2. Use the QA Assessment Report output as input for impact analysis (`impact-analysis-rule.md`).
+2. Use the Assessment Report output as input for impact analysis (`impact-analysis-rule.md`).
 3. For comprehensive assessment (feature dev, bug fix, or interconnection), use `qa-analysis-rule.md`.
 4. If the impact analysis changes the final decision, update the permanent artifact in `Assessments/<domain>/<feature-slug>/` rather than leaving the decision only in a temporary note.
 
@@ -58,7 +58,7 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 2. Read `impact-analysis-rule.md` for blast radius assessment.
 3. Identify root cause, scope, regression risk, and production safety.
 4. Document affected modules, data integrity risk, and a standardized final decision enum.
-5. Save the final bug-fix assessment as a QA Assessment Report in `Assessments/<domain>/<feature-slug>/` when it is used as a persistent decision artifact.
+5. Save the final bug-fix assessment as an Assessment Report in `Assessments/<domain>/<feature-slug>/` when it is used as a persistent decision artifact.
 
 ---
 
@@ -68,7 +68,59 @@ Skip no step. This sequence guarantees agent always has the correct methodology 
 2. Build dependency matrix and event mapping.
 3. Identify shared resources and async consumers.
 4. Assess chain-reaction risk across features.
-5. Record the outcome in the standard QA Assessment Report format if it affects a real go / revise / hold decision.
+5. Record the outcome in the standard Assessment Report format if it affects a real go / revise / hold decision.
+
+---
+
+# Reviewer Gates and Requirement Package Freeze
+
+Use the following workflow gates when the task follows the multi-agent requirement lane.
+
+## Gate A — Early Review
+
+Reviewer validates the initial Assessment Report plus PRD v0 / PRD skeleton.
+
+Allowed statuses:
+- `APPROVE_WITH_NOTES`
+- `REVISE_ASSESSMENT`
+- `REVISE_PRD_DRAFT`
+- `HOLD`
+
+## Gate B — Requirement Package Approval
+
+Reviewer validates the requirement-ready package before implementation starts.
+
+Minimum package:
+- PRD requirement-ready
+- Assessment Report
+- QA pre-implementation review
+- coverage / testcase strategy
+- automation scope or automation candidate mapping
+
+Allowed statuses:
+- `APPROVED`
+- `APPROVED_WITH_CAUTION`
+- `REVISE_PRD`
+- `HOLD`
+
+### Requirement Package Freeze
+
+After Gate B is `APPROVED` or `APPROVED_WITH_CAUTION`, treat the requirement package as **frozen input for implementation**.
+
+If any requirement changes after freeze:
+- do **not** continue coding silently
+- return to the requirement lane
+- re-review and re-approve the delta before implementation continues
+
+## Gate C — Final Review
+
+Reviewer validates implementation output against the frozen package and QA post-implementation validation.
+
+Allowed statuses:
+- `FINAL_APPROVE`
+- `REVISE_CODER`
+- `REVISE_QA`
+- `REOPEN_REQUIREMENT`
 
 ---
 

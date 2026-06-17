@@ -44,9 +44,10 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 ### ANALYSIS / PRD / FEATURE DEV:
 
 ```
-Rules/qa-analysis-rule.md         → WAJIB. Full methodology + QA Assessment Report format + decision enum.
+Rules/qa-analysis-rule.md         → WAJIB. Full methodology + Assessment Report format + decision enum.
 Rules/impact-analysis-rule.md     → Untuk cek blast radius.
 Assessments/templates/qa-assessment-report-template.md → Template artefak permanen assessment.
+Assessments/templates/Setup/assessment-report-template.md → Operational wrapper untuk Assessment Report milik Analyst.
 ```
 
 ### PRD WRITING:
@@ -85,6 +86,9 @@ Rules/test-case-rule.md           → WAJIB. QA test writing, steps, coverage, e
 Rules/qa-analysis-rule.md         → WAJIB. Source analysis dan Test Specification Layer.
 Rules/impact-analysis-rule.md     → Jika test perlu regression, rollout, rollback, atau cross-feature coverage.
 Rules/automation-bridge-rule.md   → Jika test case TSV akan disinkronkan ke repo automation.
+Assessments/templates/Setup/qa-pre-implementation-review-template.md  → Untuk QA review sebelum coding.
+Assessments/templates/Setup/qa-post-implementation-validation-template.md → Untuk QA validation setelah coding.
+Assessments/templates/Setup/automation-mapping-template.md → Untuk companion mapping requirement ↔ automation.
 ```
 
 Output test case tidak terbatas pada TSV. Jika feature belum punya generator bridge, simpan juga companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md` dan `*-automation-mapping.md`.
@@ -135,7 +139,7 @@ Muat jika tugas menyentuh salah satu dari:
 Gunakan rule yang sudah dimuat sebagai **metodologi kerja**, bukan sekadar referensi.
 
 - Output harus sesuai struktur yang ditentukan rule
-- Hasil analisis yang bersifat decision-bearing harus dipermanenkan sebagai QA Assessment Report di `Assessments/`
+- Hasil analisis yang bersifat decision-bearing harus dipermanenkan sebagai Assessment Report di `Assessments/`
 - Jangan lewati section impact/risk/regression
 - Jika ada kontradiksi antara input user dan rule, ikuti rule
 

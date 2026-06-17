@@ -1,4 +1,4 @@
-# WORKFLOW CONTEXT — BRD → PRD → QA Assessment → Decision → Testcase → Automation Script
+# WORKFLOW CONTEXT — BRD → PRD → Assessment Report → Requirement Package Freeze → Testcase → Automation Script
 
 > **File ini = konteks kerja permanen.** Baca di awal setiap session baru (termasuk di PC lain) agar agent langsung paham struktur, rules, dan alur kerja tanpa perlu eksplorasi ulang.
 
@@ -17,44 +17,61 @@
 ## 2. ALUR KERJA UTAMA (WORKFLOW)
 
 ```
-BRD (Business Requirement Document)
+User Request / BRD
     │
     ▼
-PRD V2 Writing (Conversationv2/, ticketv2/, Whatsapp web v2/)
+Orchestrator klasifikasi task + pilih lane
+    │   - Full Lane: feature baru, PRD baru, patch besar, behavior-sensitive automation change
+    │   - Fast Lane: automation minor, testcase patch kecil, wording PRD ringan, bugfix sempit
+    │
+    ▼
+Draft PRD v0 / PRD Skeleton
     │   - Mengikuti Rules/prd-writing-rule.md (Lite/Standard/Full/Patch)
-    │   - Referensi: Memory/global-memory.md (canonical rules)
-    │   - Referensi: Memory/CLAUDE-be.md, CLAUDE-fe.md (implementasi existing)
+    │   - Referensi: Memory/global-memory.md, Memory/CLAUDE-be.md, Memory/CLAUDE-fe.md
     │
     ▼
-PRD Analysis (QA Assessment)
-    │   - Mengikuti Rules/qa-analysis-rule.md (3 tipe: Feature Dev, Bug Fix, Interconnection)
+Assessment Report (Owner: Analyst)
+    │   - Mengikuti Rules/qa-analysis-rule.md + Rules/impact-analysis-rule.md
     │   - Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+    │   - Logical artifact name: Assessment Report
     │   - Versioning: versi sebelumnya dipindah ke `versions/` + ringkasan perubahan analisa wajib diisi
-    │   - Output: Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis
-    │   - Output: Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
     │
     ▼
-Decision
+Reviewer Gate A — Early Review
+    │   - Status: APPROVE_WITH_NOTES / REVISE_ASSESSMENT / REVISE_PRD_DRAFT / HOLD
     │
     ▼
-Test Case Writing (Manual TSV + QA Spec + Automation Mapping)
+PRD requirement-ready
+    │
+    ▼
+QA Pre-Implementation Review
     │   - Mengikuti Rules/test-case-rule.md
-    │   - Output permanen: `Test/<domain>/<Feature>.tsv`
-    │   - Companion docs: `Test/<domain>/<feature>-qa-test-spec.md`, `Test/<domain>/<feature>-automation-mapping.md`
-    │   - Coverage: 100% FR, EH, EC, State, RBAC, API, Migration, NFR
-    │   - Bridge: Rules/automation-bridge-rule.md (jika feature punya sync ke sixV2Automation)
+    │   - Output: PRD review findings, requirement coverage matrix, regression impact,
+    │             test strategy, automation candidate mapping
     │
     ▼
-Automation Script Generation (Playwright)
+Reviewer Gate B — Requirement Package Approval
+    │   - Status: APPROVED / APPROVED_WITH_CAUTION / REVISE_PRD / HOLD
+    │   - Output: Requirement Package Freeze
+    │   - Frozen package: PRD + Assessment Report + QA pre-review + coverage/test strategy + automation scope
+    │
+    ▼
+Implementation (mostly automation code / automation repo changes)
+    │
+    ▼
+QA Post-Implementation Validation
+    │   - Output: regression result, automation alignment, coverage confirmation,
+    │             uncovered gap, defect / mismatch note
+    │
+    ▼
+Reviewer Gate C — Final Review & Sign-off
+    │   - Status: FINAL_APPROVE / REVISE_CODER / REVISE_QA / REOPEN_REQUIREMENT
+    │
+    ▼
+Automation Script Generation / Sync / Maintenance
     │   - Source: Test/conversation/Conversation.tsv → parsed JSON
     │   - Target: sixV2Automation/playwright/tests/e2e/conversation/
-    │   - Specs: convo-list-overview, convo-room, convo-detail-panel, convo-nav, convo-list-features, convo-supplement
     │   - Conventions: sixV2Automation/AGENTS.md
-    │
-    ▼
-Execution & Maintenance
-    │   - Run: npm run pw:test (sixV2Automation)
-    │   - Sync: PRDanalisis → sixV2Automation via automation-bridge-rule.md
     │   - Update: AGENTS.md setiap kali test/page object baru
 ```
 
@@ -70,6 +87,7 @@ PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Assessments
 PRDanalisis/Memory/README.md                  ← Index memory files, routing guide, deprecated notices
 PRDanalisis/Assessments/README.md             ← Aturan artefak analisa permanen + versioning
 PRDanalisis/Assessments/templates/qa-assessment-report-template.md ← Template assessment permanen
+PRDanalisis/Assessments/templates/Setup/assessment-report-template.md ← Wrapper operasional Assessment Report milik Analyst
 ```
 
 ### **PRD Writing & Analysis**
@@ -84,6 +102,10 @@ PRDanalisis/Rules/prd-comparison-rule.md      ← Compare PRD A vs PRD B
 ```
 PRDanalisis/Rules/test-case-rule.md           ← Test writing, coverage, TSV format, execution runbook
 PRDanalisis/Rules/automation-bridge-rule.md   ← Kontrak sync PRDanalisis ↔ sixV2Automation
+PRDanalisis/Assessments/templates/Setup/qa-pre-implementation-review-template.md
+PRDanalisis/Assessments/templates/Setup/qa-post-implementation-validation-template.md
+PRDanalisis/Assessments/templates/Setup/reviewer-decision-template.md
+PRDanalisis/Assessments/templates/Setup/automation-mapping-template.md
 sixV2Automation/AGENTS.md                     ← Page objects, test inventory, config, RBAC, conventions
 sixV2Automation/memory/rbac-memory.md         ← RBAC matrix untuk test (role, permission, visibility)
 ```
@@ -123,7 +145,7 @@ PRDanalisis/AgentNotes/                       ← Hasil analisa agent (legacy �
 | **Ticket** | `PRD/ticketv2/` | `PRD/Ticket/` |
 | **WhatsApp Web** | `PRD/Whatsapp web v2/` | `PRD/Whatsapp web/` |
 | **SLA Conversation & Ticket** | `PRD/SLA conversation n ticket/` | — |
-| **QA Assessments** | `Assessments/<domain>/<feature-slug>/` | — |
+| **Assessment Reports** | `Assessments/<domain>/<feature-slug>/` | — |
 | **Test Cases (generic)** | `Test/<domain>/` | — |
 | **Conversation automation source** | `Test/conversation/Conversation.tsv` | — |
 
@@ -215,8 +237,10 @@ WHEN Conversation.tsv changes:
 3. Baca `global-memory.md` + feature memory relevan
 4. Gunakan template `Assessments/templates/qa-assessment-report-template.md`
 5. Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
-6. Simpan versi sebelumnya ke `versions/` jika analisa direvisi, lalu isi ringkasan perubahan analisa
-7. Isi minimal: Overview, Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis, Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
+6. Logical artifact name: **Assessment Report** (owner default: Analyst)
+7. Simpan versi sebelumnya ke `versions/` jika analisa direvisi, lalu isi ringkasan perubahan analisa
+8. Isi minimal: Overview, Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis, Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
+9. Jika mengikuti lane multi-agent, lanjut ke Reviewer Gate A sebelum PRD difinalisasi
 
 ### **Bug Fix Analysis**
 1. Baca `qa-analysis-rule.md` (Type 2: Bug Fix Analysis)
@@ -228,9 +252,15 @@ WHEN Conversation.tsv changes:
 1. Baca `test-case-rule.md` + `qa-analysis-rule.md` (Test Specification Layer)
 2. Baca PRD analysis output + impact analysis
 3. Baca existing test cases di scope terkait
-4. Output: Test Plan / Test Scenario List / Detailed Test Case Spec / Regression Suite / UAT Script / Automation Mapping
+4. Output bisa berupa: QA Pre-Implementation Review / Detailed Test Case Spec / Regression Suite / QA Post-Implementation Validation / UAT Script / Automation Mapping
 5. Format TSV: gunakan Manual TSV Output Mode di `test-case-rule.md` (SatuInbox Test Case Scenario V2)
-6. Jika feature belum punya generator bridge, simpan companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md` dan `*-automation-mapping.md`
+6. Jika feature belum punya generator bridge, simpan companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md`, `*-automation-mapping.md`, `*-qa-pre-implementation-review.md`, dan `*-qa-post-implementation-validation.md` bila relevan
+
+### **Reviewer Gates & Freeze**
+1. Gate A = review awal terhadap Assessment Report + PRD v0
+2. Gate B = approval requirement package + menghasilkan **Requirement Package Freeze**
+3. Setelah freeze, perubahan requirement harus kembali ke requirement lane dan di-approve ulang
+4. Gate C = final review terhadap implementation + QA post-implementation validation
 
 ### **Impact Analysis**
 1. Baca `impact-analysis-rule.md` + PRD analysis output
@@ -498,6 +528,7 @@ npm run build                # Production build
 | 1.0 | 2026-06-09 | Initial creation - full workflow context documented |
 | 1.1 | 2026-06-10 | Tambah QA Agent infrastructure: server.js (Express+Claude+SSE), AgentPanel di testcase-browser.html, Memory/qa-tooling.md. Update Section 3 (File Kunci) + Section 14 (Commands). |
 | 1.3 | 2026-06-12 | Full code review testcase-browser.html (2195 lines) + server.js (369 lines). Update Section 3 (QA Browser section rewrite — AI agent removed, server is pure QA tool). Update Memory/qa-tooling.md with full architecture (component tree, DB schema, endpoints, version system). Fix CLAUDE.md path (flinc→MyBook SAGA 12) + tambah referensi WORKFLOW_CONTEXT.md di CLAUDE.md dan agent-instruction.md. |
+| 1.4 | 2026-06-17 | Normalisasi terminology & workflow: QA Assessment → Assessment Report, tambah Reviewer Gate A/B/C, Requirement Package Freeze, QA pre/post implementation artifacts, dan referensi template `Assessments/templates/Setup/`. |
 
 **Update file ini saat:**
 - Repo structure berubah

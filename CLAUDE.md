@@ -70,8 +70,9 @@ PRDanalisis/
 │   ├── Whatsapp web v2/         ← SOURCE OF TRUTH (V1 deprecated)
 │   ├── Broadcast/
 │   └── Contact/
-└── Assessments/                 ← hasil analisa permanen (QA Assessment Reports)
+└── Assessments/                 ← hasil analisa permanen (Assessment Reports)
     └── templates/
+        └── Setup/              ← operational workflow templates (assessment, QA pre/post, reviewer, automation mapping)
 ```
 
 ---
@@ -119,11 +120,25 @@ PRDanalisis/
 
 ---
 
+## Workflow Notes (Current Canonical)
+
+- Logical nama artefak analisa permanen adalah **Assessment Report**.
+- Persisted filename saat ini masih boleh memakai suffix `-qa-assessment.md` untuk kompatibilitas struktur repo.
+- **Analyst** adalah owner default untuk Assessment Report.
+- **Reviewer Gate A / B / C** dan **Requirement Package Freeze** ada di `Rules/workflow-rule.md`.
+- **QA output dipisah dua fase**:
+  - pre-implementation: review PRD, regression impact, coverage/test strategy, automation candidate mapping
+  - post-implementation: regression result, automation alignment, coverage confirmation, uncovered gap/defect note
+- Template operasional workflow ada di `Assessments/templates/Setup/`.
+
+---
+
 ## ⚡ Baca Juga
 
 Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding lengkap yang mencakup:
 - Arsitektur 3-repo (PRDanalisis ↔ sixV2Automation ↔ omnichannel-satuinbox-fe)
 - Automation bridge pipeline detail (Conversation.tsv → JSON → Playwright specs)
+- Multi-agent workflow: Assessment Report, Reviewer Gates, Requirement Package Freeze, QA pre/post implementation
 - Environment & accounts (dev test accounts, env vars)
 - Page Objects index lengkap (18 page objects dari sixV2Automation)
 - Commands cheatsheet untuk 3 repo
@@ -133,6 +148,6 @@ Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding le
 1. Tidak ada tugas dikerjakan tanpa baca rule yang sesuai terlebih dahulu
 2. `Rules/agent-instruction.md` adalah source of truth untuk workflow
 3. `Memory/global-memory.md` adalah source of truth untuk canonical product rules
-4. Hasil analisa decision-bearing dipermanenkan di `Assessments/`
+4. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
 5. Jangan overwrite memory — update section relevan saja
 6. Jika ada konflik antara input user dan rule, **ikuti rule**

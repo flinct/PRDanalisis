@@ -22,7 +22,8 @@ README ini harus konsisten dengan aturan di `Rules/`:
 - `test-case-rule.md` — Framework penulisan QA test plan, test cases, test steps, coverage matrix, execution runbook, automation mapping berbasis hasil PRD analysis, dan output manual TSV `SatuInbox Test Case Scenario V2`.
 - `qa-analysis-rule.md` — **WAJIB.** Framework metodologi analisa QA senior untuk semua skenario: PRD analysis, feature dev, bug fix, interconnection, impact, risk. Merged from deprecated `analisa-prd-rule.md`.
 - `Assessments/README.md` — aturan penyimpanan artefak analisa permanen, latest/current vs `versions/`, dan archive historis.
-- `Assessments/templates/qa-assessment-report-template.md` — template baku QA Assessment Report permanen.
+- `Assessments/templates/qa-assessment-report-template.md` — template baku Assessment Report permanen.
+- `Assessments/templates/Setup/` — workflow templates untuk Assessment Report, QA pre/post validation, reviewer decision, dan automation mapping.
 - ~~`analisa-prd-rule.md`~~ — **DEPRECATED.** Semua konten sudah di-merge ke `qa-analysis-rule.md`. Jangan gunakan untuk analisa baru.
 
 ## Files
@@ -178,14 +179,17 @@ Gunakan artefak di luar `Memory/` untuk kebutuhan berikut:
 
 ### `Assessments/`
 - Simpan **hasil analisa permanen** yang mengandung decision, recommendation, dan histori revisi.
-- Format baku: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+- Logical artifact name: **Assessment Report**
+- Persisted filename saat ini: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
 - Gunakan `versions/` untuk histori immutable.
 
 ### `Test/<domain>/`
-- Simpan **manual TSV**, **QA test spec**, dan **automation mapping**.
+- Simpan **manual TSV**, **QA test spec**, **QA pre/post review docs**, dan **automation mapping**.
 - Pattern yang dipakai sekarang:
   - `<Feature>.tsv`
   - `<feature>-qa-test-spec.md`
+  - `<feature>-qa-pre-implementation-review.md`
+  - `<feature>-qa-post-implementation-validation.md`
   - `<feature>-automation-mapping.md`
 
 ### Current Example — WhatsApp Web Outbound Anti-Ban Guard
