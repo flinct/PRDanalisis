@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Dashboard Mockup — Control Center</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#0b1020;color:#e8ecf8;line-height:1.4}
+    .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+    .sidebar{background:linear-gradient(180deg,#111831,#0d1328);border-right:1px solid rgba(255,255,255,.08);padding:22px}
+    .brand{font-size:20px;font-weight:700;margin-bottom:6px}
+    .sub{font-size:12px;color:#97a2c7;margin-bottom:22px}
+    .menu{display:flex;flex-direction:column;gap:10px}
+    .menu button{all:unset;cursor:pointer;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.03);color:#c9d3f2;border:1px solid transparent}
+    .menu button.active{background:#1b2750;border-color:#5986ff;color:#fff}
+    .menu small{display:block;color:#8e98bb;margin-top:4px}
+    .foot{position:absolute;bottom:22px;left:22px;right:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+    .main{padding:24px 26px 30px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .title h1{font-size:28px;margin-bottom:4px}
+    .title p{color:#96a2c8;font-size:14px}
+    .actions{display:flex;gap:10px}
+    .btn{border:none;border-radius:12px;padding:11px 14px;font-weight:600;cursor:pointer}
+    .btn.secondary{background:#1a213b;color:#dce3ff;border:1px solid rgba(255,255,255,.08)}
+    .btn.primary{background:#5b7cff;color:white}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+    .stat{background:#121931;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
+    .stat b{font-size:24px;display:block;margin-top:8px}
+    .layout{display:grid;grid-template-columns:1.2fr .9fr;gap:16px}
+    .panel{background:#121931;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+    .panel h2{font-size:16px;margin-bottom:14px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .chip{padding:8px 10px;border-radius:999px;background:#0f1530;border:1px solid rgba(255,255,255,.08);font-size:13px;color:#bfcaef;cursor:pointer}
+    .chip.active{background:#22315d;color:#fff;border-color:#5b7cff}
+    .card{background:#0e1429;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;margin-bottom:12px}
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .muted{color:#90a0ca;font-size:13px}
+    .mini{font-size:12px;color:#7f8bb1}
+    .list{display:grid;gap:10px}
+    .kv{display:grid;grid-template-columns:150px 1fr;gap:10px;font-size:13px;margin:10px 0}
+    .status{padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;background:#233462;color:#bbd0ff}
+    .status.warn{background:#5a4316;color:#ffd98d}
+    .status.ok{background:#173c31;color:#8effcc}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .step{padding:10px;border-radius:12px;background:#111a35;border:1px dashed rgba(255,255,255,.1);font-size:13px}
+    .hint{margin-top:10px;padding:12px;border-radius:12px;background:#0d1f2d;color:#9ccbf4;font-size:13px;border:1px solid rgba(114,190,255,.2)}
+    @media (max-width:1200px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" style="position:relative">
+      <div class="brand">Setup Dashboard</div>
+      <div class="sub">Rule • Agent • Workflow Agent</div>
+      <div class="menu">
+        <button class="nav active" data-view="rule">Rule<small>Artifact, gate, freeze policy</small></button>
+        <button class="nav" data-view="agent">Agent<small>Roster, ownership, capability</small></button>
+        <button class="nav" data-view="workflow">Workflow Agent<small>Lane, routing, gate orchestration</small></button>
+      </div>
+      <div class="foot">
+        <div class="mini">Runtime publish</div>
+        <div style="margin:6px 0 10px;font-weight:700">runtime.md</div>
+        <div class="mini">Dashboard tidak simpan OAuth/API key. Hanya config & preview.</div>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h1 id="pageTitle">Rule Control Center</h1>
+          <p id="pageSub">Policy operasional yang boleh diubah, tanpa melanggar canonical rule.</p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary">Validate Setup</button>
+          <button class="btn secondary">Runtime Preview</button>
+          <button class="btn primary">Save Draft</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="mini">Workflow Mode</div><b>Full Lane</b></div>
+        <div class="stat"><div class="mini">Active Agents</div><b>6</b></div>
+        <div class="stat"><div class="mini">Freeze Policy</div><b>Active</b></div>
+        <div class="stat"><div class="mini">Validation</div><b>0 Errors</b></div>
+      </div>
+
+      <div id="rule" class="view">
+        <div class="layout">
+          <section class="panel">
+            <h2>Canonical References</h2>
+            <div class="list">
+              <div class="card"><div class="row"><div><b>Assessment Report</b><div class="muted">Logical artifact name</div></div><span class="status ok">Canonical</span></div><div class="kv"><div>Persisted suffix</div><div><code>-qa-assessment.md</code></div><div>Owner default</div><div>Analyst</div><div>Canonical template</div><div><code>Assessments/templates/qa-assessment-report-template.md</code></div></div></div>
+              <div class="card"><div class="row"><div><b>Reviewer Gates</b><div class="muted">A / B / C</div></div><span class="status">Readonly</span></div><div class="three"><div class="step">Gate A<br><span class="mini">Approve early review</span></div><div class="step">Gate B<br><span class="mini">Freeze package</span></div><div class="step">Gate C<br><span class="mini">Final sign-off</span></div></div></div>
+              <div class="hint">Dashboard boleh mengganti profile aktif, tapi tidak boleh mematikan Requirement Package Freeze untuk full lane.</div>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Editable Operational Policy</h2>
+            <div class="toolbar">
+              <div class="chip active">Artifact Rules</div>
+              <div class="chip">Freeze Policy</div>
+              <div class="chip">QA Policy</div>
+            </div>
+            <div class="card">
+              <div class="row"><div><b>Freeze trigger</b><div class="muted">Starts after Gate B</div></div><span class="status ok">Enabled</span></div>
+            </div>
+            <div class="card">
+              <div class="row"><div><b>Post-freeze change action</b><div class="muted">Requirement berubah setelah coder mulai</div></div><span class="status warn">Reopen lane</span></div>
+            </div>
+            <div class="card">
+              <div class="row"><div><b>QA split policy</b><div class="muted">Pre vs Post implementation</div></div><span class="status ok">Required</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div id="agent" class="view" style="display:none">
+        <div class="layout">
+          <section class="panel">
+            <h2>Agent Roster</h2>
+            <div class="list">
+              <div class="card agentCard" data-agent="orchestrator"><div class="row"><div><b>Orchestrator</b><div class="muted">Classify, choose lane, route handoff</div></div><span class="status ok">Active</span></div></div>
+              <div class="card agentCard" data-agent="analyst"><div class="row"><div><b>Analyst</b><div class="muted">Assessment Report owner</div></div><span class="status ok">Active</span></div></div>
+              <div class="card agentCard" data-agent="qa"><div class="row"><div><b>QA Agent</b><div class="muted">Pre/post implementation QA</div></div><span class="status ok">Active</span></div></div>
+              <div class="card agentCard" data-agent="reviewer"><div class="row"><div><b>Reviewer</b><div class="muted">Gatekeeper A/B/C</div></div><span class="status ok">Active</span></div></div>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Agent Detail</h2>
+            <div id="agentDetail" class="card">
+              <b>Orchestrator</b>
+              <div class="kv"><div>Purpose</div><div>Classify task, choose lane, route next step.</div><div>Can delegate</div><div>Yes</div><div>Can approve gate</div><div>No</div><div>Artifacts</div><div>None</div></div>
+            </div>
+            <div class="hint">Pattern ideal: kiri = roster list, kanan = editor detail + ownership + capability.</div>
+          </section>
+        </div>
+      </div>
+
+      <div id="workflow" class="view" style="display:none">
+        <div class="layout">
+          <section class="panel">
+            <h2>Workflow Modes</h2>
+            <div class="toolbar">
+              <div class="chip active" id="fullChip">Full Lane</div>
+              <div class="chip" id="fastChip">Fast Lane</div>
+            </div>
+            <div id="flowSteps" class="three" style="grid-template-columns:repeat(2,1fr)">
+              <div class="step">Orchestrator</div>
+              <div class="step">Draft PRD v0</div>
+              <div class="step">Analyst</div>
+              <div class="step">Reviewer Gate A</div>
+              <div class="step">PRD Writer</div>
+              <div class="step">QA Pre</div>
+              <div class="step">Reviewer Gate B</div>
+              <div class="step">Coder Automation</div>
+              <div class="step">QA Post</div>
+              <div class="step">Reviewer Gate C</div>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Routing & Freeze</h2>
+            <div class="card"><b>Task routing</b><div class="kv"><div>PRD new</div><div>Full Lane</div><div>Automation minor</div><div>Fast Lane</div><div>Bugfix narrow</div><div>Fast Lane</div></div></div>
+            <div class="card"><b>Freeze point</b><div class="kv"><div>Starts after</div><div>Reviewer Gate B</div><div>On requirement change</div><div>Return to requirement lane</div></div></div>
+            <div class="hint">Mode ini paling cocok kalau dashboard nanti jadi orchestration control panel untuk Hermes / Claude Code reader.</div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const views=['rule','agent','workflow'];
+    const meta={rule:['Rule Control Center','Policy operasional yang boleh diubah, tanpa melanggar canonical rule.'],agent:['Agent Roster Setup','Atur role, ownership, capability, dan status aktif setiap agent.'],workflow:['Workflow Agent Builder','Atur lane, gate, freeze, dan routing task antar role.']};
+    document.querySelectorAll('.nav').forEach(btn=>btn.onclick=()=>{
+      document.querySelectorAll('.nav').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      views.forEach(v=>document.getElementById(v).style.display=v===btn.dataset.view?'block':'none');
+      pageTitle.textContent=meta[btn.dataset.view][0]; pageSub.textContent=meta[btn.dataset.view][1];
+    });
+    const agents={orchestrator:{p:'Classify task, choose lane, route next step.',d:'Yes',g:'No',a:'None'},analyst:{p:'Produce Assessment Report, risk baseline, dependency map.',d:'No',g:'No',a:'Assessment Report'},qa:{p:'Handle QA pre/post implementation, regression, automation mapping.',d:'No',g:'No',a:'QA Pre, QA Post, Automation Mapping'},reviewer:{p:'Approve Gate A/B/C and final sign-off.',d:'No',g:'Yes',a:'Reviewer Decision'}};
+    document.querySelectorAll('.agentCard').forEach(c=>c.onclick=()=>{const x=agents[c.dataset.agent];agentDetail.innerHTML=`<b>${c.querySelector('b').textContent}</b><div class="kv"><div>Purpose</div><div>${x.p}</div><div>Can delegate</div><div>${x.d}</div><div>Can approve gate</div><div>${x.g}</div><div>Artifacts</div><div>${x.a}</div></div>`;});
+    const full=['Orchestrator','Draft PRD v0','Analyst','Reviewer Gate A','PRD Writer','QA Pre','Reviewer Gate B','Coder Automation','QA Post','Reviewer Gate C'];
+    const fast=['Orchestrator','Quick Assessment','Reviewer Gate B','Coder Automation','QA Post','Reviewer Gate C'];
+    function renderFlow(list){flowSteps.innerHTML=list.map(x=>`<div class="step">${x}</div>`).join('')}
+    fullChip.onclick=()=>{fullChip.classList.add('active');fastChip.classList.remove('active');renderFlow(full)};
+    fastChip.onclick=()=>{fastChip.classList.add('active');fullChip.classList.remove('active');renderFlow(fast)};
+  </script>
+</body>
+</html>

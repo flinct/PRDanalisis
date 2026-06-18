@@ -3,8 +3,8 @@
 > **Assessment Type:** Type 1 — Feature Development Analysis + Type 3 — Interconnection Analysis
 > **Source PRD / Source Input:** `PRD/Conversationv2/PRD - Global Search (Conversation + Ticket).md`
 > **Assessment Artifact Path:** `Assessments/global-search/global-search/global-search-qa-assessment.md`
-> **Version:** `v2.3`
-> **Previous Version:** `Assessments/global-search/global-search/versions/global-search-qa-assessment-v2.2.md`
+> **Version:** `v2.2`
+> **Previous Version:** `Assessments/global-search/global-search/versions/global-search-qa-assessment-v2.1.md`
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/prd-writing-rule.md`, `Rules/workflow-rule.md`, `Rules/structure-rule.md`
 > **Reference Memory:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/comprehensive-undeveloped-features-analysis.md`
 > **Tanggal Analisa:** 2026-06-15
@@ -18,11 +18,6 @@
 - **v2.0:** feature direframe menjadi **shared-attribute discovery roadmap** berbasis identifier bisnis seperti `AWB`, `Order ID`, `Tracking Number`.
 - **v2.1:** UX surface diperjelas: hasil pencarian Phase 1 menggunakan **popup modal centered overlay** sebagai primary surface, bukan drawer.
 - **v2.2:** Diagram visual di Section 4 dikembalikan agar perbandingan **Current State vs Proposed State** lebih mudah dibaca. Diagram sekarang mencakup current fragmented state, phased target model, recommended delivery model, dan one-engine-many-consumers principle.
-- **v2.3:** Analisa ekspansi ke **actionable search** ditambahkan. Temuan utama:
-  - per-item open ke Conversation Room + Detail aman dan selaras dengan objective
-  - bulk selection **tidak disarankan lintas domain** pada versi pertama
-  - auto-tag berbasis hasil search **lebih aman sebagai system relation label / system tag terpisah**, bukan langsung reuse tag manual existing
-  - filter by tag perlu dipisah antara **manual tags** dan **system relation tags** agar tetap usable
 - Generic search **bukan lagi tujuan utama**. Search sekarang diposisikan sebagai **Phase 1 discovery surface** untuk mendeteksi record terkait sebelum grouping/handling lanjutan.
 - Fase roadmap baru:
   - **Phase 1:** Global Search Suggestions lintas Ticket + Conversation berdasarkan shared attributes.
@@ -66,41 +61,36 @@ Memungkinkan agent menemukan, menghubungkan, dan memahami tiket/percakapan yang 
 
 ### 2.1 Final Decision
 
-**Decision Enum:** `SPLIT_FEATURE`
+**Decision Enum:** `PROCEED_WITH_CAUTION`
 
-**Decision Class:** `NO_GO`
+**Decision Class:** `CONDITIONAL_GO`
 
 **Decision Statement:**
-> Ekspansi Global Search menjadi **actionable search** valid, tetapi **tidak aman** jika dimasukkan sebagai satu paket perubahan dalam PRD Phase 1 yang sekarang. Per-item open masih selaras dengan discovery surface. Namun bulk selection, auto-tag dari hasil search, dan perbaikan filter by tag sudah masuk ke domain **mutation + taxonomy + filter governance**, sehingga harus dipecah menjadi delivery terpisah: (A) Actionable Search Navigation, (B) System Relation Tags / Labels, dan (C) Tag Filter UX improvement.
+> Arah baru ini valid dan lebih kuat secara bisnis dibanding generic global search, **asal** diposisikan sebagai roadmap bertahap, bukan satu feature monolitik. Phase 1 boleh lanjut sebagai discovery/search suggestions berbasis shared attributes. Phase 2 dan Phase 3 harus diperlakukan sebagai patch lanjutan ke PRD Ticket dan Conversation yang sudah ada, bukan ditumpuk sekaligus di PRD ini.
 
 ### 2.2 Required Actions Before Development
 
-- [ ] **Split scope** menjadi 3 paket:
-  - **A. Actionable Search Navigation**: per-item open, result-level actions, selection UX
-  - **B. System Relation Tags / Labels**: auto-tag model, lifecycle, audit, visibility
-  - **C. Tag Filter UX Improvement**: filter discoverability, manual vs system tag separation
-- [ ] **Putuskan selection model v1**: rekomendasi **per-domain only** (`Conversation` dan `Ticket` dipilih & dieksekusi terpisah), bukan satu bulk bucket lintas domain.
-- [ ] **Putuskan representasi auto-tag**: gunakan **system relation label** atau **system tag** terpisah dari tag manual existing.
-- [ ] **Definisikan naming model** untuk system relation tags/labels:
-  - display label: `AWB • <value>`, `Order ID • <value>`, `Tracking • <value>`
-  - internal key: `rel.<attribute_key>.<normalized_value>`
-- [ ] **Patch PRD Tag Management dan Auto Tag** jika ingin reuse infra tag existing, karena model saat ini didesain untuk taxonomy terbatas, bukan unbounded identifier-generated tags.
-- [ ] **Patch search PRD** untuk menambah action model, tetapi JANGAN langsung commit bulk cross-domain mutation sebelum semantics disepakati.
-- [ ] **Review filter by tag UX**: pisahkan `Manual Tags` vs `System Relation Tags`, tambah exact value search, recent chips, dan one-click filter from result.
+- [ ] **Reframe PRD**: ubah Global Search menjadi **Phase 1: Shared Attribute Discovery** dengan objective yang attribute-centric, bukan generic search-centric.
+- [ ] **Define source of truth untuk shared attributes**: field mana saja yang boleh jadi match key lintas domain (`awb`, `order_id`, `tracking_number`, dll.).
+- [ ] **Putuskan lifecycle auto-tagging**: tag bersifat derived/system-generated atau persisted/manual-editable?
+- [ ] **Patch existing domain PRDs** untuk Phase 2 dan 3:
+  - `PRD Ticket - Related Tickets and Ticket Merge Suggestion.md`
+  - `PRD Ticket - Omnichannel Inbox - Related Conversations Grouping.md`
+- [ ] **Konfirmasi status implementasi Collections** pada Conversation Custom Attributes, karena phase ini mengandalkan attribute-level matching dan memory saat ini masih mencatat collections sebagai undeveloped.
+- [ ] **Putuskan exact-match normalization** untuk identifier (strip dash, uppercase, whitespace normalization, alias field mapping).
 
 ### 2.3 Key Blocking Reasons / Conditions
 
-- **Condition 1:** Current PRD Phase 1 masih discovery-only. Bulk action dan auto-tag berarti feature sekarang punya mutation side effects yang belum didefinisikan.
-- **Condition 2:** Bulk selection lintas domain (`Conversation` + `Ticket` dalam satu selected bucket) akan mencampur dua entity model, dua permission scope, dan dua action semantics yang berbeda.
-- **Condition 3:** Reuse Tag Management existing secara langsung berisiko menciptakan **tag explosion**, karena setiap nilai AWB/Order ID berpotensi menjadi tag unik baru.
-- **Condition 4:** Filter by tag existing akan cepat menjadi noisy jika manual tags dan generated identifier-tags dicampur dalam satu filter surface.
-- **Condition 5:** Jika shared-attribute registry, tag lifecycle, dan filter UX belum jelas, hasil mutation akan sulit diaudit, sulit dibersihkan, dan mudah drift dari data source.
+- **Condition 1:** Jangan campur generic message-body search sebagai objective utama jika target bisnisnya adalah related-record discovery berbasis shared attributes.
+- **Condition 2:** Auto-tagging Ticket/Conversation tidak boleh didefinisikan samar — harus jelas source, trigger, update, removal, audit, dan manual override.
+- **Condition 3:** Related Tickets dan Related Conversations sudah punya PRD sendiri. PRD ini tidak boleh menduplikasi atau menimpa behavior domain tersebut tanpa patch eksplisit.
+- **Condition 4:** Jika shared-attribute registry belum jelas, hasil suggestion akan tidak konsisten antar domain.
 
 ### 2.4 Complexity and Risk Snapshot
 
-- **Complexity Level:** Critical
+- **Complexity Level:** High
 - **Risk Level:** High
-- **Primary Impact Areas:** Search, Ticket, Conversation, Custom Attributes, Custom Fields, Tag Management, Auto Tag System, Filter UX, RBAC, Data Model, Observability
+- **Primary Impact Areas:** Search, Ticket, Conversation, Custom Attributes, Custom Fields, RBAC, UI/UX, Data Model, Observability
 
 ---
 
@@ -146,92 +136,6 @@ Memungkinkan agent menemukan, menghubungkan, dan memahami tiket/percakapan yang 
 | CL-03 | Apakah auto-tag boleh diedit/hapus manual oleh agent? | Menentukan ownership tag dan audit |
 | CL-04 | Jika satu record punya beberapa identifier (mis. 3 AWB), apakah semua jadi tag? | Menentukan explosion risk di tag UI |
 | CL-05 | Jika Ticket dan Conversation sama-sama punya AWB yang match, mana yang jadi “primary handling anchor”? | Menentukan UX navigation dan future grouping logic |
-| CL-06 | Apakah user ingin bulk select berlaku lintas domain atau per-domain? | Menentukan selection state, action bar, permission checks, dan audit model |
-| CL-07 | Apakah auto-tag harus menjadi tag nyata di Tag Management, atau cukup system relation label yang tampil seperti tag? | Menentukan blast radius taxonomy, filter UX, dan data cleanup |
-| CL-08 | Jika satu record punya 10 identifier berbeda, apakah semua harus ditampilkan/dijadikan tag? | Menentukan chip overload dan filter usability |
-
-### 3.5 Actionable Search Expansion Analysis
-
-| Requested Change | Analysis | Recommendation |
-|------------------|----------|----------------|
-| 1. Per-item click → Conversation Room + Detail | Aman dan selaras dengan current popup search objective. Hanya memperjelas navigation target. | **Proceed**. Untuk Conversation result, buka Room + Detail state sekaligus. Untuk Ticket result, buka Ticket Detail. |
-| 2. Bulk select | Ini sudah mengubah search dari discovery surface menjadi operational mutation surface. Cross-domain selection akan mempersulit permission, audit, dan action semantics. | **Per-domain only untuk v1**. User boleh select beberapa Conversation ATAU beberapa Ticket, tapi action dieksekusi per section/domain. Jangan campur dalam satu selected bucket lintas domain. |
-| 3. Bulk action → auto-tag | Valid secara bisnis, tetapi risk tinggi jika langsung memakai tag model existing. Setiap AWB/Order ID unik bisa menciptakan ledakan tag. | Gunakan **system relation label** atau **system tag terpisah**. Jangan langsung jadikan setiap identifier sebagai manual tag global. |
-| 4. Dampak auto-tag | Menyentuh search, tagging, filtering, audit, analytics, cleanup, dan possibly migration/backfill. | Perlakukan sebagai paket feature terpisah, bukan sekadar action tambahan di popup search. |
-| 5. Filter by tag improvement | Wajib dibenahi kalau system-generated tags ikut tampil. Tanpa pemisahan, filter akan noisy dan susah dipakai. | Tambahkan `Manual Tags` vs `System Relation Tags`, exact-value search, recent filter chips, quick filter dari hasil search. |
-
-#### 3.5.1 Bulk Selection Model Recommendation
-
-**Rekomendasi final: per-domain only di versi pertama.**
-
-Alasan:
-- `Conversation` dan `Ticket` punya lifecycle, RBAC, dan bulk semantics berbeda.
-- Existing product juga memperlakukan bulk action per domain (Conversation list punya bulk actions sendiri, Ticket list juga punya bulk actions sendiri).
-- Jika user select lintas domain dalam satu bucket, action seperti tag apply, close, assign, atau reopen akan jadi ambigu.
-
-**Model yang disarankan:**
-- Section `Percakapan` punya checkbox sendiri + bulk bar sendiri.
-- Section `Tiket` punya checkbox sendiri + bulk bar sendiri.
-- Search popup boleh menampilkan kedua section sekaligus, tetapi selection state tetap terpisah.
-
-#### 3.5.2 Auto-Tag Naming Recommendation
-
-**Jangan pakai nama seperti:**
-- `autotag_awb_1234`
-- `shared_attr_ORD7788`
-- `RELATION_AWB_JNE123456`
-
-**Nama yang readable untuk user-facing chip:**
-- `AWB • JNE123456789`
-- `Order ID • ORD-7788`
-- `Tracking • SPX9981`
-
-**Internal key yang disarankan:**
-- `rel.awb.jne123456789`
-- `rel.order_id.ord7788`
-- `rel.tracking.spx9981`
-
-**Rekomendasi istilah produk:**
-- user-facing category: **Tag Relasi Otomatis**
-- internal model: **system relation tag** atau **relation label**
-
-#### 3.5.3 Kenapa Lebih Aman Pakai System Relation Label daripada Tag Existing
-
-PRD Tag Management dan Auto Tag existing didesain untuk:
-- taxonomy tag terbatas
-- nama tag manual yang reusable
-- visibility `Conversation`, `Ticket`, atau `All`
-- filtering berbasis daftar tag yang relatif stabil
-
-Sedangkan identifier-generated tags akan:
-- berjumlah sangat besar (1 AWB = 1 tag unik)
-- cepat mengotori global tag registry
-- sulit dibersihkan saat value berubah
-- berisiko melewati batas panjang/validasi nama tag di beberapa modul
-- membuat filter dan analytics jadi noisy
-
-**Kesimpulan:**
-> tampilkan seperti tag di UI, tetapi secara model lebih aman dipisah sebagai `system relation labels/tags`.
-
-#### 3.5.4 Filter by Tag Improvement Recommendation
-
-Jika auto-tag/system relation label diterapkan, filter by tag existing perlu diperbaiki dengan minimal 4 hal:
-
-1. **Pisahkan jenis filter**
-   - `Manual Tags`
-   - `System Relation Tags`
-
-2. **Support exact-value filter search**
-   - user bisa ketik `AWB-1234`
-   - dropdown suggestion langsung menampilkan `AWB • AWB-1234`
-
-3. **Quick filter from result**
-   - dari result card, klik chip `AWB • AWB-1234` → filter semua hasil/search/list ke value itu
-
-4. **Recent / pinned system relation filters**
-   - memudahkan user yang berulang kali cek identifier sama
-
-Tanpa improvement ini, filter existing akan cepat overload dan sulit dipakai.
 
 ---
 
@@ -557,11 +461,11 @@ Karena itu, feature tidak boleh dikerjakan sebagai satu PRD search generik denga
 
 | Item | Value |
 |------|-------|
-| Final Decision Enum | `SPLIT_FEATURE` |
+| Final Decision Enum | `PROCEED_WITH_CAUTION` |
 | Owner for Follow-up | PM / FE / BE / QA / Cross-team |
-| Required Revisions | Tambahkan addendum khusus Actionable Search. Pisahkan: (1) per-item navigation, (2) per-domain bulk selection, (3) system relation tags/labels, (4) tag filter UX improvements. |
-| Suggested Delivery Strategy | **Split 3 paket**: A. Actionable Search Navigation, B. System Relation Tags / Labels, C. Tag Filter UX Improvement |
-| Earliest Safe Next Step | Tulis addendum PRD untuk **Actionable Search Navigation only** terlebih dahulu; jangan commit auto-tag dan cross-domain bulk action di revisi yang sama |
+| Required Revisions | Reframe current PRD menjadi attribute-centric Phase 1; pindahkan detail Phase 2/3 ke patch PRD domain masing-masing |
+| Suggested Delivery Strategy | Roadmap 3 fase dengan one shared matching engine |
+| Earliest Safe Next Step | Rewrite PRD current file menjadi Shared Attribute Discovery Phase 1 + roadmap alignment section |
 
 ---
 
@@ -575,10 +479,6 @@ Karena itu, feature tidak boleh dikerjakan sebagai satu PRD search generik denga
 | Conversation auto-tagging | Needs lifecycle definition | Conversation, Data, Audit | TC-SAD-004 | Pending |
 | Existing related PRD reuse | Must patch, not duplicate | Product consistency | TC-SAD-005 | Pending |
 | Collections dependency | Still unclear from current state | Conversation custom attributes | TC-SAD-006 | Pending |
-| Per-item open to room+detail | Safe to proceed | Search, Navigation, Detail surface | TC-SAD-007 | Pending |
-| Bulk selection model | Must be per-domain first | Search, RBAC, Bulk UX | TC-SAD-008 | Pending |
-| System relation tags/labels | Safer than global manual tag reuse | Tag Management, Auto Tag, Data Model | TC-SAD-009 | Pending |
-| Tag filter UX split | Manual vs system tag separation required | Filter UX, Search, Ticket, Conversation | TC-SAD-010 | Pending |
 
 ---
 
@@ -588,4 +488,3 @@ Karena itu, feature tidak boleh dikerjakan sebagai satu PRD search generik denga
 |------|--------|--------|
 | 2026-06-15 | Initial generic Global Search assessment created | QA Analysis |
 | 2026-06-15 | Reframed to Shared Attribute Discovery & Related Record Suggestions roadmap | QA Analysis |
-| 2026-06-15 | Added actionable search expansion analysis: per-item open, per-domain bulk select, system relation tags, and tag filter UX recommendations | QA Analysis |

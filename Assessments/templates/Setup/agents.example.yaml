@@ -1,0 +1,64 @@
+version: 1
+roster_profile: default
+
+agents:
+  - id: orchestrator
+    label: Orchestrator
+    role_type: controller
+    purpose: Classify task, choose lane, route handoff, enforce gates.
+    owns_artifacts: []
+    preferred_capabilities: [routing, summarization, delegation]
+    can_delegate: true
+    can_approve_gate: false
+
+  - id: analyst
+    label: Analyst
+    role_type: analyst
+    purpose: Produce Assessment Report, dependency map, risk baseline, impact baseline.
+    owns_artifacts:
+      - Assessment Report
+    preferred_capabilities: [analysis, impact, dependency, clarification-detection]
+    can_delegate: false
+    can_approve_gate: false
+
+  - id: prd_writer
+    label: PRD Writer
+    role_type: writer
+    purpose: Convert draft and analysis into requirement-ready PRD.
+    owns_artifacts:
+      - PRD requirement-ready
+    preferred_capabilities: [writing, structuring, acceptance-criteria]
+    can_delegate: false
+    can_approve_gate: false
+
+  - id: qa_agent
+    label: QA Agent
+    role_type: qa
+    purpose: Handle QA pre/post implementation reviews, testcase strategy, automation mapping, regression alignment.
+    owns_artifacts:
+      - QA Pre-Implementation Review
+      - QA Post-Implementation Validation
+      - Automation Mapping
+    preferred_capabilities: [coverage, regression, test-strategy, automation-mapping]
+    can_delegate: false
+    can_approve_gate: false
+
+  - id: reviewer
+    label: Reviewer
+    role_type: gatekeeper
+    purpose: Gate A/B/C decisions and final sign-off routing.
+    owns_artifacts:
+      - Reviewer Decision
+    preferred_capabilities: [review, gating, consistency-check]
+    can_delegate: false
+    can_approve_gate: true
+
+  - id: coder_automation
+    label: Coder Automation
+    role_type: implementer
+    purpose: Implement automation code, mapping integration, and automation repo updates.
+    owns_artifacts:
+      - implementation output
+    preferred_capabilities: [coding, playwright, integration]
+    can_delegate: false
+    can_approve_gate: false

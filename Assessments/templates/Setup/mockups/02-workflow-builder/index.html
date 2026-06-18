@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Dashboard Mockup — Workflow Builder</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#182033;line-height:1.4}
+    .shell{display:grid;grid-template-columns:280px 1fr 360px;min-height:100vh}
+    .left{background:#fff;border-right:1px solid #e5e9f3;padding:22px}
+    .center{padding:24px}
+    .right{background:#fbfcff;border-left:1px solid #e5e9f3;padding:22px}
+    .h1{font-size:22px;font-weight:800;margin-bottom:6px}
+    .muted{color:#6d7792;font-size:13px}
+    .section{margin-bottom:22px}
+    .pill{display:inline-flex;padding:8px 11px;border-radius:999px;background:#eef3ff;color:#3556b8;font-weight:700;font-size:12px;margin-right:8px;cursor:pointer}
+    .pill.active{background:#3556b8;color:#fff}
+    .stack{display:grid;gap:10px}
+    .card{background:#fff;border:1px solid #e3e8f3;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(27,49,99,.05)}
+    .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .badge{font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:#edf2ff;color:#4262bd}
+    .badge.warn{background:#fff2d8;color:#9b6a00}
+    .builder{display:grid;gap:14px}
+    .step{display:grid;grid-template-columns:46px 1fr 160px;gap:14px;align-items:center;background:#fff;border:1px solid #dfe6f4;border-radius:18px;padding:14px 16px}
+    .num{width:46px;height:46px;border-radius:14px;background:#16213f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+    .label{font-weight:700}
+    .small{font-size:12px;color:#717c98;margin-top:4px}
+    .tag{padding:8px 10px;border-radius:12px;background:#f3f6fc;border:1px solid #dde4f0;font-size:12px;text-align:center}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .btn{border:none;border-radius:12px;padding:11px 14px;font-weight:700;cursor:pointer}
+    .btn.primary{background:#3556b8;color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #dfe6f4;color:#26314f}
+    .kv{display:grid;grid-template-columns:130px 1fr;gap:10px;font-size:13px;margin-top:12px}
+    .divider{height:1px;background:#e6eaf4;margin:14px 0}
+    .hint{padding:12px 14px;background:#eef7ff;border:1px solid #cfe7ff;border-radius:14px;font-size:13px;color:#255c87}
+    @media (max-width:1280px){.shell{grid-template-columns:1fr}.right,.left{border:none;border-top:1px solid #e5e9f3}.center{order:-1}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="left">
+      <div class="h1">Workflow Agent</div>
+      <div class="muted">Mode & route builder</div>
+      <div class="section" style="margin-top:18px">
+        <div class="pill active" id="fullBtn">Full Lane</div>
+        <div class="pill" id="fastBtn">Fast Lane</div>
+      </div>
+      <div class="section">
+        <div class="muted" style="margin-bottom:10px">Task routing</div>
+        <div class="stack">
+          <div class="card"><div class="row"><div><b>PRD baru</b><div class="small">Feature spec / cross-domain</div></div><span class="badge">Full</span></div></div>
+          <div class="card"><div class="row"><div><b>Automation minor</b><div class="small">Patch kecil / low impact</div></div><span class="badge warn">Fast</span></div></div>
+          <div class="card"><div class="row"><div><b>Bugfix sempit</b><div class="small">No major workflow rewrite</div></div><span class="badge warn">Fast</span></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="hint">Cocok kalau dashboard-mu ingin fokus ke orchestration visual dan sequence editing.</div>
+      </div>
+    </aside>
+    <main class="center">
+      <div class="toolbar">
+        <div>
+          <div class="h1" id="builderTitle">Full Lane Builder</div>
+          <div class="muted" id="builderSub">Flow requirement lengkap dengan reviewer gates dan freeze policy.</div>
+        </div>
+        <div>
+          <button class="btn secondary">Validate</button>
+          <button class="btn primary">Publish runtime</button>
+        </div>
+      </div>
+      <div id="steps" class="builder"></div>
+    </main>
+    <aside class="right">
+      <div class="h1">Inspector</div>
+      <div class="muted">Gate, freeze, dan agent dependency</div>
+      <div class="section" style="margin-top:18px">
+        <div class="card">
+          <b>Gate B</b>
+          <div class="kv">
+            <div>Reviewer</div><div>reviewer</div>
+            <div>Input roles</div><div>PRD Writer, QA Agent</div>
+            <div>Allowed output</div><div>APPROVED / APPROVED_WITH_CAUTION / REVISE_PRD / HOLD</div>
+          </div>
+          <div class="divider"></div>
+          <div class="row"><div><b>Requirement Package Freeze</b><div class="small">Starts after Gate B</div></div><span class="badge">Enabled</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="card">
+          <b>Selected role</b>
+          <div class="kv">
+            <div>Role</div><div id="inspectRole">Orchestrator</div>
+            <div>Purpose</div><div id="inspectPurpose">Classify task and choose lane.</div>
+            <div>Can delegate</div><div id="inspectDelegate">Yes</div>
+          </div>
+        </div>
+      </div>
+      <div class="hint">Panel kanan lebih cocok untuk edit detail node/step, dibanding variant control center yang lebih audit-oriented.</div>
+    </aside>
+  </div>
+  <script>
+    const full=[
+      ['01','Orchestrator','Classify task & choose lane','Routing'],
+      ['02','Draft PRD v0','Skeleton before deep analysis','Draft'],
+      ['03','Analyst','Produce Assessment Report','Analysis'],
+      ['04','Reviewer Gate A','Early review','Gate'],
+      ['05','PRD Writer','Make PRD requirement-ready','Authoring'],
+      ['06','QA Pre','Coverage, regression, automation candidate','QA'],
+      ['07','Reviewer Gate B','Approve & freeze package','Gate'],
+      ['08','Coder Automation','Implement code / automation','Build'],
+      ['09','QA Post','Regression & alignment validation','QA'],
+      ['10','Reviewer Gate C','Final sign-off','Gate']
+    ];
+    const fast=[
+      ['01','Orchestrator','Classify task & choose lane','Routing'],
+      ['02','Quick Assessment','Analyst / QA quick review','Analysis'],
+      ['03','Reviewer Gate B','Approve compact package','Gate'],
+      ['04','Coder Automation','Implement minor change','Build'],
+      ['05','QA Post','Validate result quickly','QA'],
+      ['06','Reviewer Gate C','Final decision','Gate']
+    ];
+    const info={Orchestrator:['Classify task and choose lane.','Yes'], 'Draft PRD v0':['Prepare skeleton PRD before deeper review.','No'], Analyst:['Produce Assessment Report, dependency map, risk baseline.','No'],'Reviewer Gate A':['Review assessment + draft PRD.','No'],'PRD Writer':['Convert draft into requirement-ready PRD.','No'],'QA Pre':['Review PRD, regression impact, test strategy, automation candidate mapping.','No'],'Reviewer Gate B':['Approve package and freeze requirement baseline.','No'],'Coder Automation':['Implement automation code and repo updates.','No'],'QA Post':['Validate regression and automation alignment.','No'],'Reviewer Gate C':['Final sign-off or reopen requirement.','No'], 'Quick Assessment':['Short assessment for fast lane.','No']};
+    const steps=document.getElementById('steps');
+    function render(list,title,sub){builderTitle.textContent=title;builderSub.textContent=sub;steps.innerHTML=list.map(([n,l,s,t])=>`<div class="step" data-role="${l}"><div class="num">${n}</div><div><div class="label">${l}</div><div class="small">${s}</div></div><div class="tag">${t}</div></div>`).join(''); bind();}
+    function bind(){document.querySelectorAll('.step').forEach(el=>el.onclick=()=>{const role=el.dataset.role;inspectRole.textContent=role;inspectPurpose.textContent=info[role][0];inspectDelegate.textContent=info[role][1];});}
+    fullBtn.onclick=()=>{fullBtn.classList.add('active');fastBtn.classList.remove('active');render(full,'Full Lane Builder','Flow requirement lengkap dengan reviewer gates dan freeze policy.');};
+    fastBtn.onclick=()=>{fastBtn.classList.add('active');fullBtn.classList.remove('active');render(fast,'Fast Lane Builder','Flow ringkas untuk automation minor, testcase patch kecil, atau bugfix sempit.');};
+    render(full,'Full Lane Builder','Flow requirement lengkap dengan reviewer gates dan freeze policy.');
+  </script>
+</body>
+</html>
