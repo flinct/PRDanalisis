@@ -58,7 +58,7 @@ Every Assessment Report should declare at least:
 - version
 - previous version reference (if any)
 - rules applied
-- reference memory used
+- reference context used
 - analysis date
 - status (`Draft`, `Reviewed`, `Approved`, `Superseded`)
 
@@ -646,9 +646,11 @@ Jika ada satu saja tidak terpenuhi → `Manual Only` — dokumentasikan blocking
 
 Every decision-bearing analysis MUST produce an **Assessment Report** using the permanent artifact format below:
 
+If the request came through Phase 0 / requirement lifecycle lane, the Assessment Report MUST reference the persisted **Change Intake Brief** and use it as the baseline for scope, routing rationale, and protected existing behavior.
+
 ## 1. Overview
 
-Feature / issue name, objective, business context, in-scope items, out-of-scope items.
+Feature / issue name, objective, business context, source Change Intake Brief when applicable, in-scope items, out-of-scope items.
 
 ## 2. Decision Summary
 
@@ -823,6 +825,7 @@ Before finalizing any analysis, verify:
 Before starting analysis, confirm:
 
 - [ ] PRD, feature spec, or bug report is available and reviewed
+- [ ] Change Intake Brief is available when the request came through requirement lifecycle / Phase 0
 - [ ] acceptance criteria or expected behavior defined
 - [ ] related PRDs, features, or dependencies identified
 - [ ] stakeholders and SMEs identified
@@ -842,6 +845,7 @@ Analysis is complete only when:
 - [ ] all open questions captured
 - [ ] final decision enum stated (`PROCEED`, `PROCEED_WITH_CAUTION`, `REVISE_PRD`, `SPLIT_FEATURE`, or `HOLD_FEATURE`)
 - [ ] decision statement and required actions captured in Decision Summary
+- [ ] Assessment Report references the persisted Change Intake Brief when Phase 0 applies
 - [ ] traceability matrix populated (at minimum: req → finding → test case)
 - [ ] production safety assessed (rollback, feature toggle, monitoring)
 - [ ] permanent Assessment Report saved in `Assessments/` when the analysis is a decision-bearing artifact

@@ -77,15 +77,17 @@ npm start
 
 ## Cara pakai
 
-- **Baca:** sidebar section *Google Docs* → mirror isi folder Drive (atau daftar semua Doc).
-- **Export sekali:** buka file `.md` → toolbar **⇪ Export to GDocs** → buat Doc baru.
+- **Baca:** sidebar section *Google Docs* → hanya menampilkan isi **folder aktif** (bukan semua file Drive).
+- **Pilih folder:** buka **⚙ Settings → Google Connection** → pilih folder Drive yang diinginkan lalu **Save folder**.
+- **Export sekali:** buka file `.md` → toolbar **⇪ Export to GDocs** → buat Doc baru di folder aktif.
 - **Mirror semua PRD:** Settings → **⇪ Mirror all PRD now**.
 - **Auto-update:** begitu server jalan + sudah login, tiap `.md` di `PRD/` yang berubah/baru
   otomatis di-push ke Doc-nya (file watcher, debounce ~1.2 dtk).
+- **Kalau status terlihat connected tapi mirror gagal bikin PRD baru:** klik **Reconnect with Google** agar token lama di-upgrade ke scope Google Docs + Google Drive.
 
 ## Halaman Settings (⚙)
 
-1. **Google Connection** — login/logout, status akun, tombol mirror.
+1. **Google Connection** — login/logout, status akun, **folder picker**, tombol mirror.
 2. **Theme** — pilih dari 6 tema.
 3. **Manual Import** — re-scan & reindex TSV/MD ke database.
 
@@ -93,12 +95,14 @@ npm start
 
 | Endpoint | Method | Fungsi |
 |---|---|---|
-| `/api/google/status` | GET | `{oauthConfigured, connected, email, folderName}` |
+| `/api/google/status` | GET | Status OAuth + folder aktif + scope readiness |
+| `/api/google/folders` | GET | Daftar folder Drive untuk folder picker |
+| `/api/google/folder` | PUT | Set / reset folder aktif mirror + sidebar |
 | `/api/google/login` | GET | Redirect ke Google consent |
 | `/oauth2callback` | GET | Tukar code → simpan token |
 | `/api/google/logout` | POST | Hapus token |
 | `/api/mirror` | POST | Mirror semua `PRD/*.md` → Docs |
-| `/api/gdocs` | GET | Tree dokumen (mirror folder / daftar flat) |
+| `/api/gdocs` | GET | Tree dokumen dalam folder aktif |
 | `/api/gdocs/:id` | GET/PUT | Baca / update doc |
 | `/api/gdocs` | POST | Buat doc baru `{title, content}` |
 

@@ -1,0 +1,317 @@
+version: 3
+workflow_profile: default
+modes:
+  full_lane:
+    id: standard-multi-agent-v2
+    description: Full requirement lane with Phase 0 change-intake, then full PRD → analysis → QA → review.
+    nodes:
+      - id: trigger_1
+        type: trigger
+        label: Task received
+        position:
+          x: -34
+          'y': 102
+      - id: orchestrator_1
+        type: agent
+        ref: orchestrator
+        label: Orchestrator
+        position:
+          x: 220
+          'y': 220
+        attachments: []
+      - id: change_intake_1
+        type: marker
+        ref: change_intake
+        label: change intake
+        position:
+          x: 400
+          'y': 220
+      - id: prd_v0_1
+        type: marker
+        ref: prd_v0
+        label: prd v0
+        position:
+          x: 404.2491516854534
+          'y': 398.0482450245404
+      - id: analyst_1
+        type: agent
+        ref: analyst
+        label: Analyst
+        position:
+          x: 723.2416526400948
+          'y': 440.9728009783365
+        attachments: []
+      - id: gate_a_1
+        type: gate
+        ref: gate_a
+        label: Reviewer Gate A
+        position:
+          x: 781.5223703233974
+          'y': 242.46659962646663
+      - id: prd_writer_1
+        type: agent
+        ref: prd_writer
+        label: PRD Writer
+        position:
+          x: 1052.6581280151486
+          'y': 346.9631847878693
+        attachments: []
+      - id: qa_pre_1
+        type: marker
+        ref: qa_pre
+        label: qa pre
+        position:
+          x: 1300
+          'y': 18.11528965174722
+      - id: gate_b_1
+        type: gate
+        ref: gate_b
+        label: Reviewer Gate B
+        position:
+          x: 1397.2937184402135
+          'y': 319.3260022279251
+      - id: coder_automation_1
+        type: agent
+        ref: coder_automation
+        label: Coder Automation
+        position:
+          x: 1707.5022847878245
+          'y': 299.1704746463737
+        attachments: []
+      - id: qa_post_1
+        type: marker
+        ref: qa_post
+        label: qa post
+        position:
+          x: 1874.3072056800956
+          'y': 442.9968369206191
+      - id: gate_c_1
+        type: gate
+        ref: gate_c
+        label: Reviewer Gate C
+        position:
+          x: 2112.3655537541026
+          'y': 134.2319857997619
+    edges:
+      - from: trigger_1
+        to: orchestrator_1
+      - from: orchestrator_1
+        to: change_intake_1
+      - from: change_intake_1
+        to: prd_v0_1
+      - from: prd_v0_1
+        to: analyst_1
+      - from: analyst_1
+        to: gate_a_1
+      - from: prd_writer_1
+        to: qa_pre_1
+      - from: qa_pre_1
+        to: gate_b_1
+      - from: coder_automation_1
+        to: qa_post_1
+      - from: qa_post_1
+        to: gate_c_1
+      - from: gate_a_1
+        to: prd_writer_1
+        label: APPROVE_WITH_NOTES
+      - from: gate_a_1
+        to: analyst_1
+        label: REVISE_ASSESSMENT
+        loop_back: true
+      - from: gate_a_1
+        to: change_intake_1
+        label: REVISE_PRD_DRAFT
+        loop_back: true
+      - from: gate_b_1
+        to: coder_automation_1
+        label: APPROVED
+      - from: gate_b_1
+        to: coder_automation_1
+        label: APPROVED_WITH_CAUTION
+      - from: gate_b_1
+        to: prd_writer_1
+        label: REVISE_PRD
+        loop_back: true
+      - from: gate_c_1
+        to: coder_automation_1
+        label: REVISE_CODER
+        loop_back: true
+      - from: gate_c_1
+        to: qa_post_1
+        label: REVISE_QA
+        loop_back: true
+      - from: gate_c_1
+        to: change_intake_1
+        label: REOPEN_REQUIREMENT
+        loop_back: true
+    gates:
+      gate_a:
+        reviewer_role: reviewer
+        input_roles:
+          - analyst
+        input_artifacts:
+          - Change Intake Brief
+          - Assessment Report
+          - PRD v0
+      gate_b:
+        reviewer_role: reviewer
+        input_roles:
+          - prd_writer
+          - qa_agent
+        input_artifacts:
+          - Change Intake Brief
+          - PRD requirement-ready
+          - Assessment Report
+          - QA Pre-Implementation Review
+          - coverage / testcase strategy
+          - automation candidate mapping
+      gate_c:
+        reviewer_role: reviewer
+        input_roles:
+          - coder_automation
+          - qa_agent
+        input_artifacts:
+          - implementation output
+          - QA Post-Implementation Validation
+    freeze:
+      enabled: true
+      starts_after: reviewer_gate_b
+  fast_lane:
+    id: quick-multi-agent-v2
+    description: Short lane with Phase 0 change-intake, quick assessment, then implementation.
+    nodes:
+      - id: trigger_1
+        type: trigger
+        label: Task received
+        position:
+          x: 60
+          'y': 420
+      - id: orchestrator_1
+        type: agent
+        ref: orchestrator
+        label: Orchestrator
+        position:
+          x: 220
+          'y': 420
+        attachments: []
+      - id: change_intake_1
+        type: marker
+        ref: change_intake
+        label: change intake
+        position:
+          x: 400
+          'y': 420
+      - id: quick_assessment_1
+        type: marker
+        ref: quick_assessment
+        label: quick assessment
+        position:
+          x: 580
+          'y': 420
+      - id: gate_b_1
+        type: gate
+        ref: gate_b
+        label: Reviewer Gate B
+        position:
+          x: 760
+          'y': 420
+      - id: coder_automation_1
+        type: agent
+        ref: coder_automation
+        label: Coder Automation
+        position:
+          x: 940
+          'y': 420
+        attachments: []
+      - id: qa_post_1
+        type: marker
+        ref: qa_post
+        label: qa post
+        position:
+          x: 1120
+          'y': 420
+      - id: gate_c_1
+        type: gate
+        ref: gate_c
+        label: Reviewer Gate C
+        position:
+          x: 1300
+          'y': 420
+    edges:
+      - from: trigger_1
+        to: orchestrator_1
+      - from: orchestrator_1
+        to: change_intake_1
+      - from: change_intake_1
+        to: quick_assessment_1
+      - from: quick_assessment_1
+        to: gate_b_1
+      - from: coder_automation_1
+        to: qa_post_1
+      - from: qa_post_1
+        to: gate_c_1
+      - from: gate_b_1
+        to: coder_automation_1
+        label: APPROVED
+      - from: gate_b_1
+        to: coder_automation_1
+        label: APPROVED_WITH_CAUTION
+      - from: gate_b_1
+        to: coder_automation_1
+        label: REVISE_PRD
+      - from: gate_c_1
+        to: coder_automation_1
+        label: REVISE_CODER
+        loop_back: true
+      - from: gate_c_1
+        to: qa_post_1
+        label: REVISE_QA
+        loop_back: true
+      - from: gate_c_1
+        to: change_intake_1
+        label: REOPEN_REQUIREMENT
+        loop_back: true
+    gates:
+      gate_b:
+        reviewer_role: reviewer
+        input_roles:
+          - analyst
+          - qa_agent
+        input_artifacts:
+          - Change Intake Brief
+          - quick assessment
+      gate_c:
+        reviewer_role: reviewer
+        input_roles:
+          - coder_automation
+          - qa_agent
+        input_artifacts:
+          - implementation output
+          - QA Post-Implementation Validation
+    freeze:
+      enabled: true
+      starts_after: reviewer_gate_b
+routing:
+  task_type_to_mode:
+    requirement_lifecycle: full_lane
+    prd_new: full_lane
+    prd_patch_major: full_lane
+    prd_rewrite: full_lane
+    revive_undeveloped_prd: full_lane
+    deprecation_removal: full_lane
+    behavior_change: full_lane
+    automation_behavior_sensitive: full_lane
+    cross_domain_change: full_lane
+    automation_minor: fast_lane
+    testcase_patch_small: fast_lane
+    bugfix_narrow: fast_lane
+fallbacks:
+  if_agent_missing:
+    change_intake:
+      - analyst
+      - orchestrator
+    prd_v0: prd_writer
+    quick_assessment:
+      - analyst
+      - qa_agent
+schema: workflow-v2

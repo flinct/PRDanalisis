@@ -77,12 +77,22 @@ Avoid:
 
 Before writing a PRD:
 
-1. Read `Memory/global-memory.md`.
-2. Read relevant feature memory from `Memory/` when available.
-3. Read existing V2 PRDs in the same domain.
-4. Identify related domains that may be impacted, especially Conversation, Ticket, SLA, Contact, Analytics, Broadcast, WhatsApp Web, RBAC, and Reports.
-5. Define Phase 1 scope before writing detailed requirements.
-6. If information is missing, write it as an assumption or open question in Appendix. Do not silently invent critical business rules.
+1. If the request came through requirement lifecycle lane, read the persisted Change Intake Brief first.
+2. Read `Memory/global-memory.md`.
+3. Read `Memory/reference-index.md` when the task may need reusable comparison or deep-dive PRD analysis.
+4. Read relevant feature memory from `Memory/` when available.
+5. Read relevant reference analysis from `Assessments/reference/` when available.
+6. Read existing V2 PRDs in the same domain.
+7. Identify related domains that may be impacted, especially Conversation, Ticket, SLA, Contact, Analytics, Broadcast, WhatsApp Web, RBAC, and Reports.
+8. Define Phase 1 scope before writing detailed requirements.
+9. If information is missing, write it as an assumption or open question in Appendix. Do not silently invent critical business rules.
+
+When a Change Intake Brief exists:
+
+- use it as the baseline for scope, change class, routing decision, and protected existing behavior
+- cite the persisted Change Intake Brief in the PRD's source references, appendix, or working-note metadata
+- do not silently expand beyond the brief without updating the brief first
+- for patch/addendum vs rewrite decisions, follow the route established in the brief unless new evidence forces reclassification
 
 For Conversation or Ticket PRDs:
 

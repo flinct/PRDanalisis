@@ -6,7 +6,7 @@
 > **Version:** `v1.2`
 > **Previous Version:** `Assessments/whatsapp-web/wa-outbound-anti-ban-guard/wa-outbound-anti-ban-guard-qa-assessment.md@v1.0`
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`, `Rules/prd-writing-rule.md`
-> **Reference Memory:** `Memory/global-memory.md`, `Memory/CLAUDE-fe.md`, `Memory/CLAUDE-be.md`, companion docs in `Assessments/whatsapp-web/wa-outbound-anti-ban-guard/` and `Test/whatsapp-web/`
+> **Reference Context:** `Memory/global-memory.md`, `Memory/CLAUDE-fe.md`, `Memory/CLAUDE-be.md`, companion docs in `Assessments/whatsapp-web/wa-outbound-anti-ban-guard/` and `Test/whatsapp-web/`
 > **Tanggal Analisa:** 2026-06-11
 > **Status:** Reviewed
 

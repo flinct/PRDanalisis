@@ -12,11 +12,29 @@ const gdocs  = require('./gdocs');
 const SRC_DIR = process.env.MIRROR_SRC_DIR || 'PRD';
 
 function mapPath(BASE) { return path.join(BASE, '.gdocs-mirror.json'); }
+function emptyMap() { return { rootFolderId: null, rootFolderName: null, rootFolderPath: null, folders: {}, docs: {} }; }
 function loadMap(BASE) {
-  try { return JSON.parse(fs.readFileSync(mapPath(BASE), 'utf8')); }
-  catch { return { rootFolderId: null, folders: {}, docs: {} }; }
+  try {
+    const raw = JSON.parse(fs.readFileSync(mapPath(BASE), 'utf8'));
+    return {
+      ...emptyMap(),
+      ...raw,
+      folders: raw && raw.folders && typeof raw.folders === 'object' ? raw.folders : {},
+      docs: raw && raw.docs && typeof raw.docs === 'object' ? raw.docs : {},
+    };
+  } catch {
+    return emptyMap();
+  }
 }
-function saveMap(BASE, m) { fs.writeFileSync(mapPath(BASE), JSON.stringify(m, null, 2)); }
+function saveMap(BASE, m) {
+  const next = {
+    ...emptyMap(),
+    ...m,
+    folders: m && m.folders && typeof m.folders === 'object' ? m.folders : {},
+    docs: m && m.docs && typeof m.docs === 'object' ? m.docs : {},
+  };
+  fs.writeFileSync(mapPath(BASE), JSON.stringify(next, null, 2));
+}
 function hash(s) { return crypto.createHash('md5').update(s).digest('hex'); }
 
 // True for Drive "File not found" / 404 (stale id in the map after a delete in Drive)
@@ -42,10 +60,20 @@ function listMd(BASE) {
 }
 
 async function ensureRoot(BASE, map) {
-  if (process.env.GDRIVE_FOLDER_ID) { map.rootFolderId = process.env.GDRIVE_FOLDER_ID.trim(); return map.rootFolderId; }
-  if (map.rootFolderId) return map.rootFolderId;
-  const name = (process.env.GDRIVE_FOLDER_NAME || 'PRD').trim() || 'PRD';
-  map.rootFolderId = await gdocs.findOrCreateFolder(BASE, name, null);
+  const root = await gdocs.resolveRootFolder(BASE, null, { createIfMissing: true });
+  if (!root || !root.id) {
+    const e = new Error('Folder mirror Google Drive tidak ditemukan.');
+    e.status = 400;
+    throw e;
+  }
+  const rootChanged = !!(map.rootFolderId && map.rootFolderId !== root.id);
+  map.rootFolderId = root.id;
+  map.rootFolderName = root.name || map.rootFolderName || null;
+  map.rootFolderPath = root.path || map.rootFolderPath || map.rootFolderName || map.rootFolderId;
+  if (rootChanged) {
+    map.folders = {};
+    map.docs = {};
+  }
   return map.rootFolderId;
 }
 
@@ -61,6 +89,16 @@ async function ensureDir(BASE, map, relDir) {
     map.folders[acc] = id; parent = id;
   }
   return parent;
+}
+
+async function assertMirrorReady(BASE) {
+  const root = await gdocs.resolveRootFolder(BASE, null, { createIfMissing: true });
+  if (!root || !root.id) {
+    const e = new Error('Folder mirror Google Drive tidak ditemukan.');
+    e.status = 400;
+    throw e;
+  }
+  return root;
 }
 
 // ─── SERIALIZATION ──────────────────────────────────────────────────────────
@@ -83,7 +121,12 @@ async function _mirrorFileInner(BASE, relPath, _healed = false) {
   const h = hash(content);
   const map = loadMap(BASE);
   const rec = map.docs[relPath];
-  if (rec && rec.hash === h && rec.docId && !_healed) return { relPath, skipped: 'unchanged', docId: rec.docId };
+  if (rec && rec.hash === h && rec.docId && !_healed) {
+    const exists = await gdocs.fileExists(BASE, rec.docId);
+    if (exists) return { relPath, skipped: 'unchanged', docId: rec.docId };
+    delete map.docs[relPath];
+    saveMap(BASE, map);
+  }
 
   const relDir = relPath.includes('/') ? relPath.slice(0, relPath.lastIndexOf('/')) : '';
   const title  = relPath.split('/').pop().replace(/\.md$/i, '');
@@ -93,21 +136,38 @@ async function _mirrorFileInner(BASE, relPath, _healed = false) {
     const folderId = await ensureDir(BASE, map, relDir);
 
     let docId = rec && rec.docId, action = 'updated';
+    let duplicateCount = 0;
     if (docId) {
       try { await gdocs.overwriteStyledDoc(BASE, docId, content); }
       catch (e) { if (isNotFound(e)) docId = null; else throw e; } // doc deleted → recreate
     }
-    if (!docId) { const r = await gdocs.createDoc(BASE, { title, content, folderId }); docId = r.id; action = 'created'; }
+    if (!docId) {
+      const sameNameDocs = await gdocs.findDocsByName(BASE, title, folderId);
+      duplicateCount = sameNameDocs.length;
+      if (sameNameDocs.length) {
+        docId = sameNameDocs[0].id;
+        await gdocs.overwriteStyledDoc(BASE, docId, content);
+        action = 'reused-existing';
+      } else {
+        const r = await gdocs.createDoc(BASE, { title, content, folderId });
+        docId = r.id;
+        action = 'created';
+      }
+    }
 
     map.docs[relPath] = { docId, hash: h, title, updatedAt: new Date().toISOString() };
     saveMap(BASE, map);
-    return { relPath, docId, action };
+    return { relPath, docId, action, duplicateCount };
   } catch (e) {
     // Stale folder/root id (deleted in Drive) → purge folder cache + retry once
     if (isNotFound(e) && !_healed) {
       const m = loadMap(BASE);
       const badId = (/File not found:?\s*([A-Za-z0-9_\-]+)/.exec(e.message || '') || [])[1];
-      if (badId && m.rootFolderId === badId) m.rootFolderId = null;
+      if (badId && m.rootFolderId === badId) {
+        m.rootFolderId = null;
+        m.rootFolderName = null;
+        m.rootFolderPath = null;
+      }
       m.folders = {};            // rebuild the whole folder tree from Drive
       delete m.docs[relPath];    // force recreate this doc
       saveMap(BASE, m);
@@ -118,23 +178,36 @@ async function _mirrorFileInner(BASE, relPath, _healed = false) {
 }
 
 // Mirror every .md under SRC_DIR (runs inside one queued task → no folder races).
-async function _mirrorAllInner(BASE) {
+async function _mirrorAllInner(BASE, opts = {}) {
+  const onStart = typeof opts.onStart === 'function' ? opts.onStart : null;
+  const onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null;
+  const onFinish = typeof opts.onFinish === 'function' ? opts.onFinish : null;
+  await assertMirrorReady(BASE); // fail fast on auth/scope/folder issues
   const files = listMd(BASE);
   let created = 0, updated = 0, skipped = 0, errors = [];
-  for (const rel of files) {
+  if (onStart) onStart({ total: files.length });
+  for (let i = 0; i < files.length; i++) {
+    const rel = files[i];
     try {
       const r = await _mirrorFileInner(BASE, rel); // direct call (already serialized by caller)
       if (r.skipped) skipped++;
       else if (r.action === 'created') created++;
       else updated++;
-    } catch (e) { errors.push({ file: rel, error: e.message }); }
+      if (onProgress) onProgress({ index: i + 1, total: files.length, relPath: rel, result: r, counters: { created, updated, skipped, errors: errors.length } });
+    } catch (e) {
+      const err = { file: rel, error: e.message };
+      errors.push(err);
+      if (onProgress) onProgress({ index: i + 1, total: files.length, relPath: rel, error: err, counters: { created, updated, skipped, errors: errors.length } });
+    }
   }
-  return { total: files.length, created, updated, skipped, errors };
+  const summary = { total: files.length, created, updated, skipped, errors };
+  if (onFinish) onFinish(summary);
+  return summary;
 }
 
 // Public, serialized entry points
 function mirrorFile(BASE, relPath) { return enqueue(() => _mirrorFileInner(BASE, relPath)); }
-function mirrorAll(BASE)           { return enqueue(() => _mirrorAllInner(BASE)); }
+function mirrorAll(BASE, opts)     { return enqueue(() => _mirrorAllInner(BASE, opts)); }
 
 // True if a watcher path (relative to the PRD watch dir) is a markdown file we mirror.
 function isMirrorable(filename) { return /\.md$/i.test(filename || ''); }

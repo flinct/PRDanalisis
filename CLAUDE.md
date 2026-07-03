@@ -14,7 +14,7 @@ Sebelum mengerjakan apapun, baca dan ikuti:
 Rules/agent-instruction.md
 ```
 
-File ini adalah **master workflow** — berisi: deteksi tipe tugas, rule mana yang harus dimuat, cara muat konteks produk, dan cara eksekusi.
+File ini adalah **master workflow** — berisi: deteksi tipe tugas, **Phase 0 change intake & classification**, rule mana yang harus dimuat, cara muat konteks produk, dan cara eksekusi.
 
 ---
 
@@ -37,6 +37,7 @@ PRDanalisis/
 ├── Rules/                       ← semua rule files (wajib baca sesuai tipe tugas)
 │   ├── agent-instruction.md     ← ENTRY POINT — baca ini pertama
 │   ├── workflow-rule.md
+│   ├── requirements-lifecycle-rule.md
 │   ├── structure-rule.md
 │   ├── qa-analysis-rule.md
 │   ├── impact-analysis-rule.md
@@ -49,30 +50,26 @@ PRDanalisis/
 │   ├── memory-update-rule.md
 │   ├── global-memory-write-rule.md
 │   └── global-memory-update-rule.md
-├── Memory/                      ← product context & analysis (muat sesuai kebutuhan)
+├── Memory/                      ← canonical product context, architecture refs, status summary, dan navigation index
 │   ├── README.md                ← memory index — baca untuk navigasi
 │   ├── global-memory.md         ← canonical product rules (always load)
+│   ├── reference-index.md       ← pointer ke reusable PRD analysis references di `Assessments/reference/`
 │   ├── CLAUDE-be.md             ← BE architecture reference
 │   ├── CLAUDE-fe.md             ← FE architecture reference
-│   ├── conversation-prd-cross-analysis.md
-│   ├── conversation-sla-rlt-frt-ttc-analysis.md
 │   ├── conversation-undeveloped-features-analysis.md
-│   ├── conversation-v1-vs-v2-comparison.md
-│   ├── sla-conversation-ticket.md
-│   ├── ticket-v1-vs-v2-comparison.md
-│   ├── whatsapp-web-v1-vs-v2-comparison.md
-│   ├── contact-context-visibility.md
 │   ├── comprehensive-undeveloped-features-analysis.md
-│   └── impact-linked-chat-bubble-patch.md
+│   ├── impact-linked-chat-bubble-patch.md
+│   └── qa-tooling.md
 ├── PRD/                         ← source PRD files per domain
 │   ├── Conversationv2/          ← SOURCE OF TRUTH (V1 deprecated)
 │   ├── ticketv2/                ← SOURCE OF TRUTH (V1 deprecated)
 │   ├── Whatsapp web v2/         ← SOURCE OF TRUTH (V1 deprecated)
 │   ├── Broadcast/
 │   └── Contact/
-└── Assessments/                 ← hasil analisa permanen (Assessment Reports)
+└── Assessments/                 ← assessment reports + reusable PRD analysis references
+    ├── reference/              ← comparison, deep-dive, loophole map (non-decision-bearing)
     └── templates/
-        └── Setup/              ← operational workflow templates (assessment, QA pre/post, reviewer, automation mapping)
+        └── Setup/              ← operational workflow templates (change intake, assessment, QA pre/post, reviewer, automation mapping)
 ```
 
 ---
@@ -99,6 +96,7 @@ PRDanalisis/
 
 | Tipe Tugas | Rule Wajib |
 |---|---|
+| Requirement / Change Intake | `requirements-lifecycle-rule.md`, `impact-analysis-rule.md` (jika shared behavior / removal / blast radius besar) |
 | PRD Analysis / Review | `qa-analysis-rule.md`, `impact-analysis-rule.md` |
 | PRD Writing | `prd-writing-rule.md`, `qa-analysis-rule.md` |
 | Test Case / QA / UAT | `test-case-rule.md`, `qa-analysis-rule.md` |
@@ -114,14 +112,17 @@ PRDanalisis/
 ## Memory Load Priority
 
 1. **Selalu load:** `Memory/global-memory.md`
-2. **Load jika menyentuh BE:** `Memory/CLAUDE-be.md`
-3. **Load jika menyentuh FE:** `Memory/CLAUDE-fe.md`
-4. **Load sesuai domain:** lihat `Memory/README.md` untuk navigasi
+2. **Load jika butuh reusable PRD deep-dive / comparison:** `Memory/reference-index.md`
+3. **Load jika menyentuh BE:** `Memory/CLAUDE-be.md`
+4. **Load jika menyentuh FE:** `Memory/CLAUDE-fe.md`
+5. **Load sesuai domain:** lihat `Memory/README.md` dan `Memory/reference-index.md` untuk navigasi
 
 ---
 
 ## Workflow Notes (Current Canonical)
 
+- **Phase 0 — Change Intake & Classification** wajib dijalankan untuk request yang menambah, mengubah, membuang, atau merevive behavior / PRD lama sebelum draft PRD v0 atau Assessment Report dibuat.
+- Untuk feature yang sudah punya brief, perubahan lanjutan harus **update Change Intake Brief dulu** sebelum patch PRD, Assessment Report, atau QA artifacts.
 - Logical nama artefak analisa permanen adalah **Assessment Report**.
 - Persisted filename saat ini masih boleh memakai suffix `-qa-assessment.md` untuk kompatibilitas struktur repo.
 - **Analyst** adalah owner default untuk Assessment Report.
@@ -129,7 +130,7 @@ PRDanalisis/
 - **QA output dipisah dua fase**:
   - pre-implementation: review PRD, regression impact, coverage/test strategy, automation candidate mapping
   - post-implementation: regression result, automation alignment, coverage confirmation, uncovered gap/defect note
-- Template operasional workflow ada di `Assessments/templates/Setup/`.
+- Template operasional workflow ada di `Assessments/templates/Setup/`, termasuk `change-intake-brief-template.md` untuk Phase 0.
 
 ---
 

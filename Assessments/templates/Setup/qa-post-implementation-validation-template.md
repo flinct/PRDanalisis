@@ -9,6 +9,7 @@
 # QA Post-Implementation Validation: <Feature Name>
 
 > **Artifact Type:** QA Post-Implementation Validation  
+> **Source Change Intake Brief:** `<path-to-change-intake-brief>`  
 > **Source PRD:** `<path-to-prd>`  
 > **Source Assessment Report:** `<path-to-assessment-report>`  
 > **Source QA Pre-Implementation Review:** `<path-to-pre-implementation-review>`  
@@ -38,6 +39,7 @@
 
 | Item | Path / Reference | Status | Notes |
 |------|------------------|--------|-------|
+| Change Intake Brief |  | Available / Missing / Not Applicable |  |
 | Frozen PRD |  | Available / Missing |  |
 | Assessment Report |  | Available / Missing |  |
 | QA Pre-Implementation Review |  | Available / Missing |  |

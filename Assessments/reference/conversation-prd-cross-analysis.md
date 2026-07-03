@@ -3,7 +3,7 @@
 > Fungsi file ini: analisa detail lintas-PRD, loophole, conflict, impact area, dan catatan QA mendalam untuk domain Conversation.
 >
 > **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
-> Referensi V2 file number: lihat `Memory/conversation-v1-vs-v2-comparison.md`.
+> Referensi V2 file number: lihat `Assessments/reference/conversation-v1-vs-v2-comparison.md`.
 
 ## Structure
 
@@ -384,7 +384,7 @@ Production document mengkonfirmasi bahwa semua filter field berikut sudah exist 
 
 - File ini menyimpan analisa detail, bukan ringkasan global.
 - Untuk ringkasan global dan canonical rules, lihat `Memory/global-memory.md`.
-- Untuk analisis detail SLA/RLT/FRT/TTC, lihat `Memory/conversation-sla-rlt-frt-ttc-analysis.md`.
+- Untuk analisis detail SLA/RLT/FRT/TTC, lihat `Assessments/reference/conversation-sla-rlt-frt-ttc-analysis.md`.
 - **Source of truth:** V2 (`PRD/Conversationv2/`). V1 deprecated.
 
 ---

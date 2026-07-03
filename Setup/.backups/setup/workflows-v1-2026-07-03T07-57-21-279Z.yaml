@@ -1,0 +1,104 @@
+version: 2
+workflow_profile: default
+modes:
+  full_lane:
+    id: standard-multi-agent-v2
+    description: Full requirement lane with Phase 0 change-intake, then full PRD → analysis → QA → review.
+    steps:
+      - orchestrator
+      - change_intake
+      - prd_v0
+      - analyst
+      - reviewer_gate_a
+      - prd_writer
+      - qa_pre
+      - reviewer_gate_b
+      - coder_automation
+      - qa_post
+      - reviewer_gate_c
+    gates:
+      gate_a:
+        reviewer_role: reviewer
+        input_roles:
+          - analyst
+        input_artifacts:
+          - Change Intake Brief
+          - Assessment Report
+          - PRD v0
+      gate_b:
+        reviewer_role: reviewer
+        input_roles:
+          - prd_writer
+          - qa_agent
+        input_artifacts:
+          - Change Intake Brief
+          - PRD requirement-ready
+          - Assessment Report
+          - QA Pre-Implementation Review
+          - coverage / testcase strategy
+          - automation candidate mapping
+      gate_c:
+        reviewer_role: reviewer
+        input_roles:
+          - coder_automation
+          - qa_agent
+        input_artifacts:
+          - implementation output
+          - QA Post-Implementation Validation
+    freeze:
+      enabled: true
+      starts_after: reviewer_gate_b
+  fast_lane:
+    id: quick-multi-agent-v2
+    description: Short lane with Phase 0 change-intake, quick assessment, then implementation.
+    steps:
+      - orchestrator
+      - change_intake
+      - quick_assessment
+      - reviewer_gate_b
+      - coder_automation
+      - qa_post
+      - reviewer_gate_c
+    gates:
+      gate_b:
+        reviewer_role: reviewer
+        input_roles:
+          - analyst
+          - qa_agent
+        input_artifacts:
+          - Change Intake Brief
+          - quick assessment
+      gate_c:
+        reviewer_role: reviewer
+        input_roles:
+          - coder_automation
+          - qa_agent
+        input_artifacts:
+          - implementation output
+          - QA Post-Implementation Validation
+    freeze:
+      enabled: true
+      starts_after: reviewer_gate_b
+routing:
+  task_type_to_mode:
+    requirement_lifecycle: full_lane
+    prd_new: full_lane
+    prd_patch_major: full_lane
+    prd_rewrite: full_lane
+    revive_undeveloped_prd: full_lane
+    deprecation_removal: full_lane
+    behavior_change: full_lane
+    automation_behavior_sensitive: full_lane
+    cross_domain_change: full_lane
+    automation_minor: fast_lane
+    testcase_patch_small: fast_lane
+    bugfix_narrow: fast_lane
+fallbacks:
+  if_agent_missing:
+    change_intake:
+      - analyst
+      - orchestrator
+    prd_v0: prd_writer
+    quick_assessment:
+      - analyst
+      - qa_agent

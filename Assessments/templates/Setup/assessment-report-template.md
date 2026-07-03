@@ -12,11 +12,12 @@
 > **Assessment Type:** Type 1 — Feature Development Analysis / Type 2 — Bug Fix Analysis / Type 3 — Interconnection Analysis  
 > **Owner:** Analyst  
 > **Source PRD / Source Input:** `<path-to-prd-or-request-or-bug-report>`  
+> **Source Change Intake Brief:** `Assessments/<domain>/<feature-slug>/<feature-slug>-change-intake-brief.md` / `not-applicable`  
 > **Assessment Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`  
 > **Version:** `v1.0`  
 > **Previous Version:** `none` / `<path-to-previous-version>`  
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
-> **Reference Memory:** `Memory/global-memory.md`, `<other-memory-files-if-used>`  
+> **Reference Context:** `Memory/global-memory.md`, `Assessments/reference/<reference-file>.md`, `<other-context-if-used>`  
 > **Tanggal Analisa:** YYYY-MM-DD  
 > **Status:** Draft / Reviewed / Approved / Superseded
 
@@ -37,6 +38,10 @@
 **Objective:**
 
 **Business Context:**
+
+**Change Class / Routing Decision from Brief:**
+
+**Protected Existing Behavior from Brief:**
 
 **Scope In:**
 - 

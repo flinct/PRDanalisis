@@ -1,6 +1,6 @@
 # Global Memory
 
-> Fungsi: ringkasan global/canonical context produk, dependency utama, summary implementasi penting. Analisa detail lintas-PRD di `Memory/conversation-prd-cross-analysis.md` dan `Memory/conversation-sla-rlt-frt-ttc-analysis.md`.
+> Fungsi: ringkasan global/canonical context produk, dependency utama, summary implementasi penting. Analisa detail lintas-PRD ada di `Assessments/reference/` dan dapat dinavigasi lewat `Memory/reference-index.md`.
 >
 > **Source of Truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) sudah deprecated.
 > **Source of Truth:** Ticket V2 (`PRD/ticketv2/`). V1 (`PRD/Ticket/`) sudah deprecated.
@@ -375,6 +375,6 @@ Mode belum final — perlu keputusan PM/Engineering.
 - **Source of truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
 - **Source of truth:** Ticket V2 (`PRD/ticketv2/`). V1 (`PRD/Ticket/`) deprecated.
 - **Source of truth:** WhatsApp Web V2 (`PRD/Whatsapp web v2/`). V1 (`PRD/Whatsapp web/`) deprecated.
-- V1 vs V2 comparisons: `Memory/conversation-v1-vs-v2-comparison.md`, `Memory/ticket-v1-vs-v2-comparison.md`, `Memory/whatsapp-web-v1-vs-v2-comparison.md`.
+- V1 vs V2 comparisons: `Assessments/reference/conversation-v1-vs-v2-comparison.md`, `Assessments/reference/ticket-v1-vs-v2-comparison.md`, `Assessments/reference/whatsapp-web-v1-vs-v2-comparison.md`.
 - BE architecture & implementation: `Memory/CLAUDE-be.md`.
 - FE architecture & implementation: `Memory/CLAUDE-fe.md`.

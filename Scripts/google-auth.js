@@ -11,9 +11,13 @@
 const path = require('path');
 const fs   = require('fs');
 
-const SCOPES = [
+const API_SCOPES = [
   'https://www.googleapis.com/auth/documents',
   'https://www.googleapis.com/auth/drive',
+];
+
+const SCOPES = [
+  ...API_SCOPES,
   'openid',
   'email',
 ];
@@ -60,18 +64,59 @@ function oauthClient(BASE) {
   return new google.auth.OAuth2(c.client_id, c.client_secret, c.redirect_uri);
 }
 
-// Authorized client (with stored token). Throws 401 if not logged in.
+function readStoredToken(BASE) {
+  const tp = tokenPath(BASE);
+  if (!fs.existsSync(tp)) return null;
+  try { return JSON.parse(fs.readFileSync(tp, 'utf8')); }
+  catch { return null; }
+}
+
+function parseScopeSet(scope) {
+  return new Set(String(scope || '').split(/\s+/).map(s => s.trim()).filter(Boolean));
+}
+
+function analyzeStoredToken(BASE) {
+  const token = readStoredToken(BASE);
+  const connectedRaw = !!(token && (token.refresh_token || token.access_token));
+  const email = token && token.email || null;
+  const scope = token && token.scope || '';
+  const grantedScopes = Array.from(parseScopeSet(scope));
+  const missingScopes = API_SCOPES.filter(s => !grantedScopes.includes(s));
+  const scopeOk = connectedRaw && missingScopes.length === 0;
+  const needsReconnect = connectedRaw && !scopeOk;
+  const error = needsReconnect
+    ? 'Token Google lama belum punya izin Google Docs + Google Drive. Klik reconnect/login ulang dari Settings.'
+    : null;
+  return { token, connectedRaw, email, scope, grantedScopes, missingScopes, scopeOk, needsReconnect, error };
+}
+
+function assertRequiredScopes(BASE) {
+  const info = analyzeStoredToken(BASE);
+  if (!info.connectedRaw) {
+    const e = new Error('Not connected to Google — open Settings and Login');
+    e.status = 401;
+    throw e;
+  }
+  if (!info.scopeOk) {
+    const e = new Error('Google token belum punya izin Docs/Drive. Reconnect dari Settings lalu approve akses Google Docs + Google Drive.');
+    e.status = 401;
+    e.missingScopes = info.missingScopes;
+    throw e;
+  }
+  return info;
+}
+
+// Authorized client (with stored token). Throws 401 if not logged in or token lacks scopes.
 function getAuthClient(BASE) {
   const client = oauthClient(BASE);
-  const tp = tokenPath(BASE);
-  if (!fs.existsSync(tp)) { const e = new Error('Not connected to Google — open Settings and Login'); e.status = 401; throw e; }
-  const tok = JSON.parse(fs.readFileSync(tp, 'utf8'));
+  const info = assertRequiredScopes(BASE);
+  const tok = info.token;
   client.setCredentials(tok);
   // Persist refreshed access tokens (keep refresh_token + email)
   client.on('tokens', t => {
     try {
       const merged = { ...tok, ...t };
-      fs.writeFileSync(tp, JSON.stringify(merged, null, 2));
+      fs.writeFileSync(tokenPath(BASE), JSON.stringify(merged, null, 2));
     } catch {}
   });
   return client;
@@ -86,6 +131,7 @@ async function handleCallback(BASE, code) {
   const { google } = require('googleapis');
   const client = oauthClient(BASE);
   const { tokens } = await client.getToken(code);
+  if (!tokens.scope) tokens.scope = SCOPES.join(' ');
   client.setCredentials(tokens);
   let email = null;
   try {
@@ -106,13 +152,20 @@ async function handleCallback(BASE, code) {
 function status(BASE) {
   let oauthConfigured = false, redirectUri = null;
   try { const c = loadCreds(BASE); oauthConfigured = !!c; redirectUri = c && c.redirect_uri; } catch {}
-  let connected = false, email = null;
-  const tp = tokenPath(BASE);
-  if (fs.existsSync(tp)) {
-    try { const t = JSON.parse(fs.readFileSync(tp, 'utf8')); connected = !!(t.refresh_token || t.access_token); email = t.email || null; }
-    catch {}
-  }
-  return { oauthConfigured, connected, email, redirectUri };
+  const info = analyzeStoredToken(BASE);
+  return {
+    oauthConfigured,
+    redirectUri,
+    connected: info.connectedRaw && info.scopeOk,
+    connectedRaw: info.connectedRaw,
+    email: info.email,
+    scopeOk: info.scopeOk,
+    needsReconnect: info.needsReconnect,
+    missingScopes: info.missingScopes,
+    grantedScopes: info.grantedScopes,
+    scope: info.scope,
+    error: info.error,
+  };
 }
 
 function logout(BASE) {
@@ -121,4 +174,14 @@ function logout(BASE) {
   return { ok: true };
 }
 
-module.exports = { getAuthClient, getAuthUrl, handleCallback, status, logout, SCOPES };
+module.exports = {
+  getAuthClient,
+  getAuthUrl,
+  handleCallback,
+  status,
+  logout,
+  SCOPES,
+  API_SCOPES,
+  analyzeStoredToken,
+  assertRequiredScopes,
+};

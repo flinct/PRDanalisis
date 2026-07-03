@@ -1,7 +1,8 @@
 # **PRODUCT REQUIREMENT DOCUMENT**
 
 **Feature**: Roles Management & Custom RBAC  
-**Product Manager**: Yusril Ibnu Maulana  
+**Product Manager**: Dany Christian  
+**Author**: Dany Christian  
 **Engineering Lead**: Naftal  
 **Design Lead**: Resky
 
@@ -10,13 +11,14 @@
 | Version | Date (Asia/Jakarta) | Author | Changes |
 | ----- | ----- | ----- | ----- |
 | v1.0 | 2026-04-09 | Yusril Ibnu Maulana | Initial PRD for create role, edit role, default roles, custom RBAC, and data privacy access. |
+| v1.1 | 2026-06-22 | Dany Christian | Clarified owner-ceiling-aware role authoring constraints: tenant-side role editor only shows permissions allowed by company owner, blocks save above owner ceiling, adds legacy over-ceiling handling notes, and aligns tenant-side role authoring with superAdmin-controlled company permission governance. |
 
 ## **2\. Overview**
 
 | Item | Description |
 | ----- | ----- |
 | Purpose | Provide a structured and user-friendly Roles Management system so admins can create, edit, and manage access control without directly handling raw permission keys. |
-| Scope | Support default roles, custom roles, grouped permission UI, visibility scope selection, action checkboxes, data privacy masking, dependency validation, and role assignment safety. |
+| Scope | Support default roles, custom roles, grouped permission UI, visibility scope selection, action checkboxes, data privacy masking, dependency validation, role assignment safety, and owner-ceiling-aware role authoring constraints. |
 
 ### **Scope**
 
@@ -31,6 +33,8 @@
 | Configure grouped RBAC by module. | Backend raw permission editor for end users. |
 | Configure data privacy access for phone and email. | Additional privacy fields beyond phone and email. |
 | Persist role audit logs. | Cross-workspace shared role templates. |
+| Filter visible permission options based on company owner permission ceiling. | Editing company owner permission from tenant-side settings. |
+| Block tenant-side role saves that exceed owner ceiling. | Auto-restoring member permissions when owner permission increases again. |
 
 ## **3\. Problem Statement**
 
@@ -66,6 +70,8 @@
 | US-011 | P1 | As an Admin, I want to delete custom roles so that old or unused roles can be removed. | 1\. Given I open a custom role action menu, When I click “Hapus role”, Then a confirmation dialog appears. 2\. Given the role is assigned to active members, When I confirm deletion, Then the system blocks deletion until those members are reassigned to another role. 3\. Given the role is unassigned, When deletion succeeds, Then the role disappears from the role list and an audit record is created. |
 | US-012 | P1 | As an Admin, I want to restrict all sections quickly so that I can create a minimal role faster. | 1\. Given I open role detail, When I click “Batasi semua”, Then all module switches turn off except mandatory protected defaults for the Admin role. 2\. Given I use “Batasi semua” on a non-Admin role, When completed, Then the role becomes highly restricted but still saveable if minimum required fields are valid. 3\. Given I use “Batasi semua”, When the action completes, Then the UI shows the new restricted state immediately. |
 | US-013 | P1 | As an Admin, I want audit logs for role changes so that permission changes are traceable. | 1\. Given I create, edit, duplicate, or delete a role, When the action succeeds, Then an audit entry is stored with actor, timestamp, role name, and changed fields. 2\. Given a permission matrix changes, When saved, Then audit captures old and new values. 3\. Given an action fails, When no data changes, Then no success audit is created. |
+| US-014 | P0 | As a tenant admin editing roles, I want to see only permissions allowed by the company owner so that I cannot grant access above the company ceiling. | 1\. Given I open role detail, When permission sections load, Then permissions not owned by the company owner are hidden from the UI. 2\. Given the company owner lacks a visibility option or action, When I edit a role, Then I cannot select or even see that disallowed option. 3\. Given a stale client payload still tries to save permissions above the owner ceiling, When save is submitted, Then the system blocks the save and returns a clear error. |
+| US-015 | P1 | As a tenant admin, I want the role editor to reflect owner-ceiling changes safely so that legacy over-ceiling permissions do not keep slipping through. | 1\. Given owner ceiling has been lowered previously, When I open an existing role that used to have higher permissions, Then the UI reflects only currently allowed permission options. 2\. Given legacy stored role data still contains over-ceiling permissions, When I edit and save the role, Then save is blocked or corrected according to final migration policy, and the UI explains the owner-ceiling restriction. 3\. Given owner permission increases later, When I reopen the role editor, Then previously removed permissions do not auto-return unless explicitly reconfigured. |
 
 ## **6\. Functional Requirements**
 
@@ -79,9 +85,10 @@
 | Ticket Permissions | FR-031: Inbox module MUST support action permissions for Send messages, Change status, Manage assignee, Manage macros, Manage notes, Mark as read, Mark as spam, Pin conversation, Pin message, Reopen conversation, Star conversation, View client data, Take screenshot, Assign conversation, Edit own message, Delete own message, Edit team message, and Delete team message. FR-032: Ticket visibility and ticket action permissions MUST integrate with Ticket Access behavior defined in the ticket RBAC design. FR-033: “Claim tickets” MUST represent taking unassigned tickets from team queue. FR-034: “Return tickets to queue” MUST represent removing assignment and moving ticket back to unassigned queue. |
 | Data Privacy | FR-035: Phone privacy MUST support exactly two modes: Full and Masked. FR-036: Email privacy MUST support exactly two modes: Full and Masked. FR-037: Selecting Masked MUST hide full values in all affected product surfaces for users with that role. FR-038: Selecting Full MUST allow full display subject to module access and client data visibility rules. |
 | Dependency Rules | FR-039: System MUST validate permission dependencies before save. FR-040: “Claim tickets” MUST require ticket visibility mode that includes queue access. FR-041: “Assign tickets” MUST require Ticket visibility mode All tickets or Team tickets or Assigned tickets plus team queue, depending on final policy mapping. FR-042: “Return tickets to queue” MUST require Ticket action Claim tickets or Assign tickets, based on final permission dependency rule. FR-043: “Pull conversations” visibility mode MUST expose queue-oriented conversation handling behavior. FR-044: If a visibility or action selection becomes invalid due to another change, the UI MUST auto-disable or block save with clear guidance. FR-045: System MUST ensure at least one valid visibility mode remains selected in modules that require scoped access. |
-| Default Role Rules | FR-046: Admin role MUST always resolve to full access for all configurable modules in scope. FR-047: Supervisor default role MUST ship with a predefined matrix that can later be edited by admin users. FR-048: Agent default role MUST ship with a predefined matrix that can later be edited by admin users. FR-049: Default role matrices MUST be documented and visible to product, design, QA, and engineering for consistent rollout. |
-| Role Assignment Safety | FR-050: When a role is edited and saved, all members assigned to that role MUST inherit the new role permissions immediately or at next permission refresh within defined latency. FR-051: System MUST show a warning before saving changes that affect existing members. FR-052: When deleting a custom role, system MUST prevent deletion if any member is still assigned to that role. FR-053: System MUST require reassignment to another existing role before deletion of an assigned custom role. |
-| Auditability | FR-054: System MUST store audit logs for create, edit, duplicate, and delete role actions. FR-055: Audit entries MUST include actor, role identifier, role name, changed fields, timestamp, and result status. FR-056: Audit entries MUST include permission matrix differences for role updates. |
+| Default Role Rules | FR-046: Admin role MUST always resolve to full access for all configurable modules in scope, subject to any higher-level company/subscription governance rules defined outside tenant-side settings. FR-047: Supervisor default role MUST ship with a predefined matrix that can later be edited by admin users within allowed ceiling. FR-048: Agent default role MUST ship with a predefined matrix that can later be edited by admin users within allowed ceiling. FR-049: Default role matrices MUST be documented and visible to product, design, QA, and engineering for consistent rollout. |
+| Owner Ceiling Constraints | FR-050: Tenant-side role authoring MUST only expose permission options that are currently allowed by the company owner permission ceiling. FR-051: Tenant-side role authoring MUST block saving any permission set above the company owner ceiling, including stale or manually crafted payloads. FR-052: If a permission option is not owned by the company owner, the UI MUST hide that option rather than showing it as selectable. FR-053: Existing roles opened after owner-ceiling reduction MUST be evaluated against the current ceiling before save. FR-054: Owner permission itself MUST NOT be editable from tenant-side role settings and is governed from superAdmin only. |
+| Role Assignment Safety | FR-055: When a role is edited and saved, all members assigned to that role MUST inherit the new role permissions immediately or at next permission refresh within defined latency. FR-056: System MUST show a warning before saving changes that affect existing members. FR-057: When deleting a custom role, system MUST prevent deletion if any member is still assigned to that role. FR-058: System MUST require reassignment to another existing role before deletion of an assigned custom role. |
+| Auditability | FR-059: System MUST store audit logs for create, edit, duplicate, and delete role actions. FR-060: Audit entries MUST include actor, role identifier, role name, changed fields, timestamp, and result status. FR-061: Audit entries MUST include permission matrix differences for role updates. |
 
 ## **7\. Error Handling**
 
@@ -99,6 +106,8 @@
 | EH-010 | Invalid excluded team inbox | Prevent save or clear invalid value if deleted externally. | Show “Team inbox tidak valid”. |
 | EH-011 | Permission mapping missing | Block save and log internal error. | Show “Konfigurasi permission tidak tersedia”. |
 | EH-012 | Restrict all action failed | Keep previous state and restore UI. | Show “Gagal membatasi semua permission”. |
+| EH-013 | Save above owner ceiling | Prevent save and keep draft state unresolved. | Show “Permission melebihi batas akses owner company”. |
+| EH-014 | Legacy role contains over-ceiling permission | Prevent unsafe save or strip invalid state according to migration policy. | Show “Beberapa permission role sudah tidak sesuai dengan batas akses owner”. |
 
 ## **8\. Edge Cases**
 
@@ -114,6 +123,8 @@
 | EC-008 | A role with excluded team visibility is assigned to users with no team membership. | Result follows explicit scope rules and may return empty data. | No crash. Empty states still valid. |
 | EC-009 | A role has analytics access but no report download capability if report action exists later. | Page remains accessible with limited actions. | Read-only analytics UI if needed. |
 | EC-010 | A member using a role is active in session when role changes. | Access refreshes without requiring manual logout beyond standard session policy. | Non-blocking refresh behavior. |
+| EC-011 | Owner ceiling is lowered and tenant admin reopens an old role. | UI must no longer show disallowed permissions and must not allow role to exceed owner ceiling. | Hidden options + restriction guidance. |
+| EC-012 | Owner ceiling is raised again after previous downgrade. | Previously removed permissions do not automatically return to roles. | Admin must reconfigure explicitly if still allowed. |
 
 ## **9\. UI & UX Requirements**
 
@@ -133,6 +144,7 @@
 | Default Role Protection UI | Non-deletable state and Admin permission lock state. | Admin sees protected states on default roles and read-only Admin permissions. | US-003, US-004 |
 | Duplicate Role Flow | Action menu item that opens duplicated role draft. | Admin duplicates then renames and saves. | US-010 |
 | Delete Role Confirmation | Confirmation modal with member assignment warning. | Admin clicks delete and sees blocking or confirmation state. | US-011 |
+| Owner Ceiling Filter | Permission sections filtered by current owner ceiling. | Tenant admin opens role detail and only sees allowed options. | US-014, US-015 |
 | Empty State | Empty state for role list if only defaults or if custom roles absent. | Page still shows default roles and a CTA to create new role. | US-001 |
 | Error State | Error state for failed role detail or failed role list load. | User sees retry action and preserved last safe state if available. | US-002, US-013 |
 
@@ -151,6 +163,7 @@
 | Action Checkbox | Checkbox | 1\. Boolean. 2\. Must satisfy dependency rules before save. | No |
 | Phone Privacy | Radio | 1\. Must be Full or Masked. 2\. Exactly one value. | Yes |
 | Email Privacy | Radio | 1\. Must be Full or Masked. 2\. Exactly one value. | Yes |
+| Owner Ceiling Filter Set | Derived permission set | 1\. Derived from company owner current effective permission. 2\. Not editable in tenant-side role settings. 3\. Used to filter visible permission options. | System field |
 
 ## **11\. Non-Functional Requirements**
 
@@ -168,11 +181,12 @@
 | Dependency or Risk | Owner | Impact | Mitigation |
 | ----- | ----- | ----- | ----- |
 | Permission mapping layer between grouped UI and raw backend keys | Engineering | High | Maintain a single source of truth mapping table and QA regression tests. |
-| Existing role model compatibility with new grouped RBAC UI | Engineering | High | Provide migration logic for default roles and current assigned members. |
+| Existing role model compatibility with new grouped RBAC UI and owner ceiling filter | Engineering | High | Provide migration logic for default roles and current assigned members. |
 | Misconfiguration by admins | Product | Medium | Use safe defaults, helper text, dependency validation, and protected default roles. |
 | Concurrency on role editing | Engineering | Medium | Add versioning or conflict resolution strategy. |
 | Missing dependency rules | Product and Engineering | High | Define and enforce explicit validation before save. |
 | Data privacy masking inconsistency across modules | Engineering | High | Centralize masking behavior at permission resolution layer. |
+| Hidden-option drift between FE and BE | Engineering | High | FE filters by owner ceiling and BE re-validates payload against same source of truth. |
 
 ## **13\. Success Metrics**
 
@@ -203,6 +217,7 @@
 | Default roles cannot be deleted. | Some customers may want full replacement, but this is blocked to preserve safe onboarding. |
 | Grouped RBAC abstracts raw backend permission keys. | Advanced debugging may require internal tooling. |
 | Data privacy only covers phone and email in this phase. | Other PII masking remains outside this scope. |
+| Tenant-side roles cannot author permissions above current owner ceiling. | Some previously visible options may disappear after owner governance changes. |
 
 ## **16\. Appendix**
 

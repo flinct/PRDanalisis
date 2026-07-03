@@ -9,6 +9,7 @@
 # QA Pre-Implementation Review: <Feature Name>
 
 > **Artifact Type:** QA Pre-Implementation Review  
+> **Source Change Intake Brief:** `<path-to-change-intake-brief>`  
 > **Source PRD:** `<path-to-prd>`  
 > **Source Assessment Report:** `<path-to-assessment-report>`  
 > **Artifact Path:** `Test/<domain>/<feature-slug>-qa-pre-implementation-review.md`  
@@ -38,6 +39,7 @@
 
 | Item | Path / Reference | Status | Notes |
 |------|------------------|--------|-------|
+| Change Intake Brief |  | Available / Missing / Not Applicable |  |
 | PRD |  | Available / Missing |  |
 | Assessment Report |  | Available / Missing |  |
 | Related Memory |  | Available / Missing |  |

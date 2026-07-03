@@ -3,10 +3,136 @@
 // Auth comes from scripts/google-auth.js (OAuth2 + stored token). All calls act
 // as the logged-in user, so docs live in the user's own Drive.
 
+const path  = require('path');
+const fs    = require('fs');
 const gauth = require('./google-auth');
 
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
 const DOC_MIME    = 'application/vnd.google-apps.document';
+const DEFAULT_ROOT_FOLDER_NAME = 'PRD';
+
+function mirrorStatePath(BASE) { return path.join(BASE, '.gdocs-mirror.json'); }
+function folderConfigPath(BASE) { return path.join(BASE, 'google-drive-config.json'); }
+function emptyMirrorState() {
+  return { rootFolderId: null, rootFolderName: null, rootFolderPath: null, folders: {}, docs: {} };
+}
+function emptyFolderConfig() {
+  return { rootFolderId: null, rootFolderName: null, rootFolderPath: null };
+}
+function loadMirrorState(BASE) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(mirrorStatePath(BASE), 'utf8'));
+    return {
+      ...emptyMirrorState(),
+      ...raw,
+      folders: raw && raw.folders && typeof raw.folders === 'object' ? raw.folders : {},
+      docs: raw && raw.docs && typeof raw.docs === 'object' ? raw.docs : {},
+    };
+  } catch {
+    return emptyMirrorState();
+  }
+}
+function saveMirrorState(BASE, state) {
+  const next = {
+    ...emptyMirrorState(),
+    ...state,
+    folders: state && state.folders && typeof state.folders === 'object' ? state.folders : {},
+    docs: state && state.docs && typeof state.docs === 'object' ? state.docs : {},
+  };
+  fs.writeFileSync(mirrorStatePath(BASE), JSON.stringify(next, null, 2));
+}
+function loadFolderConfig(BASE) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(folderConfigPath(BASE), 'utf8'));
+    return {
+      ...emptyFolderConfig(),
+      ...raw,
+    };
+  } catch {
+    const legacy = loadMirrorState(BASE);
+    return {
+      rootFolderId: legacy.rootFolderId || null,
+      rootFolderName: legacy.rootFolderName || null,
+      rootFolderPath: legacy.rootFolderPath || null,
+    };
+  }
+}
+function saveFolderConfig(BASE, state) {
+  const next = {
+    ...emptyFolderConfig(),
+    ...state,
+  };
+  fs.writeFileSync(folderConfigPath(BASE), JSON.stringify(next, null, 2));
+  const mirrorState = loadMirrorState(BASE);
+  mirrorState.rootFolderId = next.rootFolderId;
+  mirrorState.rootFolderName = next.rootFolderName;
+  mirrorState.rootFolderPath = next.rootFolderPath;
+  saveMirrorState(BASE, mirrorState);
+}
+
+function envFolderSetting() {
+  const folderId = (process.env.GDRIVE_FOLDER_ID || '').trim() || null;
+  const folderName = (process.env.GDRIVE_FOLDER_NAME || '').trim() || null;
+  if (!folderId && !folderName) return null;
+  return {
+    folderId,
+    folderName,
+    folderPath: folderName || folderId,
+    source: 'env',
+    locked: true,
+    isDefault: false,
+  };
+}
+
+function currentFolderSetting(BASE) {
+  const env = envFolderSetting();
+  if (env) return env;
+  const state = loadFolderConfig(BASE);
+  if (state.rootFolderId || state.rootFolderName) {
+    const fallbackName = state.rootFolderName || (state.rootFolderId ? DEFAULT_ROOT_FOLDER_NAME : null);
+    return {
+      folderId: state.rootFolderId || null,
+      folderName: fallbackName,
+      folderPath: state.rootFolderPath || fallbackName || state.rootFolderId || DEFAULT_ROOT_FOLDER_NAME,
+      source: 'saved',
+      locked: false,
+      isDefault: false,
+    };
+  }
+  return {
+    folderId: null,
+    folderName: DEFAULT_ROOT_FOLDER_NAME,
+    folderPath: DEFAULT_ROOT_FOLDER_NAME,
+    source: 'default',
+    locked: false,
+    isDefault: true,
+  };
+}
+
+function rememberResolvedRoot(BASE, info) {
+  if (!info || envFolderSetting()) return;
+  const state = loadFolderConfig(BASE);
+  const nextId   = info.id || null;
+  const nextName = info.name || null;
+  const nextPath = info.path || nextName || nextId || DEFAULT_ROOT_FOLDER_NAME;
+  if (state.rootFolderId === nextId && state.rootFolderName === nextName && state.rootFolderPath === nextPath) return;
+  state.rootFolderId = nextId;
+  state.rootFolderName = nextName;
+  state.rootFolderPath = nextPath;
+  saveFolderConfig(BASE, state);
+}
+
+function clearSavedRoot(BASE) {
+  if (envFolderSetting()) return;
+  saveFolderConfig(BASE, emptyFolderConfig());
+  const state = loadMirrorState(BASE);
+  state.rootFolderId = null;
+  state.rootFolderName = null;
+  state.rootFolderPath = null;
+  state.folders = {};
+  state.docs = {};
+  saveMirrorState(BASE, state);
+}
 
 function clients(BASE) {
   const { google } = require('googleapis');
@@ -19,20 +145,35 @@ function clients(BASE) {
 
 // status = auth status + which Drive folder we mirror/read
 function status(BASE) {
+  const auth = gauth.status(BASE);
+  const folder = currentFolderSetting(BASE);
   return {
-    ...gauth.status(BASE),
-    folderId:   process.env.GDRIVE_FOLDER_ID   || null,
-    folderName: process.env.GDRIVE_FOLDER_NAME || null,
+    ...auth,
+    folderId: folder.folderId,
+    folderName: folder.folderName,
+    folderPath: folder.folderPath,
+    folderSource: folder.source,
+    folderLockedByEnv: folder.locked,
   };
 }
 
+function isNotFound(e) {
+  const code = e && (e.code || (e.response && e.response.status));
+  return code === 404 || /File not found|not ?found/i.test((e && e.message) || '');
+}
+
 // ─── DRIVE FOLDER HELPERS ──────────────────────────────────────────────────────
-async function findOrCreateFolder(BASE, name, parentId) {
-  const { drive } = clients(BASE);
+async function findFolderByName(drive, name, parentId) {
   let q = `mimeType='${FOLDER_MIME}' and name='${String(name).replace(/'/g, "\\'")}' and trashed=false`;
   q += parentId ? ` and '${parentId}' in parents` : ` and 'root' in parents`;
   const found = await drive.files.list({ q, fields: 'files(id,name)', pageSize: 5 });
-  if (found.data.files && found.data.files.length) return found.data.files[0].id;
+  return found.data.files && found.data.files.length ? found.data.files[0] : null;
+}
+
+async function findOrCreateFolder(BASE, name, parentId) {
+  const { drive } = clients(BASE);
+  const found = await findFolderByName(drive, name, parentId);
+  if (found) return found.id;
   const created = await drive.files.create({
     requestBody: { name, mimeType: FOLDER_MIME, parents: parentId ? [parentId] : undefined },
     fields: 'id',
@@ -40,18 +181,140 @@ async function findOrCreateFolder(BASE, name, parentId) {
   return created.data.id;
 }
 
-async function resolveRootFolderId(drive) {
-  const id = process.env.GDRIVE_FOLDER_ID && process.env.GDRIVE_FOLDER_ID.trim();
-  if (id) return id;
-  const name = process.env.GDRIVE_FOLDER_NAME && process.env.GDRIVE_FOLDER_NAME.trim();
-  if (name) {
-    const r = await drive.files.list({
-      q: `mimeType='${FOLDER_MIME}' and name='${name.replace(/'/g, "\\'")}' and trashed=false`,
-      fields: 'files(id,name)', pageSize: 5,
-    });
-    if (r.data.files && r.data.files.length) return r.data.files[0].id;
+async function findDocsByName(BASE, name, parentId) {
+  const { drive } = clients(BASE);
+  let q = `mimeType='${DOC_MIME}' and name='${String(name).replace(/'/g, "\\'")}' and trashed=false`;
+  q += parentId ? ` and '${parentId}' in parents` : ` and 'root' in parents`;
+  const found = await drive.files.list({
+    q,
+    fields: 'files(id,name,createdTime,modifiedTime,webViewLink)',
+    orderBy: 'createdTime',
+    pageSize: 20,
+  });
+  return found.data.files || [];
+}
+
+async function getFileMeta(BASE, fileId) {
+  const { drive } = clients(BASE);
+  const r = await drive.files.get({
+    fileId,
+    fields: 'id,name,mimeType,parents,trashed',
+    supportsAllDrives: true,
+  });
+  return r.data;
+}
+
+async function fileExists(BASE, fileId) {
+  try {
+    const meta = await getFileMeta(BASE, fileId);
+    return !!(meta && meta.id && !meta.trashed);
+  } catch (e) {
+    if (isNotFound(e)) return false;
+    throw e;
   }
-  return null;
+}
+
+async function resolveRootFolder(BASE, drive = null, { createIfMissing = true } = {}) {
+  drive = drive || clients(BASE).drive;
+  const folder = currentFolderSetting(BASE);
+
+  if (folder.folderId) {
+    const info = {
+      id: folder.folderId,
+      name: folder.folderName || null,
+      path: folder.folderPath || folder.folderName || folder.folderId,
+      source: folder.source,
+      locked: folder.locked,
+      isDefault: folder.isDefault,
+    };
+    rememberResolvedRoot(BASE, info);
+    return info;
+  }
+
+  if (!folder.folderName) return null;
+
+  let found = await findFolderByName(drive, folder.folderName, null);
+  let id = found && found.id;
+  if (!id && createIfMissing) {
+    const created = await drive.files.create({
+      requestBody: { name: folder.folderName, mimeType: FOLDER_MIME },
+      fields: 'id',
+    });
+    id = created.data.id;
+  }
+  if (!id) return null;
+
+  const info = {
+    id,
+    name: folder.folderName,
+    path: folder.folderPath || folder.folderName,
+    source: folder.source,
+    locked: folder.locked,
+    isDefault: folder.isDefault,
+  };
+  rememberResolvedRoot(BASE, info);
+  return info;
+}
+
+async function listChildFolders(drive, folderId) {
+  const out = [];
+  let pageToken;
+  do {
+    const r = await drive.files.list({
+      q: `mimeType='${FOLDER_MIME}' and '${folderId}' in parents and trashed=false`,
+      fields: 'nextPageToken, files(id,name)',
+      orderBy: 'name',
+      pageSize: 1000,
+      pageToken,
+    });
+    out.push(...(r.data.files || []));
+    pageToken = r.data.nextPageToken;
+  } while (pageToken);
+  return out;
+}
+
+async function walkFolderChoices(drive, folderId, parentPath = '', depth = 0, out = []) {
+  if (depth > 8) return out;
+  const children = await listChildFolders(drive, folderId);
+  for (const f of children) {
+    const curPath = parentPath ? `${parentPath}/${f.name}` : f.name;
+    out.push({ id: f.id, name: f.name, path: curPath });
+    await walkFolderChoices(drive, f.id, curPath, depth + 1, out);
+  }
+  return out;
+}
+
+async function listFolders(BASE) {
+  const { drive } = clients(BASE);
+  return walkFolderChoices(drive, 'root');
+}
+
+async function setSelectedFolder(BASE, { folderId = null, folderName = null, folderPath = null } = {}) {
+  if (envFolderSetting()) {
+    const e = new Error('Folder Google Drive sedang dikunci oleh GDRIVE_FOLDER_ID / GDRIVE_FOLDER_NAME di environment.');
+    e.status = 409;
+    throw e;
+  }
+  const nextId = folderId ? String(folderId).trim() : null;
+  const nextName = nextId ? (folderName ? String(folderName).trim() : null) : null;
+  const nextPath = nextId ? (folderPath ? String(folderPath).trim() : (nextName || nextId)) : null;
+
+  const state = loadMirrorState(BASE);
+  const changed = state.rootFolderId !== nextId || state.rootFolderName !== nextName || state.rootFolderPath !== nextPath;
+  saveFolderConfig(BASE, {
+    rootFolderId: nextId,
+    rootFolderName: nextName,
+    rootFolderPath: nextPath,
+  });
+  state.rootFolderId = nextId;
+  state.rootFolderName = nextName;
+  state.rootFolderPath = nextPath;
+  if (changed) {
+    state.folders = {};
+    state.docs = {};
+  }
+  saveMirrorState(BASE, state);
+  return status(BASE);
 }
 
 // ─── LIST / TREE (read side) ─────────────────────────────────────────────────────
@@ -85,13 +348,19 @@ async function walkFolder(drive, folderId, depth = 0) {
 
 async function listTree(BASE) {
   const { drive } = clients(BASE);
-  const rootId = await resolveRootFolderId(drive);
-  if (rootId) return walkFolder(drive, rootId, 0);
-  const r = await drive.files.list({
-    q: `mimeType='${DOC_MIME}' and trashed=false`,
-    fields: 'files(id,name,modifiedTime)', orderBy: 'modifiedTime desc', pageSize: 1000,
-  });
-  return (r.data.files || []).map(f => ({ kind: 'file', name: f.name, path: 'gdoc:' + f.id, ext: 'gdoc', gdocId: f.id }));
+  let root = await resolveRootFolder(BASE, drive, { createIfMissing: true });
+  if (!root || !root.id) return [];
+  try {
+    return await walkFolder(drive, root.id, 0);
+  } catch (e) {
+    if (isNotFound(e) && !envFolderSetting()) {
+      clearSavedRoot(BASE);
+      root = await resolveRootFolder(BASE, drive, { createIfMissing: true });
+      if (!root || !root.id) return [];
+      return walkFolder(drive, root.id, 0);
+    }
+    throw e;
+  }
 }
 
 // ─── READ (Doc → markdown) ─────────────────────────────────────────────────────
@@ -223,7 +492,8 @@ async function overwriteStyledDoc(BASE, docId, md) {
 async function createDoc(BASE, { title, content = '', folderId } = {}) {
   const { drive } = clients(BASE);
   const name   = title || 'Untitled (QA Browser)';
-  const target = folderId || await resolveRootFolderId(drive) || undefined;
+  const root   = folderId ? null : await resolveRootFolder(BASE, drive, { createIfMissing: true });
+  const target = folderId || (root && root.id) || undefined;
   // Create the Doc directly inside the target folder (avoids a stray copy in My Drive root).
   const file = await drive.files.create({
     requestBody: { name, mimeType: DOC_MIME, parents: target ? [target] : undefined },
@@ -254,8 +524,8 @@ function webLink(docId, title) {
 }
 
 module.exports = {
-  status, listTree, readDoc, createDoc, updateDoc,
+  status, listTree, listFolders, setSelectedFolder, readDoc, createDoc, updateDoc,
   // primitives used by the mirror engine:
-  clients, findOrCreateFolder, resolveRootFolderId, buildStyledRequests,
+  clients, findOrCreateFolder, findDocsByName, getFileMeta, fileExists, resolveRootFolder, buildStyledRequests,
   applyStyled, overwriteStyledDoc, webLink, DOC_MIME, FOLDER_MIME,
 };

@@ -40,7 +40,7 @@ Portfolio repository for demonstrating structured PRD analysis, product risk map
 2. Read [`presentasi.md`](../presentasi.md) to understand the operating model.
 3. Read [`Memory/README.md`](../Memory/README.md) to understand the knowledge architecture.
 4. Review [`Memory/global-memory.md`](../Memory/global-memory.md) for canonical product rules.
-5. Check selected deep dives in `Memory/` and `Assessments/` for analysis quality.
+5. Check selected deep dives in `Assessments/reference/` and Assessment Reports di `Assessments/` for analysis quality.
 
 ## Highlight Artifacts
 
@@ -49,7 +49,7 @@ Portfolio repository for demonstrating structured PRD analysis, product risk map
 | [`Rules/qa-analysis-rule.md`](../Rules/qa-analysis-rule.md) | Defines the senior QA analysis method used across PRD, feature, bug fix, interconnection, impact, and risk scenarios. |
 | [`Rules/workflow-rule.md`](../Rules/workflow-rule.md) | Defines the required analysis order so every task starts from rules and memory before reading feature-level detail. |
 | [`Memory/global-memory.md`](../Memory/global-memory.md) | Stores canonical product rules and cross-domain risks for conversation, ticketing, WhatsApp Web, SLA, and RBAC. |
-| [`Memory/conversation-sla-rlt-frt-ttc-analysis.md`](../Memory/conversation-sla-rlt-frt-ttc-analysis.md) | Deep analysis of SLA metric definitions, conflicts, formulas, and unresolved policy decisions. |
+| [`Assessments/reference/conversation-sla-rlt-frt-ttc-analysis.md`](../Assessments/reference/conversation-sla-rlt-frt-ttc-analysis.md) | Deep analysis of SLA metric definitions, conflicts, formulas, and unresolved policy decisions. |
 | [`Memory/comprehensive-undeveloped-features-analysis.md`](../Memory/comprehensive-undeveloped-features-analysis.md) | Maps undeveloped features across Conversation, Ticket, and WhatsApp Web domains with QA and release implications. |
 | [`Test/test-contact-context-visibility.md`](../Test/test-contact-context-visibility.md) | Example of turning product/RBAC analysis into validation scope. |
 
@@ -58,10 +58,10 @@ Portfolio repository for demonstrating structured PRD analysis, product risk map
 ```text
 PRD / BRD input
   -> apply analysis rules
-  -> read global and feature memory
+  -> read global memory, feature memory, and reference analysis
   -> identify business rules, gaps, risks, and dependencies
   -> produce impact analysis and regression scope
-  -> route stable findings back into memory
+  -> route stable findings back into memory or reference analysis
   -> generate QA-ready validation artifacts
 ```
 

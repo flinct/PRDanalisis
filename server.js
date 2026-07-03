@@ -25,6 +25,7 @@ app.get('/runner.js', (_req, res) => res.sendFile(path.join(BASE, 'runner.js')))
 const db = new DatabaseSync(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
 db.exec("PRAGMA foreign_keys = ON");
+db.exec("PRAGMA busy_timeout = 5000");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS test_cases (
@@ -182,6 +183,16 @@ const mirror = require('./scripts/mirror.js');
 // OAuth: status / login / callback / logout
 app.get('/api/google/status', (_req, res) => res.json(gdocs.status(BASE)));
 
+app.get('/api/google/folders', async (_req, res) => {
+  try { res.json(await gdocs.listFolders(BASE)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+app.put('/api/google/folder', async (req, res) => {
+  try { res.json(await gdocs.setSelectedFolder(BASE, req.body || {})); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
 app.get('/api/google/login', (_req, res) => {
   try { res.redirect(gauth.getAuthUrl(BASE)); }
   catch (e) { res.status(e.status || 500).send('OAuth not configured: ' + e.message); }
@@ -201,7 +212,26 @@ app.post('/api/google/logout', (_req, res) => res.json(gauth.logout(BASE)));
 
 // Mirror: push local PRD .md → Google Docs (manual trigger)
 app.post('/api/mirror', async (_req, res) => {
-  try { res.json(await mirror.mirrorAll(BASE)); }
+  try {
+    const startedAt = Date.now();
+    console.log('  ⇪ mirror-all start');
+    const result = await mirror.mirrorAll(BASE, {
+      onStart: ({ total }) => console.log(`    total files : ${total}`),
+      onProgress: ({ index, total, relPath, result, error, counters }) => {
+        const prefix = String(index).padStart(String(total).length, ' ');
+        if (error) {
+          console.log(`    [${prefix}/${total}] ERROR   ${relPath}  → ${error.error}`);
+          return;
+        }
+        const label = result && result.skipped
+          ? `SKIP:${result.skipped}`
+          : (result && result.action ? result.action.toUpperCase() : 'DONE');
+        console.log(`    [${prefix}/${total}] ${label.padEnd(12)} ${relPath}  (c:${counters.created} u:${counters.updated} s:${counters.skipped} e:${counters.errors})`);
+      },
+      onFinish: summary => console.log(`  ⇪ mirror-all done  → created ${summary.created}, updated ${summary.updated}, skipped ${summary.skipped}, errors ${summary.errors.length}, ${Date.now() - startedAt}ms`),
+    });
+    res.json(result);
+  }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
@@ -334,6 +364,113 @@ app.get('/api/runs/recent', (req, res) => {
 
 // ─── API: AUTOMATION CONFIG + AUTO-MAP ───────────────────────────────────────
 const automation = require('./scripts/automation.js');
+const setupCfg   = require('./scripts/setup-config.js');
+
+// Localhost-only guard for any setup MUTATION (PUT /api/setup/*).
+// GET endpoints stay open so non-localhost testers can still view the dashboard.
+function isLoopback(ip) {
+  if (!ip) return false;
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1' || ip.startsWith('127.');
+}
+function setupMutationGuard(req, res, next) {
+  const ip = (req.ip || req.connection?.remoteAddress || '').replace('::ffff:', '');
+  if (!isLoopback(ip)) {
+    return res.status(403).json({ error: 'edit Setup hanya dari localhost (host machine)', ip });
+  }
+  next();
+}
+
+// ─── API: SETUP (Phase 2.0 — orchestration read + init + validate + preview) ─
+app.get('/api/setup/config', (_req, res) => {
+  try {
+    const s = setupCfg.readSetup(BASE);
+    res.json({
+      exists: s.exists,
+      hash:   s.hash,
+      parsed: s.parsed,
+      raw:    s.raw,        // useful for textarea editor later
+      runtime: s.runtime,
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/setup/init', setupMutationGuard, (_req, res) => {
+  try { res.json(setupCfg.initSetup(BASE)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/setup/validate', (req, res) => {
+  try { res.json(setupCfg.validateSetup(req.body || {})); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.post('/api/setup/runtime-preview', (req, res) => {
+  try { res.json({ runtime: setupCfg.compileRuntime(req.body || {}) }); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Phase 2.3 — atomic save orchestration bundle (5 yaml + runtime.md)
+app.put('/api/setup/config', setupMutationGuard, (req, res) => {
+  try {
+    const { bundle, expectedHash } = req.body || {};
+    const r = setupCfg.saveSetupAtomic(BASE, bundle || {}, expectedHash || '');
+    res.json(r);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message, serverHash: e.serverHash, validation: e.validation });
+  }
+});
+
+// ─── API: SETUP — Rules/Memory browser (Phase 2.1: list + read) ──────────────
+app.get('/api/setup/rules', (_req, res) => {
+  try { res.json(setupCfg.listRules(BASE)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/setup/rules/file', (req, res) => {
+  try { res.json(setupCfg.readManaged(BASE, 'rules', String(req.query.path || ''))); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+app.get('/api/setup/memory', (_req, res) => {
+  try { res.json(setupCfg.listMemory(BASE)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/setup/memory/file', (req, res) => {
+  try { res.json(setupCfg.readManaged(BASE, 'memory', String(req.query.path || ''))); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+// Phase 2.2 — edit + save Rules/Memory file
+app.put('/api/setup/rules/file', setupMutationGuard, (req, res) => {
+  try {
+    const { content, expectedHash } = req.body || {};
+    res.json(setupCfg.writeManaged(BASE, 'rules', String(req.query.path || ''), content, expectedHash || ''));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message, serverHash: e.serverHash }); }
+});
+app.put('/api/setup/memory/file', setupMutationGuard, (req, res) => {
+  try {
+    const { content, expectedHash } = req.body || {};
+    res.json(setupCfg.writeManaged(BASE, 'memory', String(req.query.path || ''), content, expectedHash || ''));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message, serverHash: e.serverHash }); }
+});
+
+// Phase 2.2 — list + read backup versions
+app.get('/api/setup/backups', (req, res) => {
+  try {
+    const kind = String(req.query.kind || '');
+    if (!['rules','memory','setup'].includes(kind)) return res.status(400).json({ error: 'kind must be rules|memory|setup' });
+    res.json(setupCfg.listBackups(BASE, kind, String(req.query.path || '')));
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+app.get('/api/setup/backups/content', (req, res) => {
+  try {
+    const kind = String(req.query.kind || '');
+    if (!['rules','memory','setup'].includes(kind)) return res.status(400).json({ error: 'kind must be rules|memory|setup' });
+    const content = setupCfg.readBackup(BASE, kind, String(req.query.path || ''), String(req.query.ts || ''));
+    res.json({ content });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
 
 app.get('/api/automation/config', (_req, res) => res.json(automation.getConfig(BASE)));
 app.put('/api/automation/config', (req, res) => {
@@ -504,20 +641,32 @@ function startWatcher() {
   if (!WATCH_DIRS.length) return;
 
   // Debounce: collect rapid saves (e.g. editor writes) into one import call
-  const pending = new Map(); // filePath → timer
+  const pendingImports = new Set();
+  let importTimer = null;
+
+  function runAutoImport(triggerFiles) {
+    try {
+      const { importAll } = require('./scripts/import.js');
+      const counts = importAll(BASE, db);
+      const files = Array.from(triggerFiles || []).map(f => path.relative(BASE, f).replace(/\\/g,'/')).sort();
+      const preview = files.length <= 3
+        ? files.join(', ')
+        : `${files.slice(0, 3).join(', ')} +${files.length - 3} more`;
+      console.log(`  ↺ auto-import  ${preview || '(batch)'}  → ${counts.test_cases} cases`);
+    } catch(e) {
+      console.error(`  ⚠ auto-import error: ${e.message}`);
+    }
+  }
 
   function scheduleImport(filePath) {
-    if (pending.has(filePath)) clearTimeout(pending.get(filePath));
-    pending.set(filePath, setTimeout(() => {
-      pending.delete(filePath);
-      try {
-        const { importAll } = require('./scripts/import.js');
-        const counts = importAll(BASE, db);
-        console.log(`  ↺ auto-import  ${path.relative(BASE, filePath).replace(/\\/g,'/')}  → ${counts.test_cases} cases`);
-      } catch(e) {
-        console.error(`  ⚠ auto-import error: ${e.message}`);
-      }
-    }, 800)); // wait 800ms after last write before importing
+    pendingImports.add(filePath);
+    if (importTimer) clearTimeout(importTimer);
+    importTimer = setTimeout(() => {
+      const batch = new Set(pendingImports);
+      pendingImports.clear();
+      importTimer = null;
+      runAutoImport(batch);
+    }, 800); // wait 800ms after last write before importing
   }
 
   // Auto-mirror PRD .md → Google Docs (only if logged in; skip quietly otherwise)

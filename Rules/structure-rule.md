@@ -11,11 +11,11 @@ Only permanent project-wide files live here:
 | Item | Description |
 |------|-------------|
 | `PRD/` | Product Requirement Documents (organized by feature domain) |
-| `Assessments/` | Permanent assessment reports, version history, and templates |
+| `Assessments/` | Permanent assessment reports, reusable reference analyses, version history, and templates |
 | `Scripts/` | Reusable analysis, parsing, migration, and automation helper scripts |
 | `Test/` | Test cases, test data, test scripts, automation outputs |
 | `Rules/` | Agent workflow and methodology rules |
-| `Memory/` | Agent persistent memory (global + feature-specific) |
+| `Memory/` | Agent persistent memory (global + feature-specific baseline + navigation index) |
 | `BRD/` | Business Requirement Documents |
 | `Feature List/` | Feature inventory and roadmap |
 | `Portfolio/` | Project portfolio documents |
@@ -29,8 +29,12 @@ Only permanent project-wide files live here:
 
 All formal QA assessment outputs live here:
 
+- `Assessments/templates/Setup/change-intake-brief-template.md` — canonical workflow template for Phase 0 Change Intake Brief
 - `Assessments/templates/qa-assessment-report-template.md` — canonical template for new assessment reports
+- `Assessments/reference/*.md` — reusable PRD analysis references (comparison, deep-dive, loophole map) that are not decision reports
+- `Assessments/<domain>/<feature-slug>/<feature-slug>-change-intake-brief.md` — latest/current change-intake artifact for a feature
 - `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md` — latest approved/current assessment artifact for a feature
+- `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-change-intake-brief-v1.0.md` — immutable historical change-intake versions
 - `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-qa-assessment-v1.0.md` — immutable historical versions
 - `Assessments/templates/Setup/*.md` — reusable workflow templates for Assessment Report, QA pre/post validation, reviewer decision, and automation mapping
 - `Assessments/archive/legacy-temp-analysis/` — migrated historical analysis documents from the removed `Temp Analysis/` folder
@@ -38,8 +42,12 @@ All formal QA assessment outputs live here:
 ### Convention:
 - **Use `Assessments/` for all persisted analysis documents**
 - **Domain folders** should mirror the PRD source area when practical (`conversation/`, `ticket/`, `whatsapp-web/`, etc.)
+- **Reference analyses** that are reusable across tasks belong in `Assessments/reference/`
 - **Feature folders** should be lowercase, hyphenated, and stable over time
+- **Change Intake Brief** and **Assessment Report** for the same feature should live in the same folder
 - **Latest report path** should stay stable; revisions go into `versions/`
+- **Later requirement changes** must update the feature's `*-change-intake-brief.md` first before downstream artifacts are patched
+- Every updated Change Intake Brief must include a **version value**, **previous version reference**, and **ringkasan perubahan scope / routing**
 - Every updated assessment must include a **version value**, **previous version reference**, and **ringkasan perubahan analisa**
 - The logical artifact name is **Assessment Report**; persisted filenames may continue using `-qa-assessment.md` until repo-wide migration
 - The report must follow the template in `Assessments/templates/qa-assessment-report-template.md`

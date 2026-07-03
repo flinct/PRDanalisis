@@ -1,0 +1,25 @@
+version: 3
+schema: setup-dashboard-v3
+status: active
+updated_at: '2026-07-03T07:57:21.281Z'
+files:
+  rules_config: rules-config.yaml
+  agents: agents.yaml
+  workflows: workflows.yaml
+  pointers: pointers.yaml
+  runtime: runtime.md
+active:
+  workflow_mode: full_lane
+  workflow_id: standard-multi-agent-v2
+  rule_profile: default
+  roster_profile: default
+  phase_zero: true
+validation:
+  last_checked_at: '2026-06-29T00:00:00+07:00'
+  valid: true
+  warnings: []
+  errors: []
+notes:
+  - Dashboard does not store OAuth or provider API keys.
+  - Runtime file is generated from config files above.
+  - Phase 0 (Change Intake) wajib untuk request yang menyentuh behavior produk.

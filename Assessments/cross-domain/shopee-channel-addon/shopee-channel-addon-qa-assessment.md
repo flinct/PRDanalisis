@@ -4,7 +4,7 @@
 > **Version:** `v1.0`
 > **Previous Version:** `none`
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`, `Rules/structure-rule.md`
-> **Reference Memory:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `WORKFLOW_CONTEXT.md`
+> **Reference Context:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `WORKFLOW_CONTEXT.md`
 > **Tanggal Analisa:** 2026-06-17
 > **Status:** Draft
 

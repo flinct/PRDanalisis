@@ -1,0 +1,35 @@
+version: 2
+description: Daftar Rules/*, Memory/*, dan Assessments/reference/* yang aktif untuk setup ini. Dibaca oleh runtime.md.
+active_rules:
+  - Rules/agent-instruction.md
+  - Rules/workflow-rule.md
+  - Rules/structure-rule.md
+  - Rules/requirements-lifecycle-rule.md
+  - Rules/qa-analysis-rule.md
+  - Rules/impact-analysis-rule.md
+  - Rules/prd-writing-rule.md
+  - Rules/prd-comparison-rule.md
+  - Rules/test-case-rule.md
+  - Rules/automation-bridge-rule.md
+  - Rules/memory-routing-rule.md
+  - Rules/memory-write-rule.md
+  - Rules/memory-update-rule.md
+  - Rules/global-memory-write-rule.md
+  - Rules/global-memory-update-rule.md
+active_memory:
+  - Memory/README.md
+  - Memory/global-memory.md
+  - Memory/reference-index.md
+  - Memory/CLAUDE-fe.md
+  - Memory/CLAUDE-be.md
+  - Memory/qa-tooling.md
+  - Memory/comprehensive-undeveloped-features-analysis.md
+  - Memory/conversation-undeveloped-features-analysis.md
+active_references:
+  - Assessments/reference/conversation-prd-cross-analysis.md
+  - Assessments/reference/conversation-sla-rlt-frt-ttc-analysis.md
+  - Assessments/reference/conversation-v1-vs-v2-comparison.md
+  - Assessments/reference/ticket-v1-vs-v2-comparison.md
+  - Assessments/reference/whatsapp-web-v1-vs-v2-comparison.md
+  - Assessments/reference/sla-conversation-ticket.md
+  - Assessments/reference/contact-context-visibility.md

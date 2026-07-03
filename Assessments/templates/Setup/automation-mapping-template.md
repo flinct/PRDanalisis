@@ -9,6 +9,7 @@
 # Automation Mapping: <Feature Name>
 
 > **Artifact Type:** Automation Mapping  
+> **Source Change Intake Brief:** `<path-to-change-intake-brief>`  
 > **Source PRD:** `<path-to-prd>`  
 > **Source Assessment Report:** `<path-to-assessment-report>`  
 > **Source QA Review / Test Spec:** `<path-to-qa-review-or-test-spec>`  

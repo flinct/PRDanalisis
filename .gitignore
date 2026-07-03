@@ -7,6 +7,7 @@ google-token.json
 
 # Mirror state (local↔Google Docs map)
 .gdocs-mirror.json
+google-drive-config.json
 
 # Automation config (machine-specific path)
 automation-config.json

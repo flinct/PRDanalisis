@@ -6,7 +6,7 @@
 > **Version:** `v2.3`
 > **Previous Version:** `Assessments/global-search/global-search/versions/global-search-qa-assessment-v2.2.md`
 > **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/prd-writing-rule.md`, `Rules/workflow-rule.md`, `Rules/structure-rule.md`
-> **Reference Memory:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/comprehensive-undeveloped-features-analysis.md`
+> **Reference Context:** `Memory/global-memory.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/comprehensive-undeveloped-features-analysis.md`
 > **Tanggal Analisa:** 2026-06-15
 > **Status:** Draft
 

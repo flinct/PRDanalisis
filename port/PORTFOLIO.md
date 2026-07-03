@@ -22,7 +22,7 @@ Create a repeatable workflow that helps QA and product stakeholders answer:
 
 - Structured PRD and BRD documents into reviewable product knowledge.
 - Defined analysis rules for PRD review, impact analysis, memory routing, PRD writing, and test case creation.
-- Built a reusable memory layer for canonical product behavior and feature-level analysis.
+- Built a reusable context layer: canonical memory for stable product behavior and reusable reference analysis for deep-dive PRD reasoning.
 - Mapped ambiguity, conflict, implementation gaps, and regression-sensitive areas.
 
 ## Solution
@@ -66,7 +66,7 @@ The comparison flow is:
 ```text
 New PRD
   -> compare with global product memory
-  -> compare with feature memory
+  -> compare with feature memory / reference analysis
   -> compare with V1/V2 source-of-truth status
   -> compare with known FE/BE implementation status
   -> identify delta, conflict, gap, and regression risk
@@ -89,7 +89,7 @@ This approach keeps QA aligned with the real product. For example, if a PRD uses
 
 - Separate raw requirements from analyzed product understanding.
 - Keep system-wide truth in `Memory/global-memory.md`.
-- Keep detailed feature reasoning in feature-specific memory files.
+- Keep canonical memory in `Memory/` and reusable deep-dive PRD reasoning in `Assessments/reference/`.
 - Treat V2 documents as source of truth when V1 behavior is deprecated.
 - Route only stable, reusable insight into memory.
 - Avoid turning assumptions or temporary findings into canonical rules.
@@ -108,7 +108,7 @@ This approach keeps QA aligned with the real product. For example, if a PRD uses
 
 - Clearer source-of-truth hierarchy for product analysis.
 - Better visibility into cross-feature dependencies and regression risk.
-- Faster onboarding for QA/product reviewers because context is stored in memory.
+- Faster onboarding for QA/product reviewers because context is stored in memory and reference-analysis layers.
 - Reduced risk of testing against deprecated requirements.
 - More consistent PRD analysis and test planning outputs.
 

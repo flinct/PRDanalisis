@@ -1,4 +1,4 @@
-# WORKFLOW CONTEXT — BRD → PRD → Assessment Report → Requirement Package Freeze → Testcase → Automation Script
+# WORKFLOW CONTEXT — Phase 0 Change Intake → BRD → PRD → Assessment Report → Requirement Package Freeze → Testcase → Automation Script
 
 > **File ini = konteks kerja permanen.** Baca di awal setiap session baru (termasuk di PC lain) agar agent langsung paham struktur, rules, dan alur kerja tanpa perlu eksplorasi ulang.
 
@@ -20,6 +20,17 @@
 User Request / BRD
     │
     ▼
+Phase 0 — Change Intake & Classification
+    │   - Mengikuti Rules/requirements-lifecycle-rule.md
+    │   - Klasifikasi: NEW_FEATURE / ADDITIVE_IMPROVEMENT / BEHAVIOR_CHANGE /
+    │                 DEPRECATION_OR_REMOVAL / REVIVE_UNDEVELOPED_PRD / MIXED_REQUEST
+    │   - Verifikasi current state: PRD existing, FE, BE, undeveloped feature memory
+    │   - Output: Change Intake Brief + Routing Decision
+    │   - Persisted path: Assessments/<domain>/<feature-slug>/<feature-slug>-change-intake-brief.md
+    │   - Revisions: update brief ini dulu untuk perubahan lanjutan, lalu patch artifact downstream
+    │   - Route: NEW PRD / PATCH / REWRITE / REVIVE / REMOVAL / SPLIT / HOLD
+    │
+    ▼
 Orchestrator klasifikasi task + pilih lane
     │   - Full Lane: feature baru, PRD baru, patch besar, behavior-sensitive automation change
     │   - Fast Lane: automation minor, testcase patch kecil, wording PRD ringan, bugfix sempit
@@ -38,6 +49,7 @@ Assessment Report (Owner: Analyst)
     │
     ▼
 Reviewer Gate A — Early Review
+    │   - Validates: Change Intake Brief + Assessment Report + PRD v0
     │   - Status: APPROVE_WITH_NOTES / REVISE_ASSESSMENT / REVISE_PRD_DRAFT / HOLD
     │
     ▼
@@ -53,7 +65,7 @@ QA Pre-Implementation Review
 Reviewer Gate B — Requirement Package Approval
     │   - Status: APPROVED / APPROVED_WITH_CAUTION / REVISE_PRD / HOLD
     │   - Output: Requirement Package Freeze
-    │   - Frozen package: PRD + Assessment Report + QA pre-review + coverage/test strategy + automation scope
+    │   - Frozen package: Change Intake Brief + PRD + Assessment Report + QA pre-review + coverage/test strategy + automation scope
     │
     ▼
 Implementation (mostly automation code / automation repo changes)
@@ -82,16 +94,20 @@ Automation Script Generation / Sync / Maintenance
 ### **Entry Point & Orchestration**
 ```
 PRDanalisis/Rules/agent-instruction.md        ← ENTRY POINT: deteksi tipe tugas → load rule sesuai
-PRDanalisis/Rules/workflow-rule.md            ← Urutan eksekusi: Rule → Global Memory → Feature Memory → Execute
+PRDanalisis/Rules/workflow-rule.md            ← Urutan eksekusi: Rule → Global Memory → Reference Index → Feature Memory / Reference Analysis → Execute
+PRDanalisis/Rules/requirements-lifecycle-rule.md ← Phase 0 change intake, classification, routing new/improvement/removal/revive
 PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Assessments/, Scripts/, Test/, Rules/, Memory/
 PRDanalisis/Memory/README.md                  ← Index memory files, routing guide, deprecated notices
+PRDanalisis/Memory/reference-index.md         ← Index reusable PRD analysis references di `Assessments/reference/`
 PRDanalisis/Assessments/README.md             ← Aturan artefak analisa permanen + versioning
+PRDanalisis/Assessments/templates/Setup/change-intake-brief-template.md ← Template artifact Phase 0 yang direuse lintas BRD/PRD/Assessment/QA
 PRDanalisis/Assessments/templates/qa-assessment-report-template.md ← Template assessment permanen
 PRDanalisis/Assessments/templates/Setup/assessment-report-template.md ← Wrapper operasional Assessment Report milik Analyst
 ```
 
 ### **PRD Writing & Analysis**
 ```
+PRDanalisis/Rules/requirements-lifecycle-rule.md ← WAJIB untuk request tambah/ubah/buang behavior atau revive PRD lama
 PRDanalisis/Rules/prd-writing-rule.md         ← Template PRD (Lite/Standard/Full/Patch), Quality Gate
 PRDanalisis/Rules/qa-analysis-rule.md         ← WAJIB. Metodologi analisa QA senior (3 tipe, 9 impact dimensions)
 PRDanalisis/Rules/impact-analysis-rule.md     ← Blast radius detection untuk setiap perubahan
@@ -113,14 +129,15 @@ sixV2Automation/memory/rbac-memory.md         ← RBAC matrix untuk test (role, 
 ### **Memory & Context**
 ```
 PRDanalisis/Memory/global-memory.md           ← Canonical product rules (Conversation, Ticket, WA Web, SLA, RBAC, Open Risks)
+PRDanalisis/Memory/reference-index.md         ← Navigasi ke reusable PRD analysis references di `Assessments/reference/`
 PRDanalisis/Memory/CLAUDE-be.md               ← BE Architecture: NestJS, 20 microservices, gRPC, RabbitMQ, MongoDB per service
 PRDanalisis/Memory/CLAUDE-fe.md               ← FE Architecture: Next.js 16, Turborepo, Zustand, React Query, Socket.IO
 PRDanalisis/Memory/qa-tooling.md              ← QA Browser + QA Agent: fitur aktif, setup server, tools, SSE format, roadmap
-PRDanalisis/Memory/conversation-prd-cross-analysis.md
-PRDanalisis/Memory/conversation-sla-rlt-frt-ttc-analysis.md
 PRDanalisis/Memory/conversation-undeveloped-features-analysis.md
 PRDanalisis/Memory/comprehensive-undeveloped-features-analysis.md
-... (file analysis lain di Memory/)
+PRDanalisis/Assessments/reference/conversation-prd-cross-analysis.md
+PRDanalisis/Assessments/reference/conversation-sla-rlt-frt-ttc-analysis.md
+... (reference analysis lain di `Assessments/reference/` sesuai kebutuhan)
 ```
 
 ### **QA Browser & Server (Manual QA + Automation Bridge)**
@@ -149,7 +166,7 @@ PRDanalisis/AgentNotes/                       ← Hasil analisa agent (legacy �
 | **Test Cases (generic)** | `Test/<domain>/` | — |
 | **Conversation automation source** | `Test/conversation/Conversation.tsv` | — |
 
-> **Rule:** Selalu gunakan V2. V1 hanya untuk referensi historis (lihat comparison files di Memory/).
+> **Rule:** Selalu gunakan V2. V1 hanya untuk referensi historis (lihat comparison files di `Assessments/reference/` atau `Memory/reference-index.md`).
 
 ---
 
@@ -158,7 +175,8 @@ PRDanalisis/AgentNotes/                       ← Hasil analisa agent (legacy �
 | Jenis Knowledge | Simpan ke | Aturan |
 |-----------------|-----------|--------|
 | **System-wide, reusable, stable** | `Memory/global-memory.md` | Canonical rules, shared lifecycle, RBAC, architecture constraints, cross-feature dependencies |
-| **Feature-specific, loophole, deep dive** | `Memory/<feature>-analysis.md` | PRD cross-analysis, QA reasoning, impact analysis, gap analysis |
+| **Feature baseline / status summary** | `Memory/<file>.md` | Context yang perlu dibuka cepat berulang kali, misalnya undeveloped summary, tooling reference, architecture note |
+| **Reusable PRD deep dive / comparison** | `Assessments/reference/<file>.md` | PRD cross-analysis, loophole map, comparison baseline, supporting analysis lintas task |
 | **JANGAN persist** | — | Generated test cases, raw PRD text, verbose narrative, temporary assumptions, implementation noise |
 
 **Conflict handling:** Kalau rule baru kontrab global memory → FLAG inconsistency, jangan overwrite otomatis, minta klarifikasi.
@@ -224,23 +242,35 @@ WHEN Conversation.tsv changes:
 
 ## 7. RULES UNTUK SETIAP TIPE TUGAS
 
+### **Requirement Lifecycle / Change Intake (tambah / ubah / buang / revive feature)**
+1. Baca `requirements-lifecycle-rule.md`
+2. Klasifikasikan request: `NEW_FEATURE`, `ADDITIVE_IMPROVEMENT`, `BEHAVIOR_CHANGE`, `DEPRECATION_OR_REMOVAL`, `REVIVE_UNDEVELOPED_PRD`, atau `MIXED_REQUEST`
+3. Verifikasi current state: PRD existing, FE, BE, shipped/partial/undeveloped status
+4. Tentukan `In Scope`, `Out of Scope`, dan `Protected Existing Behavior`
+5. Persist `Change Intake Brief` di `Assessments/<domain>/<feature-slug>/<feature-slug>-change-intake-brief.md`
+6. Hasilkan `Routing Decision`
+7. Untuk perubahan lanjutan di feature yang sama, update brief ini dulu sebelum patch PRD / Assessment / QA
+8. Jika hasilnya `SPLIT_REQUEST` atau `HOLD_NEEDS_DISCOVERY`, jangan lanjut ke PRD seolah scope sudah final
+
 ### **PRD Writing (buat/tulis/draft PRD)**
-1. Baca `prd-writing-rule.md` + `global-memory.md` + V2 PRD existing
-2. Klasifikasikan kompleksitas: Lite / Standard / Full / Patch
-3. Tentukan Phase 1 In Scope & Out of Scope DULU
-4. Tulis sesuai template (metadata, overview, user stories, FR, EH, EC, UI, Field, NFR, dll)
-5. Quality Gate Checklist sebelum finalisasi
+1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `requirements-lifecycle-rule.md` dulu
+2. Baca `prd-writing-rule.md` + `global-memory.md` + V2 PRD existing
+3. Klasifikasikan kompleksitas: Lite / Standard / Full / Patch
+4. Tentukan Phase 1 In Scope & Out of Scope DULU
+5. Tulis sesuai template (metadata, overview, user stories, FR, EH, EC, UI, Field, NFR, dll)
+6. Quality Gate Checklist sebelum finalisasi
 
 ### **PRD Analysis / Feature Dev Analysis**
-1. Baca `qa-analysis-rule.md` (Type 1: Feature Development Analysis)
-2. Baca `impact-analysis-rule.md` (blast radius)
-3. Baca `global-memory.md` + feature memory relevan
-4. Gunakan template `Assessments/templates/qa-assessment-report-template.md`
-5. Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
-6. Logical artifact name: **Assessment Report** (owner default: Analyst)
-7. Simpan versi sebelumnya ke `versions/` jika analisa direvisi, lalu isi ringkasan perubahan analisa
-8. Isi minimal: Overview, Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis, Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
-9. Jika mengikuti lane multi-agent, lanjut ke Reviewer Gate A sebelum PRD difinalisasi
+1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `requirements-lifecycle-rule.md` dulu
+2. Baca `qa-analysis-rule.md` (Type 1: Feature Development Analysis)
+3. Baca `impact-analysis-rule.md` (blast radius)
+4. Baca `global-memory.md` + feature memory relevan
+5. Gunakan template `Assessments/templates/qa-assessment-report-template.md`
+6. Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
+7. Logical artifact name: **Assessment Report** (owner default: Analyst)
+8. Simpan versi sebelumnya ke `versions/` jika analisa direvisi, lalu isi ringkasan perubahan analisa
+9. Isi minimal: Overview, Decision Summary, Requirement Summary, Flow Analysis, Impact Analysis, Dependency Matrix, Risk Matrix, Test Strategy, Production Safety, Traceability Matrix
+10. Jika mengikuti lane multi-agent, lanjut ke Reviewer Gate A sebelum PRD difinalisasi
 
 ### **Bug Fix Analysis**
 1. Baca `qa-analysis-rule.md` (Type 2: Bug Fix Analysis)
@@ -257,8 +287,8 @@ WHEN Conversation.tsv changes:
 6. Jika feature belum punya generator bridge, simpan companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md`, `*-automation-mapping.md`, `*-qa-pre-implementation-review.md`, dan `*-qa-post-implementation-validation.md` bila relevan
 
 ### **Reviewer Gates & Freeze**
-1. Gate A = review awal terhadap Assessment Report + PRD v0
-2. Gate B = approval requirement package + menghasilkan **Requirement Package Freeze**
+1. Gate A = review awal terhadap **Change Intake Brief + Assessment Report + PRD v0**
+2. Gate B = approval requirement package + menghasilkan **Requirement Package Freeze** (brief + PRD + Assessment + QA pre-review + coverage/test strategy + automation scope)
 3. Setelah freeze, perubahan requirement harus kembali ke requirement lane dan di-approve ulang
 4. Gate C = final review terhadap implementation + QA post-implementation validation
 
@@ -461,7 +491,7 @@ TTC       = working_duration(T1, T4)     → office-hours-aware (depending on SL
 [ ] 1. Baca Rules/agent-instruction.md → deteksi tipe tugas
 [ ] 2. Load rule WAJIB berdasarkan tipe tugas (workflow-rule.md, structure-rule.md, Memory/README.md + rule spesifik)
 [ ] 3. Baca Memory/global-memory.md
-[ ] 4. Baca feature memory relevan (Memory/CLAUDE-be.md, CLAUDE-fe.md, file analysis)
+[ ] 4. Baca context relevan (`Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/reference-index.md`, lalu file di `Assessments/reference/` bila perlu)
 [ ] 5. Eksekusi pakai rule sebagai metodologi (bukan referensi pasif)
 [ ] 6. Self-triggered actions: simpan ke memory, update bridge, regenerate specs, dll
 [ ] 7. Output sesuai format rule yang berlaku

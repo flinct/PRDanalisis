@@ -32,10 +32,12 @@ Before writing QA tests, load these inputs in order:
 1. `Rules/qa-analysis-rule.md`.
 2. Relevant PRD analysis output.
 3. Impact analysis output if the feature changes existing behavior or cross-feature dependency.
-4. Source PRD or patch/addendum.
-5. `Memory/global-memory.md`.
-6. Relevant feature memory from `Memory/`.
-7. Existing test cases in the affected scope when updating tests.
+4. Change Intake Brief jika request berasal dari Phase 0 requirement lifecycle.
+5. Source PRD or patch/addendum.
+6. `Memory/global-memory.md`.
+7. `Memory/reference-index.md` jika butuh reusable comparison atau deep-dive analysis.
+8. Relevant feature memory from `Memory/` dan/atau relevant reference analysis from `Assessments/reference/`.
+9. Existing test cases in the affected scope when updating tests.
 
 If PRD analysis does not exist, create a minimal requirement extraction first using `qa-analysis-rule.md` before writing test cases. Do not write tests directly from vague PRD text when requirements are ambiguous.
 
@@ -67,6 +69,8 @@ This rule serves two different QA moments:
 
 1. **Before implementation** — QA reviews PRD quality, regression impact, coverage readiness, and automation candidates.
 2. **After implementation** — QA validates execution result, regression outcome, automation alignment, and uncovered gaps against the frozen requirement package.
+
+When a Change Intake Brief exists, QA must treat it as the original scoped-intent baseline together with the PRD and Assessment Report. QA must not silently test behavior outside the brief unless the brief and downstream requirement artifacts are updated first.
 
 If requirement behavior changes after Gate B / Requirement Package Freeze, QA must route the change back to the requirement lane instead of silently adapting expected results.
 
@@ -104,10 +108,10 @@ Use the appropriate artifact based on user request and feature complexity.
 | ----- | ----- | ----- |
 | Test Plan | QA needs scope, strategy, environment, and execution guidance. | Objective, scope, suite plan, environment, entry/exit criteria, risks. |
 | Test Scenario List | Early QA planning or UAT alignment. | Scenario ID, user goal, requirement ID, priority, expected outcome. |
-| QA Pre-Implementation Review | Requirement package is being prepared before coding starts. | PRD review findings, requirement coverage matrix, regression impact, test strategy, automation candidate mapping. |
+| QA Pre-Implementation Review | Requirement package is being prepared before coding starts. | Change Intake Brief reference, PRD review findings, requirement coverage matrix, regression impact, test strategy, automation candidate mapping. |
 | Detailed Test Case Spec | QA needs executable manual or automation-ready cases. | TC format, test data, steps, expected result, postcondition. |
 | Regression Suite | Existing behavior may be affected. | Impact area, existing behavior, regression cases, priority. |
-| QA Post-Implementation Validation | Coding or automation implementation is complete and QA must validate alignment. | Execution summary, regression result, automation alignment, coverage confirmation, defects, uncovered gaps. |
+| QA Post-Implementation Validation | Coding or automation implementation is complete and QA must validate alignment. | Execution summary, validation against Change Intake Brief + frozen package, regression result, automation alignment, coverage confirmation, defects, uncovered gaps. |
 | UAT Script | Business users execute validation. | Plain-language steps, data, expected business outcome. |
 | API / Contract Test Spec | API/event/webhook/socket/queue/report contract changes. | Contract, payload, response, errors, backward compatibility cases. |
 | Release Validation Runbook | Feature is close to deploy. | Smoke steps, canary checks, rollback checks, evidence checklist. |

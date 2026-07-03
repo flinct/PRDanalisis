@@ -1,0 +1,3 @@
+# Pengantar
+
+Buku ini adalah petunjuk untuk kita mengenal Dunia Logistik. Tujuannya sederhana: membuat kita semua paham tentang dunia logistik digital tempat kita bekerja. Dengan memahami setiap alur, istilah, dan peran, kita bisa bekerja lebih solid sebagai tim dan memberikan layanan terbaik bagi pelanggan.Setiap paket yang kita antarkan bukan sekadar barang, tapi juga kepercayaan. Mari kita jaga kepercayaan itu bersama\!

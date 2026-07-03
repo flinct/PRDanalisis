@@ -483,4 +483,4 @@ interface OrderPayload {
 | CLAUDE-fe.md | `Memory/CLAUDE-fe.md` |
 | CLAUDE-be.md | `Memory/CLAUDE-be.md` |
 | Global Memory | `Memory/global-memory.md` |
-| WhatsApp Web V2 Comparison | `Memory/whatsapp-web-v1-vs-v2-comparison.md` |
+| WhatsApp Web V2 Comparison | `Assessments/reference/whatsapp-web-v1-vs-v2-comparison.md` |

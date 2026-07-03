@@ -70,8 +70,8 @@
 
 # Resolved Decisions
 
-- This analysis belongs in feature memory, not global memory. Findings cross-PRD but feature-scoped to SLA alignment.
-- Memory location root `Memory/`, not inside PRD folder.
+- This analysis belongs in `Assessments/reference/`, not in canonical global memory. Findings cross-PRD but scoped as reusable SLA alignment reference.
+- Reference location root `Assessments/reference/`, not inside PRD folder.
 
 # Open Questions
 

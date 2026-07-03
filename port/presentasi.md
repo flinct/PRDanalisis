@@ -11,7 +11,7 @@ Fokus:
 - Membaca PRD sistematis.
 - Menemukan business rule eksplisit dan implisit.
 - Mendeteksi gap, conflict, ambiguity, regression risk, impact lintas fitur.
-- Menyimpan pemahaman penting ke memory. Analisis berikutnya tidak mulai dari nol.
+- Menyimpan canonical knowledge ke memory dan reusable deep-dive analysis ke reference library. Analisis berikutnya tidak mulai dari nol.
 - Menjaga rules dan memory berkembang incremental.
 
 ---
@@ -29,8 +29,8 @@ Test/
 
 - `PRD/`: sumber requirement product, dikelompokkan per domain atau fitur.
 - `Rules/`: aturan kerja agent saat menganalisis PRD, membandingkan PRD, impact analysis, menulis memory, test case.
-- `Memory/`: konteks reusable dari analisis sebelumnya.
-- `Assessments/`: artefak analisis permanen dengan versioning.
+- `Memory/`: canonical memory, architecture reference, status summary, dan index navigasi.
+- `Assessments/`: Assessment Report permanen + library reusable reference analysis.
 - `Scripts/`: helper script untuk parsing, migration, atau generation.
 - `Test/`: dokumen test atau validasi QA dari hasil analisis.
 
@@ -46,7 +46,8 @@ Rules menjawab:
 - Kapan perlu comparison antar PRD?
 - Bagaimana mengukur impact lintas modul?
 - Pengetahuan mana masuk global memory?
-- Pengetahuan mana hanya feature memory?
+- Pengetahuan mana tetap di feature memory?
+- Pengetahuan mana lebih cocok jadi reference analysis di `Assessments/reference/`?
 - Apa tidak boleh disimpan sebagai memory?
 - Bagaimana test case dibuat tanpa scope creep?
 
@@ -58,7 +59,7 @@ Rules menjawab:
 - `analisa-prd-rule.md`: format dan fokus analisis satu PRD.
 - `prd-comparison-rule.md`: aturan membandingkan dua PRD.
 - `impact-analysis-rule.md`: aturan mencari blast radius perubahan.
-- `memory-routing-rule.md`: aturan routing analisis ke global memory, feature memory, atau tidak disimpan.
+- `memory-routing-rule.md`: aturan routing analisis ke global memory, feature memory baseline, reference analysis, atau tidak disimpan.
 - `global-memory-write-rule.md`: aturan menulis canonical memory lintas fitur.
 - `global-memory-update-rule.md`: aturan update global memory aman.
 - `memory-write-rule.md`: aturan mengubah analisis PRD menjadi feature memory ringkas.
@@ -97,16 +98,21 @@ Contoh:
 - Chat list: search dan filter scoped oleh RBAC aktif.
 - Open risks: cross-division leakage, queue sync inconsistency, unresolved SLA behavior.
 
-### Feature Memory
+### Feature Memory & Reference Analysis
 
-Feature memory menyimpan analisis detail per domain.
+`Memory/` menyimpan baseline yang perlu dibuka cepat berulang kali. Reusable deep-dive PRD analysis disimpan di `Assessments/reference/` dan dinavigasi lewat `Memory/reference-index.md`.
 
-Contoh:
+Contoh baseline di `Memory/`:
 
-- `Memory/conversation-prd-cross-analysis.md`
 - `Memory/conversation-undeveloped-features-analysis.md`
-- `Memory/contact-context-visibility.md`
-- `Memory/sla-conversation-ticket.md`
+- `Memory/comprehensive-undeveloped-features-analysis.md`
+- `Memory/reference-index.md`
+
+Contoh reusable reference analysis di `Assessments/reference/`:
+
+- `Assessments/reference/conversation-prd-cross-analysis.md`
+- `Assessments/reference/contact-context-visibility.md`
+- `Assessments/reference/sla-conversation-ticket.md`
 
 ---
 
@@ -124,12 +130,16 @@ Simpan ke `global-memory.md` jika pengetahuan:
 
 Simpan ke feature memory jika pengetahuan:
 
-- Feature-specific.
-- Berisi local edge case.
-- Berisi dependency khusus fitur.
-- Berisi UI behavior lokal.
-- Berisi risiko lokal fitur.
-- Berisi business rule khusus fitur.
+- Baseline context yang perlu dibuka cepat berulang kali.
+- Summary implementasi / status reusable.
+- Architecture atau tooling note yang bukan deep-dive PRD reasoning.
+
+Simpan ke reference analysis jika pengetahuan:
+
+- Comparison reusable.
+- Loophole / conflict map.
+- Cross-PRD deep dive.
+- Supporting analysis untuk assessment, PRD rewrite, impact analysis, atau test design.
 
 Jangan persist jika isinya:
 
@@ -149,16 +159,18 @@ Berdasarkan `Rules/workflow-rule.md`, setiap task ikuti urutan:
 
 1. Read applicable rule dari `Rules/`.
 2. Read `Memory/global-memory.md`.
-3. Read feature memory relevan dari `Memory/`.
-4. Execute task.
+3. Read `Memory/reference-index.md` bila butuh deep-dive / comparison reference.
+4. Read feature memory relevan dari `Memory/` dan/atau file di `Assessments/reference/`.
+5. Execute task.
 
 Canonical truth order:
 
 1. Global memory.
 2. Feature memory.
-3. PRD content.
-4. Runtime inference.
-5. Temporary assumptions.
+3. Reference analysis.
+4. PRD content.
+5. Runtime inference.
+6. Temporary assumptions.
 
 ---
 

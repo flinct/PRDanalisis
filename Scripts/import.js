@@ -155,7 +155,7 @@ function importAll(BASE, db) {
   `);
 
   // node:sqlite doesn't have db.transaction() — use manual BEGIN/COMMIT
-  db.exec('BEGIN');
+  db.exec('BEGIN IMMEDIATE');
   try {
     if (fs.existsSync(testDir)) {
       walkFiles(testDir, '', file => {
@@ -230,6 +230,7 @@ if (require.main === module) {
   const db = new DatabaseSync(DB_FILE);
   db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA foreign_keys = ON");
+  db.exec("PRAGMA busy_timeout = 5000");
   // Inline the schema so standalone import works without starting server
   db.exec(`
     CREATE TABLE IF NOT EXISTS test_cases (

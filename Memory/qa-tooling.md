@@ -53,9 +53,9 @@ Single-file browser tool (2195 lines React 18 + Babel standalone) untuk QA SatuI
 | **TSV Copy** | ✅ | Copy full TSV ke clipboard untuk paste manual |
 | **Resizable Sidebar** | ✅ | Drag handle, min 160px max 480px |
 | **Sticky Folder Selectors** | ✅ | Saat satu section dibuka, header section aktif pin di atas, file list scroll di tengah, header section lain (non-aktif) sticky di bawah sidebar untuk switch folder cepat. Tanpa section aktif → semua header stack normal. (App sidebar render, ~line 2119) |
-| **Google Docs Integration** | ✅ | **OAuth login** (akun user, bukan service account). Sidebar section "Google Docs ☁" (virtual, merge ke allSections) baca doc → read-only markdown. Tombol "⇪ Export to GDocs" di MarkdownViewer → buat Doc baru (basic styled). Backend: `scripts/google-auth.js` (OAuth2) + `scripts/gdocs.js` + endpoint `/api/google/*`, `/api/gdocs*`. Setup di `GDOCS-SETUP.md`. |
-| **PRD Mirror → Google Docs** | ✅ | One-way: semua `PRD/*.md` di-push jadi Google Doc (basic styled: heading/bold/bullet/link). Auto-update via file watcher saat .md berubah/baru (debounce 1.2s, skip kalau belum login). Manual: `/api/mirror` (POST) / tombol di Settings. Engine: `scripts/mirror.js`, peta path→docId di `.gdocs-mirror.json`. |
-| **Settings Page (⚙)** | ✅ | Top-bar gear → `view==='settings'`. 3 section: (1) Google login/logout + status + mirror-all, (2) Theme picker, (3) Manual import. Komponen `SettingsPage`. Import & Theme dipindah ke sini (dihapus dari top bar). |
+| **Google Docs Integration** | ✅ | **OAuth login** (akun user, bukan service account). Sidebar section "Google Docs ☁" baca **folder aktif saja** (bukan seluruh Drive). Backend validasi scope Docs+Drive; token lama akan ditandai **needs reconnect** bila belum punya izin lengkap. Tombol "⇪ Export to GDocs" di MarkdownViewer → buat Doc baru di folder aktif. Backend: `scripts/google-auth.js` (OAuth2 + scope check) + `scripts/gdocs.js` + endpoint `/api/google/*`, `/api/gdocs*`. Setup di `GDOCS-SETUP.md`. |
+| **PRD Mirror → Google Docs** | ✅ | One-way: semua `PRD/*.md` di-push jadi Google Doc (basic styled: heading/bold/bullet/link). Auto-update via file watcher saat .md berubah/baru (debounce 1.2s). Mirror sekarang fail-fast bila token belum punya scope Docs/Drive, jadi user tidak lagi terlihat "connected" palsu saat PRD baru gagal dibuat. Engine: `scripts/mirror.js`, peta path→docId + folder pilihan di `.gdocs-mirror.json`. |
+| **Settings Page (⚙)** | ✅ | Top-bar gear → `view==='settings'`. 5 section. Google Connection sekarang punya login/logout, status akun, **folder picker Google Drive**, reconnect warning bila token scope kurang, dan tombol mirror-all. Import & Theme tetap di sini. |
 | **+ New folder / + New TSV** | ✅ | Tombol "+" di header section & row folder → `NewItemForm` (nama + Folder/TSV). Folder via `POST /api/files/mkdir`; TSV via PUT `/api/files/content` dengan template `serializeCardToTSV([EMPTY_TC])`. Server-mode (bukan File System Access lama yang sudah deprecated). |
 | **Live sidebar (SSE)** | ✅ | `GET /api/files/events` (SSE) di-broadcast saat watcher mendeteksi perubahan file/folder. Frontend EventSource → `refreshTree()` (hanya `setSections`, tidak menyentuh selection/file terbuka → tanpa reload halaman). |
 | **Live Server reload block** | ✅ | Block WebSocket livereload + override location.reload |
@@ -163,7 +163,9 @@ Node.js Express server (369 lines) sebagai backend QA Browser.
 | `/api/testcases/:id/map` | PUT | Upsert automation mapping for TC |
 | `/api/import` | POST | Re-scan workspace & reindex all TSV/MD into SQLite |
 | `/api/run` | POST | Spawn `npx playwright test` with SSE streaming output |
-| `/api/google/status` | GET | `{oauthConfigured, connected, email, folderName}` |
+| `/api/google/status` | GET | `{oauthConfigured, connected, needsReconnect, email, folderPath}` |
+| `/api/google/folders` | GET | List folder Drive untuk picker di Settings |
+| `/api/google/folder` | PUT | Set / reset folder aktif mirror + sidebar |
 | `/api/google/login` | GET | Redirect ke Google consent |
 | `/oauth2callback` | GET | Tukar code → simpan `google-token.json` |
 | `/api/google/logout` | POST | Hapus token |
