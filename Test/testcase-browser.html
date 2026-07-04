@@ -94,6 +94,7 @@
     .react-flow__background { background: transparent; }
     .react-flow__controls button { background: var(--elevated-bg); color: var(--text-2); border-bottom: 1px solid var(--border-1); }
     .react-flow__minimap { background: var(--deep-bg); border: 1px solid var(--border-1); }
+    .nr-block:hover .nr-hover-actions { opacity: 1 !important; }
   </style>
 </head>
 <body>
@@ -3358,6 +3359,8 @@
         ];
       }
     });
+    const requestEditorRef = useRef(null);
+    const [pendingRequestFocusId, setPendingRequestFocusId] = useState(null);
     const canAdminEdit = user?.role === 'admin';
     const themeRef  = useRef(null);
     const isDraggingRef = useRef(false);
@@ -3788,11 +3791,65 @@
       try { localStorage.setItem('qa_new_request_blocks', JSON.stringify(requestBlocks)); } catch {}
     }, [requestBlocks]);
 
+    useEffect(() => {
+      if (!pendingRequestFocusId || !requestEditorRef.current) return;
+      const el = requestEditorRef.current.querySelector(`[data-block-id="${pendingRequestFocusId}"] [data-block-text]`);
+      if (!el) return;
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      requestEditorRef.current.focus();
+      setPendingRequestFocusId(null);
+    }, [requestBlocks, pendingRequestFocusId]);
+
+    function currentBlockIdFromSelection() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return null;
+      let n = sel.anchorNode;
+      while (n && n !== requestEditorRef.current) {
+        if (n.nodeType === 1 && n.dataset && n.dataset.blockId) return n.dataset.blockId;
+        n = n.parentNode;
+      }
+      return null;
+    }
+    function currentBlockIdsFromSelection() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || !requestEditorRef.current) return [];
+      const range = sel.getRangeAt(0);
+      const blocks = Array.from(requestEditorRef.current.querySelectorAll('[data-block-id]'));
+      const ids = blocks.filter(el => {
+        try { return range.intersectsNode(el); } catch { return false; }
+      }).map(el => el.dataset.blockId).filter(Boolean);
+      return ids.length ? ids : [currentBlockIdFromSelection()].filter(Boolean);
+    }
+    function patchRequestBlocks(ids, patch) {
+      if (!ids?.length) return;
+      const set = new Set(ids);
+      setRequestBlocks(prev => prev.map(b => set.has(b.id) ? { ...b, ...patch } : b));
+    }
     function patchRequestBlock(id, patch) {
       setRequestBlocks(prev => prev.map(b => b.id === id ? { ...b, ...patch } : b));
     }
+    function syncRequestBlocksFromDom() {
+      if (!requestEditorRef.current) return;
+      const next = Array.from(requestEditorRef.current.querySelectorAll('[data-block-id]')).map((el, idx) => {
+        const textEl = el.querySelector('[data-block-text]');
+        return {
+          id: el.dataset.blockId || `req-${idx}`,
+          type: el.dataset.blockType || 'text',
+          text: (textEl ? textEl.textContent : el.textContent) || '',
+          checked: el.dataset.blockChecked === 'true',
+          menuOpen: false,
+        };
+      });
+      if (next.length) setRequestBlocks(next);
+    }
     function addRequestBlock(afterId) {
-      const block = { id:'req-' + Date.now(), type:'text', text:'', checked:false };
+      const block = { id:'req-' + Date.now() + '-' + Math.random().toString(36).slice(2,6), type:'text', text:'', checked:false };
+      setPendingRequestFocusId(block.id);
       setRequestBlocks(prev => {
         const i = prev.findIndex(b => b.id === afterId);
         return i === -1 ? [...prev, block] : [...prev.slice(0, i + 1), block, ...prev.slice(i + 1)];
@@ -3802,32 +3859,73 @@
       setRequestBlocks(prev => prev.length <= 1 ? prev : prev.filter(b => b.id !== id));
     }
     function renderNewRequestView() {
+      const blockTypes = ['text','todo','bullet','numbered'];
+      const iconBtn = {
+        width:22, height:22, borderRadius:6, border:'1px solid var(--border-1)', background:'transparent',
+        color:'var(--text-4)', cursor:'pointer', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:12
+      };
+      let numberedCounter = 0;
       return (
         <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', background:'var(--app-bg)' }}>
           <div style={{ padding:'12px 20px', borderBottom:'1px solid var(--border-1)' }}>
             <div style={{ fontSize:18, fontWeight:700, color:'var(--text-1)' }}>New Request</div>
-            <div style={{ fontSize:11, color:'var(--text-4)', marginTop:4 }}>Klik text untuk edit. Enter bikin block baru. Ubah tipe: text / todo / bullet / numbered.</div>
+            <div style={{ fontSize:11, color:'var(--text-4)', marginTop:4 }}>Select bebas lintas block. Enter = block baru. Hover kiri untuk + / menu.</div>
           </div>
           <div style={{ flex:1, overflowY:'auto', padding:'18px 26px 80px' }}>
             <div style={{ maxWidth:860, margin:'0 auto' }}>
-              {requestBlocks.map((block, idx) => (
-                <div key={block.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'8px 0 12px' }}>
-                  <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:6 }}>
-                    {['text','todo','bullet','numbered'].map(t => (
-                      <button key={t} onClick={() => patchRequestBlock(block.id, { type:t })}
-                        style={{ fontSize:10, padding:'3px 8px', borderRadius:6, border:`1px solid ${block.type === t ? '#3b82f6' : 'var(--border-1)'}`,
-                          background:block.type === t ? 'rgba(59,130,246,0.18)' : 'transparent', color:block.type === t ? '#dbeafe' : 'var(--text-4)', cursor:'pointer' }}>{t}</button>
-                    ))}
-                  </div>
-                  <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
-                    {block.type === 'todo' ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} style={{ marginTop:5 }} /> : block.type === 'bullet' ? <span style={{ width:18, color:'var(--text-4)' }}>•</span> : block.type === 'numbered' ? <span style={{ width:18, color:'var(--text-4)' }}>{idx + 1}.</span> : <span style={{ width:18 }} />}
-                    <div contentEditable suppressContentEditableWarning onBlur={e=>patchRequestBlock(block.id, { text:e.currentTarget.textContent || '' })}
-                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addRequestBlock(block.id); } if (e.key === 'Backspace' && !(block.text || '').trim()) { e.preventDefault(); removeRequestBlock(block.id); } }}
-                      style={{ flex:1, minHeight:24, outline:'none', color:'var(--text-1)', fontSize:13, lineHeight:1.7, cursor:'text', whiteSpace:'pre-wrap' }}>{block.text}</div>
-                  </div>
-                </div>
-              ))}
-              <button onClick={() => addRequestBlock(requestBlocks[requestBlocks.length - 1]?.id)} style={{ marginTop:12, fontSize:11, padding:'6px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'transparent', color:'var(--text-3)', cursor:'pointer' }}>+ Add block</button>
+              <div ref={requestEditorRef} contentEditable suppressContentEditableWarning
+                onBlur={() => syncRequestBlocksFromDom()}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const id = currentBlockIdFromSelection();
+                    syncRequestBlocksFromDom();
+                    addRequestBlock(id);
+                  } else if (e.key === 'Backspace') {
+                    const id = currentBlockIdFromSelection();
+                    if (id) {
+                      const el = requestEditorRef.current?.querySelector(`[data-block-id="${id}"] [data-block-text]`);
+                      if (el && !el.textContent.trim()) {
+                        e.preventDefault();
+                        removeRequestBlock(id);
+                      }
+                    }
+                  }
+                }}
+                style={{ outline:'none', color:'var(--text-1)', fontSize:13, lineHeight:1.7 }}>
+                {requestBlocks.map((block, idx) => {
+                  const menuOpen = block.menuOpen === true;
+                  if (block.type === 'numbered') numberedCounter += 1; else numberedCounter = 0;
+                  return (
+                    <div key={block.id} data-block-id={block.id} data-block-type={block.type} data-block-checked={block.checked ? 'true' : 'false'}
+                      className='nr-block' style={{ position:'relative', padding:'4px 0' }}>
+                      <div contentEditable={false} style={{ position:'absolute', left:-52, top:4, display:'flex', gap:6, opacity:0.18, userSelect:'none' }} className='nr-hover-actions'>
+                        <button title='Add below' onMouseDown={e => { e.preventDefault(); syncRequestBlocksFromDom(); addRequestBlock(block.id); }} style={iconBtn}>+</button>
+                        <button title='Open type menu' onMouseDown={e => { e.preventDefault(); patchRequestBlocks(requestBlocks.map(b => b.id), { menuOpen:false }); patchRequestBlock(block.id, { menuOpen: !menuOpen }); }} style={iconBtn}>⋮⋮</button>
+                      </div>
+                      {menuOpen && (
+                        <div contentEditable={false} style={{ position:'absolute', left:-4, top:24, zIndex:20, minWidth:180, background:'#111827', border:'1px solid var(--border-1)', borderRadius:8, padding:6, boxShadow:'0 10px 30px rgba(0,0,0,0.45)', userSelect:'none' }}>
+                          {blockTypes.map(t => (
+                            <div key={t} onMouseDown={e => { e.preventDefault(); const ids = currentBlockIdsFromSelection(); patchRequestBlocks(ids.length ? ids : [block.id], { type:t, menuOpen:false }); }}
+                              style={{ padding:'8px 10px', borderRadius:6, cursor:'pointer', color:'var(--text-2)', fontSize:12, background:block.type === t ? 'rgba(59,130,246,0.18)' : 'transparent', border:block.type === t ? '1px solid #3b82f6' : '1px solid transparent' }}>{t}</div>
+                          ))}
+                        </div>
+                      )}
+                      <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
+                        <span contentEditable={false} style={{ width:22, userSelect:'none', color:'var(--text-4)', marginTop:2, display:'inline-flex', justifyContent:'center' }}>
+                          {block.type === 'todo'
+                            ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} />
+                            : block.type === 'bullet' ? '•'
+                            : block.type === 'numbered' ? `${numberedCounter}.`
+                            : ''}
+                        </span>
+                        <span data-block-text style={{ flex:1, minHeight:20, whiteSpace:'pre-wrap' }}>{block.text}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <button onMouseDown={e => { e.preventDefault(); syncRequestBlocksFromDom(); addRequestBlock(requestBlocks[requestBlocks.length - 1]?.id); }} style={{ marginTop:12, fontSize:11, padding:'6px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'transparent', color:'var(--text-3)', cursor:'pointer' }}>+ Add block</button>
             </div>
           </div>
         </div>
