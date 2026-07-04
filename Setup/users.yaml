@@ -1,0 +1,15 @@
+users:
+  - username: admin
+    password: admin123
+    role: admin
+    name: Admin
+
+  - username: dany
+    password: password123
+    role: admin
+    name: Dany Christian
+
+  - username: viewer
+    password: viewer123
+    role: viewer
+    name: Viewer

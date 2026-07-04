@@ -2009,7 +2009,7 @@
   }
 
   // ─── SETTINGS PAGE ─────────────────────────────────────────────────────────
-  function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, onImport, importing, importMsg }) {
+  function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, onImport, importing, importMsg, user }) {
     const [busy, setBusy] = useState(false);
     const [msg, setMsg]   = useState('');
     const [autoCfg, setAutoCfg]   = useState(null);
@@ -2034,7 +2034,8 @@
     const [setupDraft, setSetupDraft] = useState({ manifest:null, rules:null, agents:null, workflows:null, pointers:null, saving:false, error:null });
     // confirm modal for save
     const [confirmOpen, setConfirmOpen] = useState(null); // {title, body, onOk, danger}
-    // localhost detection (host browser → can edit). Updated via /api/health by checking req origin loopback is hard; cheaper: try a privileged GET vs simple check.
+    const canAdminEdit = user?.role === 'admin';
+    // localhost detection (host browser → can edit). Updated via /api/health by useEffect below.
     const isLocalhost = typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1|::1)$/.test(window.location.hostname);
     const [workflowModePick, setWorkflowModePick] = useState('full_lane');
     const [workflowGraphLib, setWorkflowGraphLib] = useState({ loading:false, ready:false, error:null });
@@ -2457,11 +2458,11 @@
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10, gap:8 }}>
               <div style={{ fontSize:11, color:'var(--text-3)', lineHeight:1.6 }}>{desc}</div>
               <div style={{ display:'flex', gap:6 }}>
-                {!editing && isLocalhost && editableBtn('✎ Edit', ()=>startEditOrch(key))}
+                {!editing && canAdminEdit && editableBtn('✎ Edit', ()=>startEditOrch(key))}
                 {editing && editableBtn('Cancel', ()=>cancelEditOrch(key))}
                 {editing && editableBtn('Validate', validateOrchPreview)}
                 {editing && editableBtn('Save', saveOrchBundleConfirm, { primary:true, disabled: setupDraft.saving })}
-                {!isLocalhost && <span style={{ fontSize:10, color:'var(--text-5)' }}>(edit hanya dari localhost)</span>}
+                {!canAdminEdit && <span style={{ fontSize:10, color:'var(--text-5)' }}>(edit hanya untuk role admin)</span>}
               </div>
             </div>
             {setupCfg.loading
@@ -2493,7 +2494,7 @@
           </div>
           <div>
             {!docPick.relPath || docPick.kind !== kind
-              ? <div style={{ fontSize:11, color:'var(--text-5)', padding:8 }}>Pilih file di kiri untuk membaca / edit isinya. {isLocalhost ? '' : '(edit hanya dari localhost — kamu non-host, mode view-only.)'}</div>
+              ? <div style={{ fontSize:11, color:'var(--text-5)', padding:8 }}>Pilih file di kiri untuk membaca / edit isinya. {canAdminEdit ? '' : '(edit hanya untuk role admin.)'}</div>
               : docPick.loading
                 ? <div style={{ fontSize:11, color:'var(--text-5)' }}>Loading {docPick.relPath}…</div>
                 : docPick.error
@@ -2506,7 +2507,7 @@
                           {docPick.editing && <span style={{ marginLeft:8, color:'#fbbf24' }}>● editing</span>}
                         </div>
                         <div style={{ display:'flex', gap:6 }}>
-                          {!docPick.editing && isLocalhost && editableBtn('✎ Edit', startEditDoc)}
+                          {!docPick.editing && canAdminEdit && editableBtn('✎ Edit', startEditDoc)}
                           {docPick.editing && editableBtn('Cancel', cancelEditDoc, { disabled: docPick.saving })}
                           {docPick.editing && editableBtn('Save', saveDocConfirm, { primary:true, disabled: docPick.saving || docPick.draft === docPick.content })}
                           {editableBtn(docPick.showBackups ? 'Hide history' : `History (${docPick.backups.length})`, ()=>setDocPick(p => ({ ...p, showBackups: !p.showBackups })))}
@@ -2760,10 +2761,10 @@
                 <select value={workflowModePick} onChange={e=>{ setWorkflowModePick(e.target.value); setWorkflowNodePick(null); }} style={{ background:'var(--deep-bg)', color:'var(--text-1)', border:'1px solid var(--border-1)', borderRadius:6, padding:'6px 8px', fontSize:11 }}>
                   {Object.keys(modes).map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
-                {!editActive && isLocalhost && editableBtn('Edit graph', ()=>startWorkflowEdit(workflowModePick), { primary:true })}
+                {!editActive && canAdminEdit && editableBtn('Edit graph', ()=>startWorkflowEdit(workflowModePick), { primary:true })}
                 {editActive && editableBtn('Exit edit', cancelWorkflowEdit, { danger:true })}
                 {editActive && editableBtn('Save graph', saveWorkflowGraphConfirm, { primary:true, disabled: !workflowEdit.dirty || workflowEdit.saving })}
-                {isLocalhost && editableBtn('Open YAML', ()=>startEditOrch('workflows'))}
+                {canAdminEdit && editableBtn('Open YAML', ()=>startEditOrch('workflows'))}
               </div>
             </div>
             {editActive ? (
@@ -3035,8 +3036,8 @@
             ) : tabBody}
 
             <div style={{ fontSize:10, color:'var(--text-5)', marginTop:14, lineHeight:1.6 }}>
-              Phase 2.0–2.3 active — orchestration config + Rules/Memory browser + edit/diff/atomic save. Localhost-only enforcement aktif.
-              {!isLocalhost && <span style={{ color:'#fbbf24', marginLeft:6 }}>● Kamu bukan host → mode view-only.</span>}
+              Phase 2.0–2.3 active — orchestration config + Rules/Memory browser + edit/diff/atomic save.
+              {!canAdminEdit && <span style={{ color:'#fbbf24', marginLeft:6 }}>● Role non-admin → mode view-only.</span>}
             </div>
           </div>
 
@@ -3261,6 +3262,62 @@
     return detailShell(<div style={{ fontSize:12, color:'var(--text-3)' }}>Pilih kategori dari Settings.</div>);
   }
 
+  // ─── LOGIN PAGE ──────────────────────────────────────────────────────────
+  function LoginPage({ onLogin, error, setError }) {
+    const [u, setU] = useState('');
+    const [p, setP] = useState('');
+    const [busy, setBusy] = useState(false);
+    async function doLogin() {
+      if (!u || !p) { setError('Username & password wajib diisi.'); return; }
+      setBusy(true); setError('');
+      try {
+        const r = await fetch('/api/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok || !data.ok) { setError(data.error || 'Login gagal'); setBusy(false); return; }
+        const session = { username: data.username, role: data.role, name: data.name || data.username };
+        try { localStorage.setItem('qa_user', JSON.stringify(session)); } catch {}
+        onLogin(session);
+      } catch (e) { setError('Gagal reach server: ' + (e.message || 'unknown')); }
+      setBusy(false);
+    }
+    function onKey(e) { if (e.key === 'Enter') doLogin(); }
+    return (
+      <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
+        background:'#08080e', color:'var(--text-1)' }}>
+        <div style={{ width:340, padding:'28px 26px', borderRadius:12, background:'var(--sidebar-bg)',
+          border:'1px solid var(--border-1)', boxShadow:'0 20px 60px rgba(0,0,0,0.5)' }}>
+          <div style={{ fontSize:20, fontWeight:700, marginBottom:6 }}>◈ QA Browser</div>
+          <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:22 }}>Sign in untuk akses dashboard</div>
+          <div style={{ marginBottom:12 }}>
+            <div style={{ fontSize:10, color:'var(--text-4)', marginBottom:4 }}>Username</div>
+            <input id="username" value={u} onChange={e=>setU(e.target.value)} onKeyDown={onKey} autoFocus
+              style={{ width:'100%', padding:'8px 10px', fontSize:12, background:'var(--deep-bg)',
+                color:'var(--text-1)', border:'1px solid var(--border-1)', borderRadius:6, outline:'none' }} />
+          </div>
+          <div style={{ marginBottom:16 }}>
+            <div style={{ fontSize:10, color:'var(--text-4)', marginBottom:4 }}>Password</div>
+            <input id="password" type="password" value={p} onChange={e=>setP(e.target.value)} onKeyDown={onKey}
+              style={{ width:'100%', padding:'8px 10px', fontSize:12, background:'var(--deep-bg)',
+                color:'var(--text-1)', border:'1px solid var(--border-1)', borderRadius:6, outline:'none' }} />
+          </div>
+          {error && <div style={{ fontSize:11, color:'#f87171', marginBottom:10 }}>{error}</div>}
+          <button onClick={doLogin} disabled={busy}
+            style={{ width:'100%', padding:'9px 12px', fontSize:12, fontWeight:600, color:'#fff',
+              background: busy ? 'var(--text-5)' : '#3b82f6', border:'none', borderRadius:6,
+              cursor: busy ? 'default' : 'pointer' }}>
+            {busy ? 'Signing in…' : 'Sign In'}
+          </button>
+          <div style={{ fontSize:10, color:'var(--text-5)', marginTop:14, lineHeight:1.6 }}>
+            Default: <code>admin/admin123</code> · <code>viewer/viewer123</code>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function App() {
     const [sections, setSections]     = useState([]);
     const [selected, setSelected]     = useState(null); // { path, sectionId, name, ext }
@@ -3283,6 +3340,25 @@
     const [themeId, setThemeId]       = useState('navy');
     const [creating, setCreating]     = useState(null);   // { path, sectionId }
     const [creatingBusy, setCreatingBusy] = useState(false);
+    const [user, setUser] = useState(() => {
+      try { return JSON.parse(localStorage.getItem('qa_user') || 'null'); } catch { return null; }
+    });
+    const [loginErr, setLoginErr] = useState('');
+    const [requestBlocks, setRequestBlocks] = useState(() => {
+      try {
+        const v = JSON.parse(localStorage.getItem('qa_new_request_blocks') || 'null');
+        return Array.isArray(v) && v.length ? v : [
+          { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
+          { id:'req-2', type:'todo', text:'Checklist item', checked:false },
+        ];
+      } catch {
+        return [
+          { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
+          { id:'req-2', type:'todo', text:'Checklist item', checked:false },
+        ];
+      }
+    });
+    const canAdminEdit = user?.role === 'admin';
     const themeRef  = useRef(null);
     const isDraggingRef = useRef(false);
     const dragStartXRef = useRef(0);
@@ -3557,6 +3633,7 @@
           onImport={handleImport}
           importing={importing}
           importMsg={importMsg}
+          user={user}
         />
       );
       if (!selected) return (
@@ -3634,9 +3711,10 @@
 
     // ── Nav items ───────────────────────────────────────────────────────────
     const NAV_ITEMS = [
-      { id:'dashboard',  label:'Dashboard',  icon:'◈' },
-      { id:'workspace',  label:'Workspace',  icon:'⊞' },
-      { id:'memory',     label:'Memory',     icon:'⚡' },
+      { id:'dashboard', label:'Dashboard', icon:'◈' },
+      { id:'workspace', label:'Workspace', icon:'⊞' },
+      { id:'new-request', label:'New Request', icon:'✎' },
+      { id:'memory', label:'Memory', icon:'⚡' },
     ];
     const navItemStyle = (id) => ({
       display:'flex', alignItems:'center', gap:9, padding:'7px 14px', cursor:'pointer', borderRadius:6,
@@ -3699,14 +3777,65 @@
     }
 
     function renderMemoryView() {
+    return (
+    <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', background:'var(--app-bg)', color:'var(--text-5)', fontSize:12 }}>
+    Memory — belum ada konten
+    </div>
+    );
+    }
+
+    useEffect(() => {
+      try { localStorage.setItem('qa_new_request_blocks', JSON.stringify(requestBlocks)); } catch {}
+    }, [requestBlocks]);
+
+    function patchRequestBlock(id, patch) {
+      setRequestBlocks(prev => prev.map(b => b.id === id ? { ...b, ...patch } : b));
+    }
+    function addRequestBlock(afterId) {
+      const block = { id:'req-' + Date.now(), type:'text', text:'', checked:false };
+      setRequestBlocks(prev => {
+        const i = prev.findIndex(b => b.id === afterId);
+        return i === -1 ? [...prev, block] : [...prev.slice(0, i + 1), block, ...prev.slice(i + 1)];
+      });
+    }
+    function removeRequestBlock(id) {
+      setRequestBlocks(prev => prev.length <= 1 ? prev : prev.filter(b => b.id !== id));
+    }
+    function renderNewRequestView() {
       return (
-        <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', background:'var(--app-bg)', color:'var(--text-5)', fontSize:12 }}>
-          Memory — belum ada konten
+        <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', background:'var(--app-bg)' }}>
+          <div style={{ padding:'12px 20px', borderBottom:'1px solid var(--border-1)' }}>
+            <div style={{ fontSize:18, fontWeight:700, color:'var(--text-1)' }}>New Request</div>
+            <div style={{ fontSize:11, color:'var(--text-4)', marginTop:4 }}>Klik text untuk edit. Enter bikin block baru. Ubah tipe: text / todo / bullet / numbered.</div>
+          </div>
+          <div style={{ flex:1, overflowY:'auto', padding:'18px 26px 80px' }}>
+            <div style={{ maxWidth:860, margin:'0 auto' }}>
+              {requestBlocks.map((block, idx) => (
+                <div key={block.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)', padding:'8px 0 12px' }}>
+                  <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:6 }}>
+                    {['text','todo','bullet','numbered'].map(t => (
+                      <button key={t} onClick={() => patchRequestBlock(block.id, { type:t })}
+                        style={{ fontSize:10, padding:'3px 8px', borderRadius:6, border:`1px solid ${block.type === t ? '#3b82f6' : 'var(--border-1)'}`,
+                          background:block.type === t ? 'rgba(59,130,246,0.18)' : 'transparent', color:block.type === t ? '#dbeafe' : 'var(--text-4)', cursor:'pointer' }}>{t}</button>
+                    ))}
+                  </div>
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
+                    {block.type === 'todo' ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} style={{ marginTop:5 }} /> : block.type === 'bullet' ? <span style={{ width:18, color:'var(--text-4)' }}>•</span> : block.type === 'numbered' ? <span style={{ width:18, color:'var(--text-4)' }}>{idx + 1}.</span> : <span style={{ width:18 }} />}
+                    <div contentEditable suppressContentEditableWarning onBlur={e=>patchRequestBlock(block.id, { text:e.currentTarget.textContent || '' })}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addRequestBlock(block.id); } if (e.key === 'Backspace' && !(block.text || '').trim()) { e.preventDefault(); removeRequestBlock(block.id); } }}
+                      style={{ flex:1, minHeight:24, outline:'none', color:'var(--text-1)', fontSize:13, lineHeight:1.7, cursor:'text', whiteSpace:'pre-wrap' }}>{block.text}</div>
+                  </div>
+                </div>
+              ))}
+              <button onClick={() => addRequestBlock(requestBlocks[requestBlocks.length - 1]?.id)} style={{ marginTop:12, fontSize:11, padding:'6px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'transparent', color:'var(--text-3)', cursor:'pointer' }}>+ Add block</button>
+            </div>
+          </div>
         </div>
       );
     }
 
     // ── Main render ─────────────────────────────────────────────────────
+    if (!user) return <LoginPage onLogin={setUser} error={loginErr} setError={setLoginErr} />;
     return (
       <div style={{ height:'100vh', display:'flex', overflow:'hidden' }}>
 
@@ -3787,14 +3916,23 @@
                   </div>
                 ))}
 
-                {/* Spacer push Settings to bottom */}
+                {/* Spacer push footer to bottom */}
                 <div style={{ flex:1 }} />
 
-                {/* Settings at bottom */}
-                <div onClick={() => { setMainNav('settings'); setWorkspaceNav(null); }}
-                  style={navItemStyle('settings')}>
-                  <span style={{ fontSize:14 }}>⚙</span>
-                  <span style={{ fontSize:12 }}>Settings</span>
+                <div style={{ padding:'10px 14px 12px', borderTop:'1px solid var(--border-1)' }}>
+                  <div style={{ fontSize:11, color:'var(--text-2)', fontWeight:600 }}>{user?.name || user?.username}</div>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:4 }}>
+                    <span style={{ fontSize:10, color: canAdminEdit ? '#93c5fd' : '#fbbf24' }}>{user?.role}</span>
+                    <button onClick={() => { try { localStorage.removeItem('qa_user'); } catch {} setUser(null); setLoginErr(''); }}
+                      style={{ fontSize:10, background:'transparent', border:'1px solid var(--border-1)', color:'var(--text-3)', borderRadius:4, padding:'2px 8px', cursor:'pointer' }}>↩ Logout</button>
+                  </div>
+                  {canAdminEdit && (
+                    <div onClick={() => { setMainNav('settings'); setWorkspaceNav(null); }}
+                      style={{ ...navItemStyle('settings'), margin:'10px 0 0', padding:'7px 10px' }}>
+                      <span style={{ fontSize:14 }}>⚙</span>
+                      <span style={{ fontSize:12 }}>Settings</span>
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -3946,6 +4084,7 @@
             }
 
             // ── Memory ─────────────────────────────────────────────────
+            if (mainNav === 'new-request') return renderNewRequestView();
             if (mainNav === 'memory') return renderMemoryView();
 
             // ── Settings ───────────────────────────────────────────────
@@ -3958,6 +4097,7 @@
                 onImport={handleImport}
                 importing={importing}
                 importMsg={importMsg}
+                user={user}
               />
             );
           })()}
