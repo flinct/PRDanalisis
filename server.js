@@ -78,6 +78,13 @@ db.exec(`
     last_scanned  TEXT DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS app_state (
+    key         TEXT PRIMARY KEY,
+    value       TEXT NOT NULL,
+    updated_by  TEXT DEFAULT 'system',
+    updated_at  TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_tc_module    ON test_cases(module);
   CREATE INDEX IF NOT EXISTS idx_tc_type      ON test_cases(test_type);
   CREATE INDEX IF NOT EXISTS idx_runs_case    ON test_runs(case_id);
@@ -130,6 +137,34 @@ app.post('/api/login', (req, res) => {
     res.json({ ok: true, username: user.username, role: user.role, name: user.name || user.username });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Failed to read users.yaml' });
+  }
+});
+
+app.get('/api/new-request', (_req, res) => {
+  try {
+    const row = db.prepare("SELECT value, updated_at, updated_by FROM app_state WHERE key = ?").get('new_request_blocks');
+    const blocks = row ? JSON.parse(row.value) : [
+      { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
+      { id:'req-2', type:'todo', text:'Checklist item', checked:false },
+    ];
+    res.json({ ok:true, blocks, updatedAt: row?.updated_at || null, updatedBy: row?.updated_by || null });
+  } catch (e) {
+    res.status(500).json({ ok:false, error:e.message });
+  }
+});
+
+app.put('/api/new-request', (req, res) => {
+  const { blocks, updatedBy } = req.body || {};
+  if (!Array.isArray(blocks)) return res.status(400).json({ ok:false, error:'blocks must be array' });
+  try {
+    db.prepare(`INSERT INTO app_state (key, value, updated_by, updated_at)
+      VALUES (?, ?, ?, datetime('now'))
+      ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=datetime('now')`)
+      .run('new_request_blocks', JSON.stringify(blocks), String(updatedBy || 'user'));
+    const row = db.prepare("SELECT updated_at, updated_by FROM app_state WHERE key = ?").get('new_request_blocks');
+    res.json({ ok:true, updatedAt: row?.updated_at || null, updatedBy: row?.updated_by || null });
+  } catch (e) {
+    res.status(500).json({ ok:false, error:e.message });
   }
 });
 

@@ -3356,20 +3356,12 @@
       try { return JSON.parse(localStorage.getItem('qa_user') || 'null'); } catch { return null; }
     });
     const [loginErr, setLoginErr] = useState('');
-    const [requestBlocks, setRequestBlocks] = useState(() => {
-      try {
-        const v = JSON.parse(localStorage.getItem('qa_new_request_blocks') || 'null');
-        return Array.isArray(v) && v.length ? v : [
-          { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
-          { id:'req-2', type:'todo', text:'Checklist item', checked:false },
-        ];
-      } catch {
-        return [
-          { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
-          { id:'req-2', type:'todo', text:'Checklist item', checked:false },
-        ];
-      }
-    });
+    const DEFAULT_REQUEST_BLOCKS = [
+      { id:'req-1', type:'text', text:'Klik text ini untuk edit request baru.' },
+      { id:'req-2', type:'todo', text:'Checklist item', checked:false },
+    ];
+    const [requestBlocks, setRequestBlocks] = useState(DEFAULT_REQUEST_BLOCKS);
+    const [requestSyncMeta, setRequestSyncMeta] = useState({ loading:true, saving:false, error:'', updatedAt:null, updatedBy:null });
     const requestEditorRef = useRef(null);
     const [pendingRequestFocusId, setPendingRequestFocusId] = useState(null);
     const canAdminEdit = user?.role === 'admin';
@@ -3575,6 +3567,14 @@
       })();
       loadTree();
       loadGDocs();
+      fetch('/api/new-request').then(r => r.json()).then(d => {
+        if (d?.ok && Array.isArray(d.blocks) && d.blocks.length) {
+          setRequestBlocks(d.blocks);
+          setRequestSyncMeta({ loading:false, saving:false, error:'', updatedAt:d.updatedAt || null, updatedBy:d.updatedBy || null });
+        } else {
+          setRequestSyncMeta(prev => ({ ...prev, loading:false, error:d?.error || '' }));
+        }
+      }).catch(e => setRequestSyncMeta(prev => ({ ...prev, loading:false, error:'Sync failed: ' + e.message })));
     }, []);
 
     // Live sidebar updates: server pings on any file/folder change → quiet tree refresh
@@ -3799,8 +3799,20 @@
     }
 
     useEffect(() => {
-      try { localStorage.setItem('qa_new_request_blocks', JSON.stringify(requestBlocks)); } catch {}
-    }, [requestBlocks]);
+      if (requestSyncMeta.loading || !requestBlocks?.length) return;
+      const t = setTimeout(() => {
+        setRequestSyncMeta(prev => ({ ...prev, saving:true, error:'' }));
+        fetch('/api/new-request', {
+          method:'PUT',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ blocks: requestBlocks, updatedBy: user?.name || user?.username || 'user' })
+        }).then(r => r.json()).then(d => {
+          if (!d?.ok) throw new Error(d?.error || 'Save failed');
+          setRequestSyncMeta({ loading:false, saving:false, error:'', updatedAt:d.updatedAt || null, updatedBy:d.updatedBy || null });
+        }).catch(e => setRequestSyncMeta(prev => ({ ...prev, saving:false, error:'Save failed: ' + e.message })));
+      }, 400);
+      return () => clearTimeout(t);
+    }, [requestBlocks, user?.name, user?.username]);
 
     useEffect(() => {
       if (!pendingRequestFocusId || !requestEditorRef.current) return;
@@ -3881,6 +3893,9 @@
           <div style={{ padding:'12px 20px', borderBottom:'1px solid var(--border-1)' }}>
             <div style={{ fontSize:18, fontWeight:700, color:'var(--text-1)' }}>New Request</div>
             <div style={{ fontSize:11, color:'var(--text-4)', marginTop:4 }}>Select bebas lintas block. Enter = block baru. Hover kiri untuk + / menu.</div>
+            <div style={{ fontSize:10, color: requestSyncMeta.error ? '#fca5a5' : 'var(--text-5)', marginTop:4 }}>
+              {requestSyncMeta.loading ? 'Loading shared draft…' : requestSyncMeta.saving ? 'Saving to server…' : requestSyncMeta.error ? requestSyncMeta.error : `Shared draft${requestSyncMeta.updatedBy ? ` · by ${requestSyncMeta.updatedBy}` : ''}${requestSyncMeta.updatedAt ? ` · ${requestSyncMeta.updatedAt}` : ''}`}
+            </div>
           </div>
           <div style={{ flex:1, overflowY:'auto', padding:'18px 26px 80px' }}>
             <div style={{ maxWidth:860, margin:'0 auto' }}>
