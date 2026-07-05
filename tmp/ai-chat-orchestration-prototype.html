@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SatuInbox AI Chat Orchestration Prototype</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --line: #e5eaf2;
+      --text: #0f172a;
+      --muted: #64748b;
+      --brand: #2563eb;
+      --brand-soft: #dbeafe;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --purple: #7c3aed;
+      --purple-soft: #ede9fe;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+    .sidebar {
+      background: linear-gradient(180deg, #0f172a 0%, #16243b 100%);
+      color: #e2e8f0;
+      padding: 22px 18px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+      font-weight: 700; font-size: 20px;
+    }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 14px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      display: grid; place-items: center; color: white; font-weight: 800;
+      box-shadow: 0 10px 22px rgba(59,130,246,.35);
+    }
+    .nav-group { margin-bottom: 24px; }
+    .nav-title { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #94a3b8; margin: 0 10px 10px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 12px; border-radius: 12px;
+      color: #cbd5e1; margin-bottom: 6px; font-size: 14px;
+      background: transparent;
+    }
+    .nav-item.active { background: rgba(59,130,246,.18); color: #fff; }
+    .main { padding: 22px; }
+    .topbar {
+      background: rgba(255,255,255,.82); backdrop-filter: blur(12px);
+      border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+      padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+    }
+    .title h1 { margin: 0; font-size: 24px; }
+    .title p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      border: 1px solid var(--line); background: white; color: var(--text);
+      border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 600;
+    }
+    .btn.primary { background: var(--brand); color: white; border-color: var(--brand); }
+    .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+    .tab {
+      padding: 10px 14px; border-radius: 12px; background: white; border: 1px solid var(--line);
+      color: var(--muted); font-weight: 600; font-size: 13px;
+    }
+    .tab.active { background: var(--brand-soft); color: var(--brand); border-color: #bfdbfe; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px;
+    }
+    .stat-label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 800; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .layout { display: grid; grid-template-columns: 320px 1fr 340px; gap: 16px; }
+    .chat-list .search, .setting-search {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-soft);
+      margin-bottom: 14px;
+    }
+    .chat-item {
+      border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; background: white;
+    }
+    .chat-item.active { border-color: #93c5fd; background: #f8fbff; }
+    .row { display: flex; justify-content: space-between; gap: 12px; }
+    .name { font-weight: 700; font-size: 14px; }
+    .meta { color: var(--muted); font-size: 12px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge.ai { color: var(--purple); background: var(--purple-soft); }
+    .badge.escalated { color: var(--amber); background: var(--amber-soft); }
+    .badge.live { color: var(--green); background: var(--green-soft); }
+    .badge.warn { color: var(--red); background: var(--red-soft); }
+    .conversation-head {
+      display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px;
+    }
+    .conversation-head h2 { margin: 0; font-size: 20px; }
+    .subline { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .utility {
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff); border: 1px solid #dbeafe; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+    }
+    .utility h3 { margin: 0 0 10px; font-size: 14px; }
+    .utility ul { margin: 8px 0 0 18px; color: #334155; }
+    .timeline { display: flex; flex-direction: column; gap: 12px; }
+    .bubble-wrap { display: flex; gap: 10px; }
+    .bubble-wrap.right { justify-content: flex-end; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px;
+      color: white; flex: none;
+    }
+    .avatar.customer { background: #0f172a; }
+    .avatar.ai { background: #7c3aed; }
+    .avatar.agent { background: #2563eb; }
+    .bubble {
+      max-width: 72%; background: white; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px;
+      box-shadow: 0 6px 18px rgba(15,23,42,.04);
+    }
+    .bubble.ai { background: #faf5ff; border-color: #e9d5ff; }
+    .bubble.agent { background: #eff6ff; border-color: #bfdbfe; }
+    .bubble .who { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .bubble p { margin: 0; font-size: 13px; line-height: 1.6; }
+    .side-stack { display: flex; flex-direction: column; gap: 14px; }
+    .section-title { margin: 0 0 12px; font-size: 14px; font-weight: 800; }
+    .mini-list { display: grid; gap: 10px; }
+    .mini-item { padding: 12px; border-radius: 14px; background: var(--panel-soft); border: 1px solid var(--line); }
+    .mini-item strong { display: block; margin-bottom: 6px; font-size: 13px; }
+    .kv { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 13px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .kv:last-child { border-bottom: 0; }
+    .settings-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; }
+    .setting-block { margin-bottom: 16px; }
+    .setting-block h3 { margin: 0 0 12px; font-size: 16px; }
+    .setting-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field {
+      border: 1px solid var(--line); background: var(--panel-soft); border-radius: 14px; padding: 14px;
+    }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .input, .select {
+      width: 100%; border: 1px solid #d7dee8; border-radius: 10px; padding: 10px 12px; background: white; font-size: 13px;
+    }
+    .toggle-row {
+      display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 14px;
+      border: 1px solid var(--line); border-radius: 14px; background: white; margin-bottom: 10px;
+    }
+    .toggle { width: 48px; height: 28px; border-radius: 999px; background: #cbd5e1; position: relative; }
+    .toggle::after {
+      content: ""; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: white;
+    }
+    .toggle.on { background: var(--brand); }
+    .toggle.on::after { left: 24px; }
+    .footnote { color: var(--muted); font-size: 12px; margin-top: 12px; }
+    @media (max-width: 1400px) {
+      .layout { grid-template-columns: 280px 1fr; }
+      .side-stack { grid-column: 1 / -1; }
+      .settings-layout { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">SI</div> SatuInbox</div>
+      <div class="nav-group">
+        <div class="nav-title">Workspace</div>
+        <div class="nav-item">Overview</div>
+        <div class="nav-item active">Conversation</div>
+        <div class="nav-item">Ticket</div>
+        <div class="nav-item">Contact</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-title">Automation</div>
+        <div class="nav-item active">AI Orchestration</div>
+        <div class="nav-item">Analytics</div>
+        <div class="nav-item">Rules & Macro</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-title">Settings</div>
+        <div class="nav-item">Channel</div>
+        <div class="nav-item">Team & Role</div>
+        <div class="nav-item active">AI Agent</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h1>AI Chat Orchestration</h1>
+          <p>Prototype gaya SatuInbox — escalation to human, transcript visibility, dan halaman konfigurasi AI.</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn">Preview Macro Policy</button>
+          <button class="btn">View AI Logs</button>
+          <button class="btn primary">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('conversation', this)">Conversation Escalation</div>
+        <div class="tab" onclick="showTab('settings', this)">AI Settings</div>
+      </div>
+
+      <section id="conversation" class="screen active">
+        <div class="stats">
+          <div class="card"><div class="stat-label">AI handled today</div><div class="stat-value">428</div><div class="stat-sub">+12% vs yesterday</div></div>
+          <div class="card"><div class="stat-label">Escalated to human</div><div class="stat-value">96</div><div class="stat-sub">22.4% escalation rate</div></div>
+          <div class="card"><div class="stat-label">Closed by AI</div><div class="stat-value">301</div><div class="stat-sub">Across livechat + WA</div></div>
+          <div class="card"><div class="stat-label">Avg escalation wait</div><div class="stat-value">01:42</div><div class="stat-sub">Human SLA starts here</div></div>
+        </div>
+
+        <div class="layout">
+          <div class="card chat-list">
+            <input class="search" placeholder="Search conversation, ticket, customer..." />
+            <div class="chat-item active">
+              <div class="row"><div class="name">PT Lincah Seller Care</div><div class="badge escalated">Escalated</div></div>
+              <div class="meta">WA Official • Company A • 2 min ago</div>
+              <div class="meta" style="margin-top:8px">Customer ask: notif error dashboard + order stuck di draft</div>
+            </div>
+            <div class="chat-item">
+              <div class="row"><div class="name">Ninja COD Follow-up</div><div class="badge ai">AI Handling</div></div>
+              <div class="meta">Livechat • Company A • waiting partner data</div>
+            </div>
+            <div class="chat-item">
+              <div class="row"><div class="name">Flat Ongkir JNE</div><div class="badge live">Closed by AI</div></div>
+              <div class="meta">WhatsApp Web • macro education sent</div>
+            </div>
+            <div class="chat-item">
+              <div class="row"><div class="name">Request Grup Seller</div><div class="badge warn">Need BD</div></div>
+              <div class="meta">Awaiting route to BD-specialist queue</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="conversation-head">
+              <div>
+                <h2>Conversation #CNV-AI-20391</h2>
+                <div class="subline">
+                  <span class="badge escalated">Escalated to Human</span>
+                  <span class="badge ai">Handled by chatbox.id</span>
+                  <span class="badge live">Company A</span>
+                </div>
+              </div>
+              <div class="meta">Escalated at 10:14:28 • SLA human started</div>
+            </div>
+
+            <div class="utility">
+              <h3>Utility Message — AI Handoff Summary</h3>
+              <div class="meta">Visible only to human agent • generated by chatbox.id → stored by SatuInbox</div>
+              <ul>
+                <li>Intent detected: <strong>Dashboard error / draft order lookup</strong></li>
+                <li>Action already done by AI: asked customer for phone number and order reference</li>
+                <li>Reason escalation: issue requires IT validation based on current CS policy</li>
+                <li>Suggested route: <strong>Company A → IT support queue</strong></li>
+                <li>Customer sentiment: neutral but waiting for immediate confirmation</li>
+              </ul>
+            </div>
+
+            <div class="timeline">
+              <div class="bubble-wrap">
+                <div class="avatar customer">CU</div>
+                <div class="bubble">
+                  <div class="who">Customer • 10:11</div>
+                  <p>Kak, pas aku cari nomor hp di dashboard muncul notif error dan order kayak masuk draft. Bisa dibantu?</p>
+                </div>
+              </div>
+
+              <div class="bubble-wrap right">
+                <div class="bubble ai">
+                  <div class="who">AI Agent • 10:11</div>
+                  <p>Tentu kak, boleh bantu share nomor hp atau data order yang sedang dicek? Aku bantu validasi dulu ya.</p>
+                </div>
+                <div class="avatar ai">AI</div>
+              </div>
+
+              <div class="bubble-wrap">
+                <div class="avatar customer">CU</div>
+                <div class="bubble">
+                  <div class="who">Customer • 10:12</div>
+                  <p>Nomornya 0812xxxx dan notif nya mirip error waktu pencarian data.</p>
+                </div>
+              </div>
+
+              <div class="bubble-wrap right">
+                <div class="bubble ai">
+                  <div class="who">AI Agent • 10:13</div>
+                  <p>Terima kasih kak. Berdasarkan panduan case serupa, issue ini perlu dicek lebih lanjut oleh tim terkait. Aku teruskan dulu ke agent kami ya.</p>
+                </div>
+                <div class="avatar ai">AI</div>
+              </div>
+
+              <div class="bubble-wrap right">
+                <div class="bubble agent">
+                  <div class="who">Human Agent • 10:15</div>
+                  <p>Halo kak, saya lanjut bantu cek ya. Data sudah saya terima dan sedang saya validasi ke tim IT.</p>
+                </div>
+                <div class="avatar agent">AG</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-stack">
+            <div class="card">
+              <h3 class="section-title">Escalation Policy Snapshot</h3>
+              <div class="mini-list">
+                <div class="mini-item"><strong>Routing mode</strong><span class="meta">Round robin aktif untuk queue IT Company A</span></div>
+                <div class="mini-item"><strong>Eligibility</strong><span class="meta">Agent AUX = off, online team only</span></div>
+                <div class="mini-item"><strong>Source</strong><span class="meta">WhatsApp Official • account owned by Company A</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3 class="section-title">AI Metadata</h3>
+              <div class="kv"><span>Intent</span><strong>Dashboard Error</strong></div>
+              <div class="kv"><span>Action policy</span><strong>Escalate to IT</strong></div>
+              <div class="kv"><span>Confidence</span><strong>0.74</strong></div>
+              <div class="kv"><span>Closed by AI</span><strong>No</strong></div>
+              <div class="kv"><span>Partner lookup</span><strong>Not used</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="screen">
+        <div class="stats">
+          <div class="card"><div class="stat-label">Connected MCP workspace</div><div class="stat-value">1</div><div class="stat-sub">chatbox.id workspace bound</div></div>
+          <div class="card"><div class="stat-label">Eligible channels</div><div class="stat-value">3</div><div class="stat-sub">Livechat, WA Web, WA Official</div></div>
+          <div class="card"><div class="stat-label">Queues with AI handoff</div><div class="stat-value">5</div><div class="stat-sub">IT, LM, BD, Finance, FM</div></div>
+          <div class="card"><div class="stat-label">Fallback health</div><div class="stat-value">99.2%</div><div class="stat-sub">Last 24h MCP success</div></div>
+        </div>
+
+        <div class="settings-layout">
+          <div>
+            <div class="card setting-block">
+              <h3>Integration & Channel Scope</h3>
+              <div class="setting-grid">
+                <div class="field"><label>MCP workspace</label><input class="input" value="chatboxid-prod-company-a" /></div>
+                <div class="field"><label>Connection health</label><input class="input" value="Healthy • last sync 36s ago" /></div>
+                <div class="field"><label>Default escalation queue</label><input class="input" value="Policy based per intent" /></div>
+                <div class="field"><label>Human SLA starts</label><input class="input" value="On escalation timestamp" /></div>
+              </div>
+              <div style="margin-top:14px">
+                <div class="toggle-row"><div><strong>Livechat widget</strong><div class="meta">AI can answer and close based on policy</div></div><div class="toggle on"></div></div>
+                <div class="toggle-row"><div><strong>WhatsApp Web</strong><div class="meta">Pending stakeholder approval note</div></div><div class="toggle on"></div></div>
+                <div class="toggle-row"><div><strong>WhatsApp Official</strong><div class="meta">Primary channel for rollout</div></div><div class="toggle on"></div></div>
+              </div>
+            </div>
+
+            <div class="card setting-block">
+              <h3>Escalation & Routing Policy</h3>
+              <div class="toggle-row"><div><strong>Show transcript to human on escalation</strong><div class="meta">Full AI ↔ customer history visible in conversation page</div></div><div class="toggle on"></div></div>
+              <div class="toggle-row"><div><strong>Insert utility summary message</strong><div class="meta">Auto-post summary bubble for human agent</div></div><div class="toggle on"></div></div>
+              <div class="toggle-row"><div><strong>Respect company boundary</strong><div class="meta">Account channel Company A handled only by Company A user</div></div><div class="toggle on"></div></div>
+              <div class="toggle-row"><div><strong>Activate round robin / pull as normal</strong><div class="meta">Human lane uses existing routing model after escalation</div></div><div class="toggle on"></div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card setting-block">
+              <h3>Intent Action Policy</h3>
+              <div class="mini-list">
+                <div class="mini-item"><strong>Direct answer + close</strong><span class="meta">Policy/FAQ intents, fixed answer, no manual action</span></div>
+                <div class="mini-item"><strong>Macro education + close</strong><span class="meta">Operational education with approved macro style</span></div>
+                <div class="mini-item"><strong>Answer + collect data</strong><span class="meta">AI gathers required fields before next action</span></div>
+                <div class="mini-item"><strong>Escalate by division</strong><span class="meta">IT / LM / BD / Finance / FM</span></div>
+              </div>
+              <div class="footnote">ponytail: matrix masih prototype level. Upgrade ke editable rule table saat intent catalog final sudah lock.</div>
+            </div>
+
+            <div class="card setting-block">
+              <h3>Access & Audit</h3>
+              <div class="kv"><span>Admin access</span><strong>Auto enabled</strong></div>
+              <div class="kv"><span>Supervisor override</span><strong>Permission based</strong></div>
+              <div class="kv"><span>View AI logs</span><strong>Permission based</strong></div>
+              <div class="kv"><span>View AI analytics</span><strong>Permission based</strong></div>
+              <div class="kv"><span>Force human handoff</span><strong>Permission based</strong></div>
+            </div>
+
+            <div class="card setting-block">
+              <h3>Fallback Snapshot</h3>
+              <div class="mini-item"><strong>MCP timeout</strong><span class="meta">Escalate to human queue or show manual fallback policy</span></div>
+              <div class="mini-item"><strong>chatbox.id failure</strong><span class="meta">Do not lose chat. Mark safe fallback event and route to human lane.</span></div>
+              <div class="mini-item"><strong>Partner API failure</strong><span class="meta">Allow AI to answer with safe limitation or escalate based on intent policy.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function showTab(id, el) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      el.classList.add('active');
+    }
+  </script>
+</body>
+</html>
