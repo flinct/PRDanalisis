@@ -16,6 +16,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Serve the QA dashboard HTML
 app.use(express.static(path.join(BASE, 'Test'), { index: 'testcase-browser.html' }));
+app.use('/tmp', express.static(path.join(BASE, 'tmp')));
 
 // Always serve the latest runner agent so tester PCs can self-update:
 //   curl http://<host>:3001/runner.js -o runner.js   (then: node runner.js)
@@ -115,6 +116,22 @@ function walkDir(dir, base = '') {
   }
   return results;
 }
+
+// ─── API: AUTH ────────────────────────────────────────────────────────────────
+const YAML = require('js-yaml');
+const USERS_PATH = path.join(BASE, 'Setup', 'users.yaml');
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ ok: false, error: 'Username & password required' });
+  try {
+    const doc = YAML.load(fs.readFileSync(USERS_PATH, 'utf8'));
+    const user = (doc.users || []).find(u => u.username === username && u.password === password);
+    if (!user) return res.status(401).json({ ok: false, error: 'Invalid username or password' });
+    res.json({ ok: true, username: user.username, role: user.role, name: user.name || user.username });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Failed to read users.yaml' });
+  }
+});
 
 // ─── API: FILES ──────────────────────────────────────────────────────────────
 app.get('/api/files', (_req, res) => {

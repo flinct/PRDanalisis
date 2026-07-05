@@ -1660,6 +1660,10 @@
     const [exported, setExported]   = useState(null); // webViewLink
     const mdRef                   = useRef(null);
 
+    // Detect prototype/design links in content
+    const prototypeLinkMatch = draft.match(/(?:https?:\/\/[^\s\)\]\>]+(?:figma\.com|framer\.app|prototype|design|mockup)[^\s\)\]\>]*|\/tmp\/[^\s\)\]\>]+\.html)/i);
+    const prototypeLink = prototypeLinkMatch ? prototypeLinkMatch[0] : null;
+
     // Export current content as a NEW Google Doc (non-destructive write path)
     async function handleExportGDoc() {
       setExporting(true); setSaveErr(null); setExported(null);
@@ -1768,6 +1772,13 @@
               style={{ fontSize:10, color: exporting ? 'var(--text-5)' : '#4ade80', background:'transparent',
                 border:'1px solid var(--border-1)', borderRadius:4, padding:'3px 10px', cursor: exporting ? 'default' : 'pointer' }}>
               {exporting ? 'Exporting…' : '⇪ Export to GDocs'}
+            </button>
+          )}
+          {prototypeLink && !editMode && (
+            <button onClick={() => window.open(prototypeLink, '_blank')} title="Open prototype/design link"
+              style={{ fontSize:10, color:'#a78bfa', background:'transparent',
+                border:'1px solid var(--border-1)', borderRadius:4, padding:'3px 10px', cursor:'pointer' }}>
+              ▶ Open Prototype
             </button>
           )}
           {editMode ? (

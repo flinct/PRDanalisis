@@ -8,7 +8,8 @@
 > **Rules Applied:** `Rules/requirements-lifecycle-rule.md`, `Rules/workflow-rule.md`, `Rules/impact-analysis-rule.md`  
 > **Supporting Context:** `Memory/global-memory.md`, `Memory/reference-index.md`, `Memory/comprehensive-undeveloped-features-analysis.md`, `PRD/Widget/PRD Widget.md`, `PRD/Add ons/Whatsapp official/PRD Whatsapp official.md`, `PRD/Conversationv2/PRD Ticket - Omnichannel Inbox.md`, `PRD/Conversationv2/PRD Ticket - Availability Auto-Reply with Conversation and Ticket Templates.md`, `PRD/Analytics/PRD Analytics - Conversation.md`, `PRD/Analytics/PRD Analytics - Ticket.md`  
 > **Tanggal Intake:** 2026-07-01  
-> **Status:** Scoped
+> **Status:** Scoped  
+> **Prototype:** `/tmp/ai-chat-orchestration-prototype.html`
 
 ---
 

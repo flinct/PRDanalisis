@@ -10,6 +10,7 @@ Selain rule, agent WAJIB tahu keberadaan:
 
 - **`WORKFLOW_CONTEXT.md`** — konteks onboarding lengkap: arsitektur 3-repo, automation bridge pipeline, page objects index, commands cheatsheet, environment accounts
 - **`Memory/qa-tooling.md`** — dokumentasi testcase-browser.html (QA Browser) + server.js (QA Agent) — fitur aktif, mode, arsitektur frontend, SSE format
+- **Global author rule:** untuk semua penulisan document, author/owner/created by harus pakai nama user: **Dany Christian**
 
 ## Step 1: Deteksi Tipe Tugas
 
