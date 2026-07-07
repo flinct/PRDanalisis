@@ -3332,12 +3332,25 @@
 
 
   function OpenProjectDashboard() {
+    // ponytail: single localStorage key holds the whole dashboard UI state so it survives tab switches. Split keys / migrate schema when we outgrow one blob.
+    const OP_STATE_KEY = 'qa_openproject_dashboard_state_v1';
+    const defaultFilters = { projectId:'7', versionIds:[], statusId:'', typeId:'', priorityId:'', assigneeId:'', sort:'updatedAt:desc', keyword:'', page:1, pageSize:100 };
     const [meta, setMeta] = useState({ loading:true, error:'', versions:[], statuses:[], types:[], priorities:[], sortOptions:[], assigneeNote:'' });
-    const [filtersOpen, setFiltersOpen] = useState(false);
-    const [statusSort, setStatusSort] = useState('asc');
-    const [filters, setFilters] = useState({ projectId:'7', versionIds:[], statusId:'', typeId:'', priorityId:'', assigneeId:'', sort:'updatedAt:desc', keyword:'', page:1, pageSize:100 });
+    const [filtersOpen, setFiltersOpen] = useState(() => {
+      try { return JSON.parse(localStorage.getItem(OP_STATE_KEY) || '{}').filtersOpen || false; } catch { return false; }
+    });
+    const [statusSort, setStatusSort] = useState(() => {
+      try { return JSON.parse(localStorage.getItem(OP_STATE_KEY) || '{}').statusSort || 'asc'; } catch { return 'asc'; }
+    });
+    const [filters, setFilters] = useState(() => {
+      try { return { ...defaultFilters, ...(JSON.parse(localStorage.getItem(OP_STATE_KEY) || '{}').filters || {}) }; } catch { return defaultFilters; }
+    });
     const [data, setData] = useState({ loading:false, error:'', total:0, count:0, workPackages:[], summary:{ byStatus:[], byType:[], byPriority:[] } });
     const dashboardRef = useRef(null);
+
+    useEffect(() => {
+      try { localStorage.setItem(OP_STATE_KEY, JSON.stringify({ filters, filtersOpen, statusSort })); } catch {}
+    }, [filters, filtersOpen, statusSort]);
 
     useEffect(() => {
       let dead = false;
@@ -3351,7 +3364,7 @@
           setFilters(prev => ({
             ...prev,
             versionIds: prev.versionIds.length ? prev.versionIds : ((d.versions || []).slice(0, 1).map(v => String(v.id))),
-          }));
+          })); // ponytail: only seed when user hasn't already picked (persisted or manual).
         } catch (e) {
           if (!dead) setMeta({ loading:false, error:e.message, versions:[], statuses:[], types:[], priorities:[], sortOptions:[], assigneeNote:'' });
         }
@@ -3602,7 +3615,7 @@
     const [view, setView]             = useState('files');
     // ── Corin-style navigation ─────────────────────────────────────────
     const [mainNav, setMainNav]       = useState('dashboard'); // 'dashboard' | 'workspace' | 'memory' | 'settings'
-    const [workspaceNav, setWorkspaceNav] = useState(null); // null | 'brd'|'assessment'|'prd'|'testcase'|'feature-list'|'google-docs'
+    const [workspaceNav, setWorkspaceNav] = useState('dashboard-openproject'); // dashboard child or workspace child
     const [themeId, setThemeId]       = useState('navy');
     const [creating, setCreating]     = useState(null);   // { path, sectionId }
     const [creatingBusy, setCreatingBusy] = useState(false);
@@ -3625,6 +3638,7 @@
     const dragStartWRef = useRef(0);
 
     // ── Sidebar resize ──────────────────────────────────────────────────────────
+
     function onResizeStart(e) {
       isDraggingRef.current = true;
       dragStartXRef.current = e.clientX;
@@ -3984,12 +3998,22 @@
       { id:'new-request', label:'New Request', icon:'✎' },
       { id:'memory', label:'Memory', icon:'⚡' },
     ];
+    const DASHBOARD_SUB = [
+      { id:'dashboard-openproject', label:'OpenProject' },
+      { id:'dashboard-testcase-stats', label:'TestCase Stats' },
+    ];
     const navItemStyle = (id) => ({
       display:'flex', alignItems:'center', gap:9, padding:'7px 14px', cursor:'pointer', borderRadius:6,
       fontSize:12, fontWeight: mainNav === id ? 600 : 400,
       color: mainNav === id ? '#fff' : 'var(--text-3)',
       background: mainNav === id ? 'rgba(255,255,255,0.1)' : 'transparent',
       margin:'1px 8px', userSelect:'none', transition:'background 0.1s, color 0.1s',
+    });
+    const dashboardSubItemStyle = (id) => ({
+      display:'block', width:'calc(100% - 16px)', textAlign:'left', padding:'6px 14px 6px 38px', cursor:'pointer', borderRadius:6, fontSize:12,
+      color: workspaceNav === id ? '#fff' : 'var(--text-4)',
+      background: workspaceNav === id ? 'rgba(255,255,255,0.08)' : 'transparent',
+      margin:'1px 8px', userSelect:'none', border:'none',
     });
     const WORKSPACE_SUB = [
       { id:'brd',          label:'BRD' },
@@ -4283,15 +4307,23 @@
             ) : (
               <>
                 {NAV_ITEMS.map(n => (
-                  <div key={n.id} onClick={() => {
-                    setMainNav(n.id);
-                    if (n.id === 'workspace') setActiveSection(null);
-                    if (n.id !== 'workspace') setWorkspaceNav(null);
-                  }}
-                    style={navItemStyle(n.id)}>
-                    <span style={{ fontSize:14 }}>{n.icon}</span>
-                    <span>{n.label}</span>
-                  </div>
+                  <React.Fragment key={n.id}>
+                    <div onClick={() => {
+                      setMainNav(n.id);
+                      if (n.id === 'workspace') setActiveSection(null);
+                      if (n.id === 'dashboard') setWorkspaceNav(prev => (prev === 'dashboard-testcase-stats' ? prev : 'dashboard-openproject'));
+                      if (n.id !== 'workspace' && n.id !== 'dashboard') setWorkspaceNav(null);
+                    }}
+                      style={navItemStyle(n.id)}>
+                      <span style={{ fontSize:14 }}>{n.icon}</span>
+                      <span>{n.label}</span>
+                    </div>
+                    {n.id === 'dashboard' && mainNav === 'dashboard' ? DASHBOARD_SUB.map(sub => (
+                      <button key={sub.id} onClick={() => { setMainNav('dashboard'); setWorkspaceNav(sub.id); }} style={dashboardSubItemStyle(sub.id)}>
+                        {sub.label}
+                      </button>
+                    )) : null}
+                  </React.Fragment>
                 ))}
 
                 {/* Spacer push footer to bottom */}
@@ -4323,6 +4355,13 @@
           {(() => {
             // ── Dashboard: kosong placeholder ──────────────────────────
             if (mainNav === 'dashboard') {
+              if (workspaceNav === 'dashboard-testcase-stats') {
+                return (
+                  <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', background:'var(--app-bg)', color:'var(--text-5)', fontSize:12 }}>
+                    TestCase Stats — belum ada konten
+                  </div>
+                );
+              }
               return <OpenProjectDashboard />;
             }
 
