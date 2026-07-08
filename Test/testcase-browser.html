@@ -3415,7 +3415,7 @@
     const skeleton = { background:'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.12), rgba(255,255,255,0.06))', backgroundSize:'200% 100%', animation:'shimmer 1.2s ease-in-out infinite', borderRadius:6 };
     const card = { background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:12 };
     const selectedVersionNames = filters.versionIds.map(id => meta.versions.find(v => String(v.id) === String(id))?.name || id);
-    const statusOrder = ['New', 'In specification', 'Specified', 'Confirmed', 'In progress', 'In testing', 'Tested', 'Test failed', 'Closed'];
+    const statusOrder = ['New', 'In specification', 'Specified', 'Confirmed', 'In progress', 'Waiting Merge Request', 'Developed', 'In testing', 'Tested', 'Test failed', 'Closed', 'On hold', 'Rejected'];
     const statusRank = new Map(statusOrder.map((name, idx) => [name.toLowerCase(), idx]));
     const byOpenProjectStatus = (left, right) => {
       const l = statusRank.get(String(left || '').toLowerCase());
@@ -3425,7 +3425,7 @@
       if (r != null) return 1;
       return String(left || '').localeCompare(String(right || ''), 'id', { sensitivity:'base' });
     };
-    const groupedByStatus = Object.entries((data.workPackages || []).reduce((acc, row) => {
+    const groupedByStatus = Object.entries(((data.allWorkPackages || data.workPackages) || []).reduce((acc, row) => {
       const key = row.statusName || 'Unknown';
       (acc[key] ||= []).push(row);
       return acc;

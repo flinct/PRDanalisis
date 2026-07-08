@@ -184,6 +184,23 @@ async function fetchOpenProjectCollection(apiPath, collectionKey) {
   return [];
 }
 
+async function fetchAllOpenProjectWorkPackages(filters, sort) {
+  const pageSize = 200;
+  let offset = 0;
+  let total = null;
+  const rows = [];
+  while (total == null || offset < total) {
+    const apiPath = `/api/v3/work_packages?offset=${offset}&pageSize=${pageSize}&filters=${encodeURIComponent(JSON.stringify(filters))}&sortBy=${encodeURIComponent(buildOpenProjectSort(sort))}`;
+    const data = await openProjectRequest(apiPath);
+    const batch = Array.isArray(data._embedded?.elements) ? data._embedded.elements : [];
+    rows.push(...batch.map(normalizeWorkPackage));
+    total = Number(data.total) || rows.length;
+    if (!batch.length) break;
+    offset += pageSize;
+  }
+  return { total: total || rows.length, rows };
+}
+
 function buildOpenProjectWpFilters(qs) {
   const filters = [];
   const projectId = toIntOrNull(qs.projectId) || 7;
@@ -539,14 +556,18 @@ app.get("/api/dashboard/openproject/work-packages", async (req, res) => {
     const offset = (page - 1) * pageSize;
     const filters = buildOpenProjectWpFilters(req.query);
     const apiPath = `/api/v3/work_packages?offset=${offset}&pageSize=${pageSize}&filters=${encodeURIComponent(JSON.stringify(filters))}&sortBy=${encodeURIComponent(buildOpenProjectSort(req.query.sort))}`;
-    const data = await openProjectRequest(apiPath);
-    const rows = Array.isArray(data._embedded?.elements)
-      ? data._embedded.elements.map(normalizeWorkPackage)
+    const [pageData, aggregate] = await Promise.all([
+      openProjectRequest(apiPath),
+      fetchAllOpenProjectWorkPackages(filters, req.query.sort),
+    ]);
+    const rows = Array.isArray(pageData._embedded?.elements)
+      ? pageData._embedded.elements.map(normalizeWorkPackage)
       : [];
+    const summaryRows = aggregate.rows;
     const summary = {
-      total: data.total || rows.length,
+      total: aggregate.total,
       byStatus: Object.values(
-        rows.reduce((acc, row) => {
+        summaryRows.reduce((acc, row) => {
           const key = row.statusName || "Unknown";
           acc[key] = acc[key] || { key, count: 0 };
           acc[key].count += 1;
@@ -554,7 +575,7 @@ app.get("/api/dashboard/openproject/work-packages", async (req, res) => {
         }, {}),
       ),
       byType: Object.values(
-        rows.reduce((acc, row) => {
+        summaryRows.reduce((acc, row) => {
           const key = row.typeName || "Unknown";
           acc[key] = acc[key] || { key, count: 0 };
           acc[key].count += 1;
@@ -562,7 +583,7 @@ app.get("/api/dashboard/openproject/work-packages", async (req, res) => {
         }, {}),
       ),
       byPriority: Object.values(
-        rows.reduce((acc, row) => {
+        summaryRows.reduce((acc, row) => {
           const key = row.priorityName || "Unknown";
           acc[key] = acc[key] || { key, count: 0 };
           acc[key].count += 1;
@@ -579,9 +600,10 @@ app.get("/api/dashboard/openproject/work-packages", async (req, res) => {
         .filter((v) => Number.isFinite(v) && v > 0),
       page,
       pageSize,
-      total: data.total || rows.length,
+      total: aggregate.total,
       count: rows.length,
       workPackages: rows,
+      allWorkPackages: aggregate.rows,
       summary,
     });
   } catch (e) {
