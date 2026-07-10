@@ -3739,6 +3739,7 @@
     const requestEditorRef = useRef(null);
     const [pendingRequestFocusId, setPendingRequestFocusId] = useState(null);
     const pendingRequestFocusOffsetRef = useRef(null);
+    const requestDragSrcRef = useRef(null);
     const canAdminEdit = user?.role === 'admin';
     const themeRef  = useRef(null);
 
@@ -4329,6 +4330,28 @@
         return next;
       });
     }
+    function moveRequestBlock(fromId, toId) {
+      if (!fromId || !toId || fromId === toId) return;
+      setRequestBlocks(prev => {
+        const fromIdx = prev.findIndex(b => b.id === fromId);
+        const toIdx = prev.findIndex(b => b.id === toId);
+        if (fromIdx === -1 || toIdx === -1) return prev;
+        const next = [...prev];
+        const [moved] = next.splice(fromIdx, 1);
+        next.splice(toIdx, 0, moved);
+        return next;
+      });
+    }
+    useEffect(() => {
+      const onPointerDown = (e) => {
+        if (!requestEditorRef.current) return;
+        if (!requestEditorRef.current.contains(e.target)) {
+          setRequestBlocks(prev => prev.some(b => b.menuOpen) ? prev.map(b => b.menuOpen ? { ...b, menuOpen:false } : b) : prev);
+        }
+      };
+      document.addEventListener('pointerdown', onPointerDown);
+      return () => document.removeEventListener('pointerdown', onPointerDown);
+    }, []);
     function renderNewRequestView() {
       const blockTypes = ['text','todo','bullet','numbered'];
       const iconBtn = {
@@ -4347,7 +4370,10 @@
           </div>
           <div style={{ flex:1, overflowY:'auto', padding:'18px 26px 80px' }}>
             <div style={{ maxWidth:860, margin:'0 auto' }}>
-              <div ref={requestEditorRef} contentEditable suppressContentEditableWarning
+              <div
+                ref={requestEditorRef}
+                contentEditable
+                suppressContentEditableWarning
                 onBlur={() => syncRequestBlocksFromDom()}
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -4362,6 +4388,7 @@
                       e.preventDefault();
                       el.textContent = '';
                       patchRequestBlock(id, { type:'bullet', text:'' });
+                      pendingRequestFocusOffsetRef.current = 0;
                       setPendingRequestFocusId(id);
                     }
                   } else if (e.key === 'Backspace') {
@@ -4392,15 +4419,46 @@
                   }
                 }}
                 style={{ outline:'none', color:'var(--text-1)', fontSize:13, lineHeight:1.7 }}>
-                {requestBlocks.map((block, idx) => {
+                {requestBlocks.map((block) => {
                   const menuOpen = block.menuOpen === true;
                   if (block.type === 'numbered') numberedCounter += 1; else numberedCounter = 0;
                   return (
-                    <div key={block.id} data-block-id={block.id} data-block-type={block.type} data-block-checked={block.checked ? 'true' : 'false'}
-                      className='nr-block' style={{ position:'relative', padding:'4px 0' }}>
+                    <div
+                      key={block.id}
+                      data-block-id={block.id}
+                      data-block-type={block.type}
+                      data-block-checked={block.checked ? 'true' : 'false'}
+                      className='nr-block'
+                      style={{ position:'relative', padding:'4px 0' }}
+                      onDragOver={e => {
+                        if (!requestDragSrcRef.current) return;
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                      }}
+                      onDrop={e => {
+                        const from = requestDragSrcRef.current;
+                        if (!from) return;
+                        e.preventDefault();
+                        moveRequestBlock(from, block.id);
+                        requestDragSrcRef.current = null;
+                      }}>
                       <div contentEditable={false} style={{ position:'absolute', left:-52, top:4, display:'flex', gap:6, opacity:0.18, userSelect:'none' }} className='nr-hover-actions'>
                         <button title='Add below' onMouseDown={e => { e.preventDefault(); syncRequestBlocksFromDom(); addRequestBlock(block.id); }} style={iconBtn}>+</button>
-                        <button title='Open type menu' onMouseDown={e => { e.preventDefault(); patchRequestBlocks(requestBlocks.map(b => b.id), { menuOpen:false }); patchRequestBlock(block.id, { menuOpen: !menuOpen }); }} style={iconBtn}>⋮⋮</button>
+                        <button
+                          title='Drag to reorder · click to open menu'
+                          draggable
+                          onDragStart={e => {
+                            requestDragSrcRef.current = block.id;
+                            e.dataTransfer.effectAllowed = 'move';
+                            e.dataTransfer.setData('text/plain', block.id);
+                          }}
+                          onDragEnd={() => { requestDragSrcRef.current = null; }}
+                          onClick={e => {
+                            e.preventDefault();
+                            patchRequestBlocks(requestBlocks.map(b => b.id), { menuOpen:false });
+                            patchRequestBlock(block.id, { menuOpen: !menuOpen });
+                          }}
+                          style={{ ...iconBtn, cursor:'grab' }}>⋮⋮</button>
                       </div>
                       {menuOpen && (
                         <div contentEditable={false} style={{ position:'absolute', left:-4, top:24, zIndex:20, minWidth:180, background:'#111827', border:'1px solid var(--border-1)', borderRadius:8, padding:6, boxShadow:'0 10px 30px rgba(0,0,0,0.45)', userSelect:'none' }}>
@@ -4414,7 +4472,7 @@
                         {block.type !== 'text' && (
                           <span contentEditable={false} style={{ width:22, userSelect:'none', color:'var(--text-4)', marginTop:2, display:'inline-flex', justifyContent:'center' }}>
                             {block.type === 'todo'
-                              ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} />
+                              ? <input type='checkbox' checked={!!block.checked} onChange={e => patchRequestBlock(block.id, { checked:e.target.checked })} />
                               : block.type === 'bullet' ? '•'
                               : block.type === 'numbered' ? `${numberedCounter}.`
                               : ''}
