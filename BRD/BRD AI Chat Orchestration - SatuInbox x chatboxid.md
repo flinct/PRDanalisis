@@ -89,6 +89,7 @@ Membangun kemampuan AI chat orchestration di SatuInbox dengan `chatbox.id` sebag
 *   Channel lain di luar candidate awal.
 *   Integrasi direct dari SatuInbox ke partner Open API jika kontrak data hanya dimiliki `chatbox.id`.
 *   Dev-ready technical contract detail untuk semua failure path pada tahap BRD.
+*   Budget model
 
 ### 4.3 Notes / Clarification Needed
 
@@ -240,12 +241,22 @@ AI tidak cukup hanya menjadi bot FAQ. AI harus bisa membedakan minimal empat mod
 
 ## 11\. Open Questions
 
-1.  Ticketing scope: apakah hanya assist/analytics setelah eskalasi atau termasuk AI handling di ticket thread?
-2.  Breakdown fallback detail untuk MCP timeout / chatbox.id failure / partner API failure seperti apa?
-3.  Apakah stakeholder setuju tiga channel awal: livechat widget, WhatsApp Web, WhatsApp Official?
-4.  Apakah summary utility cukup satu message utility atau butuh surface tambahan?
-5.  Permission key non-admin untuk config/log/analytics AI apa saja?
-6.  Intent mana yang aman dijawab + ditutup AI, dan intent mana yang wajib selalu eskalasi?
+1.  Ticketing scope: apakah hanya assist/analytics setelah eskalasi atau termasuk AI handling di ticket thread?  
+    \- HOLD perlu MCP (superadmin-untuk lihat keseluruhann data)
+2.  Breakdown fallback detail untuk MCP timeout / chatbox.id failure / partner API failure seperti apa?  
+    \- FAQ classifier punya rule, data spesifik dan model yang di pakai harus di tentukan dulu, guardrail nya juga harus di setup dengan benar  
+    \- punya  PR untuk training AI agent juga  
+    \- kalau mau penerapan awal berupa FAQ dulu  
+    \- onboarding ke 4 orang (atik, eva, alam, nasza) untuk training ai ini
+3.  Apakah stakeholder setuju tiga channel awal: livechat widget, WhatsApp Web, WhatsApp Official?  
+    \- 1 channel untuk dipergunakan sebagai phase 1, livechat  
+    \- untuk channel lain, di hold dulu, potensi block nya terutama whatsapp sangat tinggi
+4.  Apakah summary utility cukup satu message utility atau butuh surface tambahan?  
+    \- P3
+5.  Permission key non-admin untuk config/log/analytics AI apa saja?  
+    \- admin only
+6.  Intent mana yang aman dijawab + ditutup AI, dan intent mana yang wajib selalu eskalasi?  
+    \- dari poin 2, classifier nya sudah lengkap dan detail, poin ini bisa ter-handle
 
 ---
 
