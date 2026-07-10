@@ -777,19 +777,43 @@ app.get("/api/testcases/stats", (_req, res) => {
     .all();
   const byType = db
     .prepare(
-      `SELECT COALESCE(am.tc_type,'manual') as tc_type, COUNT(*) as n
-                               FROM test_cases tc LEFT JOIN automation_map am ON am.case_id=tc.id
-                               GROUP BY tc_type`,
+      `SELECT LOWER(TRIM(COALESCE(am.tc_type,'manual'))) as tc_type, COUNT(*) as n
+         FROM test_cases tc LEFT JOIN automation_map am ON am.case_id=tc.id
+         GROUP BY LOWER(TRIM(COALESCE(am.tc_type,'manual')))`,
     )
     .all();
   const byRunSt = db
     .prepare(
       `SELECT status, COUNT(*) as n FROM test_runs
-                               WHERE ran_at = (SELECT MAX(ran_at) FROM test_runs r2 WHERE r2.case_id = test_runs.case_id)
-                               GROUP BY status`,
+         WHERE ran_at = (SELECT MAX(ran_at) FROM test_runs r2 WHERE r2.case_id = test_runs.case_id)
+         GROUP BY status`,
     )
     .all();
-  res.json({ total, byModule: byMod, byType, byLastRunStatus: byRunSt });
+  const byFeature = db
+    .prepare(
+      `SELECT tc.module as feature,
+              COUNT(*) as total,
+              SUM(CASE WHEN LOWER(TRIM(COALESCE(am.tc_type,'manual'))) = 'automation' THEN 1 ELSE 0 END) as automation,
+              SUM(CASE WHEN LOWER(TRIM(COALESCE(am.tc_type,'manual'))) <> 'automation' THEN 1 ELSE 0 END) as manual
+         FROM test_cases tc
+         LEFT JOIN automation_map am ON am.case_id = tc.id
+         GROUP BY tc.module
+         ORDER BY total DESC, tc.module ASC`,
+    )
+    .all()
+    .map((row) => ({ ...row, coverage: row.total ? row.automation / row.total : 0 }));
+  const recent = db
+    .prepare(
+      `SELECT tc.id, tc.module, tc.scenario, tc.updated_at,
+              LOWER(TRIM(COALESCE(am.tc_type,'manual'))) as tc_type,
+              (SELECT status FROM test_runs WHERE case_id = tc.id ORDER BY ran_at DESC LIMIT 1) AS last_run_status
+         FROM test_cases tc
+         LEFT JOIN automation_map am ON am.case_id = tc.id
+         ORDER BY datetime(COALESCE(tc.updated_at, tc.created_at)) DESC, tc.id DESC
+         LIMIT 10`,
+    )
+    .all();
+  res.json({ total, byModule: byMod, byType, byLastRunStatus: byRunSt, byFeature, recent });
 });
 
 app.get("/api/testcases/:id", (req, res) => {

@@ -3346,6 +3346,7 @@
       try { return { ...defaultFilters, ...(JSON.parse(localStorage.getItem(OP_STATE_KEY) || '{}').filters || {}) }; } catch { return defaultFilters; }
     });
     const [data, setData] = useState({ loading:false, error:'', total:0, count:0, workPackages:[], summary:{ byStatus:[], byType:[], byPriority:[] } });
+    const [showScrollTop, setShowScrollTop] = useState(false);
     const dashboardRef = useRef(null);
 
     useEffect(() => {
@@ -3397,6 +3398,15 @@
       return () => { dead = true; };
     }, [filters]);
 
+    useEffect(() => {
+      const el = dashboardRef.current;
+      if (!el) return;
+      const onScroll = () => setShowScrollTop(el.scrollTop > 240);
+      onScroll();
+      el.addEventListener('scroll', onScroll);
+      return () => el.removeEventListener('scroll', onScroll);
+    }, []);
+
     function patchFilters(next) {
       setFilters(prev => ({ ...prev, ...next, page: Object.prototype.hasOwnProperty.call(next, 'page') ? next.page : 1 }));
     }
@@ -3443,7 +3453,7 @@
     ];
 
     return (
-      <div ref={dashboardRef} style={{ padding:16, display:'grid', gap:12, minHeight:'100%', overflow:'auto' }}>
+      <div ref={dashboardRef} style={{ padding:16, paddingBottom:96, display:'grid', gap:12, minHeight:'100%', overflow:'auto' }}>
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
 
         <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'flex-start' }}>
@@ -3532,7 +3542,6 @@
         <div style={card}>
           <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', marginBottom:12 }}>
             <button onClick={() => setStatusSort(prev => prev === 'asc' ? 'desc' : 'asc')} style={{ background:'transparent', border:'none', color:'var(--text-1)', fontSize:14, fontWeight:700, cursor:'pointer', padding:0 }}>Work Packages by Status · STATUS {statusSort === 'asc' ? '↑' : '↓'}</button>
-            <button onClick={() => dashboardRef.current?.scrollTo({ top:0, behavior:'smooth' })} style={{ ...miniInput, width:'auto', cursor:'pointer' }}>Scroll to top</button>
           </div>
           {data.error ? <div style={{ fontSize:12, color:'#f87171' }}>{data.error}</div> : data.loading ? (
             <div style={{ display:'grid', gap:12 }}>
@@ -3542,8 +3551,17 @@
                     <div style={{ ...skeleton, height:14, width:160 }} />
                   </div>
                   <div style={{ overflowX:'auto' }}>
-                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
-                      <thead><tr>{['ID','Subject','Type','Priority','Assignee','Updated'].map(h => <th key={h} style={{ textAlign:'left', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)' }}>{h}</th>)}</tr></thead>
+                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12, tableLayout:'fixed' }}>
+                      <colgroup>
+                        <col style={{ width:64 }} />
+                        <col />
+                        <col style={{ width:110 }} />
+                        <col style={{ width:90 }} />
+                        <col style={{ width:140 }} />
+                        <col style={{ width:100 }} />
+                        <col style={{ width:170 }} />
+                      </colgroup>
+                      <thead><tr>{['ID','Subject','Type','Priority','Assignee','Version','Updated'].map(h => <th key={h} style={{ textAlign:'left', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)' }}>{h}</th>)}</tr></thead>
                       <tbody>
                         {Array.from({ length:Math.min(group.count || 4, 5) }).map((_, idx) => (
                           <tr key={idx} style={{ borderBottom:'1px solid var(--border-3)', background:idx % 2 ? 'var(--sidebar-bg)' : 'transparent' }}>
@@ -3552,6 +3570,7 @@
                             <td style={{ padding:'8px 10px' }}><div style={{ ...skeleton, height:12, width:'60%' }} /></td>
                             <td style={{ padding:'8px 10px' }}><div style={{ ...skeleton, height:12, width:'56%' }} /></td>
                             <td style={{ padding:'8px 10px' }}><div style={{ ...skeleton, height:12, width:'64%' }} /></td>
+                            <td style={{ padding:'8px 10px' }}><div style={{ ...skeleton, height:12, width:'70%' }} /></td>
                             <td style={{ padding:'8px 10px' }}><div style={{ ...skeleton, height:12, width:'58%' }} /></td>
                           </tr>
                         ))}
@@ -3567,16 +3586,26 @@
                 <div key={statusName} style={{ border:'1px solid var(--border-1)', borderRadius:8, overflow:'hidden' }}>
                   <div style={{ padding:'10px 12px', background:'var(--sidebar-bg)', borderBottom:'1px solid var(--border-1)', fontSize:12, color:'var(--text-1)', fontWeight:700 }}>{statusName} · {rows.length}</div>
                   <div style={{ overflowX:'auto' }}>
-                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
-                      <thead><tr>{['ID','Subject','Type','Priority','Assignee','Updated'].map(h => <th key={h} style={{ textAlign:'left', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)' }}>{h}</th>)}</tr></thead>
+                    <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12, tableLayout:'fixed' }}>
+                      <colgroup>
+                        <col style={{ width:64 }} />
+                        <col />
+                        <col style={{ width:110 }} />
+                        <col style={{ width:90 }} />
+                        <col style={{ width:140 }} />
+                        <col style={{ width:100 }} />
+                        <col style={{ width:170 }} />
+                      </colgroup>
+                      <thead><tr>{['ID','Subject','Type','Priority','Assignee','Version','Updated'].map(h => <th key={h} style={{ textAlign:'left', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', background:'var(--deep-bg)' }}>{h}</th>)}</tr></thead>
                       <tbody>
                         {rows.map((row, idx) => (
                           <tr key={row.id || idx} style={{ borderBottom:'1px solid var(--border-3)', background:idx % 2 ? 'var(--sidebar-bg)' : 'transparent' }}>
                             <td style={{ padding:'8px 10px', color:'var(--text-2)' }}>{row.id}</td>
-                            <td style={{ padding:'8px 10px', color:'var(--text-1)' }}>{row.subject || '-'}</td>
+                            <td style={{ padding:'8px 10px', color:'var(--text-1)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }} title={row.subject || ''}>{row.subject || '-'}</td>
                             <td style={{ padding:'8px 10px', color:'var(--text-2)' }}>{row.typeName || '-'}</td>
                             <td style={{ padding:'8px 10px', color:'var(--text-2)' }}>{row.priorityName || '-'}</td>
-                            <td style={{ padding:'8px 10px', color:'var(--text-2)' }}>{row.assigneeName || row.assigneeId || '-'}</td>
+                            <td style={{ padding:'8px 10px', color:'var(--text-2)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }} title={row.assigneeName || row.assigneeId || ''}>{row.assigneeName || row.assigneeId || '-'}</td>
+                            <td style={{ padding:'8px 10px', color:'var(--text-2)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }} title={row.versionName || ''}>{row.versionName || '-'}</td>
                             <td style={{ padding:'8px 10px', color:'var(--text-2)' }}>{row.updatedAt || '-'}</td>
                           </tr>
                         ))}
@@ -3591,6 +3620,83 @@
             <button onClick={() => patchFilters({ page: Math.max(1, Number(filters.page) - 1) })} disabled={Number(filters.page) <= 1} style={{ ...miniInput, width:'auto', cursor:'pointer', opacity:Number(filters.page) <= 1 ? 0.5 : 1 }}>Prev</button>
             <div style={{ ...miniInput, width:'auto' }}>Page {filters.page}</div>
             <button onClick={() => patchFilters({ page: Number(filters.page) + 1 })} disabled={data.count < Number(filters.pageSize)} style={{ ...miniInput, width:'auto', cursor:'pointer', opacity:data.count < Number(filters.pageSize) ? 0.5 : 1 }}>Next</button>
+          </div>
+          {showScrollTop ? <button onClick={() => dashboardRef.current?.scrollTo({ top:0, behavior:'smooth' })} style={{ position:'fixed', right:24, bottom:56, zIndex:20, background:'var(--deep-bg)', color:'#f59e0b', border:'1px solid var(--border-1)', borderRadius:999, padding:'10px 14px', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,0.35)' }}>Scroll to top</button> : null}
+        </div>
+      </div>
+    );
+  }
+
+  function TestcaseStatsDashboard({ stats }) {
+    const byType = stats?.byType || [];
+    const byFeature = stats?.byFeature || [];
+    const recent = stats?.recent || [];
+    const total = Number(stats?.total || 0);
+    const automation = byType.filter(x => x.tc_type === 'automation').reduce((s, x) => s + Number(x.n || 0), 0);
+    const manual = Math.max(0, total - automation);
+    const automationRate = total ? automation / total : 0;
+    const rateColor = automationRate > 0.7 ? '#22c55e' : automationRate >= 0.5 ? '#f59e0b' : '#ef4444';
+    const circumference = 2 * Math.PI * 42;
+    const autoArc = circumference * automationRate;
+    const topFeatures = byFeature.slice(0, 8);
+    return (
+      <div style={{ padding:16, display:'grid', gap:12, minHeight:'100%', overflow:'auto' }}>
+        <div>
+          <div style={{ fontSize:20, fontWeight:700, color:'var(--text-1)' }}>Testcase Statistics</div>
+          <div style={{ fontSize:12, color:'var(--text-4)', marginTop:4 }}>Source: SQLite `test_cases`</div>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, minmax(0, 1fr))', gap:12 }}>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:12 }}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Total Testcases</div><div style={{ marginTop:6, fontSize:28, fontWeight:700 }}>{total}</div></div>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:12 }}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Automation Coverage</div><div style={{ marginTop:6, fontSize:28, fontWeight:700, color:rateColor }}>{Math.round(automationRate * 100)}%</div></div>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:12 }}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Manual</div><div style={{ marginTop:6, fontSize:28, fontWeight:700, color:'#60a5fa' }}>{manual}</div></div>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:12 }}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Automated</div><div style={{ marginTop:6, fontSize:28, fontWeight:700, color:'#22c55e' }}>{automation}</div></div>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'minmax(320px, 0.9fr) minmax(420px, 1.1fr)', gap:12 }}>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:16 }}>
+            <div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:12 }}>Manual vs Automation</div>
+            <div style={{ display:'flex', alignItems:'center', gap:18 }}>
+              <svg width="140" height="140" viewBox="0 0 120 120" aria-label="Manual vs Automation donut">
+                <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="14" />
+                <circle cx="60" cy="60" r="42" fill="none" stroke="#22c55e" strokeWidth="14" strokeDasharray={`${autoArc} ${circumference - autoArc}`} strokeLinecap="round" transform="rotate(-90 60 60)" />
+                <circle cx="60" cy="60" r="30" fill="var(--deep-bg)" />
+                <text x="60" y="58" textAnchor="middle" fill="var(--text-1)" style={{ fontSize:18, fontWeight:700 }}>{Math.round(automationRate * 100)}%</text>
+                <text x="60" y="74" textAnchor="middle" fill="var(--text-4)" style={{ fontSize:9 }}>auto</text>
+              </svg>
+              <div style={{ display:'grid', gap:10, flex:1 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', fontSize:13 }}><span style={{ color:'#22c55e' }}>Automation</span><strong>{automation}</strong></div>
+                <div style={{ height:8, borderRadius:999, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}><div style={{ width:`${automationRate * 100}%`, height:'100%', background:'#22c55e' }} /></div>
+                <div style={{ display:'flex', justifyContent:'space-between', fontSize:13 }}><span style={{ color:'#60a5fa' }}>Manual</span><strong>{manual}</strong></div>
+                <div style={{ height:8, borderRadius:999, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}><div style={{ width:`${(1 - automationRate) * 100}%`, height:'100%', background:'#60a5fa' }} /></div>
+              </div>
+            </div>
+          </div>
+          <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:16 }}>
+            <div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:12 }}>Automation Progress per Feature</div>
+            <div style={{ display:'grid', gap:10 }}>
+              {topFeatures.map(row => <div key={row.feature} style={{ display:'grid', gridTemplateColumns:'160px 1fr 48px', gap:10, alignItems:'center' }}><div style={{ fontSize:12, color:'var(--text-2)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{row.feature || '-'}</div><div style={{ height:8, borderRadius:999, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}><div style={{ width:`${Math.round((row.coverage || 0) * 100)}%`, height:'100%', background:'#22c55e' }} /></div><div style={{ fontSize:12, color:'var(--text-1)', textAlign:'right' }}>{Math.round((row.coverage || 0) * 100)}%</div></div>)}
+            </div>
+          </div>
+        </div>
+        <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:16 }}>
+          <div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:12 }}>Feature Coverage</div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+              <thead><tr>{['Feature','Total','Manual','Automation','Coverage'].map(h => <th key={h} style={{ textAlign:h === 'Feature' ? 'left' : 'right', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', fontWeight:600 }}>{h}</th>)}</tr></thead>
+              <tbody>
+                {byFeature.map(row => <tr key={row.feature || 'unknown'}><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', color:'var(--text-2)' }}><div>{row.feature || '-'}</div><div style={{ marginTop:6, height:6, borderRadius:999, background:'rgba(255,255,255,0.08)', overflow:'hidden' }}><div style={{ width:`${Math.round((row.coverage || 0) * 100)}%`, height:'100%', background:'#22c55e' }} /></div></td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', textAlign:'right' }}>{row.total}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', textAlign:'right', color:'#60a5fa' }}>{row.manual}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', textAlign:'right', color:'#22c55e' }}>{row.automation}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', textAlign:'right' }}>{Math.round((row.coverage || 0) * 100)}%</td></tr>)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style={{ background:'var(--deep-bg)', border:'1px solid var(--border-1)', borderRadius:8, padding:16 }}>
+          <div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:12 }}>Recent Testcases</div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+              <thead><tr>{['ID','Feature','Scenario','Type','Updated','Last Run'].map(h => <th key={h} style={{ textAlign:h === 'Scenario' ? 'left' : 'left', padding:'8px 10px', color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', fontWeight:600 }}>{h}</th>)}</tr></thead>
+              <tbody>
+                {recent.map(row => <tr key={row.id}><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)' }}>{row.id}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', color:'var(--text-2)' }}>{row.module || '-'}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', maxWidth:520, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{row.scenario || '-'}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', color:row.tc_type === 'automation' ? '#22c55e' : '#60a5fa' }}>{row.tc_type}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', color:'var(--text-3)' }}>{row.updated_at || '-'}</td><td style={{ padding:'10px', borderBottom:'1px solid var(--border-2)', color:row.last_run_status === 'fail' ? '#ef4444' : 'var(--text-3)' }}>{row.last_run_status || '-'}</td></tr>)}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -3612,6 +3718,7 @@
     const [importMsg, setImportMsg]   = useState('');
     const [gdocs, setGdocs]           = useState([]);    // node-shaped tree from /api/gdocs
     const [gdocsStatus, setGdocsStatus] = useState(null); // { oauthConfigured, connected, email, folderName }
+    const [tcStats, setTcStats] = useState(null);
     const [view, setView]             = useState('files');
     // ── Corin-style navigation ─────────────────────────────────────────
     const [mainNav, setMainNav]       = useState('dashboard'); // 'dashboard' | 'workspace' | 'memory' | 'settings'
@@ -3631,8 +3738,10 @@
     const [requestSyncMeta, setRequestSyncMeta] = useState({ loading:true, saving:false, error:'', updatedAt:null, updatedBy:null });
     const requestEditorRef = useRef(null);
     const [pendingRequestFocusId, setPendingRequestFocusId] = useState(null);
+    const pendingRequestFocusOffsetRef = useRef(null);
     const canAdminEdit = user?.role === 'admin';
     const themeRef  = useRef(null);
+
     const isDraggingRef = useRef(false);
     const dragStartXRef = useRef(0);
     const dragStartWRef = useRef(0);
@@ -3726,6 +3835,17 @@
         setGdocs([]);
       }
     }
+
+    async function loadTestcaseStats() {
+      try {
+        const data = await fetch('/api/testcases/stats').then(r => r.json());
+        setTcStats(data);
+      } catch {
+        setTcStats(null);
+      }
+    }
+
+    useEffect(() => { loadTestcaseStats(); }, []);
 
     // ── Load automation map for a file's test cases ──────────────────────────────
     async function loadAutoMap(cases) {
@@ -3862,16 +3982,13 @@
       if (!nodes) return null;
       const section = allSections?.find(s => s.id === sectionId);
       const secColor = section?.color || 'var(--text-5)';
-      const filtered = sideSearch
-        ? nodes.filter(n => n.name.toLowerCase().includes(sideSearch.toLowerCase()) || n.kind === 'dir')
-        : nodes;
-      return filtered.map(node => {
+      return nodes.flatMap(node => {
         const isSelected = selected?.path === node.path;
         const pad = 12 + depth * 14;
         if (node.kind === 'dir') {
           const sub = renderTree(node.children, sectionId, depth + 1);
-          if (sideSearch && !sub?.length) return null;
-          return (
+          if (sideSearch && !sub?.length) return [];
+          return [
             <div key={node.path}>
               <div style={{ padding:`4px 8px 4px ${pad}px`, display:'flex', alignItems:'center', gap:5, cursor:'default' }}>
                 <span style={{ fontSize:11, color:'#d97706', flexShrink:0 }}>📂</span>
@@ -3885,12 +4002,13 @@
               )}
               {sub}
             </div>
-          );
+          ];
         }
+        if (sideSearch && !node.name.toLowerCase().includes(sideSearch.toLowerCase())) return [];
         const extColor = node.ext === 'md' ? '#22d3ee' : node.ext === 'tsv' ? '#60a5fa' : node.ext === 'gdoc' ? '#4ade80' : 'var(--text-5)';
         const extBg = node.ext === 'md' ? 'rgba(34,211,238,0.15)' : node.ext === 'tsv' ? 'rgba(96,165,250,0.15)' : node.ext === 'gdoc' ? 'rgba(74,222,128,0.15)' : 'transparent';
         const extLabel = node.ext === 'gdoc' ? 'DOC' : node.ext?.toUpperCase();
-        return (
+        return [
           <div key={node.path} onClick={() => openFile(node, sectionId)}
             style={{ padding:`5px 8px 5px ${pad}px`, cursor:'pointer', display:'flex', alignItems:'center', gap:5,
               background: isSelected ? 'rgba(255,255,255,0.06)' : 'transparent',
@@ -3900,7 +4018,7 @@
             <span style={{ fontSize:8, fontWeight:600, color:extColor, background:extBg, padding:'1px 5px', borderRadius:3, flexShrink:0, lineHeight:'14px' }}>{extLabel}</span>
             <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{node.name}</span>
           </div>
-        );
+        ];
       });
     }
 
@@ -4054,6 +4172,10 @@
     function renderWorkspaceSubView() {
       const sub = workspaceNav;
       const label = WORKSPACE_SUB.find(w => w.id === sub)?.label || sub;
+      const statCard = { background:'var(--sidebar-bg)', border:'1px solid var(--border-1)', borderRadius:12, padding:12 };
+      const topModules = (tcStats?.byModule || []).slice(0, 6);
+      const typeRows = tcStats?.byType || [];
+      const runRows = tcStats?.byLastRunStatus || [];
       return (
         <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', background:'var(--app-bg)' }}>
           <div style={{ padding:'12px 20px', borderBottom:'1px solid var(--border-1)', display:'flex', alignItems:'center', gap:12 }}>
@@ -4061,9 +4183,25 @@
               background:'none', border:'none', color:'var(--text-4)', padding:'0' }}>←</button>
             <div><span style={{ fontSize:12, color:'var(--text-3)' }}>Workspace / </span><span style={{ fontSize:12, fontWeight:600, color:'var(--text-1)' }}>{label}</span></div>
           </div>
-          <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--text-5)', fontSize:12 }}>
-            {sub}: konten akan diisi sesuai item yang dipilih
-          </div>
+          {sub === 'testcase' ? (
+            <div style={{ flex:1, overflow:'auto', padding:20, display:'grid', gap:12, alignContent:'start' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(4, minmax(0, 1fr))', gap:12 }}>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Total</div><div style={{ marginTop:6, fontSize:24, fontWeight:700 }}>{tcStats?.total ?? '-'}</div></div>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Manual</div><div style={{ marginTop:6, fontSize:24, fontWeight:700 }}>{typeRows.find(x => x.tc_type === 'manual')?.n ?? 0}</div></div>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Auto</div><div style={{ marginTop:6, fontSize:24, fontWeight:700 }}>{typeRows.find(x => x.tc_type === 'auto')?.n ?? 0}</div></div>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase' }}>Last Run Status</div><div style={{ marginTop:6, fontSize:13, lineHeight:1.7, color:'var(--text-2)' }}>{runRows.length ? runRows.map(x => `${x.status}: ${x.n}`).join(' · ') : '-'}</div></div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr', gap:12 }}>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:8 }}>By Module</div><div style={{ display:'grid', gap:6 }}>{topModules.length ? topModules.map(row => <div key={row.module} style={{ display:'flex', justifyContent:'space-between', gap:8, fontSize:12 }}><span style={{ color:'var(--text-2)' }}>{row.module || '-'}</span><span style={{ color:'var(--text-1)', fontWeight:700 }}>{row.n}</span></div>) : <div style={{ fontSize:12, color:'var(--text-5)' }}>No data</div>}</div></div>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:8 }}>By Type</div><div style={{ display:'grid', gap:6 }}>{typeRows.length ? typeRows.map(row => <div key={row.tc_type} style={{ display:'flex', justifyContent:'space-between', gap:8, fontSize:12 }}><span style={{ color:'var(--text-2)' }}>{row.tc_type}</span><span style={{ color:'var(--text-1)', fontWeight:700 }}>{row.n}</span></div>) : <div style={{ fontSize:12, color:'var(--text-5)' }}>No data</div>}</div></div>
+                <div style={statCard}><div style={{ fontSize:11, color:'var(--text-4)', textTransform:'uppercase', marginBottom:8 }}>By Last Run</div><div style={{ display:'grid', gap:6 }}>{runRows.length ? runRows.map(row => <div key={row.status} style={{ display:'flex', justifyContent:'space-between', gap:8, fontSize:12 }}><span style={{ color:'var(--text-2)' }}>{row.status}</span><span style={{ color:'var(--text-1)', fontWeight:700 }}>{row.n}</span></div>) : <div style={{ fontSize:12, color:'var(--text-5)' }}>No run data</div>}</div></div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--text-5)', fontSize:12 }}>
+              {sub}: konten akan diisi sesuai item yang dipilih
+            </div>
+          )}
         </div>
       );
     }
@@ -4096,13 +4234,23 @@
       if (!pendingRequestFocusId || !requestEditorRef.current) return;
       const el = requestEditorRef.current.querySelector(`[data-block-id="${pendingRequestFocusId}"] [data-block-text]`);
       if (!el) return;
+      const textNode = el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE ? el.firstChild : el;
+      const fullText = el.textContent || '';
+      const wanted = pendingRequestFocusOffsetRef.current;
+      const offset = typeof wanted === 'number' ? Math.max(0, Math.min(wanted, fullText.length)) : fullText.length;
       const sel = window.getSelection();
       const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
+      if (textNode === el) {
+        range.selectNodeContents(el);
+        range.collapse(false);
+      } else {
+        range.setStart(textNode, offset);
+        range.collapse(true);
+      }
       sel.removeAllRanges();
       sel.addRange(range);
       requestEditorRef.current.focus();
+      pendingRequestFocusOffsetRef.current = null;
       setPendingRequestFocusId(null);
     }, [requestBlocks, pendingRequestFocusId]);
 
@@ -4126,6 +4274,18 @@
       }).map(el => el.dataset.blockId).filter(Boolean);
       return ids.length ? ids : [currentBlockIdFromSelection()].filter(Boolean);
     }
+    function caretAtBlockStart(id) {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || !requestEditorRef.current || !id) return false;
+      const textEl = requestEditorRef.current.querySelector(`[data-block-id="${id}"] [data-block-text]`);
+      if (!textEl) return false;
+      const range = sel.getRangeAt(0);
+      if (!range.collapsed) return false;
+      const probe = document.createRange();
+      probe.selectNodeContents(textEl);
+      probe.setEnd(range.startContainer, range.startOffset);
+      return probe.toString().length === 0;
+    }
     function patchRequestBlocks(ids, patch) {
       if (!ids?.length) return;
       const set = new Set(ids);
@@ -4148,8 +4308,10 @@
       });
       if (next.length) setRequestBlocks(next);
     }
+
     function addRequestBlock(afterId) {
       const block = { id:'req-' + Date.now() + '-' + Math.random().toString(36).slice(2,6), type:'text', text:'', checked:false };
+      pendingRequestFocusOffsetRef.current = 0;
       setPendingRequestFocusId(block.id);
       setRequestBlocks(prev => {
         const i = prev.findIndex(b => b.id === afterId);
@@ -4157,7 +4319,15 @@
       });
     }
     function removeRequestBlock(id) {
-      setRequestBlocks(prev => prev.length <= 1 ? prev : prev.filter(b => b.id !== id));
+      setRequestBlocks(prev => {
+        if (prev.length <= 1) return prev;
+        const idx = prev.findIndex(b => b.id === id);
+        const next = prev.filter(b => b.id !== id);
+        const prevId = idx > 0 ? prev[idx - 1]?.id : next[0]?.id;
+        pendingRequestFocusOffsetRef.current = null;
+        setPendingRequestFocusId(prevId || null);
+        return next;
+      });
     }
     function renderNewRequestView() {
       const blockTypes = ['text','todo','bullet','numbered'];
@@ -4185,6 +4355,15 @@
                     const id = currentBlockIdFromSelection();
                     syncRequestBlocksFromDom();
                     addRequestBlock(id);
+                  } else if (e.key === ' ' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    const id = currentBlockIdFromSelection();
+                    const el = id ? requestEditorRef.current?.querySelector(`[data-block-id="${id}"] [data-block-text]`) : null;
+                    if (id && el && el.textContent === '-') {
+                      e.preventDefault();
+                      el.textContent = '';
+                      patchRequestBlock(id, { type:'bullet', text:'' });
+                      setPendingRequestFocusId(id);
+                    }
                   } else if (e.key === 'Backspace') {
                     const id = currentBlockIdFromSelection();
                     if (id) {
@@ -4192,6 +4371,22 @@
                       if (el && !el.textContent.trim()) {
                         e.preventDefault();
                         removeRequestBlock(id);
+                        return;
+                      }
+                      if (caretAtBlockStart(id)) {
+                        e.preventDefault();
+                        syncRequestBlocksFromDom();
+                        setRequestBlocks(prev => {
+                          const idx = prev.findIndex(b => b.id === id);
+                          if (idx <= 0) return prev;
+                          const curr = prev[idx];
+                          const before = prev[idx - 1];
+                          const glue = before.text && curr.text ? ' ' : '';
+                          const merged = { ...before, text: `${before.text || ''}${glue}${curr.text || ''}` };
+                          pendingRequestFocusOffsetRef.current = (before.text || '').length + glue.length;
+                          setPendingRequestFocusId(before.id);
+                          return [...prev.slice(0, idx - 1), merged, ...prev.slice(idx + 1)];
+                        });
                       }
                     }
                   }
@@ -4215,14 +4410,16 @@
                           ))}
                         </div>
                       )}
-                      <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
-                        <span contentEditable={false} style={{ width:22, userSelect:'none', color:'var(--text-4)', marginTop:2, display:'inline-flex', justifyContent:'center' }}>
-                          {block.type === 'todo'
-                            ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} />
-                            : block.type === 'bullet' ? '•'
-                            : block.type === 'numbered' ? `${numberedCounter}.`
-                            : ''}
-                        </span>
+                      <div style={{ display:'flex', alignItems:'flex-start', gap:block.type === 'text' ? 0 : 10 }}>
+                        {block.type !== 'text' && (
+                          <span contentEditable={false} style={{ width:22, userSelect:'none', color:'var(--text-4)', marginTop:2, display:'inline-flex', justifyContent:'center' }}>
+                            {block.type === 'todo'
+                              ? <input type='checkbox' checked={!!block.checked} onChange={e=>patchRequestBlock(block.id, { checked:e.target.checked })} />
+                              : block.type === 'bullet' ? '•'
+                              : block.type === 'numbered' ? `${numberedCounter}.`
+                              : ''}
+                          </span>
+                        )}
                         <span data-block-text style={{ flex:1, minHeight:20, whiteSpace:'pre-wrap' }}>{block.text}</span>
                       </div>
                     </div>
@@ -4263,6 +4460,13 @@
                   style={{ display:'flex', alignItems:'center', gap:6, padding:'4px 16px 10px',
                     cursor:'pointer', fontSize:10, color:'var(--text-4)', transition:'color 0.1s' }}>
                   <span style={{ fontSize:11 }}>←</span><span>Back</span>
+                </div>
+                <div style={{ padding:'0 16px 10px' }}>
+                  <input value={sideSearch} onChange={e=>setSideSearch(e.target.value)}
+                    placeholder="filter files..."
+                    style={{ width:'100%', background:'var(--elevated-bg)', border:'1px solid var(--border-1)',
+                      borderRadius:6, padding:'7px 10px', fontSize:11, color:'var(--text-2)',
+                      outline:'none', fontFamily:'inherit' }}/>
                 </div>
                 <div style={{ flex:1, overflowY:'auto' }}>
                   {WORKSPACE_SUB.map(item => {
@@ -4355,13 +4559,7 @@
           {(() => {
             // ── Dashboard: kosong placeholder ──────────────────────────
             if (mainNav === 'dashboard') {
-              if (workspaceNav === 'dashboard-testcase-stats') {
-                return (
-                  <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', background:'var(--app-bg)', color:'var(--text-5)', fontSize:12 }}>
-                    TestCase Stats — belum ada konten
-                  </div>
-                );
-              }
+              if (workspaceNav === 'dashboard-testcase-stats') return <TestcaseStatsDashboard stats={tcStats} />;
               return <OpenProjectDashboard />;
             }
 
