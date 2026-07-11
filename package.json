@@ -12,13 +12,21 @@
     "docker:logs": "docker compose logs -f"
   },
   "dependencies": {
+    "@blocknote/mantine": "^0.23.0",
+    "@blocknote/react": "^0.23.0",
+    "@mantine/core": "^7.17.8",
+    "@mantine/hooks": "^7.17.8",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "googleapis": "^144.0.0",
-    "js-yaml": "^5.1.0"
+    "js-yaml": "^5.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "esbuild": "^0.28.1",
+    "nodemon": "^3.1.0",
+    "playwright": "^1.61.1"
   }
 }
