@@ -69,6 +69,11 @@ function renderNewRequestView(ctx) {
     }
     return { textEl, full, offset };
   };
+  const rememberFocus = (id, offset = null) => {
+    if (!id) return;
+    ctx.pendingRequestFocusOffsetRef.current = typeof offset === 'number' ? offset : null;
+    ctx.setPendingRequestFocusId(id);
+  };
   const controlBtnStyle = { fontSize:11, padding:'6px 10px', borderRadius:6, border:'1px solid var(--border-1)', background:'transparent', color:'var(--text-3)', cursor:'pointer' };
   const ghostBtnStyle = { ...controlBtnStyle, opacity:0, pointerEvents:'none', transition:'opacity 0.12s ease' };
   const editorHtml = (() => {
@@ -182,8 +187,11 @@ function renderNewRequestView(ctx) {
                 const ids = ctx.currentBlockIdsFromSelection();
                 if (!ids.length) return;
                 e.preventDefault();
+                const focusId = ctx.currentBlockIdFromSelection() || ids[ids.length - 1];
+                const focusBlock = ctx.requestBlocks.find(b => b.id === focusId);
                 ctx.syncRequestBlocksFromDom();
                 ctx.patchRequestBlocks(ids, (prev) => ({ level: clampLevel((prev.level || 0) + (e.shiftKey ? -1 : 1)) }));
+                rememberFocus(focusId, (focusBlock?.text || '').length);
                 return;
               }
               if (e.key === 'Enter' && !e.shiftKey) {
