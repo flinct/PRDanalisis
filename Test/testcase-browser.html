@@ -2100,14 +2100,44 @@
   const { OpenProjectDashboard, TestcaseStatsDashboard } = window.DashboardModule;
 
   function App() {
+    const APP_NAV_STATE_KEY = 'qa_browser_nav_state_v1';
+    function readAppNavState() {
+      try {
+        return JSON.parse(localStorage.getItem(APP_NAV_STATE_KEY) || '{}') || {};
+      } catch {
+        return {};
+      }
+    }
+    function normalizeMainNav(value) {
+      return ['dashboard','workspace','new-request','memory','settings'].includes(value) ? value : 'dashboard';
+    }
+    function normalizeWorkspaceNav(value, mainNavValue) {
+      if (mainNavValue === 'dashboard') return ['dashboard-openproject','dashboard-testcase-stats'].includes(value) ? value : 'dashboard-openproject';
+      if (mainNavValue === 'workspace') return ['brd','assessment','prd','testcase','feature-list','google-docs'].includes(value) ? value : null;
+      return null;
+    }
+    function normalizeSelected(value) {
+      if (!value || typeof value !== 'object') return null;
+      if (!value.path || !value.sectionId || !value.name) return null;
+      return {
+        path: value.path,
+        sectionId: value.sectionId,
+        name: value.name,
+        ext: value.ext || '',
+        gdocId: value.gdocId || '',
+      };
+    }
+    const savedNavState = readAppNavState();
+    const initialMainNav = normalizeMainNav(savedNavState.mainNav);
+    const initialWorkspaceNav = normalizeWorkspaceNav(savedNavState.workspaceNav, initialMainNav);
     const [sections, setSections]     = useState([]);
-    const [selected, setSelected]     = useState(null); // { path, sectionId, name, ext }
+    const [selected, setSelected]     = useState(() => normalizeSelected(savedNavState.selected)); // { path, sectionId, name, ext }
     const [fileData, setFileData]     = useState(null);
     const [loading, setLoading]       = useState(false);
     const [error, setError]           = useState(null);
     const [sideSearch, setSideSearch] = useState('');
     const [sidebarWidth, setSidebarWidth] = useState(256);
-    const [activeSection, setActiveSection] = useState(null);
+
     const [autoMap, setAutoMap]       = useState({});
     const [runCase, setRunCase]       = useState(null); // { caseId, specFile, grepPattern }
     const [importing, setImporting]   = useState(false);
@@ -2117,15 +2147,17 @@
     const [tcStats, setTcStats] = useState(null);
     const [view, setView]             = useState('files');
     // ── Corin-style navigation ─────────────────────────────────────────
-    const [mainNav, setMainNav]       = useState('dashboard'); // 'dashboard' | 'workspace' | 'memory' | 'settings'
-    const [workspaceNav, setWorkspaceNav] = useState('dashboard-openproject'); // dashboard child or workspace child
+    const [mainNav, setMainNav]       = useState(initialMainNav); // 'dashboard' | 'workspace' | 'memory' | 'settings'
+    const [workspaceNav, setWorkspaceNav] = useState(initialWorkspaceNav); // dashboard child or workspace child
     const [themeId, setThemeId]       = useState('navy');
     const [creating, setCreating]     = useState(null);   // { path, sectionId }
     const [creatingBusy, setCreatingBusy] = useState(false);
+
     const [user, setUser] = useState(() => {
       try { return JSON.parse(localStorage.getItem('qa_user') || 'null'); } catch { return null; }
     });
     const [loginErr, setLoginErr] = useState('');
+
     const DEFAULT_REQUEST_BLOCKS = [
       {
         id:'req-1',
@@ -2149,6 +2181,16 @@
     const [blockNoteState, setBlockNoteState] = useState({ loading:false, ready:false, error:'', rev:0 });
     const canAdminEdit = user?.role === 'admin';
     const themeRef  = useRef(null);
+
+    useEffect(() => {
+      try {
+        localStorage.setItem(APP_NAV_STATE_KEY, JSON.stringify({
+          mainNav,
+          workspaceNav,
+          selected,
+        }));
+      } catch {}
+    }, [mainNav, workspaceNav, selected]);
 
 
     const isDraggingRef = useRef(false);
@@ -2275,14 +2317,19 @@
     }
 
     // ── Open a file ─────────────────────────────────────────────────────────────
-    async function openFile(node, sectionId) {
+    async function openFile(node, sectionId, options = {}) {
       if (node.kind !== 'file') return;
       setView('files');
       setSelected({ path: node.path, sectionId, name: node.name, ext: node.ext, gdocId: node.gdocId });
+      if (!options.keepNav) {
+        setMainNav('workspace');
+        const workspaceSectionMap = { brd:'brd', assessments:'assessment', prd:'prd', test:'testcase', feature:'feature-list', gdocs:'google-docs' };
+        setWorkspaceNav(workspaceSectionMap[sectionId] || null);
+      }
       setActiveSection(sectionId);
       setLoading(true);
       setFileData(null);
-      setError(null);
+
       try {
         // Google Doc → fetch via /api/gdocs, render as read-only markdown
         if (node.ext === 'gdoc') {
@@ -2709,6 +2756,11 @@
     function renderRoomsView() { return window.WorkspaceModule.renderRoomsView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav }); }
     function renderWorkspaceSubView() { return window.WorkspaceModule.renderWorkspaceSubView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav, tcStats }); }
     function renderMemoryView() { return window.MemoryModule.renderMemoryView(); }
+
+    useEffect(() => {
+      if (mainNav !== 'workspace' || !selected?.path) return;
+      openFile(selected, selected.sectionId, { keepNav:true });
+    }, []);
 
     useEffect(() => {
       if (requestSyncMeta.loading || !requestBlocks?.length) return;
