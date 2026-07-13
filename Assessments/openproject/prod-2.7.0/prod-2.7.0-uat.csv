@@ -1,0 +1,51 @@
+﻿Version,2.7.0
+Date,2026-07-13
+PM,Dany Christian
+QA,Dany Christian
+TechLead,Naftal Yunior
+
+Checklist Type,Item,Status,Notes
+Dev,Scope version 2.7.0 locked,,
+Dev,All linked tickets deployed to target env,,
+Dev,Critical bugfix dependency validated,,
+Dev,Rollback path prepared,,
+Dev,Release notes shared,,
+QA,Smoke path identified,,
+QA,Test data prepared,,
+QA,Cross-browser target chosen,,
+QA,Evidence links accessible,,
+QA,Exit criteria agreed,,
+
+No,Feature,Description,Enhancement,Evidence,Test Results,Notes,Tester,Date,Status,Severity,Browser,Build,ENV,Module,Priority
+1,Whatsapp Web - inconsistency account channel status,Description :,No,https://project.ordo.co.id/wp/2052,,,,,In testing,Bug,,v2.7.0,Staging/Prod,SatuInbox,High
+2,Fix RabbitMQ Ticket Service Restart Issue,Feature: Fix RabbitMQ Ticket Service Restart Issue,Yes,https://project.ordo.co.id/wp/2344,,,,,In testing,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+3,Update baileys lib to v7 rc-10,Update the @whiskeysockets/baileys library to version 7 release candidate 10.,Yes,https://project.ordo.co.id/wp/1820,,,,,In testing,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+4,Whatsapp API - conversation created without message,handle issue whatsapp api terkait conversation (WAPI CHANNEL) dengan kondisi tanpa message,No,https://project.ordo.co.id/wp/2227,,,,,In testing,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+5,WhatsApp Group Messages - From Certain Participants Are Not Displayed in SatuInbox and Reply Context Is Missing,"An anomaly was found in WhatsApp Group conversations where messages from certain participants are successfully delivered and visible in the native WhatsApp application (mobile/web), but those messages do not appear in the SatuInbox Group Co",No,https://project.ordo.co.id/wp/2216,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,High
+6,Analitycs - report offline - Offline Report Status Not Updating on Pagination or Navigation,### Jam.dev Evidence,No,https://project.ordo.co.id/wp/1708,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+7,Handle autofill data on mobile ( SALES FORM ),autofill form :,No,https://project.ordo.co.id/wp/2210,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+8,Leads - Empty State Information Missing in Existing Contact Tab on Add Prospect,Jamdev :,No,https://project.ordo.co.id/wp/1834,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+9,Leads - Invalid Validation on Company Phone Number and Email/Company Email Fields in New Contact Form,Jamdev :,No,https://project.ordo.co.id/wp/1823,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+10,Notification - Incorrect Time Display in Notification Description (Using UTC Instead of Local Time),Jam.dev Evidence,No,https://project.ordo.co.id/wp/1572,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+11,Settings-Subs-Payment -Invoice Filters & Export Not Working and Tab State Not Reset After Page Reload,### Jam.dev Evidence,No,https://project.ordo.co.id/wp/1089,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+12,Ticket List - KPI Card Counter Not Synced During Real-Time Ticket List Pagination Update,### Jam.dev Evidence,No,https://project.ordo.co.id/wp/1810,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+13,Leads - Visit Detail - Decision Section UI Not Matching Design,Jamdev : [https://jam.dev/c/c01e2046-56e8-4831-982b-8c6d4bd0e726](https://jam.dev/c/c01e2046-56e8-4831-982b-8c6d4bd0e726),No,https://project.ordo.co.id/wp/1625,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Low
+14,Leads - Visit History - Late and Reschedule Badges Not Properly Arranged in Planned Column,Record :,No,https://project.ordo.co.id/wp/1619,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Low
+15,Leads-Add Data-Filter Select - Checkbox Overlaps Text in Lead Contact Filter Selection UI,Jamdev :,No,https://project.ordo.co.id/wp/1814,,,,,Tested,Bug,,v2.7.0,Staging/Prod,SatuInbox,Low
+16,Add global search config,add config for global search in organization,Yes,https://project.ordo.co.id/wp/2434,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+17,Auth - change validation at onboarding (TEMP V2.7.0),## QUICK ACT (TEMP V2.7.0),Yes,https://project.ordo.co.id/wp/2277,,,,,Closed,User story,,v2.7.0,Staging/Prod,SatuInbox,Normal
+18,Broadcast - Broadcast Can Be Sent Successfully Even When Token Balance Is Rp 0,### Jam.dev Evidence,No,https://project.ordo.co.id/wp/1207,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+19,Chatbox Copy Paste from Clipboard Features,Ada kebutuhan untuk Copy Paste Images pada Chat Box (bukan Upload Attachment),Yes,https://project.ordo.co.id/wp/1757,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+20,Conversation - add event assignBy data ,"adding assignBy id, assign type",Yes,https://project.ordo.co.id/wp/2112,,,,,Closed,User story,,v2.7.0,Staging/Prod,SatuInbox,Normal
+21,Create OPEN API Team inbox,"create ticket from api need fill member ids and team id, this endpoint shoul provide them response minimal is showing :&nbsp;",Yes,https://project.ordo.co.id/wp/2393,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+22,File compability - support heic dan heif type file,support heic dan heif type file,No,https://project.ordo.co.id/wp/1959,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+23,Global search suggestion,# PRODUCT REQUIREMENT DOCUMENT,Yes,https://project.ordo.co.id/wp/2140,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+24,Improve ticket room- user can reply message from selected bubble,Update Ticket Room: Users can now dynamically select any message bubble within the conversation ticket to be used as the reply reference bubble.,Yes,https://project.ordo.co.id/wp/2209,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+25,IT Support - Conversation Room Broadcast,Bug Broadcast terkirim 2 kali dalam waktu yang berdekatan atau rentang 2 menit kepada penerima yang sama,No,https://project.ordo.co.id/wp/2128,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+26,Shift Hour - Change shift hour did not effect member,Description :,No,https://project.ordo.co.id/wp/1975,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+27,Spintext - dynamic configuration spintext (TEMP 2.7.0),Quick patch v2.7.0,Yes,https://project.ordo.co.id/wp/2363,,,,,Closed,User story,,v2.7.0,Staging/Prod,SatuInbox,Normal
+28,Ticket - direct from ticket to conversation result static path URL,Description :,No,https://project.ordo.co.id/wp/2226,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal
+29,"Whatsapp - message utility ( contact, poll, event )",##### UI link : [https://www.figma.com/design/RAAuLaQKUufWMWWEm0kMb9/-V2--Satuinbox-Web-Specs?node-id=11944-107541&amp;t=maM2yZmwk9HFkPSf-1](https://www.figma.com/design/RAAuLaQKUufWMWWEm0kMb9/-V2--Satuinbox-Web-Specs?node-id=11944-107541&t,Yes,https://project.ordo.co.id/wp/2058,,,,,Closed,Feature,,v2.7.0,Staging/Prod,SatuInbox,Normal
+30,"conversation - reopen conversation with account channel that already disconnected and deleted, can still be done",used account :&nbsp;,No,https://project.ordo.co.id/wp/1132,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Low
+31,WhatsApp Group Conversation - Support @All Mention ,"Currently, the WhatsApp Group Mention feature only supports mentioning individual participants.",No,https://project.ordo.co.id/wp/2218,,,,,Closed,Bug,,v2.7.0,Staging/Prod,SatuInbox,Low
+32,[Mobile] - Search Autocomplete/Filtering Does Not Return Result for Partial Keyword Match,Jamdev : [https://app.betterbugs.io/session/6a1506f2247a3e53fa31531c](https://app.betterbugs.io/session/6a1506f2247a3e53fa31531c),No,https://project.ordo.co.id/wp/1940,,,,,On hold,Bug,,v2.7.0,Staging/Prod,SatuInbox,Normal

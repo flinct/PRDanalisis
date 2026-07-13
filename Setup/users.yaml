@@ -4,8 +4,8 @@ users:
     role: admin
     name: Admin
 
-  - username: dany
-    password: password123
+  - username: danyatmin
+    password: cicak1@
     role: admin
     name: Dany Christian
 

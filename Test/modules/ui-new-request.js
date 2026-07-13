@@ -5,15 +5,37 @@ window.NewRequestModule = (function(){
   function BlockNoteHost({ ctx }) {
     React.useEffect(() => {
       if (!ctx.blockNote?.ready || !ctx.requestEditorRef?.current || !ctx.blockNote?.api?.mountBlockNote) return undefined;
+      const host = ctx.requestEditorRef.current;
       const unmount = ctx.blockNote.api.mountBlockNote(
-        ctx.requestEditorRef.current,
+        host,
         ctx.requestBlocks,
         doc => ctx.onRequestDocChange(doc),
       );
-      return () => { try { unmount && unmount(); } catch {} };
+      const placeCaretAtEnd = ev => {
+        const target = ev.target;
+        if (!(target instanceof Element)) return;
+        if (target.closest('button,[role="menu"],[role="menuitem"],input,select,textarea,a,[contenteditable="false"]')) return;
+        const block = target.closest('.bn-block-outer');
+        if (!block || !host.contains(block)) return;
+        const inline = block.querySelector('.bn-inline-content');
+        if (!inline) return;
+        const sel = window.getSelection && window.getSelection();
+        if (!sel) return;
+        if (sel.rangeCount && inline.contains(sel.anchorNode) && inline.contains(sel.focusNode)) return;
+        const range = document.createRange();
+        range.selectNodeContents(inline);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      };
+      host.addEventListener('mouseup', placeCaretAtEnd, true);
+      return () => {
+        host.removeEventListener('mouseup', placeCaretAtEnd, true);
+        try { unmount && unmount(); } catch {}
+      };
     }, [ctx.blockNote?.rev]);
 
-    return e('div', { style:{ border:'1px solid var(--border-1)', borderRadius:12, background:'var(--elevated-bg)', overflow:'hidden' } },
+    return e('div', { style:{ border:'1px solid var(--border-1)', borderRadius:12, background:'var(--elevated-bg)' } },
       e('div', { ref:ctx.requestEditorRef, style:{ minHeight:520, padding:12 } }),
     );
   }
