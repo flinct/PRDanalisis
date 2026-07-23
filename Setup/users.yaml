@@ -13,3 +13,8 @@ users:
     password: viewer123
     role: viewer
     name: Viewer
+
+  - username: aprizal
+    password: rizal123
+    role: viewer
+    name: Aprizal Sanjaya

@@ -1,0 +1,1502 @@
+{
+  "inbound": [
+    {
+      "canonical": "paket apa",
+      "size": 190,
+      "variants": [
+        {
+          "normalized": "paket apa",
+          "count": 101
+        },
+        {
+          "normalized": "paket apa ya",
+          "count": 81
+        },
+        {
+          "normalized": "paket apa ya kak",
+          "count": 4
+        },
+        {
+          "normalized": "paket ya apa kak",
+          "count": 1
+        },
+        {
+          "normalized": "paket yg apa ya",
+          "count": 1
+        },
+        {
+          "normalized": "paket apa kak",
+          "count": 1
+        },
+        {
+          "normalized": "paket apa min",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "672cc8d4277cba37286f59db",
+          "text": "Paket apa ya?"
+        },
+        {
+          "conversationId": "672ccbd7277cba37286f5c0e",
+          "text": "paket apa ya?"
+        },
+        {
+          "conversationId": "672de66e5dfcf48adf0f97f3",
+          "text": "Paket apa ya"
+        }
+      ]
+    },
+    {
+      "canonical": "ok",
+      "size": 143,
+      "variants": [
+        {
+          "normalized": "ok",
+          "count": 142
+        },
+        {
+          "normalized": "ok kak",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "67063def220be27d71758f40",
+          "text": "ok"
+        },
+        {
+          "conversationId": "6731e884b26078f0f14dfa39",
+          "text": "Ok"
+        },
+        {
+          "conversationId": "673328fa72f22120a20d11d8",
+          "text": "Ok"
+        }
+      ]
+    },
+    {
+      "canonical": "iya",
+      "size": 51,
+      "variants": [
+        {
+          "normalized": "iya",
+          "count": 48
+        },
+        {
+          "normalized": "iya kak",
+          "count": 2
+        },
+        {
+          "normalized": "iya ya",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "67333b256f9a416d1dd83b8a",
+          "text": "Iya"
+        },
+        {
+          "conversationId": "67349ac9e32fd1dac4161a1e",
+          "text": "Iya.."
+        },
+        {
+          "conversationId": "673c83ac13bd546872e281a2",
+          "text": "Iya"
+        }
+      ]
+    },
+    {
+      "canonical": "halo",
+      "size": 46,
+      "variants": [
+        {
+          "normalized": "halo",
+          "count": 31
+        },
+        {
+          "normalized": "halo kak",
+          "count": 15
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "670500bdb22cf7e319d16901",
+          "text": "Halo kak"
+        },
+        {
+          "conversationId": "67050619b22cf7e319d19092",
+          "text": "halo kak"
+        },
+        {
+          "conversationId": "672ca1d2de7d505ee2c7286a",
+          "text": "Halo"
+        }
+      ]
+    },
+    {
+      "canonical": "p",
+      "size": 45,
+      "variants": [
+        {
+          "normalized": "p",
+          "count": 45
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "66ebe00fb8d4a225aa7e87f8",
+          "text": "P"
+        },
+        {
+          "conversationId": "670502a1b22cf7e319d1816c",
+          "text": "p"
+        },
+        {
+          "conversationId": "6705031cb22cf7e319d1843c",
+          "text": "P"
+        }
+      ]
+    },
+    {
+      "canonical": "it always seems impossible until it s done",
+      "size": 43,
+      "variants": [
+        {
+          "normalized": "it always seems impossible until it s done",
+          "count": 41
+        },
+        {
+          "normalized": "it always seems impossible until it s done failure is another stepping stone to greatness the journey of a thousand miles begins with one step it s going to be hard but hard does not mean impossible life is short live it fear is natural face it memory is powerful use it failure is another stepping stone to greatness we may encounter many defeats but we must not be defeated success is best when it s shared start where you are use what you have do what you can we are what we repeatedly do excellence then is not an act but a habit",
+          "count": 1
+        },
+        {
+          "normalized": "it always seems impossible until it s done be yourself everyone else is already taken",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "67249862296658893c131c33",
+          "text": "It always seems impossible until it’s done"
+        },
+        {
+          "conversationId": "67249865296658893c131cac",
+          "text": "It always seems impossible until it’s done"
+        },
+        {
+          "conversationId": "67249868296658893c131d21",
+          "text": "It always seems impossible until it’s done"
+        }
+      ]
+    },
+    {
+      "canonical": "tes",
+      "size": 37,
+      "variants": [
+        {
+          "normalized": "tes",
+          "count": 36
+        },
+        {
+          "normalized": "tes kak",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "66ef98f53a84b963ffbb1b97",
+          "text": "Tes"
+        },
+        {
+          "conversationId": "6704de7db22cf7e319d120e9",
+          "text": "tes"
+        },
+        {
+          "conversationId": "6705015fb22cf7e319d17412",
+          "text": "tes"
+        }
+      ]
+    },
+    {
+      "canonical": "test",
+      "size": 36,
+      "variants": [
+        {
+          "normalized": "test",
+          "count": 36
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "670392af8dea5cf4f5e24f5f",
+          "text": "test"
+        },
+        {
+          "conversationId": "6705044ab22cf7e319d18914",
+          "text": "test"
+        },
+        {
+          "conversationId": "6705e05db22cf7e319d1b574",
+          "text": "Test"
+        }
+      ]
+    },
+    {
+      "canonical": "oke",
+      "size": 32,
+      "variants": [
+        {
+          "normalized": "oke",
+          "count": 32
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "67340d1ae32fd1dac414b30a",
+          "text": "Oke"
+        },
+        {
+          "conversationId": "673c46cf13bd546872e243cb",
+          "text": "Oke"
+        },
+        {
+          "conversationId": "673ca41413bd546872e28fef",
+          "text": "Oke"
+        }
+      ]
+    },
+    {
+      "canonical": "hallo",
+      "size": 23,
+      "variants": [
+        {
+          "normalized": "hallo",
+          "count": 19
+        },
+        {
+          "normalized": "hallo kak",
+          "count": 4
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6705f2c56bfe724836165c67",
+          "text": "Hallo"
+        },
+        {
+          "conversationId": "67061c4a3b9e2878f47d52f6",
+          "text": "HALLO"
+        },
+        {
+          "conversationId": "67063467528e9e5c6c4eb864",
+          "text": "hallo"
+        }
+      ]
+    }
+  ],
+  "outbound": [
+    {
+      "canonical": "kepada pelanggan yang kami hormati kurir terpercaya kami",
+      "size": 1031,
+      "variants": [
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami yohannes tulus martinez <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami lukman nul hakim <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami murslin <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami m nevin <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami yohannes tulus martinez <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami rizki pratama putra <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami yuda al akdam <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami dodi herdiansah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami amir santoso <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati kurir terpercaya kami budi rivai <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "690079a40c0f21fe62a13e40",
+          "text": "Kepada pelanggan yang kami hormati\n\nKurir terpercaya kami *NGAFIF AINUN ISMAIL* - *6287754011488* telah mengantarkan paket Anda dengan No.AWB *MGT00216765988*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *MGT00213078112*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "69018e9db10ead8389d14821",
+          "text": "Kepada pelanggan yang kami hormati\n\nKurir terpercaya kami *LUKMAN NUL HAKIM* - *6288294415860* telah mengantarkan paket Anda dengan No.AWB *BLO00212833388*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "69019cc0b10ead8389d16cfe",
+          "text": "Kepada pelanggan yang kami hormati\n\nKurir terpercaya kami *SAEFUDIN AMIR* - *089643737506* telah mengantarkan paket Anda dengan No.AWB *TUB1500213086505*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "kepada pelanggan yang kami hormati tim pengantaran kami",
+      "size": 970,
+      "variants": [
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami berry nurfadli <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami wisono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak lengkap dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami muhammad fahmi nurhidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak lengkap dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami yohannes tulus martinez <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami bayu s pramata <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami muhammad andreansyah <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami herman <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami adhie lutfhi fuadhy <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim pengantaran kami billy ginaldi sidik <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870db22f8451c094d9f662c",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim pengantaran kami *EPI MUALIMIN* - *6289507023764* telah mengantarkan paket Anda dengan No.AWB *LNCH2511BA4RAD4M*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *EPI MUALIMIN* - *6289507023764* telah mengantarkan paket Anda dengan No.AWB *MGT00205178834*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68ff559e0c0f21fe62a0b240",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim pengantaran kami *HENDRA SAPUTRA* - *081917466485* telah mengantarkan paket Anda dengan No.AWB *TUB1500212751841*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *DIYAN ROHMANSAH ROHMANSAH* - *081314936845* telah mengantarkan paket Anda dengan No.AWB *BDO1500212992025*, namun tidak sukses terkirim karena *ALAMAT TIDAK DIKETAHUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "69019b5cb10ead8389d16b0a",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim pengantaran kami *ADAD MUSADDAD* - *081574684219* telah mengantarkan paket Anda dengan No.AWB *BLO00213038917*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "kepada pelanggan yang kami hormati petugas ramah kami",
+      "size": 967,
+      "variants": [
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami harry novriansyah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami rahmad ferdiansyah <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami rizki pratama putra <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami rio indra nasution <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami jeri martion <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami aang zulkifli <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami asep daerobi <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami yohannes tulus martinez <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati petugas ramah kami djb vendor <num> <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "67358707a166c645a4c6d641",
+          "text": "Kepada pelanggan yang kami hormati\n\nPetugas ramah kami *ANDI MAULANA* - *081944501039* telah mengantarkan paket Anda dengan No.AWB *MGT00214772843*, namun tidak sukses terkirim karena *SULIT DITEMUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68a0597ae966767cec8eb9b2",
+          "text": "Kepada pelanggan yang kami hormati\n\nPetugas ramah kami *AHMAD GOZALI* - *081381695441* telah mengantarkan paket Anda dengan No.AWB *DPK8500216807373*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *ADE SETIAWAN JORDY* - *0881012259644* telah mengantarkan paket Anda dengan No.AWB *LNCH2508BCYBAEGK*, namun tidak sukses terkirim karena *SULIT DITEMUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68fec6650c0f21fe629f9e2c",
+          "text": "Kepada pelanggan yang kami hormati\n\nPetugas ramah kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *JKT1500215724925*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nDriver kami *NGAFIF AINUN ISMAIL* - *6287754011488* telah mengantarkan paket Anda dengan No.AWB *JKT1500213514719*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *MGT00212848128*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan kami yang terhormat\n\nTim pengantaran kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *BLO00216303493*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nYth. Pelanggan\n\nDriver kami *NGAFIF AINUN ISMAIL* - *6287754011488* telah mengantarkan paket Anda dengan No.AWB *KNG1500216218978*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan setia kami\n\nTim pengantaran kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *MGT00214744284*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "kepada pelanggan yang kami hormati tim delivery kami",
+      "size": 942,
+      "variants": [
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami thoriq al ahya <num> telah mengantarkan paket anda dengan no awb rha<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami vendor pos <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami akmal setiaji <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami aldy nurochman <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami sandi sucipta <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami nuryadin <num> telah mengantarkan paket anda dengan no awb bki<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "kepada pelanggan yang kami hormati tim delivery kami muhamad mabrury <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "674e4bbfd162fdc3bf8702fe",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim delivery kami *ICHWAN NIRWANA* - *081380126258* telah mengantarkan paket Anda dengan No.AWB *BLO00213162617*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nYth. Pelanggan\n\nKurir terpercaya kami *SAPTO WINARSO* - *089671683482* telah mengantarkan paket Anda dengan No.AWB *MGT00213921313*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6890877b11d7e4ecc610760d",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim delivery kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *WBS00215240338*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *MGT00206946767*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68ff786b0c0f21fe62a0d3bd",
+          "text": "Kepada pelanggan yang kami hormati\n\nTim delivery kami *Nazarruddin ZA* - *085603144784* telah mengantarkan paket Anda dengan No.AWB *LNCH2510BEJCAJUJ*, namun tidak sukses terkirim karena *ALAMAT TIDAK DIKETAHUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *Nazarruddin ZA* - *085603144784* telah mengantarkan paket Anda dengan No.AWB *LNCH2510BEJCAJUJ*, namun tidak sukses terkirim karena *ALAMAT TIDAK DIKETAHUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono",
+      "size": 508,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 49
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 26
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 21
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 19
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 18
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 14
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 13
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 13
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 12
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami tauvik hendro trimaryono <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 11
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "686fd0e0e2b539f0b04eb769",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *TAUVIK HENDRO TRIMARYONO* - *08121611681* telah mengantarkan paket Anda dengan No.AWB *MGT00205045321*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "686fd308e2b539f0b04eee12",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *TAUVIK HENDRO TRIMARYONO* - *08121611681* telah mengantarkan paket Anda dengan No.AWB *RSD4072025-22*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870745ef8451c094d01d40e",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *TAUVIK HENDRO TRIMARYONO* - *08121611681* telah mengantarkan paket Anda dengan No.AWB *MGT00205268736*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami suyamto <num> telah",
+      "size": 203,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 13
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 7
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 7
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb jpa<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb ka oid <num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suyamto <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "68706a30f8451c094df3fb55",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUYAMTO* - *082111899820* telah mengantarkan paket Anda dengan No.AWB *246112861*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870d299f8451c094d93cb36",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUYAMTO* - *082111899820* telah mengantarkan paket Anda dengan No.AWB *KOMSHIP00204958072*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "687870e8f8451c094d123cee",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUYAMTO* - *082111899820* telah mengantarkan paket Anda dengan No.AWB *LNCH2507A9FSAD4O*, namun tidak sukses terkirim karena *FORCE MAJEURE* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami ivan sudibyo <num>",
+      "size": 202,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 39
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 14
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 8
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb wbs<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ivan sudibyo <num> telah mengantarkan paket anda dengan no awb tkp<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870ddd7f8451c094da5d263",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *IVAN SUDIBYO* - *6287809956859* telah mengantarkan paket Anda dengan No.AWB *BLO00204588185*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870ddd7f8451c094da5d277",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *IVAN SUDIBYO* - *6287809956859* telah mengantarkan paket Anda dengan No.AWB *BLO00204476452*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870ddd8f8451c094da5d285",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *IVAN SUDIBYO* - *6287809956859* telah mengantarkan paket Anda dengan No.AWB *BLO00204673996*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami aldofa hardivan <num>",
+      "size": 177,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 18
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 9
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 7
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb rha<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb wbs<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb odfs<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aldofa hardivan <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "688729ffcbec8c65370f4283",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ALDOFA HARDIVAN* - *082113197694* telah mengantarkan paket Anda dengan No.AWB *WBS00206419357*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68872a00cbec8c65370f42b2",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ALDOFA HARDIVAN* - *082113197694* telah mengantarkan paket Anda dengan No.AWB *TUB1500206403476*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68872a0ecbec8c65370f61a8",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ALDOFA HARDIVAN* - *082113197694* telah mengantarkan paket Anda dengan No.AWB *BLO00206394488*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami junaedi <num> telah",
+      "size": 165,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 26
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 13
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb tkgp<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami junaedi <num> telah mengantarkan paket anda dengan no awb bki<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "688c91914569be7c3ea699d3",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JUNAEDI* - *085892170005* telah mengantarkan paket Anda dengan No.AWB *YUNI4969TS*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6892d083d4b478d89320f982",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JUNAEDI* - *085892170005* telah mengantarkan paket Anda dengan No.AWB *IC25080091904*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6892d1efd4b478d893253d0d",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JUNAEDI* - *085892170005* telah mengantarkan paket Anda dengan No.AWB *BLO00206993286*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami gesit triyandi saputro",
+      "size": 136,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 26
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 13
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 8
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb komship<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb wbs<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami gesit triyandi saputro <num> telah mengantarkan paket anda dengan no awb jkt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "687862c0f8451c094d120824",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *GESIT TRIYANDI SAPUTRO* - *085212747156* telah mengantarkan paket Anda dengan No.AWB *MGT00205268660*, namun tidak sukses terkirim karena *MISSROUTE* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68873ae54569be7c3eb74bac",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *GESIT TRIYANDI SAPUTRO* - *085212747156* telah mengantarkan paket Anda dengan No.AWB *MGT00206404068*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "688eecd911d7e4ecc63b866d",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *GESIT TRIYANDI SAPUTRO* - *085212747156* telah mengantarkan paket Anda dengan No.AWB *CBN1500206783349*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami abdi purnomo <num>",
+      "size": 128,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 7
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb bjo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami abdi purnomo <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870c325f8451c094d716e53",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ABDI PURNOMO* - *6285710034799* telah mengantarkan paket Anda dengan No.AWB *KA-OID-5074077808436*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870d6d1f8451c094d99c91c",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ABDI PURNOMO* - *6285710034799* telah mengantarkan paket Anda dengan No.AWB *BLO00204903948*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870e64bf8451c094daa4002",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ABDI PURNOMO* - *6285710034799* telah mengantarkan paket Anda dengan No.AWB *TKGP2507077100028*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami amirudin <num> telah",
+      "size": 110,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb ig<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb ig<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami amirudin <num> telah mengantarkan paket anda dengan no awb <num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "68708813f8451c094d18df43",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *AMIRUDIN* - *6289637534613* telah mengantarkan paket Anda dengan No.AWB *SOC8500205071608*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870f9faf8451c094daed37c",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *AMIRUDIN* - *6289637534613* telah mengantarkan paket Anda dengan No.AWB *PKL8500205191418*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "687870e5f8451c094d123cc1",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *AMIRUDIN* - *6289637534613* telah mengantarkan paket Anda dengan No.AWB *BLO00204934199*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami suherman <num> telah",
+      "size": 103,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb <num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb psn<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb komship<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami suherman <num> telah mengantarkan paket anda dengan no awb ckr<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6878712df8451c094d124fe9",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUHERMAN* - *62819514228464* telah mengantarkan paket Anda dengan No.AWB *MGT00205315891*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6878712ef8451c094d125006",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUHERMAN* - *62819514228464* telah mengantarkan paket Anda dengan No.AWB *TUB1500205180205*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *SUHERMAN* - *62819514228464* telah mengantarkan paket Anda dengan No.AWB *TUB1500205180205*, namun tidak sukses terkirim karena *ALAMAT TIDAK DIKETAHUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68787134f8451c094d125166",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SUHERMAN* - *62819514228464* telah mengantarkan paket Anda dengan No.AWB *246527364*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami joko sulistyo <num>",
+      "size": 103,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena nama tidak dikenal dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb tkgp<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb kng<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb tkp<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb bjo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami joko sulistyo <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870ca27f8451c094d83e39b",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JOKO SULISTYO* - *081382687903* telah mengantarkan paket Anda dengan No.AWB *ODFS00204915717*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *AJAT SUDRAJAT* - *0895387195150* telah mengantarkan paket Anda dengan No.AWB *ODFS00206248660*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *AJAT SUDRAJAT* - *0895387195150* telah mengantarkan paket Anda dengan No.AWB *ODFS00207458767*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *JOKO SULISTYO* - *081382687903* telah mengantarkan paket Anda dengan No.AWB *ODFS00207458767*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6871096ff8451c094db3c602",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JOKO SULISTYO* - *081382687903* telah mengantarkan paket Anda dengan No.AWB *KNG1500204892368*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68711348f8451c094dc65580",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *JOKO SULISTYO* - *081382687903* telah mengantarkan paket Anda dengan No.AWB *IG25070473652*, namun tidak sukses terkirim karena *NAMA TIDAK DIKENAL* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami sarif hidayat <num>",
+      "size": 101,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb <num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb tkp<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb ig<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami sarif hidayat <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870c322f8451c094d716e09",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SARIF HIDAYAT* - *6281314824721* telah mengantarkan paket Anda dengan No.AWB *JKT8500205176155*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870d401f8451c094d974c00",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SARIF HIDAYAT* - *6281314824721* telah mengantarkan paket Anda dengan No.AWB *RHA00205274103*, namun tidak sukses terkirim karena *ALAMAT TIDAK LENGKAP* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *SARIF HIDAYAT* - *6281314824721* telah mengantarkan paket Anda dengan No.AWB *RHA00205274103*, namun tidak sukses terkirim karena *ALAMAT TIDAK LENGKAP* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6878710af8451c094d12456a",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *SARIF HIDAYAT* - *6281314824721* telah mengantarkan paket Anda dengan No.AWB *TKGP2507090100021*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami aspuri <num> telah",
+      "size": 93,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena alamat tidak diketahui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb rha<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami aspuri <num> telah mengantarkan paket anda dengan no awb tkgp<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "673c6aba13bd546872e271c2",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *IC24110017167*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870ac9ff8451c094d46b74f",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *JKT8500205197223*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *JKT8500205197361*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870c04ff8451c094d695cd1",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ASPURI* - *089528642858* telah mengantarkan paket Anda dengan No.AWB *BLO00204377043*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah",
+      "size": 87,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 12
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 10
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 8
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb wbs<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb lbmak<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb bjo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb ckr<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami fatoniansyah <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6890689011d7e4ecc6cfc4c2",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *FATONIANSYAH* - *083870444808* telah mengantarkan paket Anda dengan No.AWB *BLO00206780295*, namun tidak sukses terkirim karena *RUMAH KOSONG DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "68932a78d4b478d893d807f4",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *FATONIANSYAH* - *083870444808* telah mengantarkan paket Anda dengan No.AWB *MGT00206980698*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "689451c9d4b478d893edd48c",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *FATONIANSYAH* - *083870444808* telah mengantarkan paket Anda dengan No.AWB *LBMAK146625*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami ridwan ardian wijaya",
+      "size": 87,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 7
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 5
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb odfs<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena rumah kosong tidak dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ridwan ardian wijaya <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami reza prasetyo <num> telah mengantarkan paket anda dengan no awb ckr<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami reza prasetyo <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6890520a11d7e4ecc6e43355",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *RIDWAN ARDIAN WIJAYA* - *085715517434* telah mengantarkan paket Anda dengan No.AWB *MGT00206950705*, namun tidak sukses terkirim karena *RUMAH KOSONG TIDAK DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *MUHAMMAD RIDHO* - *085974828209* telah mengantarkan paket Anda dengan No.AWB *LNCH2508BCYBAECP*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6890520d11d7e4ecc6e43db2",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *RIDWAN ARDIAN WIJAYA* - *085715517434* telah mengantarkan paket Anda dengan No.AWB *LNCH2508BMRVAD4G*, namun tidak sukses terkirim karena *RUMAH KOSONG TIDAK DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *RIDWAN ARDIAN WIJAYA* - *085715517434* telah mengantarkan paket Anda dengan No.AWB *BLO00206949407*, namun tidak sukses terkirim karena *RUMAH KOSONG TIDAK DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6890537411d7e4ecc6f3ff0b",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *RIDWAN ARDIAN WIJAYA* - *085715517434* telah mengantarkan paket Anda dengan No.AWB *BLO00206932164*, namun tidak sukses terkirim karena *RUMAH KOSONG TIDAK DIHUNI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke Website SAP Express\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami haryanto <num> telah",
+      "size": 85,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb tub<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb wbs<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 6
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb ig<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb jbb<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami haryanto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870bd43f8451c094d649fe0",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *HARYANTO* - *6281330742192* telah mengantarkan paket Anda dengan No.AWB *TKP4001463808*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870bd45f8451c094d64a019",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *HARYANTO* - *6281330742192* telah mengantarkan paket Anda dengan No.AWB *LNCH2507A7MKAEEO*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870bd47f8451c094d64a054",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *HARYANTO* - *6281330742192* telah mengantarkan paket Anda dengan No.AWB *LNCH2507BGETAD9R*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    },
+    {
+      "canonical": "pelanggan yang terhormat kurir kami ato sugianto <num>",
+      "size": 84,
+      "variants": [
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 4
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 3
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena rumah kosong dihuni dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb mgt<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb cbn<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb blo<num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb <num> namun tidak sukses terkirim karena sulit ditemui dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb tkgp<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod",
+          "count": 2
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb irma<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke <url> sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb irma<num>ts namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb lnch<num>bfataeg<num> namun tidak sukses terkirim karena ditolak dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 1
+        },
+        {
+          "normalized": "pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb lnch<num>a<num>basi<num> namun tidak sukses terkirim karena alamat tidak lengkap dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod pelanggan yang terhormat kurir kami ato sugianto <num> telah mengantarkan paket anda dengan no awb lnch<num>a<num>basi<num> namun tidak sukses terkirim karena alamat tidak lengkap dan saat ini paket dalam proses pengembalian ke cabang untuk detailnya dapat diakses ke website sap express sahabatpengiriman jagonyacod",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "conversationId": "6870b947f8451c094d5e0fc9",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ATO SUGIANTO* - *085174491440* telah mengantarkan paket Anda dengan No.AWB *08072025-DUI5GE*, namun tidak sukses terkirim karena *DITOLAK* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870fe30f8451c094daf9595",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ATO SUGIANTO* - *085174491440* telah mengantarkan paket Anda dengan No.AWB *MGT00205041873*, namun tidak sukses terkirim karena *SULIT DITEMUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod\nPelanggan yang terhormat\n\nKurir kami *ATO SUGIANTO* - *085174491440* telah mengantarkan paket Anda dengan No.AWB *MGT00205041873*, namun tidak sukses terkirim karena *SULIT DITEMUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        },
+        {
+          "conversationId": "6870fe31f8451c094daf95b1",
+          "text": "Pelanggan yang terhormat\n\nKurir kami *ATO SUGIANTO* - *085174491440* telah mengantarkan paket Anda dengan No.AWB *KA-OID-7488744105481*, namun tidak sukses terkirim karena *SULIT DITEMUI* dan saat ini paket dalam proses pengembalian ke cabang.\n\nUntuk detailnya dapat diakses ke https://www.sap-express.id\n\n #Sahabatpengiriman\n #Jagonyacod"
+        }
+      ]
+    }
+  ]
+}

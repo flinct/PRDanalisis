@@ -40,8 +40,9 @@ Jika user memberi perintah yang tidak eksplisit (misal: "tolong review PRD ini",
 
 1. `Rules/workflow-rule.md` — execution order dan prioritas
 2. `Rules/structure-rule.md` — repository structure, termasuk lokasi artefak permanen di `Assessments/` dan script helper di `Scripts/`
-3. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
-4. `Assessments/README.md` — aturan artefak analisa permanen dan versioning bila tugas menyentuh hasil analisa yang ingin dipersist
+3. `Rules/summary-rule.md` — aturan file summary per-session di folder `summary/`
+4. `Memory/README.md` — memory index, tahu file mana yang ada dan fungsinya
+5. `Assessments/README.md` — aturan artefak analisa permanen dan versioning bila tugas menyentuh hasil analisa yang ingin dipersist
 
 ### REQUIREMENT LIFECYCLE / CHANGE INTAKE:
 

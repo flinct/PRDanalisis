@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:Segoe UI,Arial;background:#f4f7fb;margin:0;padding:20px}
+.grid{display:grid;grid-template-columns:380px 1fr;gap:18px}
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+textarea{width:100%;height:700px;font-family:Consolas,monospace}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.stat{background:#fff;padding:12px;border-radius:10px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.v{font-size:26px;font-weight:bold}
+.task{margin:16px 0}
+.track{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.fill{height:100%}
+ul{margin:6px 0 0 18px}
+.wrapCharts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+</style></head>
+<body>
+<h2>Checklist Project Tracker</h2>
+<div class="grid">
+<div class="card">
+<textarea id="src">- Breakdown error message
+    - Analisa existing flow -> 20%
+    - Mapping error code
+    - Implement API
+    - QA Testing
+
+- Global search dan autotagging
+    - PRD -> 100%
+    - Backend -> 40%
+    - Frontend
+    - QA
+
+- Create new draft PRD referral system
+    -> 70%
+
+- Conversation performance improve</textarea>
+</div>
+<div>
+<div class="stats">
+<div class="stat"><div class="v" id="total"></div>Total</div>
+<div class="stat"><div class="v" id="done"></div>Done</div>
+<div class="stat"><div class="v" id="prog"></div>Progress</div>
+<div class="stat"><div class="v" id="todo"></div>Todo</div>
+<div class="stat"><div class="v" id="overall"></div>Overall</div>
+</div>
+
+<div class="wrapCharts">
+<div class="card"><canvas id="overallPie"></canvas></div>
+<div class="card"><canvas id="statusBar"></canvas></div>
+</div>
+
+<div class="card" style="margin-top:16px">
+<h3>Tasks</h3>
+<div id="tasks"></div>
+</div>
+</div>
+</div>
+
+<script>
+let pie,bar;
+function color(v){return v==100?"#2563eb":v>=70?"#16a34a":v>=30?"#eab308":v>0?"#f97316":"#ef4444";}
+function parse(t){
+ let tasks=[],cur=null;
+ t.split(/\r?\n/).forEach(raw=>{
+   if(!raw.trim())return;
+   if(/^- /.test(raw)){cur={name:raw.slice(2),children:[],parent:null};tasks.push(cur);return;}
+   if(!cur)return;
+   if(/^\s+- /.test(raw)){
+      let s=raw.trim().slice(2),m=s.match(/^(.*?)(?:\s*->\s*(\d+)%)?$/);
+      cur.children.push({name:m[1].trim(),progress:m[2]?+m[2]:0});
+   }else{
+      let m=raw.trim().match(/^->\s*(\d+)%$/);
+      if(m)cur.parent=+m[1];
+   }
+ });
+ tasks.forEach(t=>{
+   if(t.children.length){
+      t.progress=t.children.reduce((a,c)=>a+c.progress,0)/t.children.length;
+   }else t.progress=t.parent||0;
+ });
+ return tasks;
+}
+function render(){
+ const data=parse(src.value);
+ let done=0,prog=0,todo=0,sum=0;
+ tasks.innerHTML="";
+ data.forEach(t=>{
+   sum+=t.progress;
+   if(t.progress==100)done++; else if(t.progress==0)todo++; else prog++;
+   tasks.innerHTML+=`<div class="task"><b>${t.name}</b><span style="float:right">${t.progress.toFixed(1)}%</span>
+   <div class="track"><div class="fill" style="width:${t.progress}%;background:${color(t.progress)}"></div></div>
+   ${t.children.length?'<ul>'+t.children.map(c=>`<li>${c.name} <b>${c.progress}%</b></li>`).join('')+'</ul>':''}</div>`;
+ });
+ let overallPct=data.length?sum/data.length:0;
+ total.textContent=data.length;
+ done.textContent=done;
+ prog.textContent=prog;
+ todo.textContent=todo;
+ overall.textContent=overallPct.toFixed(1)+"%";
+
+ if(pie)pie.destroy();
+ pie=new Chart(overallPie,{
+  type:'doughnut',
+  data:{labels:['Completed','Remaining'],datasets:[{data:[overallPct,100-overallPct]}]},
+  options:{plugins:{title:{display:true,text:'Overall Project Progress'}}}
+ });
+ if(bar)bar.destroy();
+ bar=new Chart(statusBar,{
+  type:'bar',
+  data:{labels:['Done','Progress','Todo'],datasets:[{label:'Tasks',data:[done,prog,todo]}]},
+  options:{plugins:{title:{display:true,text:'Task Status'}}}
+ });
+}
+src.oninput=render;render();
+</script>
+</body></html>

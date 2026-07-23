@@ -1,0 +1,23 @@
+# Summary
+
+- Tanggal: 2026-07-20
+- Judul session: post login landing analysis
+- Tujuan / request utama user: analisa dampak perubahan flow setelah login dari direct ke Conversation menjadi landing/loading workspace-preparation screen lalu baru masuk Conversation.
+- Ringkasan progres / analisa / keputusan penting selama session:
+  - Rule wajib sudah dibaca: `Rules/agent-instruction.md`, `Rules/requirements-lifecycle-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/summary-rule.md`, `Rules/workflow-rule.md`.
+  - Konteks produk sudah dibaca: `Memory/global-memory.md`, `WORKFLOW_CONTEXT.md`.
+  - Request diklasifikasikan sebagai `BEHAVIOR_CHANGE` pada domain `Conversation / Auth / Cross-domain` karena mengubah post-login routing dan bootstrap behavior.
+  - Klarifikasi yang sudah locked:
+    - current scope 1 user = 1 organization
+    - organization resolved saat login
+    - `roundRobinConfig.enabled === true` memicu execute assignment di BE
+    - `all message` berarti lookup semua conversation eligible RR, bukan preload semua message body
+    - phase 1 fake loading tetap menjalankan RR di BE; user baru bisa akses Conversation saat progress selesai
+  - Artefak permanen sudah dibuat dan dikonsolidasikan:
+    - `Assessments/conversation/post-login-workspace-bootstrap/post-login-workspace-bootstrap-change-intake-brief.md`
+    - `Assessments/conversation/post-login-workspace-bootstrap/post-login-workspace-bootstrap-qa-assessment.md`
+  - Assessment dikembalikan ke versi lebih lengkap dan diagram `Current vs Proposed State` disatukan ke file assessment utama.
+  - File diagram terpisah dihapus agar review cukup buka satu file assessment.
+- Status terakhir / next step:
+  - Assessment utama sekarang jadi single source untuk presentasi dan review.
+  - Next step opsional: turunkan assessment jadi PRD/acceptance criteria Phase 1, atau rapikan copy presentasi sesuai audiens stakeholder.

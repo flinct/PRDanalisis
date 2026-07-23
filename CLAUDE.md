@@ -39,6 +39,7 @@ PRDanalisis/
 │   ├── workflow-rule.md
 │   ├── requirements-lifecycle-rule.md
 │   ├── structure-rule.md
+│   ├── summary-rule.md
 │   ├── qa-analysis-rule.md
 │   ├── impact-analysis-rule.md
 │   ├── prd-writing-rule.md
@@ -105,6 +106,8 @@ PRDanalisis/
 | PRD Comparison | `prd-comparison-rule.md`, `qa-analysis-rule.md` |
 | Memory Write/Update | `memory-routing-rule.md` + rule tulis/update sesuai target |
 
+> Untuk semua tipe tugas, muat juga `summary-rule.md` dan pastikan file `summary/YYYY-MM-DD-judul-singkat.md` dibuat/diupdate selama session berjalan.
+
 > Detail lengkap ada di `Rules/agent-instruction.md`.
 
 ---
@@ -149,6 +152,7 @@ Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding le
 1. Tidak ada tugas dikerjakan tanpa baca rule yang sesuai terlebih dahulu
 2. `Rules/agent-instruction.md` adalah source of truth untuk workflow
 3. `Memory/global-memory.md` adalah source of truth untuk canonical product rules
-4. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
-5. Jangan overwrite memory — update section relevan saja
-6. Jika ada konflik antara input user dan rule, **ikuti rule**
+4. Setiap session wajib punya file summary aktif di `summary/` sesuai `Rules/summary-rule.md`
+5. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
+6. Jangan overwrite memory — update section relevan saja
+7. Jika ada konflik antara input user dan rule, **ikuti rule**

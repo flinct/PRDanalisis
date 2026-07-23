@@ -113,11 +113,20 @@ Default state for both web and mobile notification is ON.
 ### BR-8 — Channel hard stop
 If a channel is disabled for a user, that user must not receive notification through that channel.
 
-### BR-9 — Company-wide exception
+### BR-9 — Preference eligibility by role
+Only `Supervisor` and `Admin` can configure notification channel preferences.
+
+### BR-10 — Member forced-on behavior
+Member users are forced-on permanently and cannot disable conversation/ticket notifications.
+
+### BR-11 — Company-wide exception
 Notification classes not tied to conversation/ticket assignee workflow remain allowed to use company-wide delivery.
 
-### BR-10 — Dual-channel delivery allowed
+### BR-12 — Dual-channel delivery allowed
 If both web and mobile are enabled, same event may be delivered to both channels.
+
+### BR-13 — Same-event recipient dedupe
+If same user qualifies for same event through more than one recipient path, system must deliver only one notification for that event.
 
 ---
 
@@ -152,22 +161,31 @@ System shall notify eligible supervisors when conversation/ticket enters a super
 System shall notify eligible supervisors when conversation/ticket is assigned in a supervised team inbox.
 
 ### FR-5 Web preference control
-System shall provide per-user preference to enable/disable web notification delivery.
+System shall provide per-user preference to enable/disable web notification delivery for `Supervisor` and `Admin` only.
 
 ### FR-6 Mobile preference control
-System shall provide per-user preference to enable/disable mobile push notification delivery.
+System shall provide per-user preference to enable/disable mobile push notification delivery for `Supervisor` and `Admin` only.
 
-### FR-7 Mobile push delivery
+### FR-7 Member forced-on rule
+System shall always deliver conversation/ticket notifications to assigned `Member` users because `Member` users cannot disable notification.
+
+### FR-8 Mobile push delivery
 System shall deliver mobile notification through Firebase / FCM when mobile notification is enabled and a valid device token exists.
 
-### FR-8 Recipient deduplication
+### FR-9 Recipient deduplication
 System shall prevent duplicate delivery to same user for same event when user qualifies through multiple recipient paths.
 
-### FR-9 Company-wide preservation
+### FR-10 Event separation
+System shall keep different events as separate notifications and must not coalesce them into one notification.
+
+### FR-11 Company-wide preservation
 System shall preserve current company-wide notification behavior for non conversation/ticket notification classes.
 
-### FR-10 Backward-compatible web path
+### FR-12 Backward-compatible web path
 System shall preserve existing websocket/in-app notification behavior for users whose web notification remains enabled.
+
+### FR-13 Notification category label
+System shall distinguish notification category between `company-wide` and `conversation/ticket` notification classes.
 
 ---
 
@@ -265,9 +283,150 @@ Channel preference evaluation must be deterministic and consistent across domain
 2. existing company-wide behavior continues
 3. this BRD does not redefine that recipient model
 
+### 11.4 Notification Flow Diagrams
+
+The diagrams below describe intended notification behavior. They complement the numbered flows above and must remain consistent with the Business Rules in section 5 and the Event Breakdown in section 12.
+
+#### 11.4.1 High-Level Notification Flow
+
+```mermaid
+flowchart TD
+    A[Source Service<br/>conversation-service / ticket-service] --> B[Notification Event<br/>IN_APP_NOTIFICATION_CREATE]
+    B --> C[Notification Service<br/>Recipient Resolver]
+    C --> D[Preference Gate]
+    D --> E[Delivery Type Dispatcher]
+    E --> F[Web In-App Delivery<br/>WebSocket]
+    E --> G[Mobile Push Delivery<br/>Firebase / FCM]
+    F --> H[Web Client]
+    G --> I[Mobile Client]
+```
+
+#### 11.4.2 Recipient Resolution Decision Tree
+
+```mermaid
+flowchart TD
+    Start[Incoming Notification Event] --> Q1{Notification Category?}
+    Q1 -->|company_wide| CW[Deliver to company-wide audience<br/>Preserved as-is]
+    Q1 -->|conversation_ticket| Q2{Event Type?}
+    Q2 -->|entered team inbox| S1[Resolve Supervisor list<br/>by team scope]
+    Q2 -->|assigned| S2[Resolve Assigned Member<br/>+ Supervisor list by team scope]
+    Q2 -->|reopened| S3[Resolve Assigned Member only]
+    S1 --> M[Merge Recipient List]
+    S2 --> M
+    S3 --> M
+    M --> DD[Apply Same-Event Same-User Dedupe<br/>userId + eventId]
+    DD --> Out[Send resolved recipients to Preference Gate]
+```
+
+#### 11.4.3 Preference Gate Decision Tree
+
+```mermaid
+flowchart TD
+    In[Recipient User + Event] --> R{Role?}
+    R -->|Member| FM[Forced-On<br/>Deliver both Web and Mobile if channels available]
+    R -->|Supervisor / Admin| P{Preference Lookup}
+    P -->|web=true| W[Deliver Web In-App]
+    P -->|web=false| SW[Skip Web]
+    P -->|mobile=true| MP[Deliver Mobile Push]
+    P -->|mobile=false| SM[Skip Mobile]
+    W --> Done[Delivery Attempted]
+    MP --> Done
+    FM --> Done
+    SW --> Done
+    SM --> Done
+```
+
+#### 11.4.4 Current vs Proposed State Diagram
+
+```mermaid
+flowchart LR
+    subgraph Current
+      C1[Source Event] --> C2[Notification Service]
+      C2 --> C3[Company-wide Broadcast<br/>or Single Assignee]
+      C3 --> C4[Web In-App Only]
+    end
+
+    subgraph Proposed
+      P1[Source Event] --> P2[Notification Service<br/>Recipient Resolver]
+      P2 --> P3[Assignee Path]
+      P2 --> P4[Supervisor Path by Team Scope]
+      P3 --> P5[Preference Gate]
+      P4 --> P5
+      P5 --> P6[Web In-App Delivery]
+      P5 --> P7[Mobile Push Delivery via FCM]
+    end
+```
+
 ---
 
-## 12. Dependencies
+## 12. Notification Event Breakdown (v0)
+
+| Event | Domain | Trigger Summary | Recipient | Delivery Type | Source Channel Coverage | Notification Category | Dedupe Rule | Notes |
+|---|---|---|---|---|---|---|---|---|
+| Conversation entered team inbox | Conversation | New conversation enters team inbox queue | Supervisor by team scope | both | all supported source channels | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | exact technical trigger source still TBD |
+| Conversation assigned | Conversation | Conversation assigned to member | Assigned member; Supervisor by team scope | both | all supported source channels | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | assignee event path confirmed in conversation-service |
+| Conversation reopened | Conversation | Conversation reopened and routed back into active work | Assigned member only | both | all supported source channels | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | supervisor behavior on reopen not yet decided |
+| Ticket entered team inbox | Ticket | New ticket enters team inbox queue | Supervisor by team scope | both | inherits from originating conversation channel | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | exact technical trigger source still TBD |
+| Ticket assigned | Ticket | Ticket assigned to member | Assigned member; Supervisor by team scope | both | inherits from originating conversation channel | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | assignee event path confirmed in ticket-service |
+| Ticket reopened | Ticket | Ticket reopened and routed back into active work | Assigned member only | both | inherits from originating conversation channel | conversation_ticket | same-event same-user dedupe = yes; cross-event coalesce = no | supervisor behavior on reopen not yet decided |
+| Company billing notice | Company | Billing event impacts company | Company-wide | web in-app | n/a | company_wide | n/a | preserved as-is |
+| Company subscription status change | Company | Subscription state change on company | Company-wide | web in-app | n/a | company_wide | n/a | preserved as-is |
+| Company wallet balance notice | Company | Wallet balance threshold or top-up event | Company-wide | web in-app | n/a | company_wide | n/a | preserved as-is |
+| Company plan change | Company | Company plan updated by SuperAdmin or subscription flow | Company-wide | web in-app | n/a | company_wide | n/a | preserved as-is |
+| Company system announcement | Company | Product/platform level announcement | Company-wide | web in-app | n/a | company_wide | n/a | preserved as-is |
+
+### 12.1 Events explicitly Out of Scope for v0
+The following events are **not covered by this BRD v0**. They may be added in later versions.
+
+| Event | Domain | Reason for exclusion |
+|---|---|---|
+| Conversation closed | Conversation | Not part of operational ownership alerting in v0 |
+| Conversation transferred | Conversation | Team-scope re-evaluation not yet designed |
+| Ticket transferred | Ticket | Team-scope re-evaluation not yet designed |
+| Ticket status change / resolved | Ticket | Not part of operational alerting in v0 |
+| SLA breach notification | Conversation, Ticket | Handled by SLA domain, deferred |
+| Internal note mention | Conversation, Ticket | Mention semantics not defined in v0 |
+
+### 12.2 Dedupe window
+Same-event same-user dedupe window is defined as the **lifetime of the source event ID**, meaning:
+- one delivered notification per (`userId`, `eventId`) pair
+- retries of the same event ID must not create additional notifications
+- different event IDs are always treated as separate notifications
+
+### 12.3 Reopen supervisor rule
+Supervisor is **not notified on reopen** in v0. This is intentional to avoid duplicate alerting when the assignee is already known and re-notified.
+
+## 13. UI-Level Business Rules (v0)
+
+BRD v0 does not define wireframes. It defines only UI-level business rules that must exist in the product experience.
+
+### 13.1 Preference visibility
+- Web notification toggle and mobile notification toggle must exist in user settings surface.
+- Preference toggles must be **visible only to `Supervisor` and `Admin` roles**.
+- Preference toggles must **not** appear in settings surface for `Member` role.
+
+### 13.2 Notification category presentation
+- Notification list surface must visually distinguish `conversation_ticket` notifications from `company_wide` notifications.
+- Distinction may use label, icon, section grouping, or filter tab.
+- Exact visual design is deferred to design phase, but the distinction is mandatory.
+
+### 13.3 Mobile push presentation
+- Mobile push notification must show:
+  - actor / source context
+  - entity type (`conversation` or `ticket`)
+  - human-readable entity ID
+  - short message describing the trigger
+- Tapping the push must open the correct entity view in the mobile app.
+
+### 13.4 Web toast and notification panel
+- Web toast must respect existing throttle behavior.
+- Web notification panel must reflect the same dedupe rule defined in section 12.2.
+
+### 13.5 Empty state and disabled state
+- If both web and mobile preferences are disabled by a `Supervisor` / `Admin`, the user must still be able to see the notification list but must not receive real-time delivery.
+- Disabled state must be reflected on the toggle surface so the user understands the current preference state.
+
+## 14. Dependencies
 
 ### Backend Dependencies
 - conversation-service
@@ -299,16 +458,22 @@ Channel preference evaluation must be deterministic and consistent across domain
    - Additional team scope may be needed for supervisor-intake path.
 
 4. **Preference surface gap**
-   - Exact endpoint and persistence model for web/mobile preference not yet frozen.
+   - Exact endpoint and persistence model for web/mobile preference for `Supervisor` and `Admin` not yet frozen.
 
 5. **Device token lifecycle gap**
    - Exact register/unregister and invalid-token cleanup behavior not yet frozen.
+
+6. **Audit retention gap**
+   - Audit/log retention is targeted at 3 months but implementation contract is not yet frozen.
 
 ### Working Assumptions For v0
 - Existing assignee helpers will be reused, not replaced.
 - Notification-service remains central place for channel gating.
 - Non conversation/ticket notification classes remain company-wide.
 - Supervisor lookup will require small people-service addition, not platform-wide RBAC redesign.
+- Same user + same event is deduped into one notification.
+- Different events stay separate and are not coalesced.
+- Each notification should carry category distinction between `company-wide` and `conversation/ticket`.
 
 ---
 

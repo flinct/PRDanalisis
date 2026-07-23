@@ -1,0 +1,18 @@
+# Summary
+
+- Tanggal: 2026-07-16
+- Judul session: lincah-classifier-analysis
+- Tujuan / request utama user: Membaca seluruh file di `New folder/Lincah_Breakdown`, lalu analisa kebutuhan classifier chatbot AI untuk membatasi jawaban sesuai knowledge pack, human-like, tidak keluar konteks, dan bahas perlu/tidaknya layering agent.
+- Ringkasan progres / analisa / keputusan penting selama session:
+  - Rules wajib dibaca: agent-instruction, workflow-rule, structure-rule, summary-rule, qa-analysis-rule, impact-analysis-rule, Memory index, Assessments README.
+  - Skill `prdanalisis-role-workflow` dimuat, termasuk reference `assistant-classifier-from-knowledge-pack.md`.
+  - Seluruh file utama di folder `Lincah_Breakdown` dibaca: overview, logistics basics, shipping flow, glossary, operational teams, platform/features, CS flow, reference links, dan breakdown flow tambahan.
+  - Domain pack teridentifikasi sebagai knowledge pack seller-centric logistics platform dengan support-heavy operational content, ditambah sebagian sales/commercial dan onboarding/general docs.
+  - Ditemukan kontradiksi penting: `Alur_Pendaftaran_Akun_Breakdown.md` menyebut PPOB/super-app signals, tetapi mayoritas dokumen lain kuat di logistics/courier aggregation. Ini perlu dicatat agar classifier tidak salah scope.
+  - Analisa akan fokus ke intent bucket, overlap rules, tambahan guardrail, dan rekomendasi routing/layering agent minimum.
+- Status terakhir / next step: Draft classifier v0 selesai (change-intake-brief, schema, spec, prompt, examples) di `crossdomain/ai-chaat-ai-assist/`. Menunggu review user sebelum lanjut ke tahap berikut (misal integrasi retrieval, chunk metadata, atau BRD/PRD).
+- Tambahan task data prep AI training: file mentah `Assessments/cross-domain/ai-chat-ai-assist-layer/data messages/satuinbox_conversation.messages (2).json` dicek dan ternyata export JSON array besar yang korup di akhir (kurang penutup `]`). Dibuat script streaming `transform_messages_for_training.py` untuk memetakan `sender.type=client` menjadi `inbound` dan `account_channel/accountchannel` menjadi `outbound`, hanya menyimpan `content` ke field `value`.
+- Output berhasil dibuat di `Assessments/cross-domain/ai-chat-ai-assist-layer/data messages/satuinbox_conversation.messages.training.json` dengan 56,525 conversation. Dibuat juga copy perbaikan sumber di `.../satuinbox_conversation.messages.fixed.json` agar parser bisa membaca export yang asli.
+- Dari file training JSON itu dibuat sample tabel 100 baris Excel native `.xlsx`: `Assessments/cross-domain/ai-chat-ai-assist-layer/data messages/sample_100.xlsx` dengan kolom `conversationId | inbound | outbound`. Isi inbound/outbound digabung per conversation berdasarkan type masing-masing. Script pembuatnya disimpan di `.../sample_100_to_xlsx.py`.
+- Full dataset juga digenerate ke Excel native `.xlsx` di `Assessments/cross-domain/ai-chat-ai-assist-layer/data messages/satuinbox_conversation.messages.training.xlsx` memakai script `.../full_to_xlsx.py`. Verifikasi sheet `training` berisi header plus 56,525 row data.
+- Eksperimen grouping similarity dijalankan pada file training JSON dengan heuristic normalization + stem-key ringan (bukan embedding semantik) lewat script `Assessments/cross-domain/ai-chat-ai-assist-layer/data messages/group_similarity.py`. Hasil ringkas disimpan di `.../similarity_groups_top20.json`, menampilkan 10 grup inbound dan 20 grup outbound paling besar beserta count dan sample.

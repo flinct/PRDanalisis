@@ -52,6 +52,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/turndown@7/dist/turndown.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1/dist/turndown-plugin-gfm.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
@@ -79,13 +80,15 @@
     .md h1 { font-size: 20px; color: var(--text-1); margin: 20px 0 10px; border-bottom: 1px solid var(--border-1); padding-bottom: 6px; }
     .md h2 { font-size: 16px; color: var(--text-1); margin: 16px 0 8px; }
     .md h3 { font-size: 13px; color: var(--text-2); margin: 14px 0 6px; }
+    .md h4, .md h5, .md h6 { font-size: 13px; color: var(--text-2); margin: 12px 0 6px; }
     .md p  { font-size: 13px; color: var(--text-2); line-height: 1.7; margin: 6px 0; }
     .md ul, .md ol { padding-left: 20px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
     .md li { margin: 3px 0; }
     .md code { background: var(--border-1); color: #60a5fa; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: inherit; }
     .md pre  { background: var(--deep-bg); border: 1px solid var(--border-1); padding: 14px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
+    .md .mermaid { background: var(--deep-bg); border: 1px solid var(--border-1); padding: 14px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
     .md pre code { background: none; padding: 0; color: var(--text-2); }
-    .md a    { color: #60a5fa; }
+
     .md blockquote { border-left: 2px solid var(--text-5); padding-left: 12px; color: var(--text-3); margin: 8px 0; }
     .md table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 12px; }
     .md th   { background: var(--deep-bg); padding: 6px 10px; text-align: left; color: var(--text-4); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-1); }
@@ -102,6 +105,7 @@
 <script type="text/babel" src="./modules/ui-settings.js"></script>
 <script type="text/babel" src="./modules/ui-dashboard.js"></script>
 <script type="text/babel" src="./modules/ui-workspace.js"></script>
+<script type="text/babel" src="./modules/ui-tracker.js"></script>
 <script type="text/babel" src="./modules/ui-memory.js"></script>
 <script type="text/babel" src="./modules/ui-new-request.js"></script>
 <script type="text/babel">
@@ -119,7 +123,7 @@
       const s = document.createElement('script');
       s.src = src;
       s.async = true;
-      s.dataset.hermesKey = key;
+
       s.onload = () => resolve(window[key]);
       s.onerror = () => reject(new Error(`failed to load ${key}`));
       document.head.appendChild(s);
@@ -174,8 +178,14 @@
     { id:'test', label:'Test Cases', folderName:'Test',       color:'var(--sec-test)',      dimBg:'var(--sec-test-bg)', dimBd:'var(--sec-test-bd)' },
     { id:'assessments', label:'Assessments', folderName:'Assessments', color:'var(--sec-gdocs)', dimBg:'#0a1a0a', dimBd:'#166534' },
     { id:'feature',     label:'Feature List', folderName:'Feature List', color:'#fbbf24', dimBg:'#1a1200', dimBd:'#92400e' },
+    { id:'incident-report', label:'Incident Report', folderName:'incident report', color:'#f87171', dimBg:'#200d0d', dimBd:'#7f1d1d' },
+    { id:'summary', label:'Summary', folderName:'summary', color:'#38bdf8', dimBg:'#081a24', dimBd:'#0c4a6e' },
+    { id:'release-notes', label:'Release Notes', folderName:'Release notes', color:'#fb923c', dimBg:'#1f1207', dimBd:'#9a3412' },
+    { id:'uat', label:'UAT', folderName:'UAT', color:'#c084fc', dimBg:'#190c24', dimBd:'#6b21a8' },
+    { id:'presentation', label:'Presentation', folderName:'presentation', color:'#f59e0b', dimBg:'#1a1200', dimBd:'#92400e' },
     { id:'gdocs', label:'Google Docs', folderName:'', remote:true, color:'var(--sec-gdocs)', dimBg:'var(--sec-gdocs-bg)', dimBd:'var(--sec-gdocs-bd)' },
   ];
+
   const EXTRA_COLORS = [
     { color:'#f59e0b', dimBg:'#1a0f00', dimBd:'#92400e' },
     { color:'#ec4899', dimBg:'#1a001a', dimBd:'#831843' },
@@ -1727,11 +1737,28 @@
       }
     }
 
+    async function renderMarkdown(container, markdown) {
+      if (!container) return;
+      container.innerHTML = marked.parse(markdown);
+      const mermaidBlocks = Array.from(container.querySelectorAll('pre code.language-mermaid, pre code.lang-mermaid'));
+      if (!mermaidBlocks.length || !window.mermaid) return;
+      window.mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+      for (const code of mermaidBlocks) {
+        const pre = code.closest('pre');
+        if (!pre) continue;
+        const graph = document.createElement('div');
+        graph.className = 'mermaid';
+        graph.textContent = code.textContent || '';
+        pre.replaceWith(graph);
+      }
+      try { await window.mermaid.run({ nodes: container.querySelectorAll('.mermaid') }); } catch {}
+    }
+
     // Set innerHTML from draft — on mount and after save.
     // We never touch innerHTML while the user is editing (editMode=true),
     // so React never clobbers in-progress edits.
     useLayoutEffect(() => {
-      if (mdRef.current) mdRef.current.innerHTML = marked.parse(draft);
+      renderMarkdown(mdRef.current, draft);
     }, [draft]);
 
     async function handleSave() {
@@ -1766,7 +1793,7 @@
     }
 
     function handleCancel() {
-      if (mdRef.current) mdRef.current.innerHTML = marked.parse(draft); // discard edits
+      renderMarkdown(mdRef.current, draft); // discard edits
       setEditMode(false);
       setSaveErr(null);
     }
@@ -2109,11 +2136,11 @@
       }
     }
     function normalizeMainNav(value) {
-      return ['dashboard','workspace','new-request','memory','settings'].includes(value) ? value : 'dashboard';
+      return ['dashboard','workspace','tracker','new-request','memory','settings'].includes(value) ? value : 'dashboard';
     }
     function normalizeWorkspaceNav(value, mainNavValue) {
       if (mainNavValue === 'dashboard') return ['dashboard-openproject','dashboard-testcase-stats'].includes(value) ? value : 'dashboard-openproject';
-      if (mainNavValue === 'workspace') return ['brd','assessment','prd','testcase','feature-list','google-docs'].includes(value) ? value : null;
+      if (mainNavValue === 'workspace') return ['brd','assessment','prd','testcase','feature-list','incident-report','summary','release-notes','uat','presentation','google-docs'].includes(value) ? value : null;
       return null;
     }
     function normalizeSelected(value) {
@@ -2147,9 +2174,20 @@
     const [tcStats, setTcStats] = useState(null);
     const [view, setView]             = useState('files');
     // ── Corin-style navigation ─────────────────────────────────────────
-    const [mainNav, setMainNav]       = useState(initialMainNav); // 'dashboard' | 'workspace' | 'memory' | 'settings'
+    const [mainNav, rawSetMainNav]       = useState(initialMainNav); // 'dashboard' | 'workspace' | 'memory' | 'settings'
     const [workspaceNav, setWorkspaceNav] = useState(initialWorkspaceNav); // dashboard child or workspace child
     const [themeId, setThemeId]       = useState('navy');
+    const [activeSection, setActiveSection] = useState(() => normalizeSelected(savedNavState.selected)?.sectionId || null);
+
+    function confirmTrackerLeave() {
+      if (!window.__qaTrackerDirty) return true;
+      return window.confirm('Tracker belum di-save. Tinggalkan halaman?');
+    }
+    function setMainNav(next) {
+      if (!confirmTrackerLeave()) return;
+      rawSetMainNav(next);
+    }
+
     const [creating, setCreating]     = useState(null);   // { path, sectionId }
     const [creatingBusy, setCreatingBusy] = useState(false);
 
@@ -2323,7 +2361,7 @@
       setSelected({ path: node.path, sectionId, name: node.name, ext: node.ext, gdocId: node.gdocId });
       if (!options.keepNav) {
         setMainNav('workspace');
-        const workspaceSectionMap = { brd:'brd', assessments:'assessment', prd:'prd', test:'testcase', feature:'feature-list', gdocs:'google-docs' };
+        const workspaceSectionMap = { brd:'brd', assessments:'assessment', prd:'prd', test:'testcase', feature:'feature-list', 'incident-report':'incident-report', summary:'summary', 'release-notes':'release-notes', uat:'uat', presentation:'presentation', gdocs:'google-docs' };
         setWorkspaceNav(workspaceSectionMap[sectionId] || null);
       }
       setActiveSection(sectionId);
@@ -2337,6 +2375,11 @@
           if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Failed to read Google Doc');
           const d = await r.json();
           setFileData({ type: 'md', content: d.markdown, path: node.path, gdocId: node.gdocId, title: d.title });
+          setLoading(false);
+          return;
+        }
+        if (node.ext === 'pptx') {
+          setFileData({ type: 'binary', path: node.path, ext: node.ext, openUrl: '/api/files/open?path=' + encodeURIComponent(node.path) });
           setLoading(false);
           return;
         }
@@ -2497,7 +2540,7 @@
           flexDirection:'column', gap:12, color:'var(--text-5)' }}>
           <div style={{ fontSize:28, opacity:0.3 }}>◈</div>
           <div style={{ fontSize:12 }}>Select a file from the sidebar</div>
-          <div style={{ fontSize:11, opacity:0.6 }}>Supported: TSV test cases, Markdown PRD/BRD</div>
+          <div style={{ fontSize:11, opacity:0.6 }}>Supported: Markdown, TSV, CSV, TXT, Google Docs</div>
         </div>
       );
 
@@ -2546,6 +2589,22 @@
         );
       }
 
+      if (fileData.type === 'binary') {
+        return (
+          <div style={{ flex:1, overflowY:'auto', padding:'24px 32px', color:'var(--text-2)' }}>
+            <div style={{ maxWidth:720, border:'1px solid var(--border-1)', background:'var(--sidebar-bg)', borderRadius:10, padding:20 }}>
+              <div style={{ fontSize:18, color:'var(--text-1)', fontWeight:700, marginBottom:8 }}>{selected?.name}</div>
+              <div style={{ fontSize:12, color:'var(--text-4)', marginBottom:18 }}>{fileData.path}</div>
+              <div style={{ fontSize:12, lineHeight:1.7, marginBottom:18 }}>PPTX tampil sebagai file. Browser bisa open tab baru atau download file langsung.</div>
+              <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+                <a href={fileData.openUrl} target='_blank' rel='noreferrer' style={{ textDecoration:'none', fontSize:12, fontWeight:700, color:'#0b1220', background:'#f59e0b', padding:'10px 14px', borderRadius:8 }}>Open file</a>
+                <a href={fileData.openUrl} download={selected?.name} style={{ textDecoration:'none', fontSize:12, fontWeight:700, color:'var(--text-1)', border:'1px solid var(--border-1)', background:'var(--elevated-bg)', padding:'10px 14px', borderRadius:8 }}>Download</a>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div style={{ flex:1, overflowY:'auto', padding:'24px 32px' }}>
           <pre style={{ fontSize:12, color:'var(--text-3)', lineHeight:1.6, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>{fileData.content}</pre>
@@ -2569,6 +2628,7 @@
     const NAV_ITEMS = [
       { id:'dashboard', label:'Dashboard', icon:'◈' },
       { id:'workspace', label:'Workspace', icon:'⊞' },
+      { id:'tracker', label:'Tracker', icon:'◷' },
       { id:'new-request', label:'New Request', icon:'✎' },
       { id:'memory', label:'Memory', icon:'⚡' },
     ];
@@ -2590,12 +2650,17 @@
       margin:'1px 8px', userSelect:'none', border:'none',
     });
     const WORKSPACE_SUB = [
-      { id:'brd',          label:'BRD' },
-      { id:'assessment',   label:'Assessment' },
-      { id:'prd',          label:'PRD' },
-      { id:'testcase',     label:'Testcase' },
-      { id:'feature-list', label:'Feature List' },
-      { id:'google-docs',  label:'Google Docs' },
+      { id:'brd',             label:'BRD' },
+      { id:'assessment',      label:'Assessment' },
+      { id:'prd',             label:'PRD' },
+      { id:'testcase',        label:'Testcase' },
+      { id:'feature-list',    label:'Feature List' },
+      { id:'incident-report', label:'Incident Report' },
+      { id:'summary',         label:'Summary' },
+      { id:'release-notes',   label:'Release Notes' },
+      { id:'uat',             label:'UAT' },
+      { id:'presentation',    label:'Presentation' },
+      { id:'google-docs',     label:'Google Docs' },
     ];
 
     useEffect(() => {
@@ -2755,6 +2820,14 @@
     // ── Workspace rooms view ────────────────────────────────────────────
     function renderRoomsView() { return window.WorkspaceModule.renderRoomsView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav }); }
     function renderWorkspaceSubView() { return window.WorkspaceModule.renderWorkspaceSubView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav, tcStats }); }
+    function TrackerView() {
+      const [trackerDirty, setTrackerDirty] = React.useState(false);
+      React.useEffect(() => {
+        window.__qaTrackerDirty = trackerDirty;
+        return () => { window.__qaTrackerDirty = false; };
+      }, [trackerDirty]);
+      return <window.TrackerModule.TrackerView user={user} onDirtyChange={setTrackerDirty} />;
+    }
     function renderMemoryView() { return window.MemoryModule.renderMemoryView(); }
 
     useEffect(() => {
@@ -2818,7 +2891,7 @@
                   {WORKSPACE_SUB.map(item => {
                     const expanded = workspaceNav === item.id;
                     // map workspace item id → real section id from server
-                    const sectionIdMap = { brd:'brd', assessment:'assessments', prd:'prd', testcase:'test', 'feature-list':'feature', 'google-docs':'gdocs' };
+                    const sectionIdMap = { brd:'brd', assessment:'assessments', prd:'prd', testcase:'test', 'feature-list':'feature', 'incident-report':'incident-report', summary:'summary', 'release-notes':'release-notes', uat:'uat', presentation:'presentation', 'google-docs':'gdocs' };
                     const secId = sectionIdMap[item.id];
                     const sec = secId ? allSections.find(s => s.id === secId) : null;
                     const count = sec?.tree ? sec.tree.reduce((s, n) => s + countFiles(n), 0) : 0;
@@ -3041,6 +3114,7 @@
             }
 
             // ── Memory ─────────────────────────────────────────────────
+            if (mainNav === 'tracker') return <TrackerView />;
             if (mainNav === 'new-request') return renderNewRequestView();
             if (mainNav === 'memory') return renderMemoryView();
 

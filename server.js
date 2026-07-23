@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { spawn } = require("child_process");
 const { DatabaseSync } = require("node:sqlite");
@@ -311,7 +312,7 @@ function walkDir(dir, base = "") {
         path: rel,
         children: walkDir(full, rel),
       });
-    } else if (/\.(tsv|csv|md|txt)$/i.test(e.name)) {
+    } else if (/\.(tsv|csv|md|txt|pptx)$/i.test(e.name)) {
       results.push({
         kind: "file",
         name: e.name,
@@ -407,6 +408,47 @@ app.put("/api/new-request", (req, res) => {
   }
 });
 
+app.get("/api/tracker", (_req, res) => {
+  try {
+    const row = db
+      .prepare(
+        "SELECT value, updated_at, updated_by FROM app_state WHERE key = ?",
+      )
+      .get("tracker_source");
+    res.json({
+      ok: true,
+      source: row?.value || "",
+      updatedAt: row?.updated_at || null,
+      updatedBy: row?.updated_by || null,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.put("/api/tracker", (req, res) => {
+  const { source, updatedBy } = req.body || {};
+  if (typeof source !== "string")
+    return res.status(400).json({ ok: false, error: "source must be string" });
+  try {
+    db.prepare(
+      `INSERT INTO app_state (key, value, updated_by, updated_at)
+      VALUES (?, ?, ?, datetime('now'))
+      ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=datetime('now')`,
+    ).run("tracker_source", source, String(updatedBy || "user"));
+    const row = db
+      .prepare("SELECT updated_at, updated_by FROM app_state WHERE key = ?")
+      .get("tracker_source");
+    res.json({
+      ok: true,
+      updatedAt: row?.updated_at || null,
+      updatedBy: row?.updated_by || null,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ─── API: FILES ──────────────────────────────────────────────────────────────
 app.get("/api/files", (_req, res) => {
   const SECTIONS = [
@@ -425,6 +467,36 @@ app.get("/api/files", (_req, res) => {
       label: "Feature List",
       color: "#fbbf24",
     },
+    {
+      id: "incident-report",
+      folderName: "incident report",
+      label: "Incident Report",
+      color: "#f87171",
+    },
+    {
+      id: "summary",
+      folderName: "summary",
+      label: "Summary",
+      color: "#38bdf8",
+    },
+    {
+      id: "release-notes",
+      folderName: "Release notes",
+      label: "Release Notes",
+      color: "#fb923c",
+    },
+    {
+      id: "uat",
+      folderName: "UAT",
+      label: "UAT",
+      color: "#c084fc",
+    },
+    {
+      id: "presentation",
+      folderName: "presentation",
+      label: "Presentation",
+      color: "#f59e0b",
+    },
   ];
   const result = SECTIONS.map((s) => {
     const dir = path.join(BASE, s.folderName);
@@ -437,7 +509,24 @@ app.get("/api/files/content", (req, res) => {
   try {
     const fp = safePath(req.query.path || "");
     if (!fs.existsSync(fp)) return res.status(404).json({ error: "Not found" });
+    if (/\.pptx$/i.test(fp)) {
+      return res.status(400).json({ error: "Binary file. Use /api/files/open for download/open." });
+    }
     res.type("text/plain").send(fs.readFileSync(fp, "utf8"));
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.get("/api/files/open", (req, res) => {
+  try {
+    const fp = safePath(req.query.path || "");
+    if (!fs.existsSync(fp)) return res.status(404).json({ error: "Not found" });
+    res.sendFile(fp, {
+      headers: {
+        "Content-Disposition": `inline; filename="${path.basename(fp).replace(/"/g, "")}"`,
+      },
+    });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }
@@ -1455,6 +1544,11 @@ function startWatcher() {
 app.listen(PORT, () => {
   const tc = db.prepare("SELECT COUNT(*) as n FROM test_cases").get().n;
   console.log(`\n◈ QA Dashboard  →  http://localhost:${PORT}`);
+  const lanIps = Object.values(os.networkInterfaces())
+    .flat()
+    .filter((n) => n && n.family === "IPv4" && !n.internal)
+    .map((n) => n.address);
+  for (const ip of lanIps) console.log(`                   http://${ip}:${PORT}`);
   console.log(`  DB           : ${DB_PATH}`);
   console.log(`  Test cases   : ${tc}`);
   startWatcher();
