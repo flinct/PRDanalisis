@@ -258,8 +258,9 @@ window.TrackerModule = (function(){
     });
   }
 
-  async function loadTrackerFiles() {
-    return fetchJson('/api/tracker/source/files');
+  async function loadTrackerFiles(folderId) {
+    const suffix = folderId ? `?folderId=${encodeURIComponent(folderId)}` : '';
+    return fetchJson(`/api/tracker/source/files${suffix}`);
   }
 
   async function loadTrackerTabs(spreadsheetId) {
@@ -339,13 +340,42 @@ window.TrackerModule = (function(){
     );
   }
 
-  function WeekSplitTable({ rows }) {
+  function buildProgressCards(summary) {
+    return [
+      ['Total', summary.total],
+      ['New', summary.new],
+      ['Waiting', summary.waiting],
+      ['In Progress', summary['in progress']],
+      ['Complete', summary.complete],
+      ['Hold', summary.hold],
+      ['Version', summary.version],
+      ['Overall', formatPercent(summary.overall)],
+    ];
+  }
+
+  function ProgressCardGrid({ card, summary }) {
+    return e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(8, minmax(0, 1fr))', gap:10 } },
+      ...buildProgressCards(summary).map(([label, value]) => e('div', { key:label, style:card },
+        e('div', { style:{ fontSize:24, fontWeight:700, color:'var(--text-1)', lineHeight:1.2 } }, value),
+        e('div', { style:{ fontSize:11, color:'var(--text-4)', marginTop:4 } }, label)
+      ))
+    );
+  }
+
+  function WeekSplitTable({ rows, card }) {
     const milestoneRows = rows.filter(row => row.type === 'milestone');
     return e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16 } },
-      ...WEEK_OPTIONS.map(week => {
+      ...['last', 'now'].map(week => {
         const items = milestoneRows.filter(row => row.week === week);
+        const weekSummary = summarizeRows(items);
+        const title = week === 'last' ? 'Last Week' : 'This Week';
         return e('div', { key:week, style:{ border:'1px solid var(--border-1)', borderRadius:12, overflow:'hidden', background:'var(--sidebar-bg)' } },
-          e('div', { style:{ padding:'12px 14px', borderBottom:'1px solid var(--border-1)', fontSize:14, fontWeight:700, color:'var(--text-1)', textTransform:'capitalize' } }, `${week} Milestone`),
+          e('div', { style:{ padding:'12px 14px', borderBottom:'1px solid var(--border-1)', fontSize:14, fontWeight:700, color:'var(--text-1)' } }, title),
+          e('div', { style:{ padding:12, borderBottom:'1px solid var(--border-1)', overflowX:'auto' } },
+            e('div', { style:{ minWidth:860 } },
+              e(ProgressCardGrid, { card, summary:weekSummary })
+            )
+          ),
           e('div', { style:{ maxHeight:260, overflow:'auto' } },
             e('table', { style:{ width:'100%', borderCollapse:'collapse' } },
               e('thead', null,
@@ -375,20 +405,10 @@ window.TrackerModule = (function(){
         e('div', { style:{ fontSize:18, fontWeight:700, color:'var(--text-1)' } }, title),
         e('div', { style:{ fontSize:12, color:'var(--text-4)' } }, countLabel)
       ),
-      e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(8, minmax(0, 1fr))', gap:10 } },
-        ...[
-          ['Total', summary.total],
-          ['New', summary.new],
-          ['Waiting', summary.waiting],
-          ['In Progress', summary['in progress']],
-          ['Complete', summary.complete],
-          ['Hold', summary.hold],
-          ['Version', summary.version],
-          ['Overall', formatPercent(summary.overall)],
-        ].map(([label, value]) => e('div', { key:label, style:card },
-          e('div', { style:{ fontSize:24, fontWeight:700, color:'var(--text-1)', lineHeight:1.2 } }, value),
-          e('div', { style:{ fontSize:11, color:'var(--text-4)', marginTop:4 } }, label)
-        ))
+      e('div', { style:{ overflowX:'auto' } },
+        e('div', { style:{ minWidth:860 } },
+          e(ProgressCardGrid, { card, summary })
+        )
       ),
       e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16, alignItems:'stretch' } },
         e('div', { style:{ ...shell, padding:16 } },
@@ -408,7 +428,7 @@ window.TrackerModule = (function(){
           e(PriorityBarChart, { summary })
         )
       ),
-      e(WeekSplitTable, { rows }),
+      e(WeekSplitTable, { rows, card }),
       e('div', { style:{ ...shell, padding:16, marginTop:16, overflowX:'auto' } },
         e('div', { style:{ fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Task List'),
         e('table', { style:{ width:'100%', borderCollapse:'collapse' } },
@@ -542,7 +562,7 @@ window.TrackerModule = (function(){
           setSource(prev => ({ ...prev, availableTabs:[] }));
           return null;
         }
-        return loadTrackerFiles().then(filesData => {
+        return loadTrackerFiles(statusData.folderId).then(filesData => {
           if (!active) return null;
           const files = Array.isArray(filesData.files) ? filesData.files : [];
           setSource(prev => ({ ...prev, rootFolder:filesData.rootFolder || prev.rootFolder, files }));
@@ -551,7 +571,7 @@ window.TrackerModule = (function(){
             return null;
           }
           return loadTrackerTabs(selectedSpreadsheetId).then(tabData => {
-            if (!active) return null;
+
             setSource(prev => ({ ...prev, availableTabs:Array.isArray(tabData.tabs) ? tabData.tabs : [], spreadsheetName:prev.spreadsheetName || tabData.title || '' }));
             return null;
           });
@@ -661,7 +681,11 @@ window.TrackerModule = (function(){
       setSource(prev => ({ ...prev, selectedSpreadsheetId:nextId, selectedTabs:[], availableTabs:[], error:'' }));
       if (!nextId) return;
       loadTrackerTabs(nextId).then(tabData => {
-        setSource(prev => ({ ...prev, availableTabs:Array.isArray(tabData.tabs) ? tabData.tabs : [], spreadsheetName:(prev.files.find(file => file.id === nextId)?.name || tabData.title || prev.spreadsheetName || '') }));
+        setSource(prev => {
+          const availableTabs = Array.isArray(tabData.tabs) ? tabData.tabs : [];
+          const selectedTabs = Array.isArray(prev.tabs) ? prev.tabs.filter(title => availableTabs.some(tab => tab.title === title)) : [];
+          return { ...prev, availableTabs, selectedTabs, spreadsheetName:(prev.files.find(file => file.id === nextId)?.name || tabData.title || prev.spreadsheetName || '') };
+        });
       }).catch(err => {
         setSource(prev => ({ ...prev, error:'Tabs load failed: ' + err.message }));
       });
@@ -683,7 +707,7 @@ window.TrackerModule = (function(){
         return;
       }
       setSource(prev => ({ ...prev, saving:true, error:'' }));
-      saveTrackerFolder({ folderId:pickedFolder.id, folderName:pickedFolder.name, folderPath:pickedFolder.path }).then(() => Promise.all([loadTrackerSource(), loadTrackerFiles()])).then(([statusData, filesData]) => {
+      saveTrackerFolder({ folderId:pickedFolder.id, folderName:pickedFolder.name, folderPath:pickedFolder.path }).then(() => Promise.all([loadTrackerSource(), loadTrackerFiles(pickedFolder.id)])).then(([statusData, filesData]) => {
         setSource(prev => ({
           ...prev,
           saving:false,
@@ -716,12 +740,25 @@ window.TrackerModule = (function(){
       const pickedFile = source.files.find(file => file.id === source.selectedSpreadsheetId);
       saveTrackerSource({ spreadsheetId:source.selectedSpreadsheetId, spreadsheetName:pickedFile?.name || source.spreadsheetName || '', tabs:source.selectedTabs }).then(() => Promise.all([loadTrackerSource(), loadTrackerRows()])).then(([statusData, trackerData]) => {
         const nextRows = normalizeRows(trackerData.rows);
+        const nextTabs = Array.isArray(statusData.tabs) ? statusData.tabs : [];
         setRows(nextRows);
         setSavedJson(JSON.stringify(nextRows));
         setMeta(prev => ({ ...prev, loading:false, saving:false, error:'', updatedAt:trackerData.updatedAt || null, updatedBy:trackerData.updatedBy || null, storage:trackerData.storage || 'server', sheetTabs:Array.isArray(trackerData.sheetTabs) ? trackerData.sheetTabs : [] }));
-        setSource(prev => ({ ...prev, saving:false, source:statusData.source || 'user', spreadsheetId:statusData.spreadsheetId || '', spreadsheetName:statusData.spreadsheetName || '', tabs:Array.isArray(statusData.tabs) ? statusData.tabs : [], selectedSpreadsheetId:statusData.spreadsheetId || '', selectedTabs:Array.isArray(statusData.tabs) ? statusData.tabs : [] }));
+        setSource(prev => ({
+          ...prev,
+          saving:false,
+          error:'',
+          source:statusData.source || 'user',
+          spreadsheetId:statusData.spreadsheetId || '',
+          spreadsheetName:statusData.spreadsheetName || '',
+          tabs:nextTabs,
+          selectedSpreadsheetId:statusData.spreadsheetId || '',
+          selectedTabs:nextTabs,
+          availableTabs:(prev.availableTabs || []).filter(tab => nextTabs.includes(tab.title)),
+        }));
       }).catch(err => {
-        setSource(prev => ({ ...prev, saving:false, error:'Source save failed: ' + err.message }));
+        setMeta(prev => ({ ...prev, saving:false, error:'Tracker source save failed: ' + err.message }));
+        setSource(prev => ({ ...prev, saving:false, error:'Tracker source save failed: ' + err.message }));
       });
     }
 
