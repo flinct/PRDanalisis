@@ -7,6 +7,7 @@ const path = require("path");
 const { spawn } = require("child_process");
 const { DatabaseSync } = require("node:sqlite");
 const https = require("https");
+const trackerSheets = require("./Scripts/tracker-sheets.js");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -408,41 +409,152 @@ app.put("/api/new-request", (req, res) => {
   }
 });
 
-app.get("/api/tracker", (_req, res) => {
+app.get("/api/tracker", async (_req, res) => {
   try {
+    try {
+      const sheetData = await trackerSheets.readTracker(BASE);
+      if (sheetData.enabled) {
+        const now = new Date().toISOString();
+        db.prepare(
+          `INSERT INTO app_state (key, value, updated_by, updated_at)
+          VALUES (?, ?, ?, ?)
+          ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=excluded.updated_at`,
+        ).run("tracker_rows", JSON.stringify(sheetData.rows), "google-sheets", now);
+        db.prepare(
+          `INSERT INTO app_state (key, value, updated_by, updated_at)
+          VALUES (?, ?, ?, ?)
+          ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=excluded.updated_at`,
+        ).run("tracker_sheet_meta", JSON.stringify({ spreadsheetId: sheetData.spreadsheetId, tabs: sheetData.tabs.map(tab => tab.title) }), "google-sheets", now);
+        return res.json({
+          ok: true,
+          rows: sheetData.rows,
+          updatedAt: now,
+          updatedBy: "google-sheets",
+          storage: "google-sheets",
+          sheetTabs: sheetData.tabs.map(tab => tab.title),
+        });
+      }
+    } catch (sheetErr) {
+      console.warn("tracker google sheets read failed:", sheetErr.message);
+    }
     const row = db
       .prepare(
         "SELECT value, updated_at, updated_by FROM app_state WHERE key = ?",
       )
-      .get("tracker_source");
+      .get("tracker_rows");
+    let rows = [];
+    if (row?.value) {
+      try {
+        const parsed = JSON.parse(row.value);
+        rows = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        rows = [];
+      }
+    }
     res.json({
       ok: true,
-      source: row?.value || "",
+      rows,
       updatedAt: row?.updated_at || null,
       updatedBy: row?.updated_by || null,
+      storage: "server",
     });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-app.put("/api/tracker", (req, res) => {
-  const { source, updatedBy } = req.body || {};
-  if (typeof source !== "string")
-    return res.status(400).json({ ok: false, error: "source must be string" });
+app.get("/api/tracker/source", async (_req, res) => {
   try {
+    res.json(await trackerSheets.status(BASE));
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get("/api/tracker/source/folders", async (_req, res) => {
+  try {
+    res.json(await trackerSheets.listTrackerFolders(BASE));
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.put("/api/tracker/source/folder", async (req, res) => {
+  try {
+    res.json(trackerSheets.saveTrackerFolder(BASE, req.body || {}));
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get("/api/tracker/source/files", async (_req, res) => {
+  try {
+    res.json(await trackerSheets.listSpreadsheetsInScope(BASE));
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get("/api/tracker/source/tabs", async (req, res) => {
+  try {
+    const spreadsheetId = trackerSheets.spreadsheetIdFromUrl(req.query.spreadsheetId || '');
+    if (!spreadsheetId) return res.status(400).json({ ok: false, error: 'spreadsheetId required' });
+    res.json(await trackerSheets.listSheetTabs(BASE, spreadsheetId));
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.put("/api/tracker/source", async (req, res) => {
+  try {
+    const saved = await trackerSheets.pickSpreadsheet(BASE, req.body || {});
+    res.json({ ok: true, ...saved });
+  } catch (e) {
+    res.status(e.status || 500).json({ ok: false, error: e.message });
+  }
+});
+
+app.put("/api/tracker", async (req, res) => {
+  const { rows, updatedBy } = req.body || {};
+  if (!Array.isArray(rows))
+    return res.status(400).json({ ok: false, error: "rows must be array" });
+  try {
+    try {
+      const sheetData = await trackerSheets.saveTracker(BASE, rows);
+      const now = new Date().toISOString();
+      db.prepare(
+        `INSERT INTO app_state (key, value, updated_by, updated_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=excluded.updated_at`,
+      ).run("tracker_rows", JSON.stringify(sheetData.rows), String(updatedBy || "google-sheets"), now);
+      db.prepare(
+        `INSERT INTO app_state (key, value, updated_by, updated_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=excluded.updated_at`,
+      ).run("tracker_sheet_meta", JSON.stringify({ spreadsheetId: sheetData.spreadsheetId, tabs: sheetData.tabs.map(tab => tab.title) }), String(updatedBy || "google-sheets"), now);
+      return res.json({
+        ok: true,
+        updatedAt: now,
+        updatedBy: String(updatedBy || "google-sheets"),
+        storage: "google-sheets",
+        sheetTabs: sheetData.tabs.map(tab => tab.title),
+      });
+    } catch (sheetErr) {
+      console.warn("tracker google sheets save failed:", sheetErr.message);
+    }
     db.prepare(
       `INSERT INTO app_state (key, value, updated_by, updated_at)
       VALUES (?, ?, ?, datetime('now'))
       ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=datetime('now')`,
-    ).run("tracker_source", source, String(updatedBy || "user"));
+    ).run("tracker_rows", JSON.stringify(rows), String(updatedBy || "user"));
     const row = db
       .prepare("SELECT updated_at, updated_by FROM app_state WHERE key = ?")
-      .get("tracker_source");
+      .get("tracker_rows");
     res.json({
       ok: true,
       updatedAt: row?.updated_at || null,
       updatedBy: row?.updated_by || null,
+      storage: "server",
     });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });

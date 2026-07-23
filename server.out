@@ -1,0 +1,10 @@
+(node:8884) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+◈ QA Dashboard  →  http://localhost:3001
+                   http://100.81.234.52:3001
+                   http://10.151.202.96:3001
+  DB           : C:\Users\MyBook SAGA 12\Desktop\PRDanalisis\qa.db
+  Test cases   : 1930
+  Watching     : Test, PRD, BRD
+

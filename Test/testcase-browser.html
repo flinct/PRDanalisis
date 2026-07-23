@@ -3114,7 +3114,7 @@
             }
 
             // ── Memory ─────────────────────────────────────────────────
-            if (mainNav === 'tracker') return <TrackerView />;
+            if (mainNav === 'tracker') return <div style={{ flex:1, minHeight:0, overflowY:'auto', overflowX:'hidden', padding:'20px 24px', background:'var(--app-bg)' }}><TrackerView /></div>;
             if (mainNav === 'new-request') return renderNewRequestView();
             if (mainNav === 'memory') return renderMemoryView();
 
