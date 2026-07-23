@@ -364,7 +364,7 @@ window.TrackerModule = (function(){
 
   function WeekSplitTable({ rows, card }) {
     const milestoneRows = rows.filter(row => row.type === 'milestone');
-    return e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16 } },
+    return e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0, 1fr)', gap:16, marginTop:16 } },
       ...['last', 'now'].map(week => {
         const items = milestoneRows.filter(row => row.week === week);
         const weekSummary = summarizeRows(items);
