@@ -2178,6 +2178,10 @@
     const [workspaceNav, setWorkspaceNav] = useState(initialWorkspaceNav); // dashboard child or workspace child
     const [themeId, setThemeId]       = useState('navy');
     const [activeSection, setActiveSection] = useState(() => normalizeSelected(savedNavState.selected)?.sectionId || null);
+    // Tracker sidenav state — lifted so left sidebar can drive tab + sheet
+    const [trackerTab, setTrackerTab] = useState('statistics'); // 'statistics' | 'input'
+    const [trackerSheet, setTrackerSheet] = useState('all');
+    const [trackerSheetTabs, setTrackerSheetTabs] = useState([]);
 
     function confirmTrackerLeave() {
       if (!window.__qaTrackerDirty) return true;
@@ -2820,14 +2824,9 @@
     // ── Workspace rooms view ────────────────────────────────────────────
     function renderRoomsView() { return window.WorkspaceModule.renderRoomsView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav }); }
     function renderWorkspaceSubView() { return window.WorkspaceModule.renderWorkspaceSubView({ WORKSPACE_SUB, workspaceNav, setWorkspaceNav, tcStats }); }
-    function TrackerView() {
-      const [trackerDirty, setTrackerDirty] = React.useState(false);
-      React.useEffect(() => {
-        window.__qaTrackerDirty = trackerDirty;
-        return () => { window.__qaTrackerDirty = false; };
-      }, [trackerDirty]);
-      return <window.TrackerModule.TrackerView user={user} onDirtyChange={setTrackerDirty} />;
-    }
+    // Tracker dirty tracker — module callback flips window flag used by confirmTrackerLeave.
+    const handleTrackerDirty = React.useCallback(v => { window.__qaTrackerDirty = !!v; }, []);
+    React.useEffect(() => () => { window.__qaTrackerDirty = false; }, []);
     function renderMemoryView() { return window.MemoryModule.renderMemoryView(); }
 
     useEffect(() => {
@@ -2868,7 +2867,58 @@
 
           {/* Nav items — switch content bila di dalam workspace */}
           <div style={{ flex:1, display:'flex', flexDirection:'column', gap:2, padding:'4px 0', overflow:'hidden' }}>
-            {mainNav === 'workspace' ? (
+            {mainNav === 'tracker' ? (
+              <>
+                {/* Tracker label */}
+                <div style={{ padding:'2px 16px 8px', fontSize:14, color:'var(--text-1)', fontWeight:700, letterSpacing:0.3 }}>Tracker</div>
+                {/* Back button */}
+                <div onClick={() => { setMainNav('dashboard'); }}
+                  onMouseEnter={e => e.currentTarget.style.color='var(--text-2)'}
+                  onMouseLeave={e => e.currentTarget.style.color='var(--text-4)'}
+                  style={{ display:'flex', alignItems:'center', gap:6, padding:'4px 16px 10px',
+                    cursor:'pointer', fontSize:10, color:'var(--text-4)', transition:'color 0.1s' }}>
+                  <span style={{ fontSize:11 }}>←</span><span>Back</span>
+                </div>
+                <div style={{ flex:1, overflowY:'auto' }}>
+                  {['statistics', 'input'].map(id => {
+                    const expanded = trackerTab === id;
+                    const label = id === 'input' ? 'Input Table' : 'Statistic';
+                    const showSheets = id === 'statistics';
+                    const sheetOptions = ['all'].concat(trackerSheetTabs || []);
+                    return (
+                      <div key={id}>
+                        <div onClick={() => setTrackerTab(id)}
+                          style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 14px', margin:'1px 8px', cursor:'pointer', borderRadius:6,
+                            fontSize:12, fontWeight: expanded ? 600 : 500,
+                            color: expanded ? '#fff' : 'var(--text-2)',
+                            background: expanded ? 'rgba(255,255,255,0.08)' : 'transparent' }}>
+                          <span style={{ fontSize:9, color:'var(--text-5)', width:8 }}>{expanded && showSheets ? '▾' : '▸'}</span>
+                          <span style={{ flex:1 }}>{label}</span>
+                        </div>
+                        {expanded && showSheets && (
+                          <div style={{ padding:'2px 0 6px' }}>
+                            <div style={{ padding:'2px 22px 4px', fontSize:9, color:'var(--text-5)', textTransform:'uppercase', letterSpacing:0.4 }}>Sheet Selector</div>
+                            {sheetOptions.map(sheetName => {
+                              const active = trackerSheet === sheetName;
+                              const sheetLabel = sheetName === 'all' ? 'All Sheets' : sheetName;
+                              return (
+                                <div key={sheetName} onClick={() => setTrackerSheet(sheetName)}
+                                  style={{ display:'block', width:'calc(100% - 16px)', textAlign:'left', padding:'5px 14px 5px 38px', cursor:'pointer', borderRadius:6, fontSize:11.55, fontWeight:440,
+                                    color: active ? '#fff' : 'var(--text-4)',
+                                    background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                                    margin:'1px 8px', userSelect:'none' }}>
+                                  {sheetLabel}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : mainNav === 'workspace' ? (
               <>
                 {/* Workspace label — big, on top */}
                 <div style={{ padding:'2px 16px 8px', fontSize:14, color:'var(--text-1)', fontWeight:700, letterSpacing:0.3 }}>Workspace</div>
@@ -3114,7 +3164,7 @@
             }
 
             // ── Memory ─────────────────────────────────────────────────
-            if (mainNav === 'tracker') return <div style={{ flex:1, minHeight:0, overflowY:'auto', overflowX:'hidden', padding:'20px 24px', background:'var(--app-bg)' }}><TrackerView /></div>;
+            if (mainNav === 'tracker') return <div style={{ flex:1, minHeight:0, overflowY:'auto', overflowX:'hidden', padding:'20px 24px', background:'var(--app-bg)' }}><window.TrackerModule.TrackerView user={user} onDirtyChange={handleTrackerDirty} tab={trackerTab} onTabChange={setTrackerTab} selectedSheet={trackerSheet} onSelectedSheetChange={setTrackerSheet} onSheetTabsChange={setTrackerSheetTabs} /></div>;
             if (mainNav === 'new-request') return renderNewRequestView();
             if (mainNav === 'memory') return renderMemoryView();
 

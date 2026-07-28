@@ -5,7 +5,7 @@
 - **Engineering Lead**: Naftal Yunior
 - **Design Lead**: TBD
 - **Version**: v0
-- **Status**: Draft — pending 7 open technical decisions (see §17)
+- **Status**: Draft — 8 open questions closed; ready for review
 
 ---
 
@@ -15,6 +15,7 @@
 |---------|------|--------|---------|
 | v0 | 2026-07-21 | Dany Christian | Initial Full PRD generated from BRD v0 + change intake brief v0.2. Contains 7 open technical items for brainstorming with tech lead. |
 | v0.1 | 2026-07-22 | Dany Christian | Added US-009 (web tap-through parity with mobile). Added §6.3.1 Tap-Through Navigation with FR-017a–f. Updated §9 UI table for clickable card / toast semantics + mark-read side effect. |
+| v0.2 | 2026-07-24 | Dany Christian | Closed all 8 open questions (§17) following assessment recommendations. Locked decisions: Opsi A (ticket teamInboxId), notification-service pref ownership, multi-device from launch, 90d retention, per-company flags, single cutover, resolver expansion, `conversation_ticket`-only gate. Updated all cross-references. |
 
 Reference sources:
 - `BRD/Notification/notification-recipient-channel-expansion-BRD-v0.md`
@@ -174,7 +175,7 @@ Reference sources:
 | EC-001 | User is both direct assignee AND supervisor for team-inbox scope | Deliver exactly ONE notification (dedupe by `userId + eventId`). | Single notification card. |
 | EC-002 | Supervisor covers multiple teams; event fires in team A | Notify supervisor once (not once per team membership). | Single notification. |
 | EC-003 | Actor is also the assignee (self-assign) | Skip notification to actor (existing `skip actor` logic preserved). | No self-notification. |
-| EC-004 | Ticket has no `teamInboxId` | See §17 Q1 for resolution direction. Behavior depends on chosen option (A/B/C). | TBD pending decision. |
+| EC-004 | Ticket has no `teamInboxId` | Derive `teamInboxId` from originating conversation (Opsi A). Ticket supervisor-intake unblocked. | Conversation-originated ticket resolves correctly; standalone ticket without conversation defers intake notification. |
 | EC-005 | User has no device tokens registered | Skip mobile channel; web still delivers if enabled. | No user impact. |
 | EC-006 | User has multiple device tokens (multi-device) | Send FCM to all active tokens. | Notification appears on all devices. |
 | EC-007 | Both web and mobile disabled by Supervisor/Admin | Create notification record; skip real-time delivery. | Notification appears in list on next open. |
@@ -182,7 +183,7 @@ Reference sources:
 | EC-009 | Team inbox reassignment (item moves between teams) | Fire `*_ENTERED_TEAM_INBOX` for new team scope only if it's the first entry into any team inbox; otherwise no fire (see FR-020). | Depends on transition state. |
 | EC-010 | Conversation reopened and reassigned within same event window | Fire `CONVERSATION_REOPENED` (assignee-only) + `CONVERSATION_ASSIGNED` if assignee changes; two separate events, no coalesce. | Two notifications if assignee changed. |
 | EC-011 | User logs out and back in on mobile (token refresh) | Existing token upserts by `deviceToken`; `userId` updates to new user. Old user no longer receives push on that device. | Transparent to user. |
-| EC-012 | Company-wide event happens to a supervisor who has web disabled | Company-wide category not gated by user preference in v0; supervisor still receives (existing behavior preserved). See §17 Q8 for confirmation. | Notification delivers. |
+| EC-012 | Company-wide event happens to a supervisor who has web disabled | Company-wide category not gated by user preference in v0; supervisor still receives (existing behavior preserved). Confirmed per §17 Q8 lock. | Notification delivers. |
 
 ---
 
@@ -244,7 +245,7 @@ Reference sources:
 | Reliability | Dedupe by `(userId, eventId)` MUST be idempotent across retries. Message queue redelivery MUST NOT create duplicate notification records. |
 | Security | Notification content MUST be scoped by `companyId`; cross-tenant leak = P0 bug. Preference API MUST authenticate user; toggle write MUST be role-gated (Supervisor/Admin only). |
 | Privacy | Notification body MAY include entity display ID and actor name; MUST NOT include message body content in push preview for privacy (mobile push shows entity ID only). |
-| Observability | Delivery attempt log records every send/skip/fail per channel with `eventId`, `userId`, `channel`, `result`, `errorCode`. Retention 90 days via TTL index (pending §17 Q4). |
+| Observability | Delivery attempt log records every send/skip/fail per channel with `eventId`, `userId`, `channel`, `result`, `errorCode`. Retention 90 days via TTL index. |
 | Accessibility | Preference toggle UI keyboard-accessible; ARIA labels for screen readers. |
 | Localization | Notification body copy localized per user locale (existing i18n framework). Time formatting per user timezone. |
 
@@ -272,7 +273,7 @@ Reference sources:
 | Conversation | `null` / `external_intake` / `unowned_queue` | Assigned to team-inbox for first time | `team_inbox_scoped` | `CONVERSATION_ENTERED_TEAM_INBOX` |
 | Conversation | `team_inbox_scoped` | Member assigned | `assigned` | `CONVERSATION_ASSIGNED` |
 | Conversation | `closed` | Reopen | `assigned` (previous assignee) | `CONVERSATION_REOPENED` |
-| Ticket | `null` / `external_intake` / `unowned_queue` | Enters team-inbox for first time | `team_inbox_scoped` | `TICKET_ENTERED_TEAM_INBOX` (blocked by §17 Q1) |
+| Ticket | `null` / `external_intake` / `unowned_queue` | Enters team-inbox for first time | `team_inbox_scoped` | `TICKET_ENTERED_TEAM_INBOX` (derived via originating conversation teamInboxId — Opsi A) |
 | Ticket | `team_inbox_scoped` | Assigned | `assigned` | `TICKET_ASSIGNED` |
 | Ticket | `closed` | Reopen | `assigned` | `TICKET_REOPENED` |
 
@@ -301,8 +302,8 @@ Reference sources:
 
 | Contract | Method/Event | Producer | Consumer | Request/Payload | Response/Ack | Error Codes | Compatibility Notes |
 |----------|--------------|----------|----------|-----------------|--------------|-------------|---------------------|
-| Get own preferences | `GET /api/v1/notification-preferences/me` | Web/Mobile | notification-service (§17 Q2) | Auth header | `{ webEnabled, mobileEnabled }` | `401`, `500` | New endpoint |
-| Update own preferences | `PATCH /api/v1/notification-preferences/me` | Web/Mobile | notification-service (§17 Q2) | `{ webEnabled?, mobileEnabled? }` | `{ webEnabled, mobileEnabled }` | `400`, `401`, `403` (Member), `500` | New endpoint; role-gated |
+| Get own preferences | `GET /api/v1/notification-preferences/me` | Web/Mobile | notification-service | Auth header | `{ webEnabled, mobileEnabled }` | `401`, `500` | New endpoint |
+| Update own preferences | `PATCH /api/v1/notification-preferences/me` | Web/Mobile | notification-service | `{ webEnabled?, mobileEnabled? }` | `{ webEnabled, mobileEnabled }` | `400`, `401`, `403` (Member), `500` | New endpoint; role-gated |
 
 ### 14.3 New REST — Mobile Device Tokens
 
@@ -315,7 +316,7 @@ Reference sources:
 
 | Contract | Method/Event | Producer | Consumer | Request/Payload | Response/Ack | Error Codes | Compatibility Notes |
 |----------|--------------|----------|----------|-----------------|--------------|-------------|---------------------|
-| Conversation/Ticket notification event | RabbitMQ msg via existing `IN_APP_NOTIFICATION_CREATE` queue with new `eventType` field | conversation-service, ticket-service | notification-service | See §10.3 envelope schema | Ack on process | Redelivery on nack | See §17 Q6 for backward-compat strategy |
+| Conversation/Ticket notification event | RabbitMQ msg via existing `IN_APP_NOTIFICATION_CREATE` queue with new `eventType` field | conversation-service, ticket-service | notification-service | See §10.3 envelope schema | Ack on process | Redelivery on nack | Single cutover behind flag (Q6 resolved) |
 
 ### 14.5 Websocket Delivery
 
@@ -337,10 +338,10 @@ Reference sources:
 |------|------|-------|------------|----------|
 | Preference collection | Create empty collection with default-on semantics; no backfill needed (missing = default true) | Engineering (notification-service) | Read returns defaults for users without record | Drop collection; treat all users as default-on |
 | Device token collection | Create empty collection; unique index on `deviceToken` | Engineering (notification-service) | Empty state OK; tokens register as users open mobile app | Drop collection |
-| Delivery log collection | Create with TTL index on `timestamp` (90d, pending §17 Q4) | Engineering (notification-service) | Log rows appear after first event; TTL purges after retention | Drop collection |
+| Delivery log collection | Create with TTL index on `timestamp` (90d) | Engineering (notification-service) | Log rows appear after first event; TTL purges after retention | Drop collection |
 | people-service RPC | Deploy new RPC; notification-service calls behind feature flag | Engineering (people-service, notification-service) | RPC returns expected supervisor list in staging | Disable flag; fall back to assignee-only |
 | Event envelope migration | Producers add `eventType` + `category` fields; consumers ignore unknown fields initially | Engineering (all services) | Staging events carry new fields; consumers still work | Envelope changes are additive; no rollback needed |
-| Feature flag `notification.recipient_targeting_v2` | Enable per-company (see §17 Q5) | Product/Engineering | Canary company monitored for 1 week before broader rollout | Disable flag; revert to old broadcast path |
+| Feature flag `notification.recipient_targeting_v2` | Enable per-company | Product/Engineering | Canary company monitored for 1 week before broader rollout | Disable flag; revert to old broadcast path |
 | Feature flag `notification.mobile_push_v1` | Enable per-company after mobile app FCM integration ships | Product/Engineering | Test devices receive push in staging | Disable flag; skip mobile branch |
 | FE settings UI rollout | Deploy toggle UI behind role check; only Supervisor/Admin sees it | Frontend | Members do not see toggle in settings | Feature flag on FE component |
 | Mobile app FCM integration | Ship in mobile release; behind app-level flag | Mobile Engineering | Devices receive test push | Disable FCM init at app boot |
@@ -361,24 +362,24 @@ Reference sources:
 | Data | Owner | Created By | Retention | Archive/Delete Policy | Export Policy | Privacy Notes |
 |------|-------|------------|-----------|----------------------|---------------|---------------|
 | Notification record | notification-service | Event processor | Existing product retention (unchanged) | Existing policy | Existing policy | Contains entity IDs + user IDs; scoped by companyId |
-| Delivery attempt log | notification-service | Event processor | 90 days (§17 Q4) | TTL index auto-purge | Not exported | Contains eventId, userId, channel, result — no PII beyond user reference |
-| Notification preference | notification-service (§17 Q2) | User via PATCH endpoint | Lifetime of user account | Delete on user deletion | Not exported | webEnabled, mobileEnabled per user |
+| Delivery attempt log | notification-service | Event processor | 90 days | TTL index auto-purge | Not exported | Contains eventId, userId, channel, result — no PII beyond user reference |
+| Notification preference | notification-service | User via PATCH endpoint | Lifetime of user account | Delete on user deletion | Not exported | webEnabled, mobileEnabled per user |
 | Mobile device token | notification-service | Mobile app via register endpoint | Until unregistered or auto-cleanup | `revoked` on logout; hard-delete `invalid` >30d | Not exported | FCM token strings — treated as credential-adjacent, no logging in plain form |
 
 ---
 
-## **17. Open Questions (BLOCKING for Freeze — for tech lead + dev brainstorm)**
+## **17. Open Questions (CLOSED — all decisions locked)**
 
-| # | Question | Recommended Direction | Impacts If Not Resolved |
-|---|----------|----------------------|-------------------------|
-| Q1 | **Ticket `teamInboxId` strategy** — ticket schema has only `ticket.team.teamId`, no `teamInboxId`. How to resolve for `TICKET_ENTERED_TEAM_INBOX`? | **Opsi A (recommended):** derive `teamInboxId` from originating conversation. Zero schema migration. | FR-018, FR-019, EC-004, §12.2 ticket transition state |
-| Q2 | **Preference storage ownership** — collection lives in notification-service or user-service? | **notification-service** — single-service consistency with preference gate. | §14.2 endpoint ownership, §16 data lifecycle owner |
-| Q3 | **Multi-device support in phase 1** — support multiple `active` tokens per user from launch, or single-device only initially? | **Multi-device from launch** — no long-term migration cost. Unique index on `deviceToken`, upsert semantics. | FR-015, EC-006, §14.3 register endpoint semantics |
-| Q4 | **Delivery log retention** — 90 days (matches BRD target) or 30 days (storage saving)? | **90 days** — matches BRD explicit target; storage cost low. | §11 observability, §16 retention |
-| Q5 | **Feature flag granularity** — per-company rollout or global cutover? | **Per-company** — safer for canary + rollback isolation. | §15 rollout phases 2 & 4 |
-| Q6 | **Backward-compat strategy for `IN_APP_NOTIFICATION_CREATE`** — dual-emit old + new envelope during rollout, or single cutover behind flag? | **Reuse queue, add fields, single cutover behind flag** — envelope additions are backward-compatible (consumers ignore unknown fields). Dual-emit adds producer complexity. | §14.4, §15 phase 1 |
-| Q7 | **Supervisor fan-out placement** — source service resolves supervisors then emits N events, OR notification-service resolver expands one event to N recipients? | **notification-service resolver expands** — source services stay ignorant of recipient topology; matches existing centralization pattern. | §6.1 FR-003, §12 flow, blast radius on people-service RPC caller |
-| Q8 | **[review-added]** **Company-wide preference gate** — does user preference (webEnabled/mobileEnabled) apply to `category=company_wide` too, or only `conversation_ticket`? | **Only `conversation_ticket`** — preserves existing company-wide behavior fully unchanged. BRD BR-11 says "preserved as-is". | EC-012, FR-006, §13 permission matrix |
+| # | Question | Decision (per assessment recommendation) | Rationale |
+|---|----------|------------------------------------------|----------|
+| Q1 | **Ticket `teamInboxId` strategy** — ticket has no `teamInboxId`. | **Opsi A — derive from originating conversation.** | Conversation-originated ticket resolves via parent conversation's `teamInboxId`. Standalone ticket w/o conversation defers intake notification — acceptable for v0. |
+| Q2 | **Preference storage ownership** — notification-service or user-service? | **notification-service.** | Single-service consistency with preference gate; avoids cross-service RPC on every preference read. |
+| Q3 | **Multi-device support in phase 1** — multi-device or single-device? | **Multi-device from launch.** | Unique index on `deviceToken`, upsert semantics. No migration cost later. |
+| Q4 | **Delivery log retention** — 90 or 30 days? | **90 days.** | Matches BRD target; storage cost negligible. |
+| Q5 | **Feature flag granularity** — per-company or global cutover? | **Per-company.** | Safer canary + rollback isolation. |
+| Q6 | **Backward-compat strategy for `IN_APP_NOTIFICATION_CREATE`** — dual-emit or single cutover? | **Reuse queue, add fields, single cutover behind flag.** | Envelope additions backward-compatible (consumers ignore unknown fields); dual-emit adds producer complexity. |
+| Q7 | **Supervisor fan-out placement** — source-service expand or notification-service expand? | **notification-service resolver expands.** | Source services stay ignorant of recipient topology; matches existing centralization pattern. |
+| Q8 | **Company-wide preference gate** — applies to `company_wide` too? | **Only `conversation_ticket`.** | Preserves existing company-wide behavior fully unchanged per BRD BR-11. |
 
 ---
 
@@ -387,11 +388,11 @@ Reference sources:
 | Dependency or Risk | Owner | Impact | Mitigation |
 |--------------------|-------|--------|------------|
 | people-service RPC availability | Engineering (people-service) | Blocks supervisor recipient resolution | Feature flag; fall back to assignee-only if RPC down (EH-001) |
-| Ticket `teamInboxId` decision (§17 Q1) | Product + Engineering | Blocks ticket supervisor-intake path | Defer ticket-intake to v0.1 if Opsi C chosen |
+| Ticket `teamInboxId` decision — resolved (Opsi A: derive from conversation) | Product + Engineering | N/A — resolved | Opsi A chosen; no blocking path |
 | FCM credentials setup | DevOps + Mobile | Blocks mobile push channel | Provision credentials in staging first; feature flag mobile push |
 | Mobile app FCM integration | Mobile Engineering | Blocks Phase 4 rollout | Ship BE first; mobile follows independently behind app flag |
 | api-gateway socket rule change | Engineering (api-gateway) | Regression risk on existing socket delivery | Extensive regression testing; feature flag on gateway rule |
-| Existing consumer of `IN_APP_NOTIFICATION_CREATE` | Engineering (notification-service) | Envelope changes could break current processing | Envelope additions only (backward-compatible); Q6 dual-emit vs cutover decides risk profile |
+| Existing consumer of `IN_APP_NOTIFICATION_CREATE` | Engineering (notification-service) | Envelope changes could break current processing | Envelope additions only (backward-compatible); single cutover behind flag — confirmed (Q6). |
 | Preference collection uniqueness | Engineering | Race condition on concurrent PATCH could lose write | Optimistic concurrency or transaction on PATCH |
 | Dedupe key implementation | Engineering (notification-service) | Wrong dedupe = double delivery or missed delivery | Unique index on `(userId, eventId)` at DB level, not app-level check |
 
@@ -424,7 +425,7 @@ Reference sources:
 | Internal note mention notifications | Mention semantics not defined |
 | Notification coalescing across events | Explicitly out of scope in v0 (FR-014) |
 | Web push (browser-side push notification without websocket) | Alternative channel; not in v0 |
-| Company-wide preference gate | If Q8 changes to "gate applies to company-wide too", follow-up scope |
+| Company-wide preference gate | Q8 locked to "only `conversation_ticket`". If decision reopens, follow-up scope. |
 
 ---
 
@@ -480,16 +481,16 @@ Reference sources:
 
 ### Open Questions
 
-See §17. Copied here as final PRD-level checklist for tech lead brainstorm:
+See §17. All 8 questions closed with decisions locked.
 
-1. Ticket `teamInboxId` strategy → Opsi A / B / C?
-2. Preference storage ownership → notification-service or user-service?
-3. Multi-device phase 1 support → yes or single-device?
-4. Delivery log retention → 90 or 30 days?
-5. Feature flag granularity → per-company or global?
-6. Backward-compat strategy → dual-emit or single cutover?
-7. Supervisor fan-out placement → source-side or resolver-side?
-8. Company-wide preference gate → applies to company-wide or only conversation_ticket?
+1. Ticket `teamInboxId` strategy → **Opsi A — derive from conversation**
+2. Preference storage ownership → **notification-service**
+3. Multi-device phase 1 support → **yes, from launch**
+4. Delivery log retention → **90 days**
+5. Feature flag granularity → **per-company**
+6. Backward-compat strategy → **single cutover behind flag**
+7. Supervisor fan-out placement → **notification-service resolver**
+8. Company-wide preference gate → **only `conversation_ticket`**
 
 ### References
 

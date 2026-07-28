@@ -2,6 +2,10 @@
 // Read / write tracker rows from Google Sheets. Reuses google-auth + gdocs
 // folder scope so we work under whatever Drive folder the user already picked
 // in Settings → Google Connection.
+//
+// Column layout is DYNAMIC: we read whatever header row the sheet has, map
+// each known field by header name, and on save only touch columns we own.
+// Unknown user-added columns (notes, formulas, custom tags) are preserved.
 
 const path = require('path');
 const fs   = require('fs');
@@ -9,9 +13,37 @@ const gauth = require('./google-auth');
 const gdocs = require('./gdocs');
 
 const SHEET_MIME = 'application/vnd.google-apps.spreadsheet';
-const HEADER = ['Name', 'Type', 'Parent Task', 'Task Title', 'Description', 'Status', 'Difficulty', 'Priority', 'Progress', 'Week', 'ver', 'start', 'end'];
-const REQUIRED_HEADERS = HEADER.map(x => x.toLowerCase());
 const DEFAULT_SHEET_TITLE = 'Sheet1';
+
+// Ordered known fields. Order used only when we need to APPEND a missing
+// header to an existing sheet — existing columns keep their position.
+const FIELDS = [
+  { header: 'Name',        key: 'owner' },
+  { header: 'Type',        key: 'type' },
+  { header: 'Parent Task', key: 'parentTask' },
+  { header: 'Task Title',  key: 'task' },
+  { header: 'Description', key: 'description' },
+  { header: 'Activity',    key: 'activity' },
+  { header: 'Status',      key: 'status' },
+  { header: 'Difficulty',  key: 'difficulty' },
+  { header: 'Priority',    key: 'priority' },
+  { header: 'Progress',    key: 'progress' },
+  { header: 'Week',        key: 'week' },
+  { header: 'ver',         key: 'version' },
+  { header: 'date start',  key: 'date' },
+  { header: 'date start',  key: 'startDate' },
+  { header: 'date end',    key: 'endDate' },
+  { header: 'ver start date', key: 'verStartDate' },
+  { header: 'ver end date',   key: 'verEndDate' },
+];
+const HEADER = FIELDS.map(f => f.header); // back-compat export
+// ponytail: minimum headers required to consider a sheet a tracker sheet.
+// Relaxed from "all known headers" so users can add/remove columns in
+// gsheet without the reader silently returning [] and hiding all rows.
+const IDENTIFIER_HEADERS = ['name', 'task title'];
+// Widest possible read range. Sheets doesn't charge per column and decode
+// ignores columns whose header we don't recognise, so ZZ is safe.
+const READ_RANGE = 'A:ZZ';
 
 function configPath(BASE) { return path.join(BASE, 'tracker-sheet-config.json'); }
 function loadConfig(BASE) {
@@ -78,25 +110,36 @@ function normalizeRow(raw = {}) {
     parentTask: String(raw.parentTask || raw.parentTaskId || '').trim(),
     task: String(raw.task || '').trim(),
     description: String(raw.description || '').trim(),
+    activity: String(raw.activity || '').trim(),
     status: String(raw.status || '').trim().toLowerCase() || 'new',
     difficulty: String(raw.difficulty || '').trim().toLowerCase(),
     priority: String(raw.priority || '').trim().toLowerCase(),
     progress: normalizeProgress(raw.progress),
     week: String(raw.week || '').trim().toLowerCase(),
     version: String(raw.version || '').trim(),
-    startDate: String(raw.startDate || raw.start || '').trim(),
+    date: String(raw.date || raw.startDate || '').trim(),
+    startDate: String(raw.date || raw.startDate || raw.start || '').trim(),
     endDate: String(raw.endDate || raw.end || '').trim(),
+    verStartDate: String(raw.verStartDate || '').trim(),
+    verEndDate: String(raw.verEndDate || '').trim(),
   };
 }
 
 function encodeCell(value) { return value == null ? '' : String(value); }
+
+// A→1, Z→26, AA→27, ... 0-indexed input.
+function colLetter(idx) {
+  let s = '', n = idx;
+  while (n >= 0) { s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26) - 1; }
+  return s;
+}
 
 function decodeRows(values, sheetTitle) {
   if (!Array.isArray(values) || !values.length) return [];
   const [headerRow, ...body] = values;
   const headers = Array.isArray(headerRow) ? headerRow.map(normalizeHeader) : [];
   const indexByHeader = new Map(headers.map((name, idx) => [name, idx]));
-  if (!REQUIRED_HEADERS.every(name => indexByHeader.has(name))) return [];
+  if (!IDENTIFIER_HEADERS.some(name => indexByHeader.has(name))) return [];
   return body.map((cells, rowIndex) => {
     const pick = name => Array.isArray(cells) ? (cells[indexByHeader.get(name)] || '') : '';
     const row = normalizeRow({
@@ -105,25 +148,22 @@ function decodeRows(values, sheetTitle) {
       parentTask: pick('parent task'),
       task: pick('task title'),
       description: pick('description'),
+      activity: pick('activity'),
       status: pick('status'),
       difficulty: pick('difficulty'),
       priority: pick('priority'),
       progress: pick('progress'),
       week: pick('week'),
       version: pick('ver'),
-      startDate: pick('start'),
-      endDate: pick('end'),
+      date: pick('date start') || pick('date'),
+      startDate: pick('date start') || pick('start'),
+      endDate: pick('date end') || pick('end'),
+      verStartDate: pick('ver start date'),
+      verEndDate: pick('ver end date'),
     });
     if (!row.owner && !row.task && !row.description && !row.parentTask) return null;
     return { ...row, sourceSheet: sheetTitle, sourceRowNumber: rowIndex + 2 };
   }).filter(Boolean);
-}
-
-function encodeRows(rows) {
-  return rows.map(row => {
-    const n = normalizeRow(row);
-    return [n.owner, n.type, n.parentTask, n.task, n.description, n.status, n.difficulty, n.priority, n.progress, n.week, n.version, n.startDate, n.endDate].map(encodeCell);
-  });
 }
 
 function quoteTitle(title) { return `'${String(title).replace(/'/g, "''")}'`; }
@@ -300,7 +340,7 @@ async function readTracker(BASE) {
   const { sheets } = clients(BASE);
   const allTabs = await ensureDefaultSheet(sheets, active.id);
   const tabs = selectActiveTabs(allTabs, active.tabs);
-  const ranges = tabs.map(tab => `${quoteTitle(tab.title)}!A:M`);
+  const ranges = tabs.map(tab => `${quoteTitle(tab.title)}!${READ_RANGE}`);
   const batch = await sheets.spreadsheets.values.batchGet({ spreadsheetId: active.id, ranges, majorDimension: 'ROWS' });
   const valueRanges = batch.data.valueRanges || [];
   const tabRows = tabs.map((tab, idx) => ({
@@ -313,6 +353,68 @@ async function readTracker(BASE) {
     tabs: tabRows,
     rows: tabRows.flatMap(tab => tab.rows),
   };
+}
+
+// Per-tab preserving save:
+//   1. Read current grid (A:ZZ) to know header row + row count.
+//   2. Append any missing known-field headers to the end (never reorder).
+//   3. For each known field, write ONLY its column (A2:X{n}), padding blanks
+//      for rows the caller removed. Unknown user columns are never touched.
+async function saveTabPreserveUnknown(sheets, spreadsheetId, tabTitle, rows) {
+  const quoted = quoteTitle(tabTitle);
+  const cur = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${quoted}!${READ_RANGE}`,
+    majorDimension: 'ROWS',
+  });
+  const grid = cur.data.values || [];
+  const existingHeader = Array.isArray(grid[0]) ? grid[0].slice() : [];
+  const nextHeader = existingHeader.slice();
+  const nextHeaderLc = nextHeader.map(normalizeHeader);
+  for (const f of FIELDS) {
+    if (!nextHeaderLc.includes(f.header.toLowerCase())) {
+      nextHeader.push(f.header);
+      nextHeaderLc.push(f.header.toLowerCase());
+    }
+  }
+  const colOf = new Map(nextHeaderLc.map((h, i) => [h, i]));
+
+  // Extend header row if we added any columns.
+  if (nextHeader.length !== existingHeader.length) {
+    const endCol = colLetter(nextHeader.length - 1);
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${quoted}!A1:${endCol}1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [nextHeader] },
+    });
+  }
+
+  const encoded = (rows || []).map(normalizeRow);
+  const currentDataRows = Math.max(0, grid.length - 1);
+  const totalRows = Math.max(currentDataRows, encoded.length);
+  if (totalRows === 0) return;
+
+  const data = [];
+  for (const f of FIELDS) {
+    const idx = colOf.get(f.header.toLowerCase());
+    if (idx == null) continue;
+    const col = colLetter(idx);
+    const values = [];
+    for (let r = 0; r < totalRows; r++) {
+      const rowObj = encoded[r];
+      values.push([rowObj ? encodeCell(rowObj[f.key]) : '']);
+    }
+    data.push({
+      range: `${quoted}!${col}2:${col}${1 + totalRows}`,
+      values,
+    });
+  }
+  if (!data.length) return;
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId,
+    requestBody: { valueInputOption: 'USER_ENTERED', data },
+  });
 }
 
 async function saveTracker(BASE, rows) {
@@ -330,20 +432,7 @@ async function saveTracker(BASE, rows) {
     grouped.get(title).push(row);
   }
   for (const tab of tabs) {
-    const nextRows = grouped.get(tab.title) || [];
-    const values = [HEADER].concat(encodeRows(nextRows));
-    // ponytail: overwrite exactly A1:M(rows+1). Clear whole A:M first so trailing
-    // deleted rows disappear. Upgrade path: incremental diff by sourceRowNumber
-    // if this ever gets slow for very large trackers.
-    await sheets.spreadsheets.values.clear({ spreadsheetId: active.id, range: `${quoteTitle(tab.title)}!A:M` });
-    if (values.length) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: active.id,
-        range: `${quoteTitle(tab.title)}!A1:M${values.length}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values },
-      });
-    }
+    await saveTabPreserveUnknown(sheets, active.id, tab.title, grouped.get(tab.title) || []);
   }
   return readTracker(BASE);
 }
@@ -367,6 +456,8 @@ async function status(BASE) {
 
 module.exports = {
   HEADER,
+  FIELDS,
+  colLetter,
   spreadsheetIdFromUrl,
   status,
   listSpreadsheetsInScope,
@@ -378,3 +469,37 @@ module.exports = {
   readTracker,
   saveTracker,
 };
+
+// ── self-check ────────────────────────────────────────────────────────────
+if (require.main === module) {
+  const assert = require('assert');
+  assert.strictEqual(colLetter(0), 'A');
+  assert.strictEqual(colLetter(11), 'L');
+  assert.strictEqual(colLetter(13), 'N');
+  assert.strictEqual(colLetter(25), 'Z');
+  assert.strictEqual(colLetter(26), 'AA');
+  assert.strictEqual(colLetter(51), 'AZ');
+
+  // decodeRows: sheet has extra unknown col + reordered date col before start
+  const decoded = decodeRows([
+    ['Name','Type','Parent Task','Task Title','Description','Status','Difficulty','Priority','Progress','Week','ver','date start','date end','MyNote'],
+    ['Dany','core','','Do X','desc','in progress','','high',50,'now','v1','2026-07-27','','ignored'],
+    ['','core','','','','','','',0,'','','','',''], // blank row should drop
+  ], 'Sheet1');
+  assert.strictEqual(decoded.length, 1);
+  assert.strictEqual(decoded[0].date, '2026-07-27');
+  assert.strictEqual(decoded[0].week, 'now');
+
+  // decodeRows tolerates missing optional headers (no 'date' column).
+  const partial = decodeRows([
+    ['Name','Task Title','Status'],
+    ['Naftal','Draft PRD','in progress'],
+  ], 'S');
+  assert.strictEqual(partial.length, 1);
+  assert.strictEqual(partial[0].date, '');
+
+  // decodeRows rejects sheet with no identifier headers.
+  assert.strictEqual(decodeRows([['Foo','Bar'], ['x','y']], 'S').length, 0);
+
+  console.log('tracker-sheets self-check OK');
+}
