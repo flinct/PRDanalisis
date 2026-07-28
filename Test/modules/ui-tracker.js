@@ -69,6 +69,31 @@ window.TrackerModule = (function(){
     development:  THEME.waiting,   // purple
     'code review':'#60A5FA',       // blue
   };
+  // Priority: low=green, moderate=orange, high=red (+ medium alias).
+  const PRIORITY_BAR_COLOR = {
+    low:      THEME.success,
+    moderate: THEME.warning,
+    medium:   THEME.warning,
+    high:     THEME.danger,
+  };
+  // Difficulty: ease=green, medium=orange, hard=red (+ easy alias).
+  const DIFFICULTY_BAR_COLOR = {
+    ease:   THEME.success,
+    easy:   THEME.success,
+    medium: THEME.warning,
+    hard:   THEME.danger,
+  };
+  // Chart render order (spec). Keys not in list append after in original order.
+  const PRIORITY_ORDER   = ['low', 'moderate', 'medium', 'high'];
+  const DIFFICULTY_ORDER = ['ease', 'easy', 'medium', 'hard'];
+  function orderKeys(keys, order) {
+    const rank = new Map(order.map((k, i) => [k, i]));
+    return [...keys].sort((a, b) => {
+      const ra = rank.has(String(a).toLowerCase()) ? rank.get(String(a).toLowerCase()) : 999;
+      const rb = rank.has(String(b).toLowerCase()) ? rank.get(String(b).toLowerCase()) : 999;
+      return ra - rb;
+    });
+  }
 
   // Bucket rule: date → which weeks (last / now) a task appears in.
   // Base: `date` (tanggal mulai) locates the task in its start week.
@@ -691,11 +716,21 @@ window.TrackerModule = (function(){
   }
 
   function DifficultyBarChart({ summary }) {
-    return e(DynamicBarChart, { keys:summary.difficultyKeys, counts:summary.difficulties, unsetKey:'unset' });
+    return e(DynamicBarChart, {
+      keys:orderKeys(summary.difficultyKeys, DIFFICULTY_ORDER),
+      counts:summary.difficulties,
+      unsetKey:'unset',
+      colorFor:label => DIFFICULTY_BAR_COLOR[String(label).toLowerCase()],
+    });
   }
 
   function PriorityBarChart({ summary }) {
-    return e(DynamicBarChart, { keys:summary.priorityKeys, counts:summary.priorities, unsetKey:'unset' });
+    return e(DynamicBarChart, {
+      keys:orderKeys(summary.priorityKeys, PRIORITY_ORDER),
+      counts:summary.priorities,
+      unsetKey:'unset',
+      colorFor:label => PRIORITY_BAR_COLOR[String(label).toLowerCase()],
+    });
   }
 
   function ActivityBarChart({ summary }) {
