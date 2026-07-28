@@ -15,6 +15,61 @@ window.TrackerModule = (function(){
   const PRIORITY_DEFAULTS = [];
   const WEEK_OPTIONS = ['now', 'last'];
 
+  // ── Dark dashboard theme (spec v1.0) ────────────────────────────────
+  // Applied inline; does NOT override global CSS vars, so rest of the app
+  // (editor sidebar, QA browser) keeps its existing look.
+  const THEME = {
+    bgMain:'#0B0F14', bgSecondary:'#11161C', cardBg:'#121820',
+    tableHeaderBg:'#151B23', hoverBg:'#171F28',
+    border:'#263244', divider:'#232A36',
+    textPrimary:'#E6EAF1', textSecondary:'#A7B1C2', textMuted:'#6B7280',
+    info:'#3B82F6', success:'#22C55E', warning:'#F59E0B', danger:'#EF4444',
+    waiting:'#8B5CF6', purple:'#8B5CF6', overall:'#06B6D4',
+  };
+  const KPI_ACCENT = {
+    total: THEME.info,
+    'core / milestone': THEME.purple,
+    complete: THEME.success,
+    'in progress': THEME.info,
+    'on hold': THEME.warning,
+    waiting: THEME.waiting,
+    overall: THEME.overall,
+  };
+  const STATUS_COLOR = {
+    complete: THEME.success,
+    'in progress': THEME.info,
+    'on hold': THEME.warning,
+    waiting: THEME.waiting,
+    // ponytail: unknown status → muted dot. Add more when new statuses appear in data.
+  };
+  const PRIORITY_COLOR = {
+    high: THEME.danger,
+    moderate: THEME.warning,
+    medium: THEME.warning,   // alias
+    low: THEME.success,
+  };
+  // Status → bar color (extends STATUS_COLOR w/ new/developed). Spec §chart colors.
+  const STATUS_BAR_COLOR = {
+    complete:      THEME.success,   // #22C55E
+    'in progress': THEME.info,      // #3B82F6
+    'on hold':     THEME.warning,   // #F59E0B
+    waiting:       THEME.waiting,   // #8B5CF6
+    new:           '#60A5FA',       // light blue
+    developed:     '#93C5FD',       // lighter blue
+    tested:        THEME.success,
+  };
+  // Fixed render order for Task Status chart per spec.
+  const STATUS_ORDER = ['complete', 'in progress', 'on hold', 'waiting', 'new', 'developed'];
+  // Activity semantic color map. ponytail: hard-coded 5 keys per spec; unknowns
+  // fall back to PALETTE index so new activities still render.
+  const ACTIVITY_COLOR = {
+    analysis:     THEME.success,   // green
+    testing:      THEME.warning,   // orange
+    meeting:      THEME.danger,    // red
+    development:  THEME.waiting,   // purple
+    'code review':'#60A5FA',       // blue
+  };
+
   // Bucket rule: date → which weeks (last / now) a task appears in.
   // Base: `date` (tanggal mulai) locates the task in its start week.
   //   date ∈ minggu ini → this week
@@ -127,6 +182,13 @@ window.TrackerModule = (function(){
     const fmt = ms => formatDate(ms - 86400000);
     if (mode === 'month') return `${formatDate(lastS)} — ${fmt(nowE)} (8 weeks)`;
     return `This ${formatDate(nowS)} — ${fmt(nowE)} · Last ${formatDate(lastS)} — ${fmt(lastE)}`;
+  }
+
+  // Range label for one bucket, e.g. "27 Jul 2026 – 02 Aug 2026".
+  function bucketRangeLabel(bucket, mode, ref = new Date()) {
+    const offset = bucket === 'last' ? -1 : 0;
+    const [s, endEx] = periodRange(offset, mode, ref);
+    return `${formatDate(s)} – ${formatDate(endEx - 86400000)}`;
   }
 
   function formatPercent(value) {
@@ -525,15 +587,52 @@ window.TrackerModule = (function(){
     });
   }
 
+  // ── Render helpers for spec-compliant status/priority/progress ──────
+  function StatusDot({ status }) {
+    const key = String(status || '').toLowerCase();
+    const color = STATUS_COLOR[key] || THEME.textMuted;
+    return e('span', { style:{ display:'inline-flex', alignItems:'center', gap:6, textTransform:'capitalize', color:THEME.textPrimary, fontSize:13 } },
+      e('span', { 'aria-hidden':true, style:{ width:8, height:8, borderRadius:'50%', background:color, display:'inline-block' } }),
+      e('span', null, status || '—')
+    );
+  }
+  function PriorityText({ priority }) {
+    const key = String(priority || '').toLowerCase();
+    const color = PRIORITY_COLOR[key] || THEME.textSecondary;
+    return e('span', { style:{ color, textTransform:'capitalize', fontWeight:600, fontSize:13 } }, priority || '—');
+  }
+  function ProgressCell({ value, barColor }) {
+    const pct = Math.max(0, Math.min(100, Number(value || 0)));
+    return e('div', { style:{ minWidth:90 } },
+      e('div', { style:{ color:THEME.textPrimary, fontSize:13, marginBottom:6 } }, `${pct.toFixed(0)}%`),
+      e('div', { 'aria-hidden':true, style:{ height:3, background:'rgba(255,255,255,0.08)', borderRadius:2, overflow:'hidden' } },
+        e('div', { style:{ width:`${pct}%`, height:'100%', background:barColor || THEME.info, transition:'width .2s' } })
+      )
+    );
+  }
+  function KpiCard({ label, value }) {
+    const accent = KPI_ACCENT[String(label).toLowerCase()] || THEME.info;
+    return e('div', {
+      className:'tracker-kpi',
+      style:{ position:'relative', background:THEME.cardBg, border:`1px solid ${THEME.border}`, borderRadius:12, padding:'20px', minWidth:180, height:144, display:'flex', flexDirection:'column', justifyContent:'flex-end', transition:'background .15s, border-color .15s, box-shadow .15s' }
+    },
+      e('div', { 'aria-hidden':true, style:{ position:'absolute', top:0, left:0, right:0, height:4, background:accent, borderRadius:'12px 12px 0 0' } }),
+      e('div', { style:{ fontSize:32, fontWeight:700, color:THEME.textPrimary, lineHeight:1.05 } }, value),
+      e('div', { style:{ fontSize:14, fontWeight:400, color:THEME.textSecondary, marginTop:8 } }, label)
+    );
+  }
+
   function DoughnutChart({ percent }) {
     const pct = Math.max(0, Math.min(100, Number(percent || 0)));
     const endDeg = (pct / 100) * 360;
+    // Spec: diameter 160, stroke 16, center value 32px bold, label 13px.
+    // r=72 + stroke 16 → outer diameter 160.
     return e('div', { style:{ display:'grid', placeItems:'center', minHeight:220 } },
       e('svg', { width:180, height:180, viewBox:'0 0 180 180', role:'img', 'aria-label':`Overall progress ${formatPercent(pct)}` },
-        e('circle', { cx:90, cy:90, r:64, fill:'none', stroke:'var(--border-2)', strokeWidth:18 }),
-        pct > 0 ? e('path', { d:arcPath(90, 90, 64, 0, endDeg), fill:'none', stroke:'#2563eb', strokeWidth:18, strokeLinecap:'round' }) : null,
-        e('text', { x:90, y:86, textAnchor:'middle', fontSize:16, fontWeight:700, fill:'var(--text-1)' }, formatPercent(pct)),
-        e('text', { x:90, y:108, textAnchor:'middle', fontSize:12, fill:'var(--text-4)' }, 'Overall')
+        e('circle', { cx:90, cy:90, r:72, fill:'none', stroke:'var(--border-2)', strokeWidth:16 }),
+        pct > 0 ? e('path', { d:arcPath(90, 90, 72, 0, endDeg), fill:'none', stroke:THEME.info, strokeWidth:16, strokeLinecap:'round' }) : null,
+        e('text', { x:90, y:92, textAnchor:'middle', fontSize:32, fontWeight:700, fill:THEME.textPrimary }, formatPercent(pct)),
+        e('text', { x:90, y:116, textAnchor:'middle', fontSize:13, fill:THEME.textSecondary }, 'Overall')
       )
     );
   }
@@ -544,33 +643,50 @@ window.TrackerModule = (function(){
 
   const PALETTE = ['#22c55e', '#f59e0b', '#ef4444', '#7c3aed', '#8fd0f8', '#ec4899', '#14b8a6', '#eab308', '#3b82f6', '#a855f7'];
 
+  // Reusable dashed horizontal grid lines behind chart bars. 4 lines at 25/50/75/100.
+  function GridLines() {
+    return e('div', { 'aria-hidden':true, style:{ position:'absolute', inset:0, pointerEvents:'none' } },
+      ...[0.25, 0.5, 0.75, 1].map((r, i) => e('div', { key:i, style:{ position:'absolute', left:0, right:0, bottom:`${r * 100}%`, borderTop:`1px dashed ${THEME.divider}` } }))
+    );
+  }
+
   function StatusBarChart({ summary }) {
-    const rows = summary.statusKeys.map(label => ({ label, value:summary.statuses[label] || 0 }));
+    const s = summary.statuses || {};
+    // Fixed spec order; drop zero-value slots so chart doesn't render dead columns
+    // when a status has no rows. ponytail: keeps chart honest, order preserved.
+    const rows = STATUS_ORDER
+      .map(key => ({ key, label:titleCase(key), value:s[key] || 0, color:STATUS_BAR_COLOR[key] || THEME.info }))
+      .filter(r => r.value > 0);
     const max = Math.max(3, ...rows.map(row => row.value));
-    return e('div', { style:{ display:'grid', gap:8 } },
-      e('div', { style:{ display:'grid', gridTemplateColumns:'36px 1fr', gap:10 } },
-        e('div', { style:{ display:'grid', alignItems:'end', height:180, fontSize:13, fontWeight:800, color:'var(--text-4)' } }, 'task'),
-        e('div', { style:{ height:180, display:'grid', gridTemplateColumns:`repeat(${rows.length}, minmax(0, 1fr))`, alignItems:'end', gap:10, borderBottom:'1px solid var(--border-1)', padding:'0 0 8px' } },
-          ...rows.map(row => e('div', { key:row.label, style:{ height:'100%', display:'flex', flexDirection:'column', justifyContent:'flex-end', alignItems:'center', gap:6 } },
-            e('div', { style:{ fontSize:14, fontWeight:800, color:'var(--text-2)' } }, row.value),
-            e('div', { title:`${row.label}: ${row.value}`, style:{ width:'100%', maxWidth:36, height:`${max ? (row.value / max) * 135 : 0}px`, minHeight:row.value ? 8 : 0, background:'#8fd0f8', borderRadius:'8px 8px 0 0' } }),
-            e('div', { style:{ fontSize:15, fontWeight:800, color:'var(--text-2)', textAlign:'center', textTransform:'capitalize' } }, row.label)
-          ))
-        )
+    return e('div', { style:{ position:'relative', height:220, padding:'16px 10px 8px', borderBottom:`1px solid ${THEME.border}` } },
+      e(GridLines, null),
+      e('div', { style:{ position:'relative', height:'100%', display:'flex', alignItems:'flex-end', gap:16 } },
+        ...rows.map(row => e('div', { key:row.key, style:{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6 } },
+          e('div', { style:{ fontSize:13, fontWeight:600, color:THEME.textSecondary } }, row.value),
+          e('div', { title:`${row.label}: ${row.value}`, style:{ width:'100%', maxWidth:36, height:`${(row.value / max) * 135}px`, minHeight:8, background:row.color, borderRadius:'6px 6px 0 0' } }),
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, textAlign:'center' } }, row.label)
+        ))
       )
     );
   }
 
-  function DynamicBarChart({ keys, counts, unsetKey }) {
-    const rows = keys.map((label, i) => ({ label:titleCase(label), value:counts[label] || 0, color:PALETTE[i % PALETTE.length] }));
+  function DynamicBarChart({ keys, counts, unsetKey, colorFor }) {
+    const rows = keys.map((label, i) => ({
+      label:titleCase(label),
+      value:counts[label] || 0,
+      color:(colorFor && colorFor(label)) || PALETTE[i % PALETTE.length],
+    }));
     if (unsetKey && counts[unsetKey]) rows.push({ label:'Unset', value:counts[unsetKey], color:'#64748b' });
     const max = Math.max(3, ...rows.map(row => row.value));
-    return e('div', { style:{ height:220, display:'flex', alignItems:'flex-end', gap:16, padding:'16px 10px 8px', borderBottom:'1px solid var(--border-1)' } },
-      ...rows.map(row => e('div', { key:row.label, style:{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:8 } },
-        e('div', { style:{ fontSize:14, fontWeight:800, color:'var(--text-2)' } }, row.value),
-        e('div', { title:`${row.label}: ${row.value}`, style:{ width:'100%', maxWidth:36, height:`${max ? (row.value / max) * 135 : 0}px`, minHeight:row.value ? 8 : 0, background:row.color, borderRadius:'8px 8px 0 0' } }),
-        e('div', { style:{ fontSize:15, fontWeight:800, color:'var(--text-2)', textAlign:'center' } }, row.label)
-      ))
+    return e('div', { style:{ position:'relative', height:220, padding:'16px 10px 8px', borderBottom:`1px solid ${THEME.border}` } },
+      e(GridLines, null),
+      e('div', { style:{ position:'relative', height:'100%', display:'flex', alignItems:'flex-end', gap:16 } },
+        ...rows.map(row => e('div', { key:row.label, style:{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6 } },
+          e('div', { style:{ fontSize:13, fontWeight:600, color:THEME.textSecondary } }, row.value),
+          e('div', { title:`${row.label}: ${row.value}`, style:{ width:'100%', maxWidth:36, height:`${(row.value / max) * 135}px`, minHeight:row.value ? 8 : 0, background:row.color, borderRadius:'6px 6px 0 0' } }),
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, textAlign:'center' } }, row.label)
+        ))
+      )
     );
   }
 
@@ -583,33 +699,53 @@ window.TrackerModule = (function(){
   }
 
   function ActivityBarChart({ summary }) {
-    return e(DynamicBarChart, { keys:summary.activityKeys, counts:summary.activities });
+    return e(DynamicBarChart, {
+      keys:summary.activityKeys,
+      counts:summary.activities,
+      colorFor:label => ACTIVITY_COLOR[String(label).toLowerCase()],
+    });
   }
 
+  // Spec: 7 KPI in fixed order. Missing statuses show 0 so layout stays stable.
   function buildProgressCards(summary) {
+    const s = summary.statuses || {};
+    const pick = key => {
+      const found = Object.keys(s).find(k => String(k).toLowerCase() === key);
+      return found ? (s[found] || 0) : 0;
+    };
     return [
       ['Total', summary.total],
-      ['Core | Miles', `${summary.cores} | ${summary.milestones}`],
-      ...summary.statusKeys.map(key => [titleCase(key), summary.statuses[key] || 0]),
+      ['Core / Milestone', `${summary.cores} / ${summary.milestones}`],
+      ['Complete', pick('complete')],
+      ['In Progress', pick('in progress')],
+      ['On Hold', pick('on hold')],
+      ['Waiting', pick('waiting')],
       ['Overall', formatPercent(summary.overall)],
     ];
   }
 
-  function ProgressCardGrid({ card, summary }) {
-    const cards = buildProgressCards(summary);
-    return e('div', { style:{ display:'grid', gridTemplateColumns:`repeat(${cards.length}, minmax(0, 1fr))`, gap:10 } },
-      ...cards.map(([label, value]) => e('div', { key:label, style:card },
-        e('div', { style:{ fontSize:24, fontWeight:700, color:'var(--text-1)', lineHeight:1.2 } }, value),
-        e('div', { style:{ fontSize:11, color:'var(--text-4)', marginTop:4 } }, label)
-      ))
+  // ponytail: `card` prop kept for backward compat with StatSection callers but ignored;
+  // KpiCard owns its styling now. `pick` optional array filters/orders the KPI list.
+  function ProgressCardGrid(_props) {
+    const summary = _props.summary;
+    const pick = Array.isArray(_props.pick) ? _props.pick : null;
+    const cols = Number(_props.cols) > 0 ? Number(_props.cols) : 0;
+    let cards = buildProgressCards(summary);
+    if (pick) {
+      const map = new Map(cards.map(c => [c[0].toLowerCase(), c]));
+      cards = pick.map(k => map.get(String(k).toLowerCase())).filter(Boolean);
+    }
+    const gridCols = cols ? `repeat(${cols}, minmax(0, 1fr))` : 'repeat(auto-fit, minmax(180px, 1fr))';
+    return e('div', { style:{ display:'grid', gridTemplateColumns:gridCols, gap:16 } },
+      ...cards.map(([label, value]) => e(KpiCard, { key:label, label, value }))
     );
   }
 
-  function PeriodSplitTable({ allRows, card, sectioned, mode }) {
+  function PeriodSplitTable({ allRows, sectioned, mode }) {
     const coreById = React.useMemo(() => new Map(allRows.filter(row => row.type === 'core').map(row => [row.id, row])), [allRows]);
     const labels = mode === 'month'
-      ? { last:'Prev Month (4W)', now:'This Month (4W)' }
-      : { last:'Last Week',        now:'This Week' };
+      ? { last:'Last Month', now:'This Month', unitPrev:'vs Previous Month' }
+      : { last:'Last Week',  now:'This Week',  unitPrev:'vs Previous Week' };
     // Order cores/orphans/children into a flat tree for rendering.
     function orderTreeRows(bucketRows) {
       const cores = bucketRows.filter(r => r.type === 'core');
@@ -629,42 +765,56 @@ window.TrackerModule = (function(){
       orphans.forEach(o => flat.push(o));
       return flat;
     }
+    const thStyle = { textAlign:'left', fontSize:12, fontWeight:500, color:THEME.textSecondary, letterSpacing:0.4, padding:'0 12px', height:48, background:THEME.tableHeaderBg, borderBottom:`1px solid ${THEME.divider}`, textTransform:'uppercase', position:'sticky', top:0, zIndex:1 };
+    const tdStyle = { padding:'0 12px', borderBottom:`1px solid ${THEME.divider}`, color:THEME.textPrimary, fontSize:13 };
     return e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0, 1fr)', gap:16, marginTop:16 } },
       ...['last', 'now'].map(bucket => {
         const items = orderTreeRows(filterRowsByPeriod(allRows, mode, bucket));
         const weekSummary = summarizeRows(items);
         const title = labels[bucket];
-        const weekProps = { key:bucket, style:{ border:'1px solid var(--border-1)', borderRadius:12, overflow:'hidden', background:'var(--sidebar-bg)' } };
+        const thisRange = bucketRangeLabel(bucket, mode);
+        // ponytail: "vs previous" only shown for the current-week header per spec.
+        const weekProps = { key:bucket, style:{ border:`1px solid ${THEME.border}`, borderRadius:12, overflow:'hidden', background:THEME.bgSecondary } };
         if (sectioned) weekProps['data-stat-section'] = bucket;
         return e('div', weekProps,
-          e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 14px', borderBottom:'1px solid var(--border-1)' } },
-            e('div', { style:{ fontSize:14, fontWeight:700, color:'var(--text-1)' } }, title),
-            e('div', { style:{ fontSize:12, fontWeight:600, color:'#fff', whiteSpace:'nowrap' } }, formatPeriodLabel(mode))
-          ),
-          e('div', { style:{ padding:12, borderBottom:'1px solid var(--border-1)', overflowX:'auto' } },
-            e('div', { style:{ minWidth:860 } },
-              e(ProgressCardGrid, { card, summary:weekSummary })
+          // Header per spec: title + current range + "vs previous range"
+          e('div', { style:{ display:'flex', flexDirection:'column', gap:2, padding:'14px 16px', background:THEME.cardBg, borderBottom:`1px solid ${THEME.divider}` } },
+            e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
+            e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary } },
+              thisRange,
+              bucket === 'now' ? e('span', { style:{ color:THEME.textMuted } }, ` ${labels.unitPrev} · ${bucketRangeLabel('last', mode)}`) : null
             )
           ),
-          e('div', { style:{ maxHeight:'70vh', overflow:'auto' } },
+          e('div', { style:{ padding:16, borderBottom:`1px solid ${THEME.divider}`, background:THEME.bgSecondary, overflowX:'auto' } },
+            e(ProgressCardGrid, { summary:weekSummary })
+          ),
+          e('div', { style:{ maxHeight:'70vh', overflow:'auto', background:THEME.bgSecondary } },
             e('table', { style:{ width:'100%', borderCollapse:'collapse' } },
               e('thead', null,
                 e('tr', null,
-                  ...['Task', 'Core Task', 'Status', 'Priority', 'Progress'].map(label => e('th', { key:label, style:{ textAlign:'left', fontSize:11, color:'var(--text-4)', padding:'10px 8px', borderBottom:'1px solid var(--border-1)', textTransform:'uppercase' } }, label))
+                  ...['Task', 'Core Task', 'Status', 'Priority', 'Progress'].map(label => e('th', { key:label, style:thStyle }, label))
                 )
               ),
               e('tbody', null,
-                ...(items.length ? items : [{ id:`empty-${bucket}`, task:'—', status:'—', priority:'—' }]).map(row => {
+                ...(items.length ? items : [{ id:`empty-${bucket}`, task:'—', status:'', priority:'' }]).map((row, i) => {
                   const isChild = row.type === 'milestone' && coreById.has(row.parentTaskId);
-                  const parentId = isChild ? row.parentTaskId : '';
-                  const parent = parentId && coreById.get(parentId);
-                  const indent = isChild ? '  ' : '';
-                  return e('tr', { key:row.id, style:{ background:isChild ? 'transparent' : 'rgba(255,255,255,0.04)' } },
-                    e('td', { style:{ padding:'10px 8px', borderBottom:'1px solid var(--border-1)', color:'var(--text-2)', fontWeight:isChild ? 500 : 700 } }, indent + (row.task || '—')),
-                    e('td', { style:{ padding:'10px 8px', borderBottom:'1px solid var(--border-1)', color:'var(--text-3)', fontSize:12 } }, isChild ? (parent ? parent.task : '—') : '—'),
-                    e('td', { style:{ padding:'10px 8px', borderBottom:'1px solid var(--border-1)', color:'var(--text-2)', textTransform:'capitalize' } }, row.status || '—'),
-                    e('td', { style:{ padding:'10px 8px', borderBottom:'1px solid var(--border-1)', color:'var(--text-2)', textTransform:'capitalize' } }, row.priority || '—'),
-                    e('td', { style:{ padding:'10px 8px', borderBottom:'1px solid var(--border-1)', color:'var(--text-2)' } }, row.task === '—' ? '—' : formatPercent(getEffectiveProgress(row, allRows)))
+                  const parent = isChild ? coreById.get(row.parentTaskId) : null;
+                  const alt = i % 2 === 1 ? THEME.bgSecondary : 'transparent';
+                  const bg = isChild ? alt : 'rgba(59,130,246,0.06)'; // parent subtle tint
+                  const barColor = STATUS_COLOR[String(row.status || '').toLowerCase()] || THEME.info;
+                  return e('tr', {
+                    key:row.id,
+                    className:'tracker-row',
+                    style:{ height:56, background:bg }
+                  },
+                    e('td', { style:{ ...tdStyle, paddingLeft: isChild ? 36 : 12, fontWeight:isChild ? 400 : 700, fontSize:isChild ? 13 : 14, color: isChild ? THEME.textSecondary : '#fff' } },
+                      isChild ? e('span', { 'aria-hidden':true, style:{ color:THEME.textMuted, marginRight:6 } }, '↳') : null,
+                      row.task || '—'
+                    ),
+                    e('td', { style:{ ...tdStyle, color:THEME.textSecondary, fontSize:12 } }, isChild ? (parent ? parent.task : '—') : '—'),
+                    e('td', { style:tdStyle }, row.task === '—' ? '—' : e(StatusDot, { status:row.status })),
+                    e('td', { style:tdStyle }, row.task === '—' ? '—' : e(PriorityText, { priority:row.priority })),
+                    e('td', { style:tdStyle }, row.task === '—' ? '—' : e(ProgressCell, { value:getEffectiveProgress(row, allRows), barColor }))
                   );
                 })
               )
@@ -684,30 +834,33 @@ window.TrackerModule = (function(){
     });
     const cores = rows.filter(row => row.type === 'core');
     const orphans = rows.filter(row => row.type === 'milestone' && !cores.some(c => c.id === row.parentTaskId));
-    const th = { textAlign:'left', fontSize:11, color:'var(--text-4)', padding:'12px 8px', borderBottom:'1px solid var(--border-1)', textTransform:'uppercase' };
-    const tdBase = { padding:'10px 8px', borderBottom:'1px solid var(--border-1)', verticalAlign:'top' };
-    const renderRow = (row, isChild) => {
+    const th = { textAlign:'left', fontSize:12, fontWeight:500, color:THEME.textSecondary, letterSpacing:0.4, padding:'0 12px', height:48, background:THEME.tableHeaderBg, borderBottom:`1px solid ${THEME.divider}`, textTransform:'uppercase' };
+    const tdBase = { padding:'0 12px', borderBottom:`1px solid ${THEME.divider}`, verticalAlign:'middle', color:THEME.textPrimary, fontSize:13 };
+    const renderRow = (row, isChild, i) => {
       const children = isChild ? [] : getChildMilestones(rows, row.id);
       const isOpen = !collapsed.has(row.id);
-      const bg = isChild ? 'transparent' : 'rgba(255,255,255,0.04)';
-      const fs = isChild ? 13 : 15;
-      const fw = isChild ? 500 : 700;
-      const indent = isChild ? 28 : 0;
-      const marker = isChild ? '↳ ' : (children.length ? (isOpen ? '▼ ' : '▶ ') : '');
+      const alt = i % 2 === 1 ? THEME.bgSecondary : 'transparent';
+      const bg = isChild ? alt : 'rgba(59,130,246,0.06)';
       const clickable = !isChild && children.length;
+      const marker = isChild ? '↳ ' : (children.length ? (isOpen ? '▼ ' : '▶ ') : '');
+      const barColor = STATUS_COLOR[String(row.status || '').toLowerCase()] || THEME.info;
       return e(React.Fragment, { key:row.id },
-        e('tr', { style:{ background:bg, cursor:clickable ? 'pointer' : 'default' }, onClick:clickable ? () => toggle(row.id) : undefined },
-          e('td', { style:{ ...tdBase, minWidth:180, color:'var(--text-2)', fontSize:fs, fontWeight:fw, paddingLeft:8 + indent } },
-            e('span', { style:{ color:'var(--text-4)', marginRight:4, userSelect:'none' } }, marker),
+        e('tr', {
+          className:'tracker-row',
+          style:{ height:56, background:bg, cursor:clickable ? 'pointer' : 'default' },
+          onClick:clickable ? () => toggle(row.id) : undefined
+        },
+          e('td', { style:{ ...tdBase, minWidth:180, fontWeight:isChild ? 400 : 700, fontSize:isChild ? 13 : 14, color:isChild ? THEME.textSecondary : '#fff', paddingLeft: isChild ? 36 : 12 } },
+            e('span', { style:{ color:THEME.textMuted, marginRight:6, userSelect:'none' }, 'aria-hidden':true }, marker),
             row.task || '—'
           ),
-          e('td', { style:{ ...tdBase, minWidth:200, color:'var(--text-3)', fontSize:fs } }, row.description || '—'),
-          e('td', { style:{ ...tdBase, width:120, color:'var(--text-2)', textTransform:'capitalize', fontSize:fs } }, row.status),
-          e('td', { style:{ ...tdBase, width:100, color:'var(--text-2)', textTransform:'capitalize', fontSize:fs } }, row.difficulty || '—'),
-          e('td', { style:{ ...tdBase, width:100, color:'var(--text-2)', textTransform:'capitalize', fontSize:fs } }, row.priority || '—'),
-          e('td', { style:{ ...tdBase, width:120, color:'var(--text-2)', fontSize:fs, fontWeight:isChild ? 500 : 700 } }, formatPercent(getEffectiveProgress(row, rows)))
+          e('td', { style:{ ...tdBase, minWidth:200, color:THEME.textSecondary, fontSize:12 } }, row.description || '—'),
+          e('td', { style:{ ...tdBase, width:140 } }, e(StatusDot, { status:row.status })),
+          e('td', { style:{ ...tdBase, width:110, color:THEME.textSecondary, textTransform:'capitalize' } }, row.difficulty || '—'),
+          e('td', { style:{ ...tdBase, width:110 } }, e(PriorityText, { priority:row.priority })),
+          e('td', { style:{ ...tdBase, width:130 } }, e(ProgressCell, { value:getEffectiveProgress(row, rows), barColor }))
         ),
-        ...(isOpen ? children.map(child => renderRow(child, true)) : [])
+        ...(isOpen ? children.map((child, ci) => renderRow(child, true, ci)) : [])
       );
     };
     return e('table', { style:{ width:'100%', borderCollapse:'collapse' } },
@@ -715,86 +868,78 @@ window.TrackerModule = (function(){
         e('tr', null, ...['Task', 'Description', 'Status', 'Difficulty', 'Priority', 'Progress'].map(label => e('th', { key:label, style:th }, label)))
       ),
       e('tbody', null,
-        ...cores.map(row => renderRow(row, false)),
-        ...orphans.map(row => renderRow(row, true))
+        ...cores.map((row, i) => renderRow(row, false, i)),
+        ...orphans.map((row, i) => renderRow(row, true, i))
       )
     );
   }
 
   function StatSection({ shell, card, title, summary, countLabel, rows, allRows, sectioned, periodMode }) {
-    const sectionShell = { ...shell, background:'#2e4976', padding:16 };
-    const overviewProps = { style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 1.4fr)', gap:16, alignItems:'stretch' } };
+    const sectionShell = { ...shell, background:THEME.bgSecondary, padding:16, border:`1px solid ${THEME.border}` };
+    const overviewProps = { style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 2fr)', gap:16, alignItems:'stretch' } };
     const activityProps = { style:{ ...shell, padding:16, marginTop:16 } };
     const chartsProps = { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16, alignItems:'stretch' } };
-    const taskListProps = { style:{ ...shell, padding:16, marginTop:16 } };
+    const taskListProps = { style:{ ...shell, padding:16, marginTop:16, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } };
     if (sectioned) {
       overviewProps['data-stat-section'] = 'overview';
       activityProps['data-stat-section'] = 'activity';
       chartsProps['data-stat-section'] = 'charts';
       taskListProps['data-stat-section'] = 'tasks';
     }
-    const pickStatus = label => {
-      const key = (summary.statusKeys || []).find(k => String(k).toLowerCase() === label);
-      return key ? (summary.statuses[key] || 0) : 0;
-    };
-    const overviewCards = [
-      ['Total', summary.total],
-      ['Core / Miles', `${summary.cores} / ${summary.milestones}`],
-      ['Complete', pickStatus('complete')],
-      ['In Progress', pickStatus('in progress')],
-    ];
-    const overviewCell = { ...card, padding:14 };
     return e('div', { style:sectionShell },
       e('div', { style:{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', marginBottom:12, flexWrap:'wrap' } },
-        e('div', { style:{ fontSize:18, fontWeight:700, color:'var(--text-1)' } }, title),
+        e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
         e('div', { style:{ display:'flex', gap:12, alignItems:'center' } },
-          e('div', { style:{ fontSize:13, fontWeight:700, color:'#fff', whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode)),
-          e('div', { style:{ fontSize:12, color:'var(--text-4)' } }, countLabel)
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode)),
+          e('div', { style:{ fontSize:12, color:THEME.textMuted } }, countLabel)
         )
       ),
       e('div', overviewProps,
-        e('div', { style:{ ...shell, padding:16, display:'grid', alignContent:'center' } },
-          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Overall Project'),
+        e('div', { style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, display:'grid', alignContent:'center', minHeight:300 } },
+          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Overall Project'),
           e(DoughnutChart, { percent:summary.overall })
         ),
-        e('div', { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:12 } },
-          ...overviewCards.map(([label, value]) => e('div', { key:label, style:overviewCell },
-            e('div', { style:{ fontSize:26, fontWeight:700, color:'var(--text-1)', lineHeight:1.2 } }, value),
-            e('div', { style:{ fontSize:12, color:'var(--text-4)', marginTop:6 } }, label)
-          ))
+        e('div', null,
+          e(ProgressCardGrid, { summary, pick:['Total', 'Core / Milestone', 'Complete', 'In Progress'], cols:2 })
         )
       ),
-      e('div', { style:{ ...shell, padding:16, marginTop:16 } },
-        e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Task Status'),
+      e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, marginTop:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+        e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
+          e('div', { style:{ fontSize:14, fontWeight:600, color:THEME.textPrimary } }, 'Task Status'),
+          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${summary.total} Tasks`)
+        ),
         e(StatusBarChart, { summary })
       ),
-      (summary.activityKeys && summary.activityKeys.length) ? e('div', activityProps,
-        e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Activity'),
+      (summary.activityKeys && summary.activityKeys.length) ? e('div', { ...activityProps, className:'tracker-chart-card', style:{ ...activityProps.style, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+        e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
+          e('div', { style:{ fontSize:14, fontWeight:600, color:THEME.textPrimary } }, 'Activity'),
+          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${summary.total} Tasks`)
+        ),
         e(ActivityBarChart, { summary })
       ) : null,
       e('div', chartsProps,
-        e('div', { style:{ ...shell, padding:16 } },
-          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Difficulty'),
+        e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Difficulty'),
           e(DifficultyBarChart, { summary })
         ),
-        e('div', { style:{ ...shell, padding:16 } },
-          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:'var(--text-2)', marginBottom:12 } }, 'Priority'),
+        e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+          e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Priority'),
           e(PriorityBarChart, { summary })
         )
       ),
       e('div', taskListProps,
         e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
-          e('div', { style:{ fontSize:14, fontWeight:600, color:'var(--text-2)' } }, 'Task List'),
-          e('div', { style:{ fontSize:12, fontWeight:600, color:'#fff', whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode))
+          e('div', { style:{ fontSize:14, fontWeight:600, color:'#fff' } }, 'Task List'),
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode))
         ),
-        e('div', { style:{ minWidth:860, marginBottom:16, overflowX:'auto' } },
-          e(ProgressCardGrid, { card, summary })
+        e('div', { style:{ marginBottom:16 } },
+          e(ProgressCardGrid, { summary })
         ),
         e('div', { style:{ maxHeight:'80vh', overflow:'auto' } },
           e(TaskListTree, { rows })
         )
       ),
-      e(PeriodSplitTable, { allRows:allRows || rows, card, sectioned, mode:periodMode })
+      e(PeriodSplitTable, { allRows:allRows || rows, sectioned, mode:periodMode })
     );
   }
 
@@ -1240,8 +1385,15 @@ window.TrackerModule = (function(){
     );
 
     return e('div', { style:{ display:'flex', minHeight:0, height:'100%' } },
+      // Spec: hover / focus states for tracker rows and KPI cards
+      e('style', null, `
+        .tracker-row:hover { background: ${THEME.hoverBg} !important; }
+        .tracker-kpi:hover { background: ${THEME.hoverBg}; border-color: ${THEME.info}; box-shadow: 0 8px 20px rgba(59,130,246,0.15); }
+        .tracker-chart-card:hover { border-color: ${THEME.info}; box-shadow: 0 8px 20px rgba(59,130,246,0.15); }
+        .tracker-row:focus-within { outline: 2px solid ${THEME.info}; outline-offset: -2px; }
+      `),
       // Right panel — all main content
-      e('div', { ref:scrollRef, style:{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:16, minHeight:0, overflowY:'auto', padding:'16px 24px', position:'relative' } },
+      e('div', { ref:scrollRef, style:{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:16, minHeight:0, overflowY:'auto', padding:'16px 24px', position:'relative', background:THEME.bgMain } },
         e('div', { style:{ display:'flex', justifyContent:'space-between', gap:16, alignItems:'center', flexWrap:'wrap' } },
           e('div', { style:{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' } },
             e('div', { style:{ fontSize:13, fontWeight:700, color:'var(--text-1)' } }, tab === 'input' ? 'Input Table' : (selectedSheet === 'all' ? 'Statistic · All Sheets' : `Statistic · ${selectedSheet}`)),
@@ -1285,20 +1437,22 @@ window.TrackerModule = (function(){
                 )
               )
             )
-          : e('div', { style:{ ...shell, overflow:'visible', minHeight:0 } },
+          : e('div', { style:{ ...shell, overflow:'visible', minHeight:0, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } },
               e('div', { style:{ overflowX:'auto', overflowY:'visible' } },
                 e('table', { style:{ width:'100%', borderCollapse:'collapse' } },
                   e('thead', null,
-                    e('tr', { style:{ background:'var(--app-bg)' } },
+                    e('tr', { style:{ background:THEME.tableHeaderBg } },
                       ...['Owner', 'Sheet', 'Type', 'Parent Task', 'Task', 'Description', 'Activity', 'Status', 'Difficulty', 'Priority', 'Week', 'Progress', 'Version', 'Date', 'Start', 'End', 'Ver Start', 'Ver End', 'Action'].map(label => {
                         const isWide = label === 'Parent Task' || label === 'Task' || label === 'Description';
-                        return e('th', { key:label, style:{ textAlign:'left', padding:'12px 10px', fontSize:11, color:'var(--text-4)', borderBottom:'1px solid var(--border-1)', textTransform:'uppercase', position:'sticky', top:0, background:'var(--app-bg)', zIndex:1, ...(isWide ? { maxWidth:250, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } : {}) } }, label);
+                        return e('th', { key:label, style:{ textAlign:'left', padding:'0 12px', height:48, fontSize:12, fontWeight:500, color:THEME.textSecondary, letterSpacing:0.4, borderBottom:`1px solid ${THEME.divider}`, textTransform:'uppercase', position:'sticky', top:0, background:THEME.tableHeaderBg, zIndex:1, ...(isWide ? { maxWidth:250, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } : {}) } }, label);
                       })
                     )
                   ),
                   e('tbody', null,
                     ...rows.map(row => e('tr', {
                       key:row.id,
+                      className:'tracker-row',
+                      style:{ minHeight:56 },
                       draggable:true,
                       onDragStart:() => setDragId(row.id),
                       onDragOver:ev => ev.preventDefault(),
