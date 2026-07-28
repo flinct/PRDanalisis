@@ -1073,10 +1073,10 @@ window.TrackerModule = (function(){
       cancelAnimationFrame(animRef.current);
       const start = container.scrollTop;
       const distance = target - start;
-      if (!distance) return;
+      if (!distance && target !== 0) return;
+      // ponytail: allow scroll-to-0 even when scrollTop already 0
       const duration = Math.min(700, 300 + Math.abs(distance) * 0.4);
       const t0 = performance.now();
-      // easeInOutCubic
       const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       const step = (now) => {
         const p = Math.min(1, (now - t0) / duration);
