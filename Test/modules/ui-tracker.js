@@ -160,7 +160,8 @@ window.TrackerModule = (function(){
     const override = normalizeWeek(row?.week);
     let last = false;
     let now  = false;
-    if (override === 'last') { last = true; } else if (override === 'now') { now = true; }
+    // ponytail: only `now` override forces bucket; `last` follows date rule.
+    if (override === 'now') { now = true; }
     if (Number.isFinite(startMs)) {
       if (periodOverlaps(startMs, endMs, ongoing, lastStart, lastEnd)) last = true;
       if (periodOverlaps(startMs, endMs, ongoing, nowStart, nowEnd))   now  = true;
@@ -467,6 +468,9 @@ window.TrackerModule = (function(){
     // Override works regardless of status: week='now' → always now.
     const b5 = periodBuckets({ startDate: iso(2026,7,1), status:'in progress', week:'now' }, 'week', ref);
     console.assert(b5.now, 'periodBuckets week: override now');
+    // week='last' is NOT an override — follows date rule. Out-of-range date → hidden.
+    const bLastOverride = periodBuckets({ startDate: iso(2026,6,15), endDate: iso(2026,6,26), status:'complete', week:'last' }, 'week', ref);
+    console.assert(!bLastOverride.last && !bLastOverride.now, 'periodBuckets week: last override no longer forces bucket');
     // Override on complete + out-of-range start → override wins (complete + week=now → now).
     const bStale = periodBuckets({ startDate: iso(2026,5,18), status:'complete', week:'now' }, 'week', ref);
     console.assert(bStale.now, 'periodBuckets week: stale override complete still shows in now');
@@ -811,6 +815,7 @@ window.TrackerModule = (function(){
         // ponytail: "vs previous" only shown for the current-week header per spec.
         const weekProps = { key:bucket, style:{ border:`1px solid ${THEME.border}`, borderRadius:12, overflow:'hidden', background:THEME.bgSecondary } };
         if (sectioned) weekProps['data-stat-section'] = bucket;
+        weekProps['data-slide-part'] = bucket === 'last' ? 'last-period' : 'this-period';
         return e('div', weekProps,
           // Header per spec: title + current range + "vs previous range"
           e('div', { style:{ display:'flex', flexDirection:'column', gap:2, padding:'14px 16px', background:THEME.cardBg, borderBottom:`1px solid ${THEME.divider}` } },
@@ -911,10 +916,10 @@ window.TrackerModule = (function(){
 
   function StatSection({ shell, card, title, summary, countLabel, rows, allRows, sectioned, periodMode }) {
     const sectionShell = { ...shell, background:THEME.bgSecondary, padding:16, border:`1px solid ${THEME.border}` };
-    const overviewProps = { style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 2fr)', gap:16, alignItems:'stretch' } };
-    const activityProps = { style:{ ...shell, padding:16, marginTop:16 } };
-    const chartsProps = { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16, alignItems:'stretch' } };
-    const taskListProps = { style:{ ...shell, padding:16, marginTop:16, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } };
+    const overviewProps = { 'data-slide-part':'overview', style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 2fr)', gap:16, alignItems:'stretch' } };
+    const activityProps = { 'data-slide-part':'activity-chart', style:{ ...shell, padding:16, marginTop:16 } };
+    const chartsProps = { 'data-slide-part':'diff-priority', style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16, alignItems:'stretch' } };
+    const taskListProps = { 'data-slide-part':'task-list', style:{ ...shell, padding:16, marginTop:16, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } };
     if (sectioned) {
       // ponytail: 5-view scroll spec — view 1 starts at scrollTop=0 (doughnut+KPI+task
       // status+activity bottom), boundaries at activity/tasks/last/now. overview and
@@ -922,7 +927,7 @@ window.TrackerModule = (function(){
       activityProps['data-stat-section'] = 'activity';
       taskListProps['data-stat-section'] = 'tasks';
     }
-    return e('div', { style:sectionShell },
+    return e('div', { style:sectionShell, 'data-deck':title },
       e('div', { style:{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', marginBottom:12, flexWrap:'wrap' } },
         e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
         e('div', { style:{ display:'flex', gap:12, alignItems:'center' } },
@@ -939,7 +944,7 @@ window.TrackerModule = (function(){
           e(ProgressCardGrid, { summary, pick:['Total', 'Core / Milestone', 'Complete', 'In Progress'], cols:2 })
         )
       ),
-      e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, marginTop:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+      e('div', { className:'tracker-chart-card', 'data-slide-part':'task-status', style:{ ...shell, padding:16, marginTop:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
         e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
           e('div', { style:{ fontSize:14, fontWeight:600, color:THEME.textPrimary } }, 'Task Status'),
           e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${summary.total} Tasks`)
@@ -1086,6 +1091,162 @@ window.TrackerModule = (function(){
       };
       animRef.current = requestAnimationFrame(step);
     }, []);
+    // ponytail: builds standalone slideshow doc from live DOM. Reused for HTML export,
+    // PDF export (print inside opened window), and preview (Slideshow button).
+    // Slides = 5 per deck × N decks (All Sheets + each owner group).
+    const buildSlideshowHtml = React.useCallback(() => {
+      const node = scrollRef.current;
+      if (!node) return '';
+      const decks = Array.from(node.querySelectorAll('[data-deck]'));
+      if (!decks.length) return '';
+      const cs = getComputedStyle(document.documentElement);
+      const vars = ['--app-bg','--sidebar-bg','--border-1','--border-2','--text-1','--text-2','--text-3','--text-4']
+        .map(k => `${k}: ${cs.getPropertyValue(k).trim() || 'initial'};`).join(' ');
+      const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const bm = batchMeta || {};
+      const metaLine = `${periodMode.charAt(0).toUpperCase() + periodMode.slice(1)}` +
+        (bm.version ? ` · v${bm.version}` : '') +
+        (bm.startDate || bm.endDate ? ` · ${bm.startDate || '?'} → ${bm.endDate || '?'}` : '');
+      // Pick DOM subtree for a slide from a deck.
+      const pick = (deck, parts) => parts.map(p => deck.querySelector(`[data-slide-part="${p}"]`)).filter(Boolean);
+      const slides = [];
+      decks.forEach(deck => {
+        const deckTitle = deck.getAttribute('data-deck') || '—';
+        const groups = [
+          { name:'Overview', parts:['overview', 'task-status'] },
+          { name:'Activity · Difficulty · Priority', parts:['activity-chart', 'diff-priority'] },
+          { name:'Task List', parts:['task-list'] },
+          { name:'Last Period', parts:['last-period'] },
+          { name:'This Period', parts:['this-period'] },
+        ];
+        groups.forEach(g => {
+          const nodes = pick(deck, g.parts);
+          if (!nodes.length) return;
+          slides.push({ deckTitle, name:g.name, html:nodes.map(n => n.outerHTML).join('') });
+        });
+      });
+      const slideHtml = slides.map((s, i) => (
+        `<section class="slide" data-idx="${i}">
+          <div class="slide-head">
+            <div class="slide-title"><strong>${escapeHtml(s.deckTitle)}</strong> · ${escapeHtml(s.name)}</div>
+            <div class="slide-meta">${escapeHtml(metaLine)} · ${i + 1}/${slides.length}</div>
+          </div>
+          <div class="slide-body">${s.html}</div>
+        </section>`
+      )).join('');
+      return `<!doctype html>
+<html><head><meta charset="utf-8"><title>Tracker Slideshow · ${escapeHtml(stamp)}</title>
+<style>
+  :root { ${vars} }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--app-bg); color: var(--text-1); font-family: -apple-system, Segoe UI, Roboto, sans-serif; }
+  .deck { position: relative; height: 100vh; overflow: hidden; }
+  .slide { position: absolute; inset: 0; padding: 40px 56px 72px; display: flex; flex-direction: column; gap: 16px; opacity: 0; pointer-events: none; transform: translateX(30px); transition: opacity .25s ease, transform .25s ease; }
+  .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+  .slide-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-1); flex: 0 0 auto; }
+  .slide-title { font-size: 20px; color: var(--text-1); }
+  .slide-meta { font-size: 12px; color: var(--text-3); }
+  .slide-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 6px; }
+  .slide-body [data-noexport], .slide-body button { display: none !important; }
+  .slide-body input, .slide-body select, .slide-body textarea { pointer-events: none; background: transparent !important; border: 0 !important; color: inherit !important; padding: 0 !important; -webkit-appearance: none; appearance: none; }
+  .nav { position: fixed; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; z-index: 10; }
+  .nav button { background: var(--sidebar-bg); color: var(--text-1); border: 1px solid var(--border-1); padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer; }
+  .nav button:disabled { opacity: .4; cursor: not-allowed; }
+  .nav .counter { font-size: 12px; color: var(--text-3); min-width: 60px; text-align: center; }
+  .dots { display: flex; gap: 4px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-1); display: inline-block; }
+  .dots i.on { background: #2563eb; width: 14px; border-radius: 3px; }
+  svg { max-width: 100%; height: auto; }
+  @media print {
+    html, body { overflow: visible; height: auto; }
+    .deck { height: auto; }
+    .nav { display: none !important; }
+    .slide { position: relative; inset: auto; opacity: 1 !important; transform: none !important; pointer-events: auto; page-break-after: always; break-after: page; height: 100vh; }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .slide-body { overflow: visible; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page { size: A4 landscape; margin: 8mm; }
+  }
+</style></head>
+<body>
+<div class="deck" id="deck">${slideHtml}</div>
+<div class="nav">
+  <button id="prev" title="Previous (←)">◀</button>
+  <span class="counter" id="counter">1/${slides.length}</span>
+  <button id="next" title="Next (→ / Space)">▶</button>
+  <button id="fs" title="Fullscreen (F)">⛶</button>
+  <button id="printBtn" title="Print / Save as PDF">🖨</button>
+  <span class="dots" id="dots">${slides.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
+</div>
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var dots = document.querySelectorAll('#dots i');
+  var counter = document.getElementById('counter');
+  var idx = 0;
+  function go(n){
+    idx = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, i){ s.classList.toggle('active', i === idx); });
+    dots.forEach(function(d, i){ d.classList.toggle('on', i === idx); });
+    counter.textContent = (idx + 1) + '/' + slides.length;
+    document.getElementById('prev').disabled = idx === 0;
+    document.getElementById('next').disabled = idx === slides.length - 1;
+  }
+  document.getElementById('prev').onclick = function(){ go(idx - 1); };
+  document.getElementById('next').onclick = function(){ go(idx + 1); };
+  document.getElementById('fs').onclick = function(){
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  };
+  document.getElementById('printBtn').onclick = function(){ window.print(); };
+  document.addEventListener('keydown', function(ev){
+    if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); go(idx + 1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); go(idx - 1); }
+    else if (ev.key === 'Home') go(0);
+    else if (ev.key === 'End') go(slides.length - 1);
+    else if (ev.key === 'f' || ev.key === 'F') document.getElementById('fs').click();
+    else if (ev.key === 'Escape' && document.fullscreenElement) document.exitFullscreen();
+  });
+  slides[0].classList.add('active');
+})();
+</script>
+</body></html>`;
+    }, [batchMeta, periodMode]);
+    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const handleExportPdf = React.useCallback(() => {
+      const html = buildSlideshowHtml();
+      if (!html) return;
+      const w = window.open('', '_blank');
+      if (!w) { alert('Popup blocked. Izinkan popup untuk export PDF.'); return; }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      // ponytail: give layout+fonts a beat before print dialog; 400ms empirically enough.
+      setTimeout(() => { try { w.focus(); w.print(); } catch (err) { console.error(err); } }, 400);
+    }, [buildSlideshowHtml]);
+    const handleExportHtml = React.useCallback(() => {
+      const html = buildSlideshowHtml();
+      if (!html) return;
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tracker-slideshow-${stamp}.html`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, [buildSlideshowHtml]);
+    const handleSlideshow = React.useCallback(() => {
+      const html = buildSlideshowHtml();
+      if (!html) return;
+      const w = window.open('', '_blank');
+      if (!w) { alert('Popup blocked. Izinkan popup untuk slideshow.'); return; }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }, [buildSlideshowHtml]);
     const scrollToNextSection = React.useCallback(() => {
       const container = scrollRef.current;
       if (!container) return;
@@ -1433,7 +1594,7 @@ window.TrackerModule = (function(){
         e('div', { style:{ display:'flex', justifyContent:'space-between', gap:16, alignItems:'center', flexWrap:'wrap' } },
           e('div', { style:{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' } },
             e('div', { style:{ fontSize:13, fontWeight:700, color:'var(--text-1)' } }, tab === 'input' ? 'Input Table' : (selectedSheet === 'all' ? 'Statistic · All Sheets' : `Statistic · ${selectedSheet}`)),
-            e('button', { type:'button', onClick:addRow, style:{ border:'1px solid var(--border-1)', background:'var(--sidebar-bg)', color:'var(--text-2)', borderRadius:999, padding:'8px 14px', fontSize:12, fontWeight:600, cursor:'pointer' } }, '+ Row'),
+            e('button', { type:'button', 'data-noexport':'1', onClick:addRow, style:{ border:'1px solid var(--border-1)', background:'var(--sidebar-bg)', color:'var(--text-2)', borderRadius:999, padding:'8px 14px', fontSize:12, fontWeight:600, cursor:'pointer' } }, '+ Row'),
             tab === 'statistics' ? e('div', { style:{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', marginLeft:8 } },
               e('div', { style:{ display:'inline-flex', border:'1px solid var(--border-1)', borderRadius:999, overflow:'hidden' } },
                 ...['week', 'month'].map(mode => e('button', {
@@ -1445,7 +1606,12 @@ window.TrackerModule = (function(){
               ),
               e('input', { type:'text', value:batchMeta.version, onChange:ev => setBatchMeta(prev => ({ ...prev, version:ev.target.value })), placeholder:'Version', style:{ ...inputStyle, width:140, padding:'8px 10px' } }),
               e('div', { style:{ minWidth:150 } }, e(DateCell, { value:batchMeta.startDate, onChange:value => setBatchMeta(prev => ({ ...prev, startDate:value })), inputStyle:{ ...inputStyle, padding:'8px 10px' } })),
-              e('div', { style:{ minWidth:150 } }, e(DateCell, { value:batchMeta.endDate, onChange:value => setBatchMeta(prev => ({ ...prev, endDate:value })), inputStyle:{ ...inputStyle, padding:'8px 10px' } }))
+              e('div', { style:{ minWidth:150 } }, e(DateCell, { value:batchMeta.endDate, onChange:value => setBatchMeta(prev => ({ ...prev, endDate:value })), inputStyle:{ ...inputStyle, padding:'8px 10px' } })),
+              e('div', { 'data-noexport':'1', style:{ display:'inline-flex', border:'1px solid var(--border-1)', borderRadius:999, overflow:'hidden', marginLeft:4 } },
+                e('button', { type:'button', onClick:handleSlideshow, title:'Open slideshow in new tab', style:{ border:'none', background:'#2563eb', color:'#fff', padding:'8px 12px', fontSize:12, fontWeight:600, cursor:'pointer' } }, 'Slideshow'),
+                e('button', { type:'button', onClick:handleExportPdf, title:'Open slideshow then Print / Save as PDF', style:{ border:'none', borderLeft:'1px solid rgba(255,255,255,0.2)', background:'#0f766e', color:'#fff', padding:'8px 12px', fontSize:12, fontWeight:600, cursor:'pointer' } }, 'PDF'),
+                e('button', { type:'button', onClick:handleExportHtml, title:'Download standalone HTML slideshow', style:{ border:'none', borderLeft:'1px solid rgba(255,255,255,0.2)', background:'#0f766e', color:'#fff', padding:'8px 12px', fontSize:12, fontWeight:600, cursor:'pointer' } }, 'HTML')
+              )
             ) : null
           ),
           tab === 'input' ? e('button', { type:'button', disabled:meta.saving || !dirty, onClick:handleSave, style:{ border:'1px solid ' + ((!dirty || meta.saving) ? 'var(--border-1)' : '#0f766e'), background:(!dirty || meta.saving) ? 'var(--border-2)' : '#0f766e', color:(!dirty || meta.saving) ? 'var(--text-4)' : '#fff', borderRadius:999, padding:'9px 16px', fontSize:12, fontWeight:700, cursor:(!dirty || meta.saving) ? 'not-allowed' : 'pointer' } }, meta.saving ? 'Saving...' : 'Save') : null
@@ -1527,6 +1693,7 @@ window.TrackerModule = (function(){
       ),
       tab === 'statistics' ? e('button', {
         type:'button',
+        'data-noexport':'1',
         onClick:scrollToNextSection,
         title:'Scroll to next section (wraps to top)',
         'aria-label':'Scroll to next section',
