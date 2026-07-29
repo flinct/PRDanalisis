@@ -916,9 +916,10 @@ window.TrackerModule = (function(){
     const chartsProps = { style:{ display:'grid', gridTemplateColumns:'repeat(2, minmax(0, 1fr))', gap:16, marginTop:16, alignItems:'stretch' } };
     const taskListProps = { style:{ ...shell, padding:16, marginTop:16, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } };
     if (sectioned) {
-      overviewProps['data-stat-section'] = 'overview';
+      // ponytail: 5-view scroll spec — view 1 starts at scrollTop=0 (doughnut+KPI+task
+      // status+activity bottom), boundaries at activity/tasks/last/now. overview and
+      // charts intentionally NOT markers to keep view 1 & view 2 as single stops.
       activityProps['data-stat-section'] = 'activity';
-      chartsProps['data-stat-section'] = 'charts';
       taskListProps['data-stat-section'] = 'tasks';
     }
     return e('div', { style:sectionShell },
