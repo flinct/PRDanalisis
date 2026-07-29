@@ -1091,14 +1091,39 @@ window.TrackerModule = (function(){
       };
       animRef.current = requestAnimationFrame(step);
     }, []);
-    // ponytail: builds standalone slideshow doc from live DOM. Reused for HTML export,
-    // PDF export (print inside opened window), and preview (Slideshow button).
-    // Slides = 5 per deck × N decks (All Sheets + each owner group).
+    // Period-filtered rows for export — independent of sheet picker (spec: cover uses
+    // all sheets combined, per-sheet decks derived from same period-filtered universe).
+    const exportRows = React.useMemo(() => filterRowsByPeriod(rows, periodMode, 'now'), [rows, periodMode]);
+    const exportSummary = React.useMemo(() => summarizeRows(exportRows), [exportRows]);
+    // Group by sheet (Dany, Naftal, Agung, ...) — ordered by sheetTabs when available so
+    // export order matches the sidebar selector; falls back to first-seen order.
+    const exportSheetDecks = React.useMemo(() => {
+      const byName = new Map();
+      exportRows.forEach(r => {
+        const key = String(r.sourceSheet || '').trim() || 'Unassigned';
+        if (!byName.has(key)) byName.set(key, []);
+        byName.get(key).push(r);
+      });
+      const ordered = [];
+      const seen = new Set();
+      (sheetTabs || []).forEach(name => {
+        if (byName.has(name)) { ordered.push(name); seen.add(name); }
+      });
+      byName.forEach((_, name) => { if (!seen.has(name)) ordered.push(name); });
+      return ordered.map(name => ({
+        name,
+        rows: byName.get(name),
+        summary: summarizeRows(byName.get(name)),
+        allRows: rows.filter(r => (String(r.sourceSheet || '').trim() || 'Unassigned') === name),
+      }));
+    }, [exportRows, rows, sheetTabsKey]);
+
+    // ponytail: builds standalone slideshow doc from hidden export decks. Data flow:
+    //   Cover: doughnut + 4 KPI from all-sheet aggregate (period-filtered).
+    //   Then per sheet (Dany/Naftal/Agung/...): divider slide + 5 content slides.
     const buildSlideshowHtml = React.useCallback(() => {
-      const node = scrollRef.current;
-      if (!node) return '';
-      const decks = Array.from(node.querySelectorAll('[data-deck]'));
-      if (!decks.length) return '';
+      const root = document.querySelector('[data-export-decks]');
+      if (!root) return '';
       const cs = getComputedStyle(document.documentElement);
       const vars = ['--app-bg','--sidebar-bg','--border-1','--border-2','--text-1','--text-2','--text-3','--text-4']
         .map(k => `${k}: ${cs.getPropertyValue(k).trim() || 'initial'};`).join(' ');
@@ -1107,13 +1132,23 @@ window.TrackerModule = (function(){
       const metaLine = `${periodMode.charAt(0).toUpperCase() + periodMode.slice(1)}` +
         (bm.version ? ` · v${bm.version}` : '') +
         (bm.startDate || bm.endDate ? ` · ${bm.startDate || '?'} → ${bm.endDate || '?'}` : '');
-      // Pick DOM subtree for a slide from a deck.
       const pick = (deck, parts) => parts.map(p => deck.querySelector(`[data-slide-part="${p}"]`)).filter(Boolean);
       const slides = [];
-      decks.forEach(deck => {
-        const deckTitle = deck.getAttribute('data-deck') || '—';
+      // Cover deck: only overview part (doughnut + 4 KPI cards).
+      const coverDeck = root.querySelector('[data-deck-role="cover"]');
+      if (coverDeck) {
+        const overview = coverDeck.querySelector('[data-slide-part="overview"]');
+        if (overview) {
+          slides.push({ kind:'cover', title:'All Sheets · Overall', name:'Doughnut + KPI', html:overview.outerHTML });
+        }
+      }
+      // Per-sheet decks: divider + 5 content slides.
+      const sheetDecks = Array.from(root.querySelectorAll('[data-deck-role="sheet"]'));
+      sheetDecks.forEach(deck => {
+        const name = deck.getAttribute('data-deck') || '—';
+        slides.push({ kind:'divider', title:name, name:'Sheet' });
         const groups = [
-          { name:'Overview', parts:['overview', 'task-status'] },
+          { name:'Overview · Task Status', parts:['overview', 'task-status'] },
           { name:'Activity · Difficulty · Priority', parts:['activity-chart', 'diff-priority'] },
           { name:'Task List', parts:['task-list'] },
           { name:'Last Period', parts:['last-period'] },
@@ -1122,18 +1157,30 @@ window.TrackerModule = (function(){
         groups.forEach(g => {
           const nodes = pick(deck, g.parts);
           if (!nodes.length) return;
-          slides.push({ deckTitle, name:g.name, html:nodes.map(n => n.outerHTML).join('') });
+          slides.push({ kind:'content', title:name, name:g.name, html:nodes.map(n => n.outerHTML).join('') });
         });
       });
-      const slideHtml = slides.map((s, i) => (
-        `<section class="slide" data-idx="${i}">
+      if (!slides.length) return '';
+      const total = slides.length;
+      const slideHtml = slides.map((s, i) => {
+        if (s.kind === 'divider') {
+          return `<section class="slide slide-divider" data-idx="${i}">
+            <div class="divider-inner">
+              <div class="divider-eyebrow">Sheet</div>
+              <div class="divider-title">${escapeHtml(s.title)}</div>
+              <div class="divider-meta">${escapeHtml(metaLine)}</div>
+            </div>
+          </section>`;
+        }
+        const badge = s.kind === 'cover' ? 'Cover' : escapeHtml(s.name);
+        return `<section class="slide" data-idx="${i}">
           <div class="slide-head">
-            <div class="slide-title"><strong>${escapeHtml(s.deckTitle)}</strong> · ${escapeHtml(s.name)}</div>
-            <div class="slide-meta">${escapeHtml(metaLine)} · ${i + 1}/${slides.length}</div>
+            <div class="slide-title"><strong>${escapeHtml(s.title)}</strong> · ${badge}</div>
+            <div class="slide-meta">${escapeHtml(metaLine)} · ${i + 1}/${total}</div>
           </div>
           <div class="slide-body">${s.html}</div>
-        </section>`
-      )).join('');
+        </section>`;
+      }).join('');
       return `<!doctype html>
 <html><head><meta charset="utf-8"><title>Tracker Slideshow · ${escapeHtml(stamp)}</title>
 <style>
@@ -1149,6 +1196,11 @@ window.TrackerModule = (function(){
   .slide-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 6px; }
   .slide-body [data-noexport], .slide-body button { display: none !important; }
   .slide-body input, .slide-body select, .slide-body textarea { pointer-events: none; background: transparent !important; border: 0 !important; color: inherit !important; padding: 0 !important; -webkit-appearance: none; appearance: none; }
+  .slide-divider { align-items: center; justify-content: center; padding: 0; }
+  .divider-inner { text-align: center; padding: 40px; }
+  .divider-eyebrow { font-size: 14px; letter-spacing: 4px; text-transform: uppercase; color: var(--text-3); margin-bottom: 20px; }
+  .divider-title { font-size: 72px; font-weight: 800; color: var(--text-1); margin-bottom: 24px; line-height: 1.05; }
+  .divider-meta { font-size: 14px; color: var(--text-3); }
   .nav { position: fixed; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; z-index: 10; }
   .nav button { background: var(--sidebar-bg); color: var(--text-1); border: 1px solid var(--border-1); padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer; }
   .nav button:disabled { opacity: .4; cursor: not-allowed; }
@@ -1172,7 +1224,7 @@ window.TrackerModule = (function(){
 <div class="deck" id="deck">${slideHtml}</div>
 <div class="nav">
   <button id="prev" title="Previous (←)">◀</button>
-  <span class="counter" id="counter">1/${slides.length}</span>
+  <span class="counter" id="counter">1/${total}</span>
   <button id="next" title="Next (→ / Space)">▶</button>
   <button id="fs" title="Fullscreen (F)">⛶</button>
   <button id="printBtn" title="Print / Save as PDF">🖨</button>
@@ -1582,6 +1634,25 @@ window.TrackerModule = (function(){
     );
 
     return e('div', { style:{ display:'flex', minHeight:0, height:'100%' } },
+      // Hidden export decks — always rendered when Statistics tab is active so charts,
+      // tables, and SVGs are ready when user clicks Slideshow/PDF/HTML. Data is period-
+      // filtered but ignores the sheet picker (cover = all sheets combined).
+      tab === 'statistics' ? e('div', {
+        'data-export-decks':'1',
+        'aria-hidden':'true',
+        style:{ position:'fixed', left:-99999, top:0, width:1400, pointerEvents:'none', opacity:0 }
+      },
+        e('div', { 'data-deck-role':'cover', 'data-deck':'All Sheets · Overall' },
+          e(StatSection, { shell, card, title:'All Sheets', summary:exportSummary, countLabel:`${exportRows.length} rows`, rows:exportRows, allRows:rows, periodMode })
+        ),
+        ...exportSheetDecks.map(deck => e('div', {
+          key:`export-${deck.name}`,
+          'data-deck-role':'sheet',
+          'data-deck':deck.name
+        },
+          e(StatSection, { shell, card, title:deck.name, summary:deck.summary, countLabel:`${deck.rows.length} rows`, rows:deck.rows, allRows:deck.allRows, periodMode })
+        ))
+      ) : null,
       // Spec: hover / focus states for tracker rows and KPI cards
       e('style', null, `
         .tracker-row:hover { background: ${THEME.hoverBg} !important; }
