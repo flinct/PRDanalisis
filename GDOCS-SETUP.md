@@ -5,7 +5,7 @@ login** (akun Google kamu sendiri). Fitur:
 
 - **Baca** Google Docs di sidebar (section "Google Docs").
 - **Export** markdown apa pun → Google Doc baru (basic styled).
-- **Mirror otomatis**: setiap file `.md` di folder `PRD/` di-push jadi Google Doc, dan
+- **Mirror otomatis**: setiap file `.md` di folder `PRD/`, `BRD/`, dan `Assessments/` di-push jadi Google Doc, dan
   **otomatis update** tiap kamu simpan / generate file baru.
 
 Semua dokumen tersimpan di **Drive akun kamu** — tidak perlu share folder ke siapa pun.
@@ -80,8 +80,8 @@ npm start
 - **Baca:** sidebar section *Google Docs* → hanya menampilkan isi **folder aktif** (bukan semua file Drive).
 - **Pilih folder:** buka **⚙ Settings → Google Connection** → pilih folder Drive yang diinginkan lalu **Save folder**.
 - **Export sekali:** buka file `.md` → toolbar **⇪ Export to GDocs** → buat Doc baru di folder aktif.
-- **Mirror semua PRD:** Settings → **⇪ Mirror all PRD now**.
-- **Auto-update:** begitu server jalan + sudah login, tiap `.md` di `PRD/` yang berubah/baru
+- **Mirror semua dokumen:** Settings → **⇪ Mirror all docs now**.
+- **Auto-update:** begitu server jalan + sudah login, tiap `.md` di `PRD/`, `BRD/`, dan `Assessments/` yang berubah/baru
   otomatis di-push ke Doc-nya (file watcher, debounce ~1.2 dtk).
 - **Kalau status terlihat connected tapi mirror gagal bikin PRD baru:** klik **Reconnect with Google** agar token lama di-upgrade ke scope Google Docs + Google Drive.
 
@@ -101,7 +101,7 @@ npm start
 | `/api/google/login` | GET | Redirect ke Google consent |
 | `/oauth2callback` | GET | Tukar code → simpan token |
 | `/api/google/logout` | POST | Hapus token |
-| `/api/mirror` | POST | Mirror semua `PRD/*.md` → Docs |
+| `/api/mirror` | POST | Mirror semua `PRD/**/*.md`, `BRD/**/*.md`, `Assessments/**/*.md` → Docs |
 | `/api/gdocs` | GET | Tree dokumen dalam folder aktif |
 | `/api/gdocs/:id` | GET/PUT | Baca / update doc |
 | `/api/gdocs` | POST | Buat doc baru `{title, content}` |

@@ -860,7 +860,7 @@ app.get("/oauth2callback", async (req, res) => {
 
 app.post("/api/google/logout", (_req, res) => res.json(gauth.logout(BASE)));
 
-// Mirror: push local PRD .md → Google Docs (manual trigger)
+// Mirror: push local PRD/BRD/Assessment .md → Google Docs (manual trigger)
 app.post("/api/mirror", async (_req, res) => {
   try {
     const startedAt = Date.now();
@@ -1604,8 +1604,8 @@ function startWatcher() {
     }, 800); // wait 800ms after last write before importing
   }
 
-  // Auto-mirror PRD .md → Google Docs (only if logged in; skip quietly otherwise)
-  const PRD_DIR = path.join(BASE, mirror.SRC_DIR);
+  // Auto-mirror PRD/BRD/Assessment .md → Google Docs (only if logged in; skip quietly otherwise)
+  const MIRROR_DIRS = new Set(mirror.SRC_DIRS.map((d) => path.join(BASE, d)));
   const mirrorPend = new Map(); // relPath → timer
   function scheduleMirror(relPath) {
     if (mirrorPend.has(relPath)) clearTimeout(mirrorPend.get(relPath));
@@ -1641,9 +1641,8 @@ function startWatcher() {
       scheduleTreeBroadcast(); // refresh sidebar tree on any change
       if (/\.(tsv|md)$/i.test(filename))
         scheduleImport(path.join(dir, filename));
-      // mirror only markdown files living under the PRD source dir
-      if (dir === PRD_DIR && mirror.isMirrorable(filename))
-        scheduleMirror(String(filename).replace(/\\/g, "/"));
+      if (MIRROR_DIRS.has(dir) && mirror.isMirrorable(filename))
+        scheduleMirror(mirror.keyForWatchDir(BASE, dir, filename));
     });
   }
 

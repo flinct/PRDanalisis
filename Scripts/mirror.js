@@ -1,5 +1,5 @@
 'use strict';
-// ─── Mirror local PRD .md files → Google Docs ────────────────────────────────
+// ─── Mirror local docs .md files → Google Docs ───────────────────────────────
 // One-way push. Maintains a map (relPath → docId + content hash) so unchanged
 // files are skipped and edits overwrite the same Doc. Folder structure under the
 // source dir is recreated in Drive under a single root folder.
@@ -10,6 +10,11 @@ const crypto = require('crypto');
 const gdocs  = require('./gdocs');
 
 const SRC_DIR = process.env.MIRROR_SRC_DIR || 'PRD';
+const EXTRA_SRC_DIRS = (process.env.MIRROR_EXTRA_SRC_DIRS || 'BRD,Assessments')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+const SRC_DIRS = [SRC_DIR, ...EXTRA_SRC_DIRS];
 
 function mapPath(BASE) { return path.join(BASE, '.gdocs-mirror.json'); }
 function emptyMap() { return { rootFolderId: null, rootFolderName: null, rootFolderPath: null, folders: {}, docs: {} }; }
@@ -43,19 +48,39 @@ function isNotFound(e) {
   return code === 404 || /File not found|not ?found/i.test((e && e.message) || '');
 }
 
-// All .md files under <BASE>/<SRC_DIR>, as '/'-separated paths relative to SRC_DIR.
+function mirrorKey(srcDir, relPath) {
+  const src = String(srcDir || '').replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+  const rel = String(relPath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  return src === SRC_DIR ? rel : `${src}/${rel}`;
+}
+
+function resolveMirrorKey(BASE, key) {
+  key = String(key || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  for (const src of SRC_DIRS) {
+    const prefix = `${src}/`;
+    const rel = key.startsWith(prefix) ? key.slice(prefix.length) : (src === SRC_DIR ? key : null);
+    if (!rel) continue;
+    const abs = path.join(BASE, src, rel.split('/').join(path.sep));
+    if (fs.existsSync(abs)) return { key: mirrorKey(src, rel), abs };
+  }
+  return { key, abs: path.join(BASE, SRC_DIR, key.split('/').join(path.sep)) };
+}
+
+// All .md files under mirror roots. PRD keeps legacy keys; BRD/Assessments are prefixed.
 function listMd(BASE) {
-  const root = path.join(BASE, SRC_DIR);
   const out = [];
-  (function walk(dir, rel) {
-    let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
-    for (const e of ents) {
-      if (e.name.startsWith('.')) continue;
-      const r = rel ? rel + '/' + e.name : e.name;
-      if (e.isDirectory()) walk(path.join(dir, e.name), r);
-      else if (/\.md$/i.test(e.name)) out.push(r);
-    }
-  })(root, '');
+  for (const src of SRC_DIRS) {
+    const root = path.join(BASE, src);
+    (function walk(dir, rel) {
+      let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+      for (const e of ents) {
+        if (e.name.startsWith('.')) continue;
+        const r = rel ? rel + '/' + e.name : e.name;
+        if (e.isDirectory()) walk(path.join(dir, e.name), r);
+        else if (/\.md$/i.test(e.name)) out.push(mirrorKey(src, r));
+      }
+    })(root, '');
+  }
   return out;
 }
 
@@ -111,10 +136,11 @@ function enqueue(fn) {
   return run;
 }
 
-// Mirror a single file (relPath relative to SRC_DIR, '/'-separated).
+// Mirror a single file. PRD accepts legacy relPath; BRD/Assessments use prefixed keys.
 async function _mirrorFileInner(BASE, relPath, _healed = false) {
-  relPath = String(relPath).replace(/\\/g, '/').replace(/^\/+/, '');
-  const abs = path.join(BASE, SRC_DIR, relPath.split('/').join(path.sep));
+  const resolved = resolveMirrorKey(BASE, relPath);
+  relPath = resolved.key;
+  const abs = resolved.abs;
   if (!fs.existsSync(abs)) return { relPath, skipped: 'missing' };
 
   const content = fs.readFileSync(abs, 'utf8');
@@ -209,7 +235,21 @@ async function _mirrorAllInner(BASE, opts = {}) {
 function mirrorFile(BASE, relPath) { return enqueue(() => _mirrorFileInner(BASE, relPath)); }
 function mirrorAll(BASE, opts)     { return enqueue(() => _mirrorAllInner(BASE, opts)); }
 
-// True if a watcher path (relative to the PRD watch dir) is a markdown file we mirror.
+// True if a watcher path is a markdown file we mirror.
 function isMirrorable(filename) { return /\.md$/i.test(filename || ''); }
 
-module.exports = { mirrorAll, mirrorFile, listMd, isMirrorable, SRC_DIR, mapPath };
+function keyForWatchDir(BASE, dir, filename) {
+  const src = path.relative(BASE, dir).replace(/\\/g, '/');
+  return mirrorKey(src, filename);
+}
+
+module.exports = { mirrorAll, mirrorFile, listMd, isMirrorable, keyForWatchDir, SRC_DIR, SRC_DIRS, mapPath };
+
+if (require.main === module) {
+  const assert = require('assert');
+  assert.strictEqual(mirrorKey('PRD', 'Conversation/a.md'), 'Conversation/a.md');
+  assert.strictEqual(mirrorKey('BRD', 'x.md'), 'BRD/x.md');
+  assert.strictEqual(mirrorKey('Assessments', 'a/b.md'), 'Assessments/a/b.md');
+  assert.deepStrictEqual(SRC_DIRS, ['PRD', 'BRD', 'Assessments']);
+  console.log('mirror self-check OK');
+}

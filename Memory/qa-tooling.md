@@ -54,7 +54,7 @@ Single-file browser tool (2195 lines React 18 + Babel standalone) untuk QA SatuI
 | **Resizable Sidebar** | ✅ | Drag handle, min 160px max 480px |
 | **Sticky Folder Selectors** | ✅ | Saat satu section dibuka, header section aktif pin di atas, file list scroll di tengah, header section lain (non-aktif) sticky di bawah sidebar untuk switch folder cepat. Tanpa section aktif → semua header stack normal. (App sidebar render, ~line 2119) |
 | **Google Docs Integration** | ✅ | **OAuth login** (akun user, bukan service account). Sidebar section "Google Docs ☁" baca **folder aktif saja** (bukan seluruh Drive). Backend validasi scope Docs+Drive; token lama akan ditandai **needs reconnect** bila belum punya izin lengkap. Tombol "⇪ Export to GDocs" di MarkdownViewer → buat Doc baru di folder aktif. Backend: `scripts/google-auth.js` (OAuth2 + scope check) + `scripts/gdocs.js` + endpoint `/api/google/*`, `/api/gdocs*`. Setup di `GDOCS-SETUP.md`. |
-| **PRD Mirror → Google Docs** | ✅ | One-way: semua `PRD/*.md` di-push jadi Google Doc (basic styled: heading/bold/bullet/link). Auto-update via file watcher saat .md berubah/baru (debounce 1.2s). Mirror sekarang fail-fast bila token belum punya scope Docs/Drive, jadi user tidak lagi terlihat "connected" palsu saat PRD baru gagal dibuat. Engine: `scripts/mirror.js`, peta path→docId + folder pilihan di `.gdocs-mirror.json`. |
+| **Docs Mirror → Google Docs** | ✅ | One-way: semua `PRD/**/*.md`, `BRD/**/*.md`, dan `Assessments/**/*.md` di-push jadi Google Doc (basic styled: heading/bold/bullet/link). Auto-update via file watcher saat .md berubah/baru (debounce 1.2s). Mirror sekarang fail-fast bila token belum punya scope Docs/Drive, jadi user tidak lagi terlihat "connected" palsu saat dokumen baru gagal dibuat. Engine: `scripts/mirror.js`, peta path→docId + folder pilihan di `.gdocs-mirror.json`. |
 | **Settings Page (⚙)** | ✅ | Top-bar gear → `view==='settings'`. 5 section. Google Connection sekarang punya login/logout, status akun, **folder picker Google Drive**, reconnect warning bila token scope kurang, dan tombol mirror-all. Import & Theme tetap di sini. |
 | **+ New folder / + New TSV** | ✅ | Tombol "+" di header section & row folder → `NewItemForm` (nama + Folder/TSV). Folder via `POST /api/files/mkdir`; TSV via PUT `/api/files/content` dengan template `serializeCardToTSV([EMPTY_TC])`. Server-mode (bukan File System Access lama yang sudah deprecated). |
 | **Live sidebar (SSE)** | ✅ | `GET /api/files/events` (SSE) di-broadcast saat watcher mendeteksi perubahan file/folder. Frontend EventSource → `refreshTree()` (hanya `setSections`, tidak menyentuh selection/file terbuka → tanpa reload halaman). |
@@ -169,7 +169,7 @@ Node.js Express server (369 lines) sebagai backend QA Browser.
 | `/api/google/login` | GET | Redirect ke Google consent |
 | `/oauth2callback` | GET | Tukar code → simpan `google-token.json` |
 | `/api/google/logout` | POST | Hapus token |
-| `/api/mirror` | POST | Mirror semua `PRD/*.md` → Docs |
+| `/api/mirror` | POST | Mirror semua `PRD/**/*.md`, `BRD/**/*.md`, `Assessments/**/*.md` → Docs |
 | `/api/automation/config` | GET/PUT | Baca/set `AUTOMATION_ROOT` (path repo sixV2Automation, disimpan di `automation-config.json`) |
 | `/api/automation/automap` | POST | Auto-map `{case_ids}` dari manifest `*-automation-map.generated.json` (test_id → spec bucket + scenario) |
 | `/api/gdocs` | GET/POST | Tree dokumen / create doc `{title, content}` |

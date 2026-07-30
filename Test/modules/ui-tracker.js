@@ -95,16 +95,9 @@ window.TrackerModule = (function(){
     });
   }
 
-  // Bucket rule: date → which weeks (last / now) a task appears in.
-  // Base: `date` (tanggal mulai) locates the task in its start week.
-  //   date ∈ minggu ini → this week
-  //   date ∈ minggu lalu → last week (+ carry to this week if still ongoing)
-  //   date ∈ minggu2 lalu (atau lebih) → hidden by date alone
-  // Overrides via `week` select:
-  //   week='last' → force include in last week (e.g. task lama masih on-going)
-  //   week='now'  → force include in this week (e.g. carry-over yang date-nya jauh)
-  // Ongoing = status yang belum selesai/hold. Complete/on-hold gak auto-carry.
-  const ONGOING_STATUSES = new Set(['in progress', 'developed', 'tested', 'waiting']);
+  // ── Period visibility & status (date-based, spec v2) ────────────
+  // periodRange (above) kept for label formatting exclusively.
+  // getPeriod, isPeriodOverlap, isOverride, periodStatus added below parseDateMs.
 
   // Returns [startMs, endMs) for the given offset.
   // mode='week' = current calendar week (Monday..next Monday) at offset*7 days.
@@ -144,40 +137,61 @@ window.TrackerModule = (function(){
     return new Date(y, m - 1, d).getTime();
   }
 
-  // Returns { last:boolean, now:boolean } — which tables the row belongs to.
-  // mode: 'week' | 'month'. Uses date start & date end to determine interval
-  // overlap: task appears in a period if [startDate, endDate] intersects
-  // the period's range. Ongoing tasks with no endDate span indefinitely.
-  // Complete/tested tasks with no endDate fall back to single-date rule.
-  // Override column `week` ('last'/'now') works as before.
-  function periodBuckets(row, mode = 'week', ref = new Date()) {
-    const [lastStart, lastEnd] = periodRange(-1, mode, ref);
-    const [nowStart, nowEnd]   = periodRange(0, mode, ref);
-    const startMs = parseDateMs(row?.startDate || row?.date);
-    const endMs   = row?.endDate ? parseDateMs(row?.endDate) : NaN;
-    const status = String(row?.status || '').toLowerCase();
-    const ongoing = ONGOING_STATUSES.has(status);
-    const override = normalizeWeek(row?.week);
-    let last = false;
-    let now  = false;
-    // ponytail: only `now` override forces bucket; `last` follows date rule.
-    if (override === 'now') { now = true; }
-    if (Number.isFinite(startMs)) {
-      if (periodOverlaps(startMs, endMs, ongoing, lastStart, lastEnd)) last = true;
-      if (periodOverlaps(startMs, endMs, ongoing, nowStart, nowEnd))   now  = true;
-    }
-    return { last, now };
+  // ── Period helpers (date-based, spec v2) ────────────────────────
+
+  // Convert half-open periodRange to closed { start, end } (ms).
+  function getPeriod(offset, mode, ref) {
+    const [s, endEx] = periodRange(offset, mode, ref);
+    return { start: s, end: endEx - 86400000 }; // closed interval
   }
 
-  // Does interval [startMs, endMs) overlap [pStart, pEnd)?
-  // endMs = NaN + ongoing → unbounded (overlaps any future period).
-  // endMs = NaN + complete/tested → use single-date check (backward compat
-  // for old data that has no endDate column).
-  function periodOverlaps(startMs, endMs, ongoing, pStart, pEnd) {
-    if (startMs >= pEnd) return false;               // starts after period
-    if (Number.isFinite(endMs)) return endMs + 86400000 > pStart; // endDate inclusive
-    if (ongoing) return true;                         // no end = still active
-    return startMs >= pStart;                         // single-date fallback
+  // Does [dateStart, dateEnd] overlap { start, end }?
+  // dateEnd == null/NaN means unbounded.
+  // dateStart == null/NaN → no overlap (hide).
+  function isPeriodOverlap(row, period) {
+    const startMs = parseDateMs(row?.startDate || row?.date);
+    if (!Number.isFinite(startMs)) return false;
+    if (startMs > period.end) return false;
+    const endMs = row?.endDate ? parseDateMs(row?.endDate) : NaN;
+    if (Number.isFinite(endMs)) return endMs >= period.start;
+    return true; // no endDate = ongoing → overlaps any future period
+  }
+
+  // Override: week column forces bucket, independent of dates.
+  // isOverride(row, 'last') → force last, isOverride(row, 'now') → force now.
+  function isOverride(row, bucketType) {
+    const w = normalizeWeek(row?.week);
+    if (!w) return false;
+    if (w === 'now')  return bucketType === 'now';
+    if (w === 'last') return bucketType === 'last';
+    return false;
+  }
+
+  // Returns { last, now } — which buckets the row belongs to.
+  function periodBuckets(row, mode = 'week', ref = new Date()) {
+    const lastPeriod = getPeriod(-1, mode, ref);
+    const nowPeriod  = getPeriod(0, mode, ref);
+    return {
+      last: isPeriodOverlap(row, lastPeriod) || isOverride(row, 'last'),
+      now:  isPeriodOverlap(row, nowPeriod)  || isOverride(row, 'now'),
+    };
+  }
+
+  // Period-scoped status: computed from startDate/endDate only.
+  // Override never affects status.
+  // Returns 'not started' | 'in progress' | 'complete'.
+  // Fallback to row.status when date data is insufficient.
+  function periodStatus(row, period) {
+    const startMs = parseDateMs(row?.startDate || row?.date);
+    if (!Number.isFinite(startMs)) {
+      // no date data at all → fallback to spreadsheet status
+      return row?.status || 'new';
+    }
+    if (startMs > period.end) return 'not started';
+    const endMs = row?.endDate ? parseDateMs(row?.endDate) : NaN;
+    if (Number.isFinite(endMs) && endMs <= period.end) return 'complete';
+    // endMs > period.end or no endMs → ongoing during this period
+    return 'in progress';
   }
 
   // Filter rows to those in the selected period bucket.
@@ -343,8 +357,11 @@ window.TrackerModule = (function(){
     return Array.from(seen.keys());
   }
 
-  function summarizeRows(rows) {
-    const statuses = collectDistinct(rows, 'status', STATUS_DEFAULTS);
+  function summarizeRows(rows, getStatus) {
+    const rawStatuses = getStatus ? rows.map(getStatus) : null;
+    const statuses = rawStatuses
+      ? [...new Set([...STATUS_DEFAULTS, ...rawStatuses.filter(Boolean)])]
+      : collectDistinct(rows, 'status', STATUS_DEFAULTS);
     const difficulties = collectDistinct(rows, 'difficulty', DIFFICULTY_DEFAULTS);
     const priorities = collectDistinct(rows, 'priority', PRIORITY_DEFAULTS);
     const activities = collectDistinct(rows, 'activity', []);
@@ -371,7 +388,8 @@ window.TrackerModule = (function(){
     const usedDifficulties = new Set();
     rows.forEach(row => {
       sum += getEffectiveProgress(row, rows);
-      if (row.status) next.statuses[row.status] = (next.statuses[row.status] || 0) + 1;
+      const s = getStatus ? getStatus(row) : row.status;
+      if (s) next.statuses[s] = (next.statuses[s] || 0) + 1;
       if (row.version) versions.add(row.version);
       if (row.difficulty) { usedDifficulties.add(row.difficulty); next.difficulties[row.difficulty] = (next.difficulties[row.difficulty] || 0) + 1; }
       else next.difficulties.unset += 1;
@@ -387,14 +405,14 @@ window.TrackerModule = (function(){
     return next;
   }
 
-  function groupByOwner(rows) {
+  function groupByOwner(rows, getStatus) {
     const map = new Map();
     rows.forEach(row => {
       const key = row.owner || 'Unassigned';
       if (!map.has(key)) map.set(key, []);
       map.get(key).push(row);
     });
-    return Array.from(map.entries()).map(([owner, items]) => ({ owner, rows:items, summary:summarizeRows(items) }));
+    return Array.from(map.entries()).map(([owner, items]) => ({ owner, rows:items, summary:summarizeRows(items, getStatus) }));
   }
 
   function moveRow(rows, fromId, toId) {
@@ -449,7 +467,7 @@ window.TrackerModule = (function(){
     console.assert(b2b.now, 'periodBuckets week: long span end in this week');
     // start last week, complete without endDate → single-date fallback: last only.
     const b3a = periodBuckets({ date: iso(2026,7,22), status:'complete' }, 'week', ref);
-    console.assert(b3a.last && !b3a.now, 'periodBuckets week: no endDate complete last-week');
+    if (!(b3a.last && b3a.now)) throw new Error('periodBuckets week: no endDate date-only rows stay visible last+now');
     // start this week, ongoing, no endDate → this only.
     const b3b = periodBuckets({ startDate: iso(2026,7,28), status:'in progress' }, 'week', ref);
     console.assert(b3b.now && !b3b.last, 'periodBuckets week: ongoing no end this-week');
@@ -470,7 +488,7 @@ window.TrackerModule = (function(){
     console.assert(b5.now, 'periodBuckets week: override now');
     // week='last' is NOT an override — follows date rule. Out-of-range date → hidden.
     const bLastOverride = periodBuckets({ startDate: iso(2026,6,15), endDate: iso(2026,6,26), status:'complete', week:'last' }, 'week', ref);
-    console.assert(!bLastOverride.last && !bLastOverride.now, 'periodBuckets week: last override no longer forces bucket');
+    if (!(bLastOverride.last && !bLastOverride.now)) throw new Error('periodBuckets week: last override forces last bucket');
     // Override on complete + out-of-range start → override wins (complete + week=now → now).
     const bStale = periodBuckets({ startDate: iso(2026,5,18), status:'complete', week:'now' }, 'week', ref);
     console.assert(bStale.now, 'periodBuckets week: stale override complete still shows in now');
@@ -514,7 +532,7 @@ window.TrackerModule = (function(){
     ]);
     const wkX = filterRowsByPeriod(boundaryRows, 'week', 'now', ref).length;
     const mnX = filterRowsByPeriod(boundaryRows, 'month', 'now', ref).length;
-    console.assert(wkX !== mnX, `week and month must differ for Jul13-Jul18 row: wk=${wkX} mn=${mnX}`);
+    if (wkX !== 0 || mnX !== 1) throw new Error(`week/month now buckets wrong for Jul13-Jul18 row: wk=${wkX} mn=${mnX}`);
   }
   selfCheck();
 
@@ -681,9 +699,8 @@ window.TrackerModule = (function(){
 
   function StatusBarChart({ summary }) {
     const s = summary.statuses || {};
-    // Fixed spec order; drop zero-value slots so chart doesn't render dead columns
-    // when a status has no rows. ponytail: keeps chart honest, order preserved.
-    const rows = STATUS_ORDER
+    const order = summary.statusKeys || STATUS_ORDER;
+    const rows = order
       .map(key => ({ key, label:titleCase(key), value:s[key] || 0, color:STATUS_BAR_COLOR[key] || THEME.info }))
       .filter(r => r.value > 0);
     const max = Math.max(3, ...rows.map(row => row.value));
@@ -780,7 +797,7 @@ window.TrackerModule = (function(){
     );
   }
 
-  function PeriodSplitTable({ allRows, sectioned, mode }) {
+  function PeriodSplitTable({ allRows, sectioned, mode, periods }) {
     const coreById = React.useMemo(() => new Map(allRows.filter(row => row.type === 'core').map(row => [row.id, row])), [allRows]);
     const labels = mode === 'month'
       ? { last:'Last Month', now:'This Month', unitPrev:'vs Previous Month' }
@@ -809,7 +826,9 @@ window.TrackerModule = (function(){
     return e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0, 1fr)', gap:16, marginTop:16 } },
       ...['last', 'now'].map(bucket => {
         const items = orderTreeRows(filterRowsByPeriod(allRows, mode, bucket));
-        const weekSummary = summarizeRows(items);
+        const period = bucket === 'last' ? periods?.lastPeriod : periods?.nowPeriod;
+        const bucketGetStatus = period ? row => periodStatus(row, period) : undefined;
+        const weekSummary = summarizeRows(items, bucketGetStatus);
         const title = labels[bucket];
         const thisRange = bucketRangeLabel(bucket, mode);
         // ponytail: "vs previous" only shown for the current-week header per spec.
@@ -841,7 +860,8 @@ window.TrackerModule = (function(){
                   const parent = isChild ? coreById.get(row.parentTaskId) : null;
                   const alt = i % 2 === 1 ? THEME.bgSecondary : 'transparent';
                   const bg = isChild ? alt : 'rgba(59,130,246,0.06)'; // parent subtle tint
-                  const barColor = STATUS_COLOR[String(row.status || '').toLowerCase()] || THEME.info;
+                  const rowStatus = bucketGetStatus ? bucketGetStatus(row) : row.status;
+                  const barColor = STATUS_COLOR[String(rowStatus || '').toLowerCase()] || THEME.info;
                   return e('tr', {
                     key:row.id,
                     className:'tracker-row',
@@ -852,7 +872,7 @@ window.TrackerModule = (function(){
                       row.task || '—'
                     ),
                     e('td', { style:{ ...tdStyle, color:THEME.textSecondary, fontSize:12 } }, isChild ? (parent ? parent.task : '—') : '—'),
-                    e('td', { style:tdStyle }, row.task === '—' ? '—' : e(StatusDot, { status:row.status })),
+                    e('td', { style:tdStyle }, row.task === '—' ? '—' : e(StatusDot, { status: rowStatus })),
                     e('td', { style:tdStyle }, row.task === '—' ? '—' : e(PriorityText, { priority:row.priority })),
                     e('td', { style:tdStyle }, row.task === '—' ? '—' : e(ProgressCell, { value:getEffectiveProgress(row, allRows), barColor }))
                   );
@@ -865,7 +885,7 @@ window.TrackerModule = (function(){
     );
   }
 
-  function TaskListTree({ rows }) {
+  function TaskListTree({ rows, getStatus }) {
     const [collapsed, setCollapsed] = React.useState(() => new Set());
     const toggle = id => setCollapsed(prev => {
       const next = new Set(prev);
@@ -883,7 +903,8 @@ window.TrackerModule = (function(){
       const bg = isChild ? alt : 'rgba(59,130,246,0.06)';
       const clickable = !isChild && children.length;
       const marker = isChild ? '↳ ' : (children.length ? (isOpen ? '▼ ' : '▶ ') : '');
-      const barColor = STATUS_COLOR[String(row.status || '').toLowerCase()] || THEME.info;
+      const statusVal = getStatus ? getStatus(row) : row.status;
+      const barColor = STATUS_COLOR[String(statusVal || '').toLowerCase()] || THEME.info;
       return e(React.Fragment, { key:row.id },
         e('tr', {
           className:'tracker-row',
@@ -895,7 +916,7 @@ window.TrackerModule = (function(){
             row.task || '—'
           ),
           e('td', { style:{ ...tdBase, minWidth:200, color:THEME.textSecondary, fontSize:12 } }, row.description || '—'),
-          e('td', { style:{ ...tdBase, width:140 } }, e(StatusDot, { status:row.status })),
+          e('td', { style:{ ...tdBase, width:140 } }, e(StatusDot, { status: statusVal })),
           e('td', { style:{ ...tdBase, width:110, color:THEME.textSecondary, textTransform:'capitalize' } }, row.difficulty || '—'),
           e('td', { style:{ ...tdBase, width:110 } }, e(PriorityText, { priority:row.priority })),
           e('td', { style:{ ...tdBase, width:130 } }, e(ProgressCell, { value:getEffectiveProgress(row, rows), barColor }))
@@ -914,7 +935,7 @@ window.TrackerModule = (function(){
     );
   }
 
-  function StatSection({ shell, card, title, summary, countLabel, rows, allRows, sectioned, periodMode }) {
+  function StatSection({ shell, card, title, summary, chartSummary, countLabel, rows, allRows, sectioned, periodMode, periods, getStatus, chartGetStatus }) {
     const sectionShell = { ...shell, background:THEME.bgSecondary, padding:16, border:`1px solid ${THEME.border}` };
     const overviewProps = { 'data-slide-part':'overview', style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 2fr)', gap:16, alignItems:'stretch' } };
     const activityProps = { 'data-slide-part':'activity-chart', style:{ ...shell, padding:16, marginTop:16 } };
@@ -927,6 +948,7 @@ window.TrackerModule = (function(){
       activityProps['data-stat-section'] = 'activity';
       taskListProps['data-stat-section'] = 'tasks';
     }
+    const activeSummary = chartSummary || summary;
     return e('div', { style:sectionShell, 'data-deck':title },
       e('div', { style:{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', marginBottom:12, flexWrap:'wrap' } },
         e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
@@ -938,34 +960,34 @@ window.TrackerModule = (function(){
       e('div', overviewProps,
         e('div', { style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, display:'grid', alignContent:'center', minHeight:300 } },
           e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Overall Project'),
-          e(DoughnutChart, { percent:summary.overall })
+          e(DoughnutChart, { percent:activeSummary.overall })
         ),
         e('div', null,
-          e(ProgressCardGrid, { summary, pick:['Total', 'Core / Milestone', 'Complete', 'In Progress'], cols:2 })
+          e(ProgressCardGrid, { summary:activeSummary, pick:['Total', 'Core / Milestone', 'Complete', 'In Progress'], cols:2 })
         )
       ),
       e('div', { className:'tracker-chart-card', 'data-slide-part':'task-status', style:{ ...shell, padding:16, marginTop:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
         e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
           e('div', { style:{ fontSize:14, fontWeight:600, color:THEME.textPrimary } }, 'Task Status'),
-          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${summary.total} Tasks`)
+          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${activeSummary.total} Tasks`)
         ),
-        e(StatusBarChart, { summary })
+        e(StatusBarChart, { summary:activeSummary })
       ),
-      (summary.activityKeys && summary.activityKeys.length) ? e('div', { ...activityProps, className:'tracker-chart-card', style:{ ...activityProps.style, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
+      (activeSummary.activityKeys && activeSummary.activityKeys.length) ? e('div', { ...activityProps, className:'tracker-chart-card', style:{ ...activityProps.style, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
         e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
           e('div', { style:{ fontSize:14, fontWeight:600, color:THEME.textPrimary } }, 'Activity'),
-          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${summary.total} Tasks`)
+          e('div', { style:{ fontSize:12, fontWeight:600, color:THEME.textSecondary } }, `${activeSummary.total} Tasks`)
         ),
-        e(ActivityBarChart, { summary })
+        e(ActivityBarChart, { summary:activeSummary })
       ) : null,
       e('div', chartsProps,
         e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
           e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Difficulty'),
-          e(DifficultyBarChart, { summary })
+          e(DifficultyBarChart, { summary:activeSummary })
         ),
         e('div', { className:'tracker-chart-card', style:{ ...shell, padding:16, background:THEME.cardBg, border:`1px solid ${THEME.border}`, transition:'border-color .15s, box-shadow .15s' } },
           e('div', { style:{ textAlign:'center', fontSize:14, fontWeight:600, color:THEME.textSecondary, marginBottom:12 } }, 'Priority'),
-          e(PriorityBarChart, { summary })
+          e(PriorityBarChart, { summary:activeSummary })
         )
       ),
       e('div', taskListProps,
@@ -977,10 +999,10 @@ window.TrackerModule = (function(){
           e(ProgressCardGrid, { summary })
         ),
         e('div', { style:{ maxHeight:'80vh', overflow:'auto' } },
-          e(TaskListTree, { rows })
+          e(TaskListTree, { rows, getStatus })
         )
       ),
-      e(PeriodSplitTable, { allRows:allRows || rows, sectioned, mode:periodMode })
+      e(PeriodSplitTable, { allRows:allRows || rows, sectioned, mode:periodMode, periods })
     );
   }
 
@@ -1091,33 +1113,6 @@ window.TrackerModule = (function(){
       };
       animRef.current = requestAnimationFrame(step);
     }, []);
-    // Period-filtered rows for export — independent of sheet picker (spec: cover uses
-    // all sheets combined, per-sheet decks derived from same period-filtered universe).
-    const exportRows = React.useMemo(() => filterRowsByPeriod(rows, periodMode, 'now'), [rows, periodMode]);
-    const exportSummary = React.useMemo(() => summarizeRows(exportRows), [exportRows]);
-    // Group by sheet (Dany, Naftal, Agung, ...) — ordered by sheetTabs when available so
-    // export order matches the sidebar selector; falls back to first-seen order.
-    const exportSheetDecks = React.useMemo(() => {
-      const byName = new Map();
-      exportRows.forEach(r => {
-        const key = String(r.sourceSheet || '').trim() || 'Unassigned';
-        if (!byName.has(key)) byName.set(key, []);
-        byName.get(key).push(r);
-      });
-      const ordered = [];
-      const seen = new Set();
-      (sheetTabs || []).forEach(name => {
-        if (byName.has(name)) { ordered.push(name); seen.add(name); }
-      });
-      byName.forEach((_, name) => { if (!seen.has(name)) ordered.push(name); });
-      return ordered.map(name => ({
-        name,
-        rows: byName.get(name),
-        summary: summarizeRows(byName.get(name)),
-        allRows: rows.filter(r => (String(r.sourceSheet || '').trim() || 'Unassigned') === name),
-      }));
-    }, [exportRows, rows, sheetTabsKey]);
-
     // ponytail: builds standalone slideshow doc from hidden export decks. Data flow:
     //   Cover: doughnut + 4 KPI from all-sheet aggregate (period-filtered).
     //   Then per sheet (Dany/Naftal/Agung/...): divider slide + 5 content slides.
@@ -1424,10 +1419,53 @@ window.TrackerModule = (function(){
     // Period filter: keep rows relevant to current period (this + last = "berjalan hingga 1 sebelum").
     // Milestone: passes periodBuckets. Core: itself passes OR any child milestone passes (keep parent context).
     // ponytail: O(n) per row on core lookup via .some — fine at tracker scale (<1k rows).
-    const periodStatRows = React.useMemo(() => filterRowsByPeriod(statRows, periodMode, 'now'), [statRows, periodMode]);
-    const visibleOwnerGroups = React.useMemo(() => groupByOwner(periodStatRows), [periodStatRows]);
+    const periodStatRows = React.useMemo(() => filterRowsByPeriod(statRows, periodMode, 'both'), [statRows, periodMode]);
+    const periods = React.useMemo(() => {
+      const ref = new Date();
+      return {
+        nowPeriod: getPeriod(0, periodMode, ref),
+        lastPeriod: getPeriod(-1, periodMode, ref),
+      };
+    }, [periodMode]);
+    const nowGetStatus = React.useMemo(() => row => periodStatus(row, periods.nowPeriod), [periods]);
+    // Chart/KPI: exclude 'not started' but preserve raw status labels
+    const chartGetStatus = React.useMemo(() => row => {
+      const s = periodStatus(row, periods.nowPeriod);
+      return s === 'not started' ? null : (row.status || null);
+    }, [periods]);
+    const visibleOwnerGroups = React.useMemo(() => groupByOwner(periodStatRows, nowGetStatus), [periodStatRows, nowGetStatus]);
     const visibleGroup = React.useMemo(() => visibleOwnerGroups.find(group => group.owner === selectedOwner) || null, [visibleOwnerGroups, selectedOwner]);
     const overallSummary = React.useMemo(() => summarizeRows(periodStatRows), [periodStatRows]);
+    const chartSummary = React.useMemo(() => summarizeRows(periodStatRows, chartGetStatus), [periodStatRows, chartGetStatus]);
+    const visibleChartSummary = React.useMemo(() => visibleGroup ? summarizeRows(visibleGroup.rows, chartGetStatus) : null, [visibleGroup, chartGetStatus]);
+    // Period-filtered rows for export — independent of sheet picker (spec: cover uses
+    // all sheets combined, per-sheet decks derived from same period-filtered universe).
+    const exportRows = React.useMemo(() => filterRowsByPeriod(rows, periodMode, 'both'), [rows, periodMode]);
+    const exportSummary = React.useMemo(() => summarizeRows(exportRows), [exportRows]);
+    const exportChartSummary = React.useMemo(() => summarizeRows(exportRows, chartGetStatus), [exportRows, chartGetStatus]);
+    // Group by sheet (Dany, Naftal, Agung, ...) — ordered by sheetTabs when available so
+    // export order matches the sidebar selector; falls back to first-seen order.
+    const exportSheetDecks = React.useMemo(() => {
+      const byName = new Map();
+      exportRows.forEach(r => {
+        const key = String(r.sourceSheet || '').trim() || 'Unassigned';
+        if (!byName.has(key)) byName.set(key, []);
+        byName.get(key).push(r);
+      });
+      const ordered = [];
+      const seen = new Set();
+      sheetTabs.forEach(name => {
+        if (byName.has(name)) { ordered.push(name); seen.add(name); }
+      });
+      byName.forEach((_, name) => { if (!seen.has(name)) ordered.push(name); });
+      return ordered.map(name => ({
+        name,
+        rows: byName.get(name),
+        summary: summarizeRows(byName.get(name)),
+        chartSummary: summarizeRows(byName.get(name), chartGetStatus),
+        allRows: rows.filter(r => (String(r.sourceSheet || '').trim() || 'Unassigned') === name),
+      }));
+    }, [exportRows, rows, sheetTabsKey, chartGetStatus]);
 
     React.useEffect(() => {
       if (selectedSheet === 'all') return;
@@ -1643,14 +1681,14 @@ window.TrackerModule = (function(){
         style:{ position:'fixed', left:-99999, top:0, width:1400, pointerEvents:'none', opacity:0 }
       },
         e('div', { 'data-deck-role':'cover', 'data-deck':'All Sheets · Overall' },
-          e(StatSection, { shell, card, title:'All Sheets', summary:exportSummary, countLabel:`${exportRows.length} rows`, rows:exportRows, allRows:rows, periodMode })
+          e(StatSection, { shell, card, title:'All Sheets', summary:exportSummary, chartSummary:exportChartSummary, countLabel:`${exportRows.length} rows`, rows:exportRows, allRows:rows, periodMode, periods, getStatus:nowGetStatus })
         ),
         ...exportSheetDecks.map(deck => e('div', {
           key:`export-${deck.name}`,
           'data-deck-role':'sheet',
           'data-deck':deck.name
         },
-          e(StatSection, { shell, card, title:deck.name, summary:deck.summary, countLabel:`${deck.rows.length} rows`, rows:deck.rows, allRows:deck.allRows, periodMode })
+          e(StatSection, { shell, card, title:deck.name, summary:deck.summary, chartSummary:deck.chartSummary, countLabel:`${deck.rows.length} rows`, rows:deck.rows, allRows:deck.allRows, periodMode, periods, getStatus:nowGetStatus })
         ))
       ) : null,
       // Spec: hover / focus states for tracker rows and KPI cards
@@ -1693,7 +1731,7 @@ window.TrackerModule = (function(){
         tab === 'statistics'
           ? e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0,1fr)', gap:18, alignItems:'start' } },
               e('div', { style:{ display:'grid', gap:18, minWidth:0 } },
-                e(StatSection, { shell, card, title:selectedSheet === 'all' ? 'All Sheets' : selectedSheet, summary:overallSummary, countLabel:`${periodStatRows.length} rows · ${periodMode === 'month' ? 'past 4 weeks' : 'this week'}`, rows:periodStatRows, allRows:statRows, sectioned:true, periodMode }),
+                e(StatSection, { shell, card, title:selectedSheet === 'all' ? 'All Sheets' : selectedSheet, summary:overallSummary, chartSummary, countLabel:`${periodStatRows.length} rows · ${periodMode === 'month' ? 'past 4 weeks' : 'this week'}`, rows:periodStatRows, allRows:statRows, sectioned:true, periodMode, periods, getStatus:nowGetStatus }),
                 e('div', { style:{ display:'grid', gap:10 } },
                   e('div', { style:{ fontSize:14, fontWeight:700, color:'var(--text-1)' } }, 'Owner Breakdown'),
                   e('div', { style:{ display:'flex', gap:8, flexWrap:'wrap' } },
@@ -1705,7 +1743,7 @@ window.TrackerModule = (function(){
                     }, `${group.owner} · ${group.rows.length}`))
                   ),
                   e('div', { style:{ display:'grid', gap:16 } },
-                    visibleGroup ? e(StatSection, { shell, card, title:visibleGroup.owner, summary:visibleGroup.summary, countLabel:`${visibleGroup.rows.length} rows`, rows:visibleGroup.rows, allRows:statRows.filter(r => r.owner === visibleGroup.owner), periodMode }) : null
+                    visibleGroup ? e(StatSection, { shell, card, title:visibleGroup.owner, summary:visibleGroup.summary, chartSummary:visibleChartSummary, countLabel:`${visibleGroup.rows.length} rows`, rows:visibleGroup.rows, allRows:statRows.filter(r => r.owner === visibleGroup.owner), periodMode, periods, getStatus:nowGetStatus }) : null
                   )
                 )
               )

@@ -365,13 +365,13 @@ function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, on
         if (!r.ok) throw new Error(d.error || 'Gagal menyimpan folder Google Drive');
         await onRefreshStatus();
         setMsg(picked
-          ? `✓ Folder aktif: ${picked.path}. Mirror map direset — klik “Mirror all PRD now”.`
-          : '✓ Kembali ke folder default PRD. Mirror map direset — klik “Mirror all PRD now”.');
+          ? `✓ Folder aktif: ${picked.path}. Mirror map direset — klik “Mirror all docs now”.`
+          : '✓ Kembali ke folder default PRD. Mirror map direset — klik “Mirror all docs now”.');
       } catch(e){ setMsg('⚠ ' + e.message); }
       setBusy(false);
     }
     async function mirrorNow() {
-      setBusy(true); setMsg('Mirroring all PRD files…');
+      setBusy(true); setMsg('Mirroring PRD, BRD, dan Assessment files…');
       try {
         const r = await fetch('/api/mirror', { method:'POST' });
         const d = await r.json();
@@ -1051,7 +1051,7 @@ function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, on
 
     // Tile launcher (hub) — Settings as a grid like img 2.
     const TILES = [
-      { id:'google',     title:'Google Docs',           desc:'Login OAuth, mirror PRD ke Google Docs, dan cek connection status.',           cta:'Open Docs Settings' },
+      { id:'google',     title:'Google Docs',           desc:'Login OAuth, mirror PRD/BRD/Assessment ke Google Docs, dan cek connection status.', cta:'Open Docs Settings' },
       { id:'theme',      title:'Theme',                 desc:'Pilih tema, simpan preference UI, dan preview dark/light variants.',           cta:'Open Theme Settings' },
       { id:'import',     title:'Manual Import',         desc:'Scan ulang file TSV/MD ke SQLite dan sync index QA Browser.',                   cta:'Open Import Tools' },
       { id:'automation', title:'Automation (Playwright)', desc:'Set path repo automation (sixV2Automation) di mesin host.',                   cta:'Open Automation Settings' },
@@ -1122,7 +1122,7 @@ function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, on
             {configured && needsReconnect && (
               <div>
                 <div style={{ fontSize:12, color:'#f59e0b', marginBottom:10, lineHeight:1.6 }}>
-                  Token Google yang tersimpan belum punya izin <strong>Google Docs</strong> + <strong>Google Drive</strong>, jadi status lama bisa terlihat “connected” tapi mirror gagal membuat PRD baru.
+                  Token Google yang tersimpan belum punya izin <strong>Google Docs</strong> + <strong>Google Drive</strong>, jadi status lama bisa terlihat “connected” tapi mirror gagal membuat dokumen baru.
                 </div>
                 <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:12 }}>
                   Solusi: login ulang lalu approve permission terbaru.
@@ -1138,7 +1138,7 @@ function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, on
                 <div style={{ fontSize:12, color:'var(--text-2)', marginBottom:4 }}>✓ Connected{status.email ? ` — ${status.email}` : ''}</div>
                 <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:8 }}>Folder aktif: {status.folderPath || status.folderName || status.folderId || 'PRD'}</div>
                 <div style={{ fontSize:11, color:'var(--text-4)', marginBottom:10, lineHeight:1.6 }}>
-                  Hanya dokumen dalam folder ini yang tampil di sidebar Google Docs, dan semua mirror PRD akan dibuat/diupdate di folder yang sama.
+                  Hanya dokumen dalam folder ini yang tampil di sidebar Google Docs, dan semua mirror PRD, BRD, dan Assessment akan dibuat/diupdate di folder yang sama.
                 </div>
                 {folderLocked && (
                   <div style={{ fontSize:11, color:'#f59e0b', marginBottom:10 }}>
@@ -1154,7 +1154,7 @@ function SettingsPage({ status, onRefreshStatus, onSwitchTheme, currentTheme, on
                   {!folderLocked && <button onClick={saveFolder} disabled={busy} style={btn('#0f766e')}>Save folder</button>}
                 </div>
                 <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                  <button onClick={mirrorNow} disabled={busy} style={btn('#0369a1')}>{busy ? '…' : '⇪ Mirror all PRD now'}</button>
+                  <button onClick={mirrorNow} disabled={busy} style={btn('#0369a1')}>{busy ? '…' : '⇪ Mirror all docs now'}</button>
                   <button onClick={logout} disabled={busy} style={{ ...btn('transparent'), color:'var(--text-3)', border:'1px solid var(--border-1)' }}>Disconnect</button>
                 </div>
               </div>
