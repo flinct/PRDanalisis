@@ -11,6 +11,7 @@
 | ----- | ----- | ----- | ----- |
 | v1.0 | 2025-10-09 | Yusril Ibnu | Initial PRD per standard. |
 | v1.1 | 2026-02-06 | Yusril Ibnu | Updated scope to match current UI. Added Launcher Image upload and Custom Color Picker. Clarified Widget Account topics for routing and tagging. |
+| v1.2 | 2026-08-03 | Dany Christian | Patch: Domain-based topic filter. See `PRD Widget - Domain Topic Filter Patch.md`. |
 
 ## **2\. Overview**
 

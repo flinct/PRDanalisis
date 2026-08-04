@@ -99,34 +99,15 @@ window.TrackerModule = (function(){
   // periodRange (above) kept for label formatting exclusively.
   // getPeriod, isPeriodOverlap, isOverride, periodStatus added below parseDateMs.
 
-  // Returns [startMs, endMs) for the given offset.
-  // mode='week' = current calendar week (Monday..next Monday) at offset*7 days.
-  //   offset 0 = this week (Mon..Sun inclusive), -1 = last week.
-  // mode='month' = past 4-week rolling window ending at THIS Monday, shifted by
-  //   offset*4 weeks. offset 0 = past 4 weeks (this Mon - 4w .. this Mon),
-  //   -1 = 8..4 weeks ago. This is backward-only — matches user spec "picker
-  //   month = 8 minggu ke belakang" (this + last = weeks -1..-8 from now).
+  // Returns [startMs, endMs) for rolling period ending at selected anchor date.
+  // week offset 0 with anchor 22 = 16..22, offset -1 = 9..15.
   function periodRange(offset = 0, mode = 'week', now = new Date()) {
     const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dow = base.getDay(); // 0=Sun..6=Sat
-    const daysSinceMonday = (dow + 6) % 7;
-    const thisMonday = new Date(base);
-    thisMonday.setDate(base.getDate() - daysSinceMonday);
-    if (mode === 'month') {
-      // 4-week span ending at NEXT Monday (so this week is included in "now" bucket).
-      // offset 0: [thisMon - 21d, thisMon + 7d) = past 3 weeks + this week
-      // offset -1: 4 weeks before that
-      const end = new Date(thisMonday);
-      end.setDate(thisMonday.getDate() + 7 + offset * 28);
-      const start = new Date(end);
-      start.setDate(end.getDate() - 28);
-      return [start.getTime(), end.getTime()];
-    }
-    // week: current Monday..next Monday, shifted by offset*7
-    const start = new Date(thisMonday);
-    start.setDate(thisMonday.getDate() + offset * 7);
-    const end = new Date(start);
-    end.setDate(start.getDate() + 7);
+    const span = mode === 'month' ? 28 : 7;
+    const end = new Date(base);
+    end.setDate(base.getDate() + 1 + offset * span);
+    const start = new Date(end);
+    start.setDate(end.getDate() - span);
     return [start.getTime(), end.getTime()];
   }
 
@@ -135,6 +116,12 @@ window.TrackerModule = (function(){
     if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return NaN;
     const [y, m, d] = text.split('-').map(Number);
     return new Date(y, m - 1, d).getTime();
+  }
+
+  function todayIso() {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
   }
 
   // ── Period helpers (date-based, spec v2) ────────────────────────
@@ -180,8 +167,12 @@ window.TrackerModule = (function(){
   // Period-scoped status: computed from startDate/endDate only.
   // Override never affects status.
   // Returns 'not started' | 'in progress' | 'complete'.
+  // Working-state statuses (on hold / waiting) pass through as-is: they are
+  // not timeline progress, so dates only decide VISIBILITY, never the label.
   // Fallback to row.status when date data is insufficient.
   function periodStatus(row, period) {
+    const raw = normalizeText(row?.status);
+    if (raw === 'on hold' || raw === 'waiting') return raw;
     const startMs = parseDateMs(row?.startDate || row?.date);
     if (!Number.isFinite(startMs)) {
       // no date data at all → fallback to spreadsheet status
@@ -215,10 +206,9 @@ window.TrackerModule = (function(){
 
   function formatDate(ms) { return new Date(ms).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }); }
 
-  function formatPeriodLabel(mode) {
-    const now = new Date();
-    const [lastS, lastE] = periodRange(-1, mode, now);
-    const [nowS, nowE]   = periodRange(0, mode, now);
+  function formatPeriodLabel(mode, ref = new Date()) {
+    const [lastS, lastE] = periodRange(-1, mode, ref);
+    const [nowS, nowE]   = periodRange(0, mode, ref);
     const fmt = ms => formatDate(ms - 86400000);
     if (mode === 'month') return `${formatDate(lastS)} — ${fmt(nowE)} (8 weeks)`;
     return `This ${formatDate(nowS)} — ${fmt(nowE)} · Last ${formatDate(lastS)} — ${fmt(lastE)}`;
@@ -451,10 +441,18 @@ window.TrackerModule = (function(){
     console.assert(groupByOwner(rows)[0].summary.priorities.high === 1, 'tracker priority summary failed');
     console.assert(groupByOwner(rows)[0].summary.weeks.now === 1, 'tracker week summary failed');
 
-    // periodBuckets — pick a fixed reference so tests are deterministic.
-    // ref = Wed 2026-07-29 → this week = Mon 2026-07-27..Sun 2026-08-02, last = 2026-07-20..2026-07-26.
+    // periodBuckets — pick a fixed anchor so tests are deterministic.
+    // ref = Wed 2026-07-29 → this = 2026-07-23..2026-07-29, last = 2026-07-16..2026-07-22.
     const ref = new Date(2026, 6, 29);
     const iso = (y, m, d) => `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const anchor22 = new Date(2026, 6, 22);
+    const localIso = ms => {
+      const d = new Date(ms);
+      return iso(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    };
+    const [aLastS, aLastE] = periodRange(-1, 'week', anchor22).map(localIso);
+    const [aNowS, aNowE] = periodRange(0, 'week', anchor22).map(localIso);
+    if (aNowS !== '2026-07-16' || aNowE !== '2026-07-23' || aLastS !== '2026-07-09' || aLastE !== '2026-07-16') throw new Error(`periodRange anchor week wrong: last=${aLastS}..${aLastE} now=${aNowS}..${aNowE}`);
     // New rule: interval overlap of [startDate, endDate] with period.
     // start+end both in this week → this only.
     const b1 = periodBuckets({ startDate: iso(2026,7,28), endDate: iso(2026,7,30), status:'in progress' }, 'week', ref);
@@ -475,7 +473,7 @@ window.TrackerModule = (function(){
     const b3c = periodBuckets({ startDate: iso(2026,7,22), status:'in progress' }, 'week', ref);
     console.assert(b3c.last && b3c.now, 'periodBuckets week: ongoing no end = unbounded future');
     // start+end both in last week → last only.
-    const b3 = periodBuckets({ startDate: iso(2026,7,21), endDate: iso(2026,7,25), status:'complete' }, 'week', ref);
+    const b3 = periodBuckets({ startDate: iso(2026,7,17), endDate: iso(2026,7,20), status:'complete' }, 'week', ref);
     console.assert(b3.last && !b3.now, 'periodBuckets week: span last-week only');
     // No dates at all → hidden.
     const b7 = periodBuckets({ status:'in progress' }, 'week', ref);
@@ -532,7 +530,19 @@ window.TrackerModule = (function(){
     ]);
     const wkX = filterRowsByPeriod(boundaryRows, 'week', 'now', ref).length;
     const mnX = filterRowsByPeriod(boundaryRows, 'month', 'now', ref).length;
-    if (wkX !== 0 || mnX !== 1) throw new Error(`week/month now buckets wrong for Jul13-Jul18 row: wk=${wkX} mn=${mnX}`);
+    // statuses raw (chart view): on hold/waiting pass through periodStatus,
+    // so the status bar + KPI show them as-is. Assert Σ statuses = total.
+    const holdLabel = normalizeRows([{ id:'h1', owner:'A', sourceSheet:'S', type:'core', task:'H', status:'on hold', startDate:iso(2026,7,28) }]);
+    const holdStatus = periodStatus(holdLabel[0], getPeriod(0, 'week', ref));
+    if (holdStatus !== 'on hold') throw new Error(`periodStatus on hold label lost: ${holdStatus}`);
+    const waitLabel = periodStatus({ status:'waiting', startDate:iso(2026,7,1) }, getPeriod(0, 'week', ref));
+    if (waitLabel !== 'waiting') throw new Error(`periodStatus waiting label lost: ${waitLabel}`);
+    const holdBucket = periodBuckets({ startDate:iso(2026,7,28), status:'on hold' }, 'week', ref);
+    console.assert(holdBucket.now && !holdBucket.last, 'periodBuckets week: on hold visibility follows dates');
+    const holdOut = periodBuckets({ startDate:iso(2026,6,1), endDate:iso(2026,6,5), status:'on hold' }, 'week', ref);
+    console.assert(!holdOut.last && !holdOut.now, 'periodBuckets week: on hold outside window hidden');
+    const waitSum = summarizeRows(normalizeRows([{ id:'w1', owner:'A', sourceSheet:'S', type:'core', task:'W', status:'waiting', startDate:iso(2026,7,20), endDate:iso(2026,7,24) }]), r => periodStatus(r, getPeriod(0, 'week', ref)));
+    if (waitSum.statuses.waiting !== 1) throw new Error(`summarizeRows waiting status lost: ${JSON.stringify(waitSum.statuses)}`);
   }
   selfCheck();
 
@@ -797,7 +807,7 @@ window.TrackerModule = (function(){
     );
   }
 
-  function PeriodSplitTable({ allRows, sectioned, mode, periods }) {
+  function PeriodSplitTable({ allRows, sectioned, mode, periods, periodRef }) {
     const coreById = React.useMemo(() => new Map(allRows.filter(row => row.type === 'core').map(row => [row.id, row])), [allRows]);
     const labels = mode === 'month'
       ? { last:'Last Month', now:'This Month', unitPrev:'vs Previous Month' }
@@ -825,12 +835,12 @@ window.TrackerModule = (function(){
     const tdStyle = { padding:'0 12px', borderBottom:`1px solid ${THEME.divider}`, color:THEME.textPrimary, fontSize:13 };
     return e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0, 1fr)', gap:16, marginTop:16 } },
       ...['last', 'now'].map(bucket => {
-        const items = orderTreeRows(filterRowsByPeriod(allRows, mode, bucket));
+        const items = orderTreeRows(filterRowsByPeriod(allRows, mode, bucket, periodRef));
         const period = bucket === 'last' ? periods?.lastPeriod : periods?.nowPeriod;
         const bucketGetStatus = period ? row => periodStatus(row, period) : undefined;
         const weekSummary = summarizeRows(items, bucketGetStatus);
         const title = labels[bucket];
-        const thisRange = bucketRangeLabel(bucket, mode);
+        const thisRange = bucketRangeLabel(bucket, mode, periodRef);
         // ponytail: "vs previous" only shown for the current-week header per spec.
         const weekProps = { key:bucket, style:{ border:`1px solid ${THEME.border}`, borderRadius:12, overflow:'hidden', background:THEME.bgSecondary } };
         if (sectioned) weekProps['data-stat-section'] = bucket;
@@ -841,7 +851,7 @@ window.TrackerModule = (function(){
             e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
             e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary } },
               thisRange,
-              bucket === 'now' ? e('span', { style:{ color:THEME.textMuted } }, ` ${labels.unitPrev} · ${bucketRangeLabel('last', mode)}`) : null
+              bucket === 'now' ? e('span', { style:{ color:THEME.textMuted } }, ` ${labels.unitPrev} · ${bucketRangeLabel('last', mode, periodRef)}`) : null
             )
           ),
           e('div', { style:{ padding:16, borderBottom:`1px solid ${THEME.divider}`, background:THEME.bgSecondary, overflowX:'auto' } },
@@ -935,7 +945,7 @@ window.TrackerModule = (function(){
     );
   }
 
-  function StatSection({ shell, card, title, summary, chartSummary, countLabel, rows, allRows, sectioned, periodMode, periods, getStatus, chartGetStatus }) {
+  function StatSection({ shell, card, title, summary, chartSummary, countLabel, rows, allRows, sectioned, periodMode, periodRef, periods, getStatus, chartGetStatus }) {
     const sectionShell = { ...shell, background:THEME.bgSecondary, padding:16, border:`1px solid ${THEME.border}` };
     const overviewProps = { 'data-slide-part':'overview', style:{ display:'grid', gridTemplateColumns:'minmax(260px, 1fr) minmax(0, 2fr)', gap:16, alignItems:'stretch' } };
     const activityProps = { 'data-slide-part':'activity-chart', style:{ ...shell, padding:16, marginTop:16 } };
@@ -953,7 +963,7 @@ window.TrackerModule = (function(){
       e('div', { style:{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', marginBottom:12, flexWrap:'wrap' } },
         e('div', { style:{ fontSize:16, fontWeight:600, color:'#fff' } }, title),
         e('div', { style:{ display:'flex', gap:12, alignItems:'center' } },
-          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode)),
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode, periodRef)),
           e('div', { style:{ fontSize:12, color:THEME.textMuted } }, countLabel)
         )
       ),
@@ -993,7 +1003,7 @@ window.TrackerModule = (function(){
       e('div', taskListProps,
         e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
           e('div', { style:{ fontSize:14, fontWeight:600, color:'#fff' } }, 'Task List'),
-          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode))
+          e('div', { style:{ fontSize:12, fontWeight:400, color:THEME.textSecondary, whiteSpace:'nowrap' } }, formatPeriodLabel(periodMode, periodRef))
         ),
         e('div', { style:{ marginBottom:16 } },
           e(ProgressCardGrid, { summary })
@@ -1002,7 +1012,7 @@ window.TrackerModule = (function(){
           e(TaskListTree, { rows, getStatus })
         )
       ),
-      e(PeriodSplitTable, { allRows:allRows || rows, sectioned, mode:periodMode, periods })
+      e(PeriodSplitTable, { allRows:allRows || rows, sectioned, mode:periodMode, periodRef, periods })
     );
   }
 
@@ -1076,9 +1086,16 @@ window.TrackerModule = (function(){
       try { return localStorage.getItem('tracker.periodMode') === 'month' ? 'month' : 'week'; }
       catch { return 'week'; }
     });
+    const [periodAnchor, setPeriodAnchor] = React.useState(() => {
+      try { return normalizeDate(localStorage.getItem('tracker.periodAnchor')) || todayIso(); }
+      catch { return todayIso(); }
+    });
     React.useEffect(() => {
       try { localStorage.setItem('tracker.periodMode', periodMode); } catch {}
     }, [periodMode]);
+    React.useEffect(() => {
+      try { localStorage.setItem('tracker.periodAnchor', periodAnchor); } catch {}
+    }, [periodAnchor]);
     const tab = tabProp !== undefined ? tabProp : localTab;
     const setTab = onTabChange || setLocalTab;
     const selectedSheet = selectedSheetProp !== undefined ? selectedSheetProp : localSheet;
@@ -1124,7 +1141,7 @@ window.TrackerModule = (function(){
         .map(k => `${k}: ${cs.getPropertyValue(k).trim() || 'initial'};`).join(' ');
       const stamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
       const bm = batchMeta || {};
-      const metaLine = `${periodMode.charAt(0).toUpperCase() + periodMode.slice(1)}` +
+      const metaLine = `${periodMode.charAt(0).toUpperCase() + periodMode.slice(1)} · Anchor ${periodAnchor}` +
         (bm.version ? ` · v${bm.version}` : '') +
         (bm.startDate || bm.endDate ? ` · ${bm.startDate || '?'} → ${bm.endDate || '?'}` : '');
       const pick = (deck, parts) => parts.map(p => deck.querySelector(`[data-slide-part="${p}"]`)).filter(Boolean);
@@ -1258,7 +1275,7 @@ window.TrackerModule = (function(){
 })();
 </script>
 </body></html>`;
-    }, [batchMeta, periodMode]);
+    }, [batchMeta, periodMode, periodAnchor]);
     const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const handleExportPdf = React.useCallback(() => {
       const html = buildSlideshowHtml();
@@ -1419,14 +1436,15 @@ window.TrackerModule = (function(){
     // Period filter: keep rows relevant to current period (this + last = "berjalan hingga 1 sebelum").
     // Milestone: passes periodBuckets. Core: itself passes OR any child milestone passes (keep parent context).
     // ponytail: O(n) per row on core lookup via .some — fine at tracker scale (<1k rows).
-    const periodStatRows = React.useMemo(() => filterRowsByPeriod(statRows, periodMode, 'both'), [statRows, periodMode]);
+    const periodRef = React.useMemo(() => new Date(parseDateMs(periodAnchor) || Date.now()), [periodAnchor]);
+    const periodStatRows = React.useMemo(() => filterRowsByPeriod(statRows, periodMode, 'both', periodRef), [statRows, periodMode, periodRef]);
     const periods = React.useMemo(() => {
-      const ref = new Date();
+      const ref = periodRef;
       return {
         nowPeriod: getPeriod(0, periodMode, ref),
         lastPeriod: getPeriod(-1, periodMode, ref),
       };
-    }, [periodMode]);
+    }, [periodMode, periodRef]);
     const nowGetStatus = React.useMemo(() => row => periodStatus(row, periods.nowPeriod), [periods]);
     // Chart/KPI: exclude 'not started' but preserve raw status labels
     const chartGetStatus = React.useMemo(() => row => {
@@ -1440,7 +1458,7 @@ window.TrackerModule = (function(){
     const visibleChartSummary = React.useMemo(() => visibleGroup ? summarizeRows(visibleGroup.rows, chartGetStatus) : null, [visibleGroup, chartGetStatus]);
     // Period-filtered rows for export — independent of sheet picker (spec: cover uses
     // all sheets combined, per-sheet decks derived from same period-filtered universe).
-    const exportRows = React.useMemo(() => filterRowsByPeriod(rows, periodMode, 'both'), [rows, periodMode]);
+    const exportRows = React.useMemo(() => filterRowsByPeriod(rows, periodMode, 'both', periodRef), [rows, periodMode, periodRef]);
     const exportSummary = React.useMemo(() => summarizeRows(exportRows), [exportRows]);
     const exportChartSummary = React.useMemo(() => summarizeRows(exportRows, chartGetStatus), [exportRows, chartGetStatus]);
     // Group by sheet (Dany, Naftal, Agung, ...) — ordered by sheetTabs when available so
@@ -1510,7 +1528,7 @@ window.TrackerModule = (function(){
       const invalidProgress = rows.find(row => {
         const hasChildren = row.type === 'core' && getChildMilestones(rows, row.id).length > 0;
         if (hasChildren) return false;
-        return (row.status === 'in progress' || row.status === 'hold') && (!row.progress || row.progress <= 0);
+        return (row.status === 'in progress' || row.status === 'hold' || row.status === 'on hold') && (!row.progress || row.progress <= 0);
       });
       if (invalidProgress) {
         setMeta(prev => ({ ...prev, error:`Task "${invalidProgress.task || invalidProgress.id}" status ${invalidProgress.status} wajib isi progress.` }));
@@ -1681,14 +1699,14 @@ window.TrackerModule = (function(){
         style:{ position:'fixed', left:-99999, top:0, width:1400, pointerEvents:'none', opacity:0 }
       },
         e('div', { 'data-deck-role':'cover', 'data-deck':'All Sheets · Overall' },
-          e(StatSection, { shell, card, title:'All Sheets', summary:exportSummary, chartSummary:exportChartSummary, countLabel:`${exportRows.length} rows`, rows:exportRows, allRows:rows, periodMode, periods, getStatus:nowGetStatus })
+          e(StatSection, { shell, card, title:'All Sheets', summary:exportSummary, chartSummary:exportChartSummary, countLabel:`${exportRows.length} rows`, rows:exportRows, allRows:rows, periodMode, periodRef, periods, getStatus:nowGetStatus })
         ),
         ...exportSheetDecks.map(deck => e('div', {
           key:`export-${deck.name}`,
           'data-deck-role':'sheet',
           'data-deck':deck.name
         },
-          e(StatSection, { shell, card, title:deck.name, summary:deck.summary, chartSummary:deck.chartSummary, countLabel:`${deck.rows.length} rows`, rows:deck.rows, allRows:deck.allRows, periodMode, periods, getStatus:nowGetStatus })
+          e(StatSection, { shell, card, title:deck.name, summary:deck.summary, chartSummary:deck.chartSummary, countLabel:`${deck.rows.length} rows`, rows:deck.rows, allRows:deck.allRows, periodMode, periodRef, periods, getStatus:nowGetStatus })
         ))
       ) : null,
       // Spec: hover / focus states for tracker rows and KPI cards
@@ -1713,6 +1731,7 @@ window.TrackerModule = (function(){
                   style:{ border:'none', background:periodMode === mode ? '#2563eb' : 'transparent', color:periodMode === mode ? '#fff' : 'var(--text-2)', padding:'8px 14px', fontSize:12, fontWeight:600, cursor:'pointer', textTransform:'capitalize' }
                 }, mode))
               ),
+              e('div', { style:{ minWidth:150 } }, e(DateCell, { value:periodAnchor, onChange:setPeriodAnchor, inputStyle:{ ...inputStyle, padding:'8px 10px' } })),
               e('input', { type:'text', value:batchMeta.version, onChange:ev => setBatchMeta(prev => ({ ...prev, version:ev.target.value })), placeholder:'Version', style:{ ...inputStyle, width:140, padding:'8px 10px' } }),
               e('div', { style:{ minWidth:150 } }, e(DateCell, { value:batchMeta.startDate, onChange:value => setBatchMeta(prev => ({ ...prev, startDate:value })), inputStyle:{ ...inputStyle, padding:'8px 10px' } })),
               e('div', { style:{ minWidth:150 } }, e(DateCell, { value:batchMeta.endDate, onChange:value => setBatchMeta(prev => ({ ...prev, endDate:value })), inputStyle:{ ...inputStyle, padding:'8px 10px' } })),
@@ -1731,7 +1750,7 @@ window.TrackerModule = (function(){
         tab === 'statistics'
           ? e('div', { style:{ display:'grid', gridTemplateColumns:'minmax(0,1fr)', gap:18, alignItems:'start' } },
               e('div', { style:{ display:'grid', gap:18, minWidth:0 } },
-                e(StatSection, { shell, card, title:selectedSheet === 'all' ? 'All Sheets' : selectedSheet, summary:overallSummary, chartSummary, countLabel:`${periodStatRows.length} rows · ${periodMode === 'month' ? 'past 4 weeks' : 'this week'}`, rows:periodStatRows, allRows:statRows, sectioned:true, periodMode, periods, getStatus:nowGetStatus }),
+                e(StatSection, { shell, card, title:selectedSheet === 'all' ? 'All Sheets' : selectedSheet, summary:overallSummary, chartSummary, countLabel:`${periodStatRows.length} rows · ${periodMode === 'month' ? 'past 4 weeks' : 'this week'}`, rows:periodStatRows, allRows:statRows, sectioned:true, periodMode, periodRef, periods, getStatus:nowGetStatus }),
                 e('div', { style:{ display:'grid', gap:10 } },
                   e('div', { style:{ fontSize:14, fontWeight:700, color:'var(--text-1)' } }, 'Owner Breakdown'),
                   e('div', { style:{ display:'flex', gap:8, flexWrap:'wrap' } },
@@ -1743,7 +1762,7 @@ window.TrackerModule = (function(){
                     }, `${group.owner} · ${group.rows.length}`))
                   ),
                   e('div', { style:{ display:'grid', gap:16 } },
-                    visibleGroup ? e(StatSection, { shell, card, title:visibleGroup.owner, summary:visibleGroup.summary, chartSummary:visibleChartSummary, countLabel:`${visibleGroup.rows.length} rows`, rows:visibleGroup.rows, allRows:statRows.filter(r => r.owner === visibleGroup.owner), periodMode, periods, getStatus:nowGetStatus }) : null
+                    visibleGroup ? e(StatSection, { shell, card, title:visibleGroup.owner, summary:visibleGroup.summary, chartSummary:visibleChartSummary, countLabel:`${visibleGroup.rows.length} rows`, rows:visibleGroup.rows, allRows:statRows.filter(r => r.owner === visibleGroup.owner), periodMode, periodRef, periods, getStatus:nowGetStatus }) : null
                   )
                 )
               )
