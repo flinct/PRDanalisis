@@ -137,6 +137,45 @@ PRDanalisis/
 
 ---
 
+## Orchestrator Mode (trigger: kata "orchestrator")
+
+**Trigger:** kalau pesan user mengandung kata **`orchestrator`** (di mana saja), aktifkan mode ini untuk task tersebut. Tanpa kata itu → kerja normal (single-agent).
+
+**Peran:**
+- **Main agent = orchestrator.** Semua kendali di sini: spawn worker, terima hasil, spawn reviewer, jalankan loop, putuskan stop. Subagent TIDAK saling bicara langsung — semua transit lewat orchestrator.
+- **Subagent = `leaf`** (via `delegate_task`). Worker mengerjakan; reviewer menilai. Model per-subagent ditentukan oleh `kind` → `delegation.role_models` (lihat tabel di bawah); tanpa `kind` inherit `combo1`.
+
+**Alur loop (worker → review → revise):**
+1. **Delegate worker** — beri goal + konteks lengkap (subagent tidak tahu isi chat ini). Task tipikal: analisa, research/deep-research, atau coding. **Wajib set `kind`** biar subagent pakai model yang tepat (lihat tabel di bawah).
+2. **Delegate reviewer** (`kind: "review"` / `"code-review"` / `"qa"`) — kirim output worker + kriteria. Reviewer WAJIB akhiri dengan verdict eksplisit: `PASS` atau `NEEDS_REVISION: <daftar hal yang harus diperbaiki>`.
+3. **Jika `NEEDS_REVISION`** → delegate worker lagi dengan feedback reviewer, lalu ulang dari langkah 2.
+4. **Jika `PASS`** → selesai, laporkan hasil final ke user.
+
+**Model per task (`delegate_task(kind=...)` → `delegation.role_models`):**
+
+| Task | `kind` | Model (via ninerouter) |
+|---|---|---|
+| Coding fitur/bugfix | `coding` | `openai/gpt-5.5` |
+| Nulis kode mekanis/boilerplate | `code-writing` | `cmc/deepseek/deepseek-v4-flash` |
+| Review kode | `code-review` | `openai/gpt-5.5` |
+| Review umum (PRD/analisa) | `review` | `openai/gpt-5.5` |
+| Analisa / deep-research | `analysis` | `openai/o3-pro` |
+| Debugging | `debugging` | `openai/gpt-5.5` |
+| Planning | `planning` | `cc/claude-opus-4-8` |
+| Arsitektur | `architecture` | `cc/claude-opus-4-8` |
+| Test case / QA | `qa` / `test-generation` | `openai/gpt-5.5` / `cc/claude-sonnet-5` |
+
+Daftar lengkap ada di `delegation.role_models` (config.yaml). `kind` tidak diisi → subagent inherit `combo1`. Provider selalu ninerouter (semua model lewat proxy yang sama).
+
+**Rem (wajib, biar tidak loop selamanya):**
+- Maksimal **3 putaran revisi**. Kalau putaran ke-3 masih `NEEDS_REVISION` → STOP, laporkan ke user output terbaik + sisa isu yang belum beres. Jangan lanjut sendiri.
+- Reviewer & worker = subagent terpisah tiap putaran (konteks bersih).
+- Task sepele (baca 1 file, tanya singkat, ubah 1 baris) → JANGAN pakai loop meski ada kata "orchestrator"; kerjakan langsung.
+
+**Batas teknis:** `delegation.max_concurrent_children: 3`, `max_spawn_depth: 1` (subagent tidak bisa delegate lagi — loop harus dijalankan orchestrator, bukan didelegasikan turun).
+
+---
+
 ## ⚡ Baca Juga
 
 Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding lengkap yang mencakup:

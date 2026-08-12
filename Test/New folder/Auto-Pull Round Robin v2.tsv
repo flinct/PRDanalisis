@@ -1,0 +1,501 @@
+total cases =			38							
+DEV				STAGGING			PROD		created at	12/08/2026
+Passed			0	Passed		0	Passed	0	update by	
+Failed			0	Failed		0	Failed	0	update at	
+Need to test			0	Need to test		0	Need to test	0		
+On test			0	On test		0	On test	0		
+No Status			38	No Status		38	No Status	38		
+
+Test ID	AutoPull-001									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Login Burst		Pre-Condition	Agent A maxConversation=3, 0 assigned, 0 rate used, backlog 10	DATE			
+Url					Description	[P0] Login burst - maxConv binds first (maxConv=3 < rate 10)	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A logs in (transitions to READY)		test type	POSITIVE				
+		2	Sistem hitung slotsToFill = min(3-0, 10-0) = 3							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 3 conversation (bukan 10). Backlog turun jadi 7.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-002									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Login Burst		Pre-Condition	Agent A maxConversation=10, 0 assigned, 0 rate used, backlog 15	DATE			
+Url					Description	[P0] Login burst - rate binds first (maxConv=10 > rate 10)	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A logs in (transitions to READY)		test type	POSITIVE				
+		2	Sistem hitung slotsToFill = min(10-0, 10-0) = 10							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 10 conversation. Backlog turun jadi 5.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-003									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Login Burst		Pre-Condition	Agent A maxConversation=10, 0 assigned, rateUsed=8 (sisa 2), backlog 15	DATE			
+Url					Description	[P0] Login burst - rate binds di sisa window (min(10,2)=2)	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A logs in (transitions to READY)		test type	POSITIVE				
+		2	Sistem hitung slotsToFill = min(10-0, 10-8) = 2							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 2 conversation saja. Rate cap membatasi.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-004									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Login Burst		Pre-Condition	Agent A maxConversation=0 (unlimited), 0 assigned, 0 rate used, backlog 50	DATE			
+Url					Description	[P0] Login burst - maxConv=0 unlimited, rate cap sole governor → gets 10	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A logs in (transitions to READY)		test type	POSITIVE				
+		2	Sistem hitung slotsToFill = min(∞, 10-0) = 10							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 10 conversation. Tidak ada ceiling dari maxConversation.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-005									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Simultaneous Login Burst		Pre-Condition	3 agent (A:maxConv=3, B:maxConv=6, C:maxConv=10) log in bareng. Backlog 100.	DATE			
+Url					Description	[P0] Simultaneous login - independent burst per agent, no cross-agent fairness	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A, B, C login bersamaan (transitions to READY)		test type	POSITIVE				
+		2	Masing-masing trigger burst independen							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				A gets 3, B gets 6, C gets 10. Total 19 assigned. Backlog sisa 81.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-006									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Close Replacement		Pre-Condition	Agent A punya 3/3 conversation, backlog 5. Agent A tutup 1 conversation.	DATE			
+Url					Description	[P0] Close triggers 1 replacement auto-pull	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A close 1 conversation		test type	POSITIVE				
+		2	Sistem trigger autoPullCloseConversation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				1 conversation baru auto-pull masuk ke Agent A. A tetap 3/3.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-007									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Close Replacement		Pre-Condition	Agent A close conversation. Backlog ada 3.	DATE			
+Url					Description	[P0] Close re-trigger chain: autoPullCloseConversation → autoPullForAllParticipants → autoPullUnassignedConversationForUser	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A close conversation		test type	POSITIVE				
+		2	Trace event chain: autoPullCloseConversation dipanggil							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Event chain memanggil autoPullForAllParticipants → autoPullUnassignedConversationForUser. 1 oldest conversation assigned ke A.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-008									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			FIFO Selection		Pre-Condition	Backlog: Conv1(created T1), Conv2(T2), Conv3(T3), Conv4(T4), Conv5(T5). Agent A eligible, maxConv=5.	DATE			
+Url					Description	[P0] FIFO - oldest createdAt assigned first	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login, burst triggers		test type	POSITIVE				
+		2	Sistem pilih conversation berdasarkan createdAt ASC							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conv1 assigned duluan (oldest), lalu Conv2, Conv3, Conv4, Conv5. Urutan = T1→T2→T3→T4→T5.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-009									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Atomic Assignment Guard		Pre-Condition	1 conversation unassigned. 2 trigger (login burst A + cron) race untuk assign conversation yg sama.	DATE			
+Url					Description	[P0] Atomic guard - same conversation race, exactly 1 wins	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login dan cron jalan bersamaan untuk 1 conversation		test type	POSITIVE				
+		2	MongoDB update pakai guard: participants: { $size: 0 }							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Tepat 1 trigger berhasil assign. Trigger lain no-op (update matched 0 docs). Tidak ada double-assign.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-010									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Atomic Assignment Guard		Pre-Condition	2 conversations unassigned (Conv1, Conv2). Login burst Agent A dan cron race.	DATE			
+Url					Description	[P0] Atomic guard - 2 conversations assigned to eligible agents without double-assign	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login + cron jalan bersamaan		test type	POSITIVE				
+		2	Kedua trigger mencari conversation unassigned							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conv1 dan Conv2 masing-masing assigned ke 1 agent. Tidak ada conversation yang punya 2 participants.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-011									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Rate Cap		Pre-Condition	Agent A maxConv=100, 0 assigned. Backlog 50.	DATE			
+Url					Description	[P0] Rate cap blocks at 10 assignments dalam 120s window	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login, burst triggers		test type	POSITIVE				
+		2	Sistem assign sampai rate cap tercapai							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 10 conversation (rate cap 10/120s). Sisa 40 tetap di backlog meski maxConv=100.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-012									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Rate Cap Window Reset		Pre-Condition	Agent A sudah dapat 10/10 assignments. Tunggu 121 detik.	DATE			
+Url					Description	[P0] Rate cap window resets after 120s from first assignment	ENV	DEV	STAGGING	PROD
+Steps		1	Tunggu 121 detik sejak assignment pertama Agent A		test type	POSITIVE				
+		2	Trigger auto-pull baru (cron atau close)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A bisa terima assignment lagi. Rate budget reset ke 10. Window baru dimulai.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-013									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Rate Cap Independent		Pre-Condition	Agent A sudah 10/10 rate. Agent B 0/10 rate. Backlog 20.	DATE			
+Url					Description	[P0] Rate cap independent per agent - A blocked, B masih bisa	ENV	DEV	STAGGING	PROD
+Steps		1	Trigger auto-pull (cron)		test type	POSITIVE				
+		2	Agent A rate exhausted, Agent B rate tersisa							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A tidak dapat assignment (rate cap). Agent B menerima sampai 10. Rate cap per-agent, bukan global.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-014									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			maxConversation Cap		Pre-Condition	Agent A maxConversation=3 (default). Backlog 10.	DATE			
+Url					Description	[P0] Agent stops receiving at default maxConversation=3	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login, burst triggers		test type	POSITIVE				
+		2	Sistem assign sampai maxConversation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima tepat 3 conversation. Tidak lebih. Backlog sisa 7.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-015									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			maxConversation Slot Free		Pre-Condition	Agent A di 3/3 maxConversation. Backlog 5.	DATE			
+Url					Description	[P0] Close frees slot → immediate re-assign	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A close 1 conversation (slot jadi 2/3)		test type	POSITIVE				
+		2	Close event trigger autoPullCloseConversation							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				1 conversation baru langsung masuk. A kembali 3/3.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-016									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			maxConversation Unlimited		Pre-Condition	Agent A maxConversation=0 (unlimited). Backlog 50.	DATE			
+Url					Description	[P1] maxConversation=0 → rate cap sole governor, no ceiling	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login, burst triggers		test type	POSITIVE				
+		2	Sistem hitung: maxConv=0 artinya unlimited							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 10 (rate cap). Tidak ada ceiling dari maxConversation. Bisa terima lagi setelah window reset.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-017									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron Safety Net		Pre-Condition	Backlog 20. Agent A eligible. Cron interval 15 menit.	DATE			
+Url					Description	[P1] Cron runs every 15 min with Redis distributed lock (TTL 110s)	ENV	DEV	STAGGING	PROD
+Steps		1	Tunggu cron tick		test type	POSITIVE				
+		2	Cron acquire Redis lock (setNx, TTL 110s)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Cron berjalan. Group by (companyId, orgId, teamId). Redis lock prevents double-run di cluster.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-018									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron Least-Loaded		Pre-Condition	Team X: Agent A (2 assigned), Agent B (1 assigned), Agent C (1 assigned). Backlog 5.	DATE			
+Url					Description	[P1] Cron picks least-loaded eligible agent, ties broken randomly	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan untuk Team X		test type	POSITIVE				
+		2	Sistem cari least-loaded eligible agent							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conversation pertama → B atau C (random tiebreak, keduanya 1). Conversation kedua → sisanya. Agent A dapat giliran terakhir.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-019									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron Team Batch Cap		Pre-Condition	Team X: 3 eligible agents. Backlog 100.	DATE			
+Url					Description	[P1] Team batch cap = min(50, eligibleCount × 10). 3 agents → cap=30	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan untuk Team X		test type	POSITIVE				
+		2	eligibleMemberCount = 3, teamBatchCap = min(50, 3×10) = 30							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Cron drain maksimal 30 conversation di tick ini. Backlog turun ke 70. Next tick +30 lagi.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-020									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron Drain Loop		Pre-Condition	Team X: 2 eligible agents (maxConv=10 each, 0 assigned). Backlog 5.	DATE			
+Url					Description	[P1] Cron drain loop stops when backlog empty, no room, or batch cap	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan untuk Team X		test type	POSITIVE				
+		2	Loop assign oldest-first ke least-loaded agent							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				5 conversation assigned (backlog habis). Loop berhenti karena backlog empty, bukan cap atau no room.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-021									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron Cooldown Skip-Set		Pre-Condition	Team X: 1 agent (maxConv=3, sudah 3/3). Backlog 2.	DATE			
+Url					Description	[P2] Only failed conversation enters 30-min cooldown, not successful ones	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan untuk Team X		test type	POSITIVE				
+		2	Agent penuh → assignment gagal untuk conversation pertama							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conversation yang gagal masuk 30-min cooldown skip-set. Conversation kedua juga gagal (sama agent).				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-022									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			No-Team Exclusion		Pre-Condition	Conversation tanpa teamId ada di backlog. Agent A eligible di Team X.	DATE			
+Url					Description	[P0] No-team conversation permanently excluded from auto-pull	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A login, burst triggers		test type	POSITIVE				
+		2	Sistem filter conversation eligible							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conversation tanpa teamId TIDAK pernah di-auto-pull. Tetap di queue. Fails NO_TEAM guard.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-023									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Self-Pull Clamp		Pre-Condition	Agent A maxConversation=5, sudah 3 assigned. Backlog 10.	DATE			
+Url					Description	[P1] Self-pull clamps limit server-side to remaining slots	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A self-pull dengan limit=10		test type	POSITIVE				
+		2	Sistem clamp limit ke getAvailableSlot = 5-3 = 2							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 2 conversation (bukan 10). Server-side clamp dari maxConversation.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-024									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Self-Pull Rate Asymmetry		Pre-Condition	Agent A maxConversation=100, 0 assigned, rateUsed=10 (exhausted). Backlog 50.	DATE			
+Url					Description	[P1] Self-pull bypasses rate cap entirely - gets 100, auto-pull gets 0	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A self-pull dengan limit=100		test type	POSITIVE				
+		2	Self-pull TIDAK check/consume rate budget							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A menerima 100 conversation. Rate cap tidak berlaku untuk self-pull (user action ≠ auto).				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-025									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Race Same Agent		Pre-Condition	Agent A sisa 1 slot. Close event + cron race untuk assign ke A.	DATE			
+Url					Description	[P0] Per-member Redis slot lock serializes concurrent triggers	ENV	DEV	STAGGING	PROD
+Steps		1	Close event dan cron trigger bersamaan untuk Agent A		test type	POSITIVE				
+		2	Redis slot lock (10s TTL) serialize proses							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				1 trigger berhasil assign. Trigger lain lihat lock, gagal atau retry. Tidak ada over-assign melebihi maxConv.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-026									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Batch Cap Scaling		Pre-Condition	Team X backlog 100. Test dengan 1, 3, 5, 10 eligible agents.	DATE			
+Url					Description	[P1] Batch cap scales: 1→10, 3→30, 5→50, 10→50	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick dengan 1 eligible agent → cap=min(50,1×10)=10		test type	POSITIVE				
+		2	Cron tick dengan 3 agents → cap=min(50,3×10)=30							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				5 agents → cap=50 (ceiling binds). 10 agents → cap=50 (ceiling binds, split thinner). Formula: min(50, eligibleCount×10).				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-027									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Window/Interval Mismatch		Pre-Condition	Rate window=120s, cron interval=900s. Agent A idle selama >120s.	DATE			
+Url					Description	[P2] Rate window refills go unused between cron ticks	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan setelah 15 menit idle		test type	POSITIVE				
+		2	Agent A rate budget fresh (idle > 120s)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Cron dapat 10 assignment dari budget fresh. ~7 refill cycles dalam 15min gap tidak terpakai. No mid-interval check.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-028									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Lone Agent Plateau		Pre-Condition	1 agent (maxConv=3), 1 eligible. Backlog 10.	DATE			
+Url					Description	[P1] Lone agent hits maxConv → backlog stuck until close or 2nd agent	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan. Agent dapat 3 (maxConv=3).		test type	POSITIVE				
+		2	Next cron tick - agent sudah di 3/3							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Backlog stuck di 7. calculateAvailableSlots=0. Recovery: close frees slot atau agent baru online.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-029									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Lock Fail-Open		Pre-Condition	Redis down/outage. Auto-pull trigger berjalan.	DATE			
+Url					Description	[P2] Redis outage → lock fails open, assignment still proceeds	ENV	DEV	STAGGING	PROD
+Steps		1	Simulasi Redis outage		test type	POSITIVE				
+		2	Trigger auto-pull (login/cron)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Assignment tetap jalan. Lock fail-open (cache failure tidak block real assignment). Race window kembali ke pre-fix state.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-030									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Cron-Only Drain		Pre-Condition	1 agent (maxConv=100), 0 assigned. Backlog 1000. Tidak ada close.	DATE			
+Url					Description	[P1] Cron-only drain: +10/tick, plateaus at maxConv	ENV	DEV	STAGGING	PROD
+Steps		1	Tick 1: agent dapat 10. Tick 2: +10=20. Tick 3: +10=30. ...		test type	POSITIVE				
+		2	Tick 10 (~2h15m): agent di 100/100							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Tick 11+: stuck. Backlog permanently plateaus di 900. maxConv=100 adalah hard backstop.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-031									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			maxConversation Skew		Pre-Condition	Team X: A(maxConv=3), B(maxConv=6), C(maxConv=10). Backlog 100.	DATE			
+Url					Description	[P1] Different maxConv creates capacity skew - by design	ENV	DEV	STAGGING	PROD
+Steps		1	Agent A, B, C login bersamaan		test type	POSITIVE				
+		2	Burst per agent: A=3, B=6, C=10							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Total held=19. C absorbs 53% (10/19). Team capacity=3+6+10=19. Skew sesuai declared capacity.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-032									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Per-Team Auto-Pull Routing		Pre-Condition	Agent A di Team X, Agent B di Team Y. Backlog: Conv Team X dan Team Y.	DATE			
+Url					Description	[P1] [REWRITE 014] Per-team routing: conversations assigned ke eligible agent di team masing-masing	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan		test type	POSITIVE				
+		2	Sistem group by teamId							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conv Team X → Agent A. Conv Team Y → Agent B. Routing per-team, bukan round-robin pointer.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-033									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Skip Offline Agent		Pre-Condition	Agent A offline, Agent B online+eligible. Backlog 3.	DATE			
+Url					Description	[P1] [REWRITE 020] Offline agent excluded from eligible pool before selection	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick atau close event berjalan		test type	POSITIVE				
+		2	Sistem build eligible pool (exclude offline)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A tidak masuk eligible pool. Semua 3 conversation ke Agent B (only eligible agent).				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-034									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Skip Full Agent		Pre-Condition	Agent A di 3/3 (penuh), Agent B di 1/3. Backlog 3.	DATE			
+Url					Description	[P1] [REWRITE 021] Full agent excluded from eligible pool, verify maxConv enforcement	ENV	DEV	STAGGING	PROD
+Steps		1	Cron tick berjalan		test type	POSITIVE				
+		2	Sistem build eligible pool (exclude penuh)							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Agent A tidak masuk eligible pool (sudah di maxConv). Conversation ke Agent B. B dapat sampai 2 lagi (sisa slot).				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-035									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Atomic Guard Race Rewrite		Pre-Condition	2 conversations (Conv1, Conv2) unassigned. 2 triggers race.	DATE			
+Url					Description	[P0] [REWRITE 029] Atomic guard: kedua conv assigned ke eligible agents, no double-assign	ENV	DEV	STAGGING	PROD
+Steps		1	Login burst Agent A + cron trigger bersamaan		test type	POSITIVE				
+		2	Kedua trigger proses Conv1 dan Conv2 dengan $size:0 guard							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Conv1 dan Conv2 masing-masing punya 1 participant. Tidak ada double-assign. Race loser no-op.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-036									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Slot Lock Concurrent Trigger		Pre-Condition	Agent A sisa 1 slot. Close event dan cron race.	DATE			
+Url					Description	[P0] [REWRITE 030] Redis slot lock: concurrent triggers → one succeeds, other sees lock	ENV	DEV	STAGGING	PROD
+Steps		1	Close event + cron trigger bersamaan untuk Agent A (sisa 1 slot)		test type	POSITIVE				
+		2	Redis slot lock (withMemberAutoPullLock, TTL 10s) serialize							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				1 trigger berhasil assign (A ke 3/3). Trigger lain lihat lock, gagal karena slot sudah 0. Tidak over-assign.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-037									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			Close + Cron Race with Lock		Pre-Condition	Agent B di 2/3. Close event dan cron race.	DATE			
+Url					Description	[P0] [REWRITE 031] Lock + atomic guard: close+cron → slot lock prevents both reading '1 free'	ENV	DEV	STAGGING	PROD
+Steps		1	Agent B close 1 conversation (slot 1/3) + cron tick bersamaan		test type	POSITIVE				
+		2	Redis slot lock serialize read remaining slots + assign							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Tidak ada yang bisa over-assign. Bisa: 1 dapat (B ke 3/3) atau 1 dapat + 1 gagal. Konsisten.				
+		5								
+										
+										
+										
+
+Test ID	AutoPull-038									
+Create at			12/08/2026		created by	danny	Tester			
+Scenario			100 Chats Load		Pre-Condition	3 agents (maxConv=10 each). Backlog 100.	DATE			
+Url					Description	[P1] [REWRITE 032] 100 chats: rate cap + batch cap + maxConv govern distribution	ENV	DEV	STAGGING	PROD
+Steps		1	3 agent login bersamaan		test type	POSITIVE				
+		2	Burst: masing-masing dapat 10 (min(10,10)=10). Total 30.							
+		3			Status Response	Expected Result	Actual Result	Status		Status
+		4				Sisa 70 di backlog. Cron drain: batchCap=min(50,3×10)=30/tick. ~3 cron tick untuk habis. Tidak ada error.				
+		5								
+										
+										
+										

@@ -4,11 +4,12 @@
 > **Source Request / BRD:** Diskusi PM (Dany Christian) — request Exporting Report, 2026-08-03; contoh output: `.hermes/desktop-attachments/SatuInbox_SAP_Report_31_07_2026.xlsx` (4 sheet, 47.5 MB)
 > **Artifact Path:** `Assessments/cross-domain/sap-report-export/sap-report-export-change-intake-brief.md`
 > **Version:** `v1.0`
+> **Status:** **CONSUMED** by `Assessments/general/sap-report-export/sap-report-export-change-intake-brief.md` (v3.0) — SAP template becomes Sub-PRD D preset within general configurable export system. This brief remains as reference; its column specs and OQs carry forward.
 > **Previous Version:** `none`
 > **Rules Applied:** `Rules/requirements-lifecycle-rule.md`, `Rules/workflow-rule.md`, `Rules/impact-analysis-rule.md`
 > **Supporting Context:** `PRD/Analytics/PRD Analytics - offline report download.md`, `PRD/ticketv2/PRD Ticket - Export Ticket List (XLSX).md`, `Memory/CLAUDE-be.md`
 > **Tanggal Intake:** 2026-08-03
-> **Status:** Draft
+> **Status:** CONSUMED (v3.0 general brief)
 
 ---
 

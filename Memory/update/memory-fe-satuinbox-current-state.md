@@ -1,3 +1,8 @@
+> ⚠️ **SUPERSEDED / ARSIP — JANGAN DIPAKAI SEBAGAI SOURCE OF TRUTH.**
+> Konten file ini sudah dipromosikan ke canonical `Memory/CLAUDE-fe.md` pada 2026-08-11.
+> Semua pointer repo (Assessments, PRD, Rules, WORKFLOW_CONTEXT) menunjuk ke `Memory/CLAUDE-fe.md`, bukan file ini.
+> Disimpan hanya sebagai snapshot arsip verifikasi v2.8.0 / prod-2.7.0.3.
+
 # SatuInbox — Frontend Technical Reference (for Product Lead)
 
 > **Purpose:** a self-contained picture of the frontend for someone who does **not** have repo access.
