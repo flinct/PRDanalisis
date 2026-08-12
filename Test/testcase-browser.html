@@ -887,6 +887,7 @@
     const [open, setOpen]       = useState(depth < 2);
     const [showAdd, setShowAdd] = useState(false);
     const [hover, setHover]     = useState(false);
+    const headerRef = useRef(null);
     const pl = 10 + depth * 16;
 
     // Auto-expand if the selected file is inside this folder
@@ -896,12 +897,22 @@
       }
     }, [activePath]);
 
+    // Scroll folder header into view when opened (skip mount)
+    const _mounted = useRef(false);
+    useEffect(() => {
+      if (open && headerRef.current && _mounted.current) {
+        headerRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      _mounted.current = true;
+    }, [open]);
+
     if (node.kind === 'dir') {
       const fc = countFiles(node);
       const isOpen = forceOpen || open;
       return (
         <div>
           <div
+            ref={headerRef}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
             style={{
@@ -2937,45 +2948,62 @@
                       borderRadius:6, padding:'7px 10px', fontSize:11, color:'var(--text-2)',
                       outline:'none', fontFamily:'inherit' }}/>
                 </div>
-                <div style={{ flex:1, overflowY:'auto' }}>
-                  {WORKSPACE_SUB.map(item => {
-                    const expanded = workspaceNav === item.id;
-                    // map workspace item id → real section id from server
-                    const sectionIdMap = { brd:'brd', assessment:'assessments', prd:'prd', testcase:'test', 'feature-list':'feature', 'incident-report':'incident-report', summary:'summary', 'release-notes':'release-notes', uat:'uat', presentation:'presentation', 'google-docs':'gdocs' };
-                    const secId = sectionIdMap[item.id];
-                    const sec = secId ? allSections.find(s => s.id === secId) : null;
+                {(() => {
+                  const sectionIdMap = { brd:'brd', assessment:'assessments', prd:'prd', testcase:'test', 'feature-list':'feature', 'incident-report':'incident-report', summary:'summary', 'release-notes':'release-notes', uat:'uat', presentation:'presentation', 'google-docs':'gdocs' };
+                  const resolve = (item) => { const secId = sectionIdMap[item.id]; return secId ? allSections.find(s => s.id === secId) : null; };
+                  const renderHeader = (item, isActive) => {
+                    const sec = resolve(item);
                     const count = sec?.tree ? sec.tree.reduce((s, n) => s + countFiles(n), 0) : 0;
                     return (
-                      <div key={item.id}>
-                        <div onClick={() => setWorkspaceNav(expanded ? null : item.id)}
-                          style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 14px', margin:'1px 8px', cursor:'pointer', borderRadius:6,
-                            fontSize:12, fontWeight: expanded ? 600 : 500,
-                            color: expanded ? '#fff' : 'var(--text-2)',
-                            background: expanded ? 'rgba(255,255,255,0.08)' : 'transparent' }}>
-                          <span style={{ fontSize:9, color:'var(--text-5)', width:8 }}>{expanded ? '▾' : '▸'}</span>
-                          <span style={{ flex:1 }}>{item.label}</span>
-                          {count > 0 && <span style={{ fontSize:9, color:'var(--text-5)', background:'rgba(255,255,255,0.06)', padding:'1px 6px', borderRadius:8 }}>{count}</span>}
-                          {sec?.remote && <span style={{ fontSize:9, color:'var(--text-5)' }}>☁</span>}
-                        </div>
-                        {expanded && (
-                          <div style={{ padding:'2px 0 6px' }}>
-                            {sec && sec.tree?.length > 0 ? (
-                              <div style={{ paddingLeft:8 }}>{renderTree(sec.tree, sec.id)}</div>
-                            ) : sec && sec.remote && !sec.configured ? (
-                              <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)', lineHeight:1.5 }}>
-                                {sec.statusError || '⚠ Belum terhubung'}
-                              </div>
-                            ) : sec ? (
-                              <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)' }}>Kosong</div>
-                            ) : (
-                              <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)' }}>Belum ada folder untuk {item.label}</div>
-                            )}
+                      <div key={item.id} onClick={() => setWorkspaceNav(isActive ? null : item.id)}
+                        style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 14px', margin:'1px 8px', cursor:'pointer', borderRadius:6,
+                          fontSize:12, fontWeight: isActive ? 600 : 500,
+                          color: isActive ? '#fff' : 'var(--text-2)',
+                          background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent' }}>
+                        <span style={{ fontSize:9, color:'var(--text-5)', width:8 }}>{isActive ? '▾' : '▸'}</span>
+                        <span style={{ flex:1 }}>{item.label}</span>
+                        {count > 0 && <span style={{ fontSize:9, color:'var(--text-5)', background:'rgba(255,255,255,0.06)', padding:'1px 6px', borderRadius:8 }}>{count}</span>}
+                        {sec?.remote && <span style={{ fontSize:9, color:'var(--text-5)' }}>☁</span>}
+                      </div>
+                    );
+                  };
+                  const renderBody = (item) => {
+                    const sec = resolve(item);
+                    return (
+                      <div style={{ padding:'2px 0 6px' }}>
+                        {sec && sec.tree?.length > 0 ? (
+                          <div style={{ paddingLeft:8 }}>{renderTree(sec.tree, sec.id)}</div>
+                        ) : sec && sec.remote && !sec.configured ? (
+                          <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)', lineHeight:1.5 }}>
+                            {sec.statusError || '⚠ Belum terhubung'}
                           </div>
+                        ) : sec ? (
+                          <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)' }}>Kosong</div>
+                        ) : (
+                          <div style={{ padding:'4px 22px', fontSize:10, color:'var(--text-5)' }}>Belum ada folder untuk {item.label}</div>
                         )}
                       </div>
                     );
-                  })}
-                </div>
+                  };
+                  const activeItem = WORKSPACE_SUB.find(item => workspaceNav === item.id);
+                  if (!activeItem) {
+                    return <div style={{ flex:1, overflowY:'auto' }}>{WORKSPACE_SUB.map(item => renderHeader(item, false))}</div>;
+                  }
+                  const others = WORKSPACE_SUB.filter(item => item.id !== activeItem.id);
+                  return (
+                    <React.Fragment>
+                      <div style={{ flex:1, overflowY:'auto' }}>
+                        {renderHeader(activeItem, true)}
+                        {renderBody(activeItem)}
+                      </div>
+                      {others.length > 0 && (
+                        <div style={{ flexShrink:0, borderTop:'1px solid var(--border-1)' }}>
+                          {others.map(item => renderHeader(item, false))}
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                })()}
               </>
             ) : (
               <>
