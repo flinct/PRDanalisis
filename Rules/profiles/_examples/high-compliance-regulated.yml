@@ -1,0 +1,40 @@
+# High-Compliance Regulated Project — Example Profile (test harness only)
+# Bukti: core rules reusable untuk proyek regulated TANPA membawa detail SatuInbox.
+
+project:
+  name: FinServe Ledger
+  default_language: en
+  domains: [Ledger, Payments]
+  stack: {be: [Java, Postgres], fe: [Angular]}
+  repository:
+    root: finserve/
+    artifacts: {requirements: spec/, assessments: reviews/, tests: qa/}
+  roles: [PM, Engineer, Compliance Officer, QA, Auditor]
+
+governance:
+  mode: governed                    # governed lane: brief versioned + approval
+  non_bypassable:
+    - phase0_change_intake
+    - change_intake_brief
+    - approval_gates
+    - decision_enum
+    - traceability
+    - no_invented_test_results
+    - no_production_pii
+    - retention_policy              # regulated: retention + audit wajib
+    - memory_conflict_flag
+
+change_management:
+  phase0_mandatory: true
+  lane: governed
+
+approvals:
+  gates: [ChangeReview, ComplianceSignOff]
+
+delivery:
+  decision_taxonomy: [Proceed, Proceed_With_Conditions, Revise, Split, Hold]
+  environments: [dev, staging, preprod, production]
+
+privacy_and_retention_policy:
+  require_full_transcript: false
+  audit_trail: mandatory

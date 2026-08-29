@@ -1,3 +1,8 @@
+> ⚠️ **SUPERSEDED** — canonical rule sekarang di `core/change-management.md (+ profiles/satuinbox.yml governance)`.
+> File ini dipertahankan sebagai detail reference (metodologi/checklist lama) selama transisi;
+> jangan pakai sebagai entry point untuk pekerjaan baru. Peta lengkap: `Rules/MIGRATION.md`.
+> Isi di bawah TIDAK dihapus untuk menghindari silent degradation pada referensi lama.
+
 # Requirements Lifecycle Rules
 
 Purpose:
@@ -273,7 +278,7 @@ Catatan:
 
 ---
 
-# Fast Heuristics
+## Fast Heuristics
 
 Gunakan heuristik cepat berikut:
 
@@ -282,6 +287,24 @@ Gunakan heuristik cepat berikut:
 - Kalau user bilang **"hapus" / "buang" / "nonaktifkan"** → default route ke `ROUTE_DEPRECATION_REMOVAL`.
 - Kalau user bilang **"dulu pernah ada PRD-nya" / "fitur ini belum developed"** → default curigai `REVIVE_UNDEVELOPED_PRD`, bukan `NEW_FEATURE`.
 - Kalau request menyentuh **assignment, status, SLA, visibility, search scope, reporting, export, notification, API/event** → mandatory impact analysis.
+
+## Demand Screen (L0-L4)
+
+Sebelum mengklasifikasikan sebagai work item, nilai dulu *level demand* request. Ini memisahkan "bisa dibangun" dari "harus dibangun":
+
+| Level | Sinyal | Tindakan default |
+| --- | --- | --- |
+| `L0` | Founder anxiety / "kompetitor punya" / request polite tanpa bukti butuh | Tahan; jangan PRD dulu |
+| `L1` | Satu user minta sekali | Catat, jangan prioritaskan |
+| `L2` | Diminta berulang tapi belum ada bukti dipakai | Tahan / riset kecil |
+| `L3` | Workflow blocker nyata (user tidak bisa selesaikan pekerjaan) | Layak dibangun |
+| `L4` | Revenue / retention blocker | Prioritaskan tinggi |
+
+Rule:
+- `L3` / `L4` → lanjut ke klasifikasi change class + route normal.
+- `L0` / `L1` / `L2` → tulis sebagai open question / catat demand level di Change Intake Brief, dan jangan langsung generate PRD penuh tanpa konfirmasi. Likes, compliment, waitlist, dan angka market-size **bukan** demand; file nyata, booking, pembayaran, penggunaan manual berulang, atau migrasi dari alternatif adalah demand.
+
+> Sumber: diadaptasi dari `pm-skills` (product-on-purpose) `foundation-build-risk-review` — demand hierarchy.
 
 ---
 

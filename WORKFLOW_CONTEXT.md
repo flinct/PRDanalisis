@@ -21,7 +21,7 @@ User Request / BRD
     │
     ▼
 Phase 0 — Change Intake & Classification
-    │   - Mengikuti Rules/requirements-lifecycle-rule.md
+    │   - Mengikuti Rules/core/change-management.md
     │   - Klasifikasi: NEW_FEATURE / ADDITIVE_IMPROVEMENT / BEHAVIOR_CHANGE /
     │                 DEPRECATION_OR_REMOVAL / REVIVE_UNDEVELOPED_PRD / MIXED_REQUEST
     │   - Verifikasi current state: PRD existing, FE, BE, undeveloped feature memory
@@ -37,12 +37,12 @@ Orchestrator klasifikasi task + pilih lane
     │
     ▼
 Draft PRD v0 / PRD Skeleton
-    │   - Mengikuti Rules/prd-writing-rule.md (Lite/Standard/Full/Patch)
+    │   - Mengikuti Rules/core/requirements.md (Lite/Standard/Full/Patch)
     │   - Referensi: Memory/global-memory.md, Memory/CLAUDE-be.md, Memory/CLAUDE-fe.md
     │
     ▼
 Assessment Report (Owner: Analyst)
-    │   - Mengikuti Rules/qa-analysis-rule.md + Rules/impact-analysis-rule.md
+    │   - Mengikuti Rules/core/analysis-and-risk.md + Rules/core/analysis-and-risk.md
     │   - Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
     │   - Logical artifact name: Assessment Report
     │   - Versioning: versi sebelumnya dipindah ke `versions/` + ringkasan perubahan analisa wajib diisi
@@ -57,7 +57,7 @@ PRD requirement-ready
     │
     ▼
 QA Pre-Implementation Review
-    │   - Mengikuti Rules/test-case-rule.md
+    │   - Mengikuti Rules/core/test-design.md
     │   - Output: PRD review findings, requirement coverage matrix, regression impact,
     │             test strategy, automation candidate mapping
     │
@@ -93,10 +93,10 @@ Automation Script Generation / Sync / Maintenance
 
 ### **Entry Point & Orchestration**
 ```
-PRDanalisis/Rules/agent-instruction.md        ← ENTRY POINT: deteksi tipe tugas → load rule sesuai
-PRDanalisis/Rules/workflow-rule.md            ← Urutan eksekusi: Rule → Global Memory → Reference Index → Feature Memory / Reference Analysis → Execute
-PRDanalisis/Rules/requirements-lifecycle-rule.md ← Phase 0 change intake, classification, routing new/improvement/removal/revive
-PRDanalisis/Rules/structure-rule.md           ← Lokasi file: PRD/, Assessments/, Scripts/, Test/, Rules/, Memory/
+PRDanalisis/Rules/core/task-router.md        ← ENTRY POINT: deteksi tipe tugas → load rule sesuai
+PRDanalisis/Rules/core/task-router.md            ← Urutan eksekusi: Rule → Global Memory → Reference Index → Feature Memory / Reference Analysis → Execute
+PRDanalisis/Rules/core/change-management.md ← Phase 0 change intake, classification, routing new/improvement/removal/revive
+PRDanalisis/Rules/profiles/satuinbox.yml           ← Lokasi file: PRD/, Assessments/, Scripts/, Test/, Rules/, Memory/
 PRDanalisis/Memory/README.md                  ← Index memory files, routing guide, deprecated notices
 PRDanalisis/Memory/reference-index.md         ← Index reusable PRD analysis references di `Assessments/reference/`
 PRDanalisis/Assessments/README.md             ← Aturan artefak analisa permanen + versioning
@@ -107,17 +107,17 @@ PRDanalisis/Assessments/templates/Setup/assessment-report-template.md ← Wrappe
 
 ### **PRD Writing & Analysis**
 ```
-PRDanalisis/Rules/requirements-lifecycle-rule.md ← WAJIB untuk request tambah/ubah/buang behavior atau revive PRD lama
-PRDanalisis/Rules/prd-writing-rule.md         ← Template PRD (Lite/Standard/Full/Patch), Quality Gate
-PRDanalisis/Rules/qa-analysis-rule.md         ← WAJIB. Metodologi analisa QA senior (3 tipe, 9 impact dimensions)
-PRDanalisis/Rules/impact-analysis-rule.md     ← Blast radius detection untuk setiap perubahan
-PRDanalisis/Rules/prd-comparison-rule.md      ← Compare PRD A vs PRD B
+PRDanalisis/Rules/core/change-management.md ← WAJIB untuk request tambah/ubah/buang behavior atau revive PRD lama
+PRDanalisis/Rules/core/requirements.md         ← Template PRD (Lite/Standard/Full/Patch), Quality Gate
+PRDanalisis/Rules/core/analysis-and-risk.md         ← WAJIB. Metodologi analisa QA senior (3 tipe, 9 impact dimensions)
+PRDanalisis/Rules/core/analysis-and-risk.md     ← Blast radius detection untuk setiap perubahan
+PRDanalisis/Rules/core/analysis-and-risk.md      ← Compare PRD A vs PRD B
 ```
 
 ### **Test Case & Automation Bridge**
 ```
-PRDanalisis/Rules/test-case-rule.md           ← Test writing, coverage, TSV format, execution runbook
-PRDanalisis/Rules/automation-bridge-rule.md   ← Kontrak sync PRDanalisis ↔ sixV2Automation
+PRDanalisis/Rules/core/test-design.md           ← Test writing, coverage, TSV format, execution runbook
+PRDanalisis/Rules/integrations/satuinbox-playwright-bridge.md   ← Kontrak sync PRDanalisis ↔ sixV2Automation
 PRDanalisis/Assessments/templates/Setup/qa-pre-implementation-review-template.md
 PRDanalisis/Assessments/templates/Setup/qa-post-implementation-validation-template.md
 PRDanalisis/Assessments/templates/Setup/reviewer-decision-template.md
@@ -243,7 +243,7 @@ WHEN Conversation.tsv changes:
 ## 7. RULES UNTUK SETIAP TIPE TUGAS
 
 ### **Requirement Lifecycle / Change Intake (tambah / ubah / buang / revive feature)**
-1. Baca `requirements-lifecycle-rule.md`
+1. Baca `core/change-management.md`
 2. Klasifikasikan request: `NEW_FEATURE`, `ADDITIVE_IMPROVEMENT`, `BEHAVIOR_CHANGE`, `DEPRECATION_OR_REMOVAL`, `REVIVE_UNDEVELOPED_PRD`, atau `MIXED_REQUEST`
 3. Verifikasi current state: PRD existing, FE, BE, shipped/partial/undeveloped status
 4. Tentukan `In Scope`, `Out of Scope`, dan `Protected Existing Behavior`
@@ -253,17 +253,17 @@ WHEN Conversation.tsv changes:
 8. Jika hasilnya `SPLIT_REQUEST` atau `HOLD_NEEDS_DISCOVERY`, jangan lanjut ke PRD seolah scope sudah final
 
 ### **PRD Writing (buat/tulis/draft PRD)**
-1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `requirements-lifecycle-rule.md` dulu
-2. Baca `prd-writing-rule.md` + `global-memory.md` + V2 PRD existing
+1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `core/change-management.md` dulu
+2. Baca `core/requirements.md` + `global-memory.md` + V2 PRD existing
 3. Klasifikasikan kompleksitas: Lite / Standard / Full / Patch
 4. Tentukan Phase 1 In Scope & Out of Scope DULU
 5. Tulis sesuai template (metadata, overview, user stories, FR, EH, EC, UI, Field, NFR, dll)
 6. Quality Gate Checklist sebelum finalisasi
 
 ### **PRD Analysis / Feature Dev Analysis**
-1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `requirements-lifecycle-rule.md` dulu
-2. Baca `qa-analysis-rule.md` (Type 1: Feature Development Analysis)
-3. Baca `impact-analysis-rule.md` (blast radius)
+1. Jika request menambah / mengubah / membuang / merevive behavior, jalankan Phase 0 di `core/change-management.md` dulu
+2. Baca `core/analysis-and-risk.md` (Type 1: Feature Development Analysis)
+3. Baca `core/analysis-and-risk.md` (blast radius)
 4. Baca `global-memory.md` + feature memory relevan
 5. Gunakan template `Assessments/templates/qa-assessment-report-template.md`
 6. Output permanen: `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
@@ -273,17 +273,17 @@ WHEN Conversation.tsv changes:
 10. Jika mengikuti lane multi-agent, lanjut ke Reviewer Gate A sebelum PRD difinalisasi
 
 ### **Bug Fix Analysis**
-1. Baca `qa-analysis-rule.md` (Type 2: Bug Fix Analysis)
-2. Baca `impact-analysis-rule.md`
+1. Baca `core/analysis-and-risk.md` (Type 2: Bug Fix Analysis)
+2. Baca `core/analysis-and-risk.md`
 3. Identifikasi root cause, scope, regression risk, production safety
 4. Output: Root Cause, Affected Modules, Data Integrity Risk, Regression Scope, Backward Compatibility, Validation Strategy, Rollback Test Scope
 
 ### **Test Case Writing (buat test case / test scenario / QA test)**
-1. Baca `test-case-rule.md` + `qa-analysis-rule.md` (Test Specification Layer)
+1. Baca `core/test-design.md` + `core/analysis-and-risk.md` (Test Specification Layer)
 2. Baca PRD analysis output + impact analysis
 3. Baca existing test cases di scope terkait
 4. Output bisa berupa: QA Pre-Implementation Review / Detailed Test Case Spec / Regression Suite / QA Post-Implementation Validation / UAT Script / Automation Mapping
-5. Format TSV: gunakan Manual TSV Output Mode di `test-case-rule.md` (SatuInbox Test Case Scenario V2)
+5. Format TSV: gunakan Manual TSV Output Mode di `core/test-design.md` (SatuInbox Test Case Scenario V2)
 6. Jika feature belum punya generator bridge, simpan companion docs di `Test/<domain>/` sebagai `*-qa-test-spec.md`, `*-automation-mapping.md`, `*-qa-pre-implementation-review.md`, dan `*-qa-post-implementation-validation.md` bila relevan
 
 ### **Reviewer Gates & Freeze**
@@ -293,15 +293,15 @@ WHEN Conversation.tsv changes:
 4. Gate C = final review terhadap implementation + QA post-implementation validation
 
 ### **Impact Analysis**
-1. Baca `impact-analysis-rule.md` + PRD analysis output
+1. Baca `core/analysis-and-risk.md` + PRD analysis output
 2. Evaluasi 10 dimensi: Module, DB, API, UI/UX, Security, Performance, Integration, Reporting, Financial, Concurrency
 3. Output format: Direct/Indirect Modules, DB Impact, API Contract, Frontend Impact, Automation Testing Impact, Security/RBAC, Performance Risks, Concurrency Risks, Regression Scope, Migration Risks
 
 ### **Memory Write / Update**
-1. Baca `memory-routing-rule.md` → tentukan global vs feature
+1. Baca `core/knowledge-management.md` → tentukan global vs feature
 2. Baca existing memory (global + feature)
-3. Global: `global-memory-write-rule.md` / `global-memory-update-rule.md`
-4. Feature: `memory-write-rule.md` / `memory-update-rule.md`
+3. Global: `global-core/knowledge-management.md` / `global-core/knowledge-management.md`
+4. Feature: `core/knowledge-management.md` / `core/knowledge-management.md`
 5. Output format: Added / Updated / Removed / Conflicting / Final Merged
 
 ---
@@ -488,8 +488,8 @@ TTC       = working_duration(T1, T4)     → office-hours-aware (depending on SL
 ## 13. AGENT WORKFLOW CHECKLIST (SETIAP TUGAS)
 
 ```
-[ ] 1. Baca Rules/agent-instruction.md → deteksi tipe tugas
-[ ] 2. Load rule WAJIB berdasarkan tipe tugas (workflow-rule.md, structure-rule.md, Memory/README.md + rule spesifik)
+[ ] 1. Baca Rules/core/task-router.md → deteksi tipe tugas
+[ ] 2. Load rule WAJIB berdasarkan tipe tugas (core/task-router.md, profiles/satuinbox.yml, Memory/README.md + rule spesifik)
 [ ] 3. Baca Memory/global-memory.md
 [ ] 4. Baca context relevan (`Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`, `Memory/reference-index.md`, lalu file di `Assessments/reference/` bila perlu)
 [ ] 5. Eksekusi pakai rule sebagai metodologi (bukan referensi pasif)
@@ -557,7 +557,7 @@ npm run build                # Production build
 |---------|------|---------|
 | 1.0 | 2026-06-09 | Initial creation - full workflow context documented |
 | 1.1 | 2026-06-10 | Tambah QA Agent infrastructure: server.js (Express+Claude+SSE), AgentPanel di testcase-browser.html, Memory/qa-tooling.md. Update Section 3 (File Kunci) + Section 14 (Commands). |
-| 1.3 | 2026-06-12 | Full code review testcase-browser.html (2195 lines) + server.js (369 lines). Update Section 3 (QA Browser section rewrite — AI agent removed, server is pure QA tool). Update Memory/qa-tooling.md with full architecture (component tree, DB schema, endpoints, version system). Fix CLAUDE.md path (flinc→MyBook SAGA 12) + tambah referensi WORKFLOW_CONTEXT.md di CLAUDE.md dan agent-instruction.md. |
+| 1.3 | 2026-06-12 | Full code review testcase-browser.html (2195 lines) + server.js (369 lines). Update Section 3 (QA Browser section rewrite — AI agent removed, server is pure QA tool). Update Memory/qa-tooling.md with full architecture (component tree, DB schema, endpoints, version system). Fix CLAUDE.md path (flinc→MyBook SAGA 12) + tambah referensi WORKFLOW_CONTEXT.md di CLAUDE.md dan core/task-router.md. |
 | 1.4 | 2026-06-17 | Normalisasi terminology & workflow: QA Assessment → Assessment Report, tambah Reviewer Gate A/B/C, Requirement Package Freeze, QA pre/post implementation artifacts, dan referensi template `Assessments/templates/Setup/`. |
 
 **Update file ini saat:**

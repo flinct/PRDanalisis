@@ -1,13 +1,13 @@
 version: 2
 rule_profile: default
 source_of_truth:
-  agent_instruction: Rules/agent-instruction.md
-  workflow_rule: Rules/workflow-rule.md
-  structure_rule: Rules/structure-rule.md
-  qa_analysis_rule: Rules/qa-analysis-rule.md
-  test_case_rule: Rules/test-case-rule.md
-  automation_bridge_rule: Rules/automation-bridge-rule.md
-  requirements_lifecycle_rule: Rules/requirements-lifecycle-rule.md
+  agent_instruction: Rules/core/task-router.md
+  workflow_rule: Rules/core/task-router.md
+  structure_rule: Rules/profiles/satuinbox.yml
+  qa_analysis_rule: Rules/core/analysis-and-risk.md
+  test_case_rule: Rules/core/test-design.md
+  automation_bridge_rule: Rules/integrations/satuinbox-playwright-bridge.md
+  requirements_lifecycle_rule: Rules/core/change-management.md
 artifacts:
   change_intake_brief:
     logical_name: Change Intake Brief
@@ -71,7 +71,7 @@ freeze_policy:
   action_on_post_freeze_requirement_change: reopen_requirement_lane
 phase_zero:
   enabled: true
-  rule: Rules/requirements-lifecycle-rule.md
+  rule: Rules/core/change-management.md
   trigger_conditions:
     - request adds, changes, removes, deprecates, or revives product behavior
     - request references undeveloped PRD or partial implementation

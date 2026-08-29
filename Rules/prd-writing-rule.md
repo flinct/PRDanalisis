@@ -1,3 +1,8 @@
+> ⚠️ **SUPERSEDED** — canonical rule sekarang di `core/requirements.md (+ profiles/satuinbox.yml untuk ID/bahasa/role)`.
+> File ini dipertahankan sebagai detail reference (metodologi/checklist lama) selama transisi;
+> jangan pakai sebagai entry point untuk pekerjaan baru. Peta lengkap: `Rules/MIGRATION.md`.
+> Isi di bawah TIDAK dihapus untuk menghindari silent degradation pada referensi lama.
+
 # PRD Writing Rules
 
 Purpose:
@@ -144,6 +149,7 @@ If unsure, choose Standard PRD. If the feature touches Conversation, Ticket, SLA
 | Data Lifecycle & Retention | Not allowed | Conditional | Mandatory for persisted data, PII, export, attachment, or audit log |
 | Analytics & Observability Plan | Optional | Conditional | Mandatory for production-sensitive features |
 | Concurrency, Rate Limit & Idempotency | Not allowed | Conditional | Mandatory for high-volume or retryable actions |
+| Agent Execution Contract | Not allowed | Conditional | Mandatory when an agent/contractor/worker implements without the authoring context |
 
 Conditional means include the section when the trigger exists. Do not add empty ceremonial sections.
 
@@ -390,6 +396,15 @@ For Full PRD, insert these sections when triggered. Renumber the final document 
 | ----- | ----- | ----- |
 | Sequence Diagram | <link/path> | <Flow covered> |
 | State Diagram | <link/path> | <Lifecycle covered> |
+
+## **Agent Execution Contract**
+
+| Item | Notes |
+| ----- | ----- |
+| Authoritative Sources | <Table: Source \| Path/link \| Definitive for. State which source wins on conflict.> |
+| Do Not Touch | <Table: Path/system \| Reason it is off limits. A path with no reason gets edited anyway.> |
+| Requirement Verification Map | <Table: Requirement \| How verified \| Who verifies (Automated/QA/PM/Reviewer). One row per FR-n.> |
+| Stop and Escalate | <Table: Condition \| Escalate to. Name an owner; escalation with no addressee becomes a guess.> |
 ```
 
 Do not add these sections as empty placeholders. Add them only when the feature trigger exists, then make them complete enough for Engineering and QA.
@@ -542,6 +557,12 @@ Functional requirement categories to consider:
 - Define duplicate request behavior, double-click behavior, concurrent actor behavior, retry behavior, idempotency key, locking strategy, and rate limit outcome.
 - Include user-facing behavior for partial success and delayed processing.
 
+## Agent Execution Contract
+
+- Required when a coding agent, worker, contractor, or any executor implements this PRD without the authoring context (e.g. orchestrator delegates a worker; reviewer gates the result). Skip when the implementers were in the room.
+- The executor cannot infer what the author already knows. Declare: which sources are authoritative and which wins on conflict; what must not be touched and why; how each FR-n is verified and by whom; and the conditions where the executor must stop and escalate rather than decide.
+- A requirement with no verification is not ready to hand off, because nothing distinguishes "done" from "the executor believes it is done".
+
 ## Non-Functional Requirements
 
 - Include measurable performance targets when possible.
@@ -689,3 +710,4 @@ Before finalizing a PRD, verify:
 - [ ] Assumptions and open questions are documented instead of hidden.
 - [ ] UI-facing copy is Bahasa Indonesia unless the product surface requires otherwise.
 - [ ] PRD does not contradict `Memory/global-memory.md`; any conflict is flagged explicitly.
+- [ ] Agent Execution Contract is present when an agent/contractor/worker implements without the authoring context.

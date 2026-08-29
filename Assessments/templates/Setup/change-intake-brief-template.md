@@ -2,7 +2,7 @@
 
 > **Owner:** Analyst / PM / Orchestrator  
 > **Purpose:** Artefak Phase 0 untuk mengklasifikasikan request change sebelum PRD, Assessment Report, atau QA artifacts dibuat / direvisi.  
-> **Derived From:** `Rules/requirements-lifecycle-rule.md`, `Rules/workflow-rule.md`, `Rules/impact-analysis-rule.md`  
+> **Derived From:** `Rules/core/change-management.md`, `Rules/core/task-router.md`, `Rules/core/analysis-and-risk.md`  
 > **Reuse Rule:** BRD, PRD, Assessment Report, QA review, dan perubahan lanjutan harus mereferensikan brief ini. Jika scope berubah di tengah jalan, **update brief ini dulu** sebelum patch artefak downstream.
 
 ---
@@ -14,7 +14,7 @@
 > **Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-change-intake-brief.md`  
 > **Version:** `v1.0`  
 > **Previous Version:** `none` / `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-change-intake-brief-v0.9.md`  
-> **Rules Applied:** `Rules/requirements-lifecycle-rule.md`, `Rules/workflow-rule.md`  
+> **Rules Applied:** `Rules/core/change-management.md`, `Rules/core/task-router.md`  
 > **Supporting Context:** `Memory/global-memory.md`, `Memory/reference-index.md`, `<other-context-if-used>`  
 > **Tanggal Intake:** YYYY-MM-DD  
 > **Status:** Draft / Scoped / Ready for PRD / Hold / Superseded
@@ -117,7 +117,7 @@
 | Item | Value |
 |------|-------|
 | Routing Decision | `ROUTE_NEW_PRD / ROUTE_PATCH_EXISTING_PRD / ROUTE_REWRITE_EXISTING_PRD / ROUTE_REVIVE_UNDEVELOPED_PRD / ROUTE_DEPRECATION_REMOVAL / SPLIT_REQUEST / HOLD_NEEDS_DISCOVERY` |
-| Recommended Next Rules | `Rules/prd-writing-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/test-case-rule.md`, dll |
+| Recommended Next Rules | `Rules/core/requirements.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/test-design.md`, dll |
 | Recommended Next Artifact | PRD baru / Patch PRD / Assessment Report / Change split / Discovery follow-up |
 | Can Proceed to PRD? | Yes / No |
 

@@ -2,7 +2,7 @@
 
 > **Owner:** QA Agent  
 > **Purpose:** Review requirement package sebelum coding dimulai. Fokus pada PRD review, regression impact, coverage/test strategy, dan automation candidate mapping.  
-> **Derived From:** `Rules/test-case-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`
+> **Derived From:** `Rules/core/test-design.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`
 
 ---
 

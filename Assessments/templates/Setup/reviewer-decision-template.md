@@ -2,7 +2,7 @@
 
 > **Owner:** Reviewer  
 > **Purpose:** Template keputusan baku untuk Gate A, Gate B, dan Gate C agar Orchestrator bisa meroute next step tanpa interpretasi naratif panjang.  
-> **Derived From:** SOP workflow multi-agent, `Rules/qa-analysis-rule.md` decision discipline, dan requirement package freeze convention.
+> **Derived From:** SOP workflow multi-agent, `Rules/core/analysis-and-risk.md` decision discipline, dan requirement package freeze convention.
 
 ---
 

@@ -1,3 +1,8 @@
+> ⚠️ **SUPERSEDED** — canonical rule sekarang di `integrations/satuinbox-openproject-adapter.md`.
+> File ini dipertahankan sebagai detail reference (metodologi/checklist lama) selama transisi;
+> jangan pakai sebagai entry point untuk pekerjaan baru. Peta lengkap: `Rules/MIGRATION.md`.
+> Isi di bawah TIDAK dihapus untuk menghindari silent degradation pada referensi lama.
+
 # UAT Writing Rule
 
 ## Purpose

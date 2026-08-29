@@ -2,7 +2,7 @@
 
 > **Owner:** QA Agent  
 > **Purpose:** Validasi setelah implementation selesai. Fokus pada regression result, automation alignment, coverage confirmation, dan uncovered gaps/defects.  
-> **Derived From:** `Rules/test-case-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`
+> **Derived From:** `Rules/core/test-design.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`
 
 ---
 

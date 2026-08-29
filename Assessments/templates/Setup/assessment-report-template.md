@@ -2,7 +2,7 @@
 
 > **Owner:** Analyst  
 > **Purpose:** Artefak assessment awal untuk baseline risk, dependency, gap, dan impact sebelum PRD dibekukan untuk implementasi.  
-> **Derived From:** `Assessments/templates/qa-assessment-report-template.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
+> **Derived From:** `Assessments/templates/qa-assessment-report-template.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/task-router.md`  
 > **Compatibility Note:** Untuk kompatibilitas dengan struktur repo saat ini, file final yang dipersist di `Assessments/` boleh tetap memakai naming path existing `*-qa-assessment.md` sampai ada migrasi naming filesystem repo-wide. Judul artefak ini tetap **Assessment Report** agar ownership Analyst jelas.
 
 ---
@@ -16,7 +16,7 @@
 > **Assessment Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`  
 > **Version:** `v1.0`  
 > **Previous Version:** `none` / `<path-to-previous-version>`  
-> **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
+> **Rules Applied:** `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/task-router.md`  
 > **Reference Context:** `Memory/global-memory.md`, `Assessments/reference/<reference-file>.md`, `<other-context-if-used>`  
 > **Tanggal Analisa:** YYYY-MM-DD  
 > **Status:** Draft / Reviewed / Approved / Superseded

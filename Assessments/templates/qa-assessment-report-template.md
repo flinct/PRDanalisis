@@ -7,7 +7,7 @@
 > **Assessment Artifact Path:** `Assessments/<domain>/<feature-slug>/<feature-slug>-qa-assessment.md`
 > **Version:** `v1.0`
 > **Previous Version:** `none` / `Assessments/<domain>/<feature-slug>/versions/<feature-slug>-qa-assessment-v0.9.md`
-> **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`
+> **Rules Applied:** `Rules/core/analysis-and-risk.md`, `Rules/core/analysis-and-risk.md`, `Rules/core/task-router.md`
 > **Reference Context:** `Memory/global-memory.md`, `Assessments/reference/<reference-file>.md`, `<other-context-if-used>`
 > **Tanggal Analisa:** YYYY-MM-DD
 > **Status:** Draft / Reviewed / Approved / Superseded

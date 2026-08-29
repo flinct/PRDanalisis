@@ -2,7 +2,7 @@
 
 > **Owner:** QA Agent / Coder (automation)  
 > **Purpose:** Memetakan requirement dan candidate test ke target automation yang nyata, termasuk readiness, split spec, dan batasan harness.  
-> **Derived From:** `Rules/automation-bridge-rule.md`, `Rules/test-case-rule.md`, contoh `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`
+> **Derived From:** `Rules/integrations/satuinbox-playwright-bridge.md`, `Rules/core/test-design.md`, contoh `Test/whatsapp-web/wa-outbound-anti-ban-automation-mapping.md`
 
 ---
 

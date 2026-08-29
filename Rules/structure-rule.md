@@ -1,3 +1,8 @@
+> ⚠️ **SUPERSEDED** — canonical rule sekarang di `profiles/satuinbox.yml (project.repository)`.
+> File ini dipertahankan sebagai detail reference (metodologi/checklist lama) selama transisi;
+> jangan pakai sebagai entry point untuk pekerjaan baru. Peta lengkap: `Rules/MIGRATION.md`.
+> Isi di bawah TIDAK dihapus untuk menghindari silent degradation pada referensi lama.
+
 # Repository Structure Rules
 
 **Purpose:** Define where files belong in this repository to keep it organized, predictable, and automation-friendly.

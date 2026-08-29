@@ -1,0 +1,29 @@
+# Simple Greenfield Project — Example Profile (test harness only)
+# Bukti: core rules reusable untuk proyek TANPA tracker/automation/SatuInbox detail.
+
+project:
+  name: Greenfield CRM Lite
+  default_language: en
+  domains: [Leads]
+  stack: {be: [Node, SQLite], fe: [React]}
+  repository:
+    root: greenfield-crm/
+    artifacts: {requirements: docs/, assessments: docs/reviews/, tests: tests/}
+  roles: [PM, Engineer, QA]
+
+governance:
+  mode: light                      # light lane: brief hanya bila project menentukannya
+  non_bypassable:
+    - no_production_pii            # tetap non-bypassable walau light
+    - traceability
+
+change_management:
+  phase0_mandatory: false          # greenfield tidak wajib Phase 0 berat
+  lane: light
+
+delivery:
+  decision_taxonomy: [Proceed, Revise, Hold]
+  environments: [dev, staging]
+
+release:
+  tracker: null                    # TIDAK ada OpenProject — core tidak boleh memaksanya

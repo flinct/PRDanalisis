@@ -1,11 +1,8 @@
-> ⚠️ **SUPERSEDED** — canonical rule sekarang di `integrations/satuinbox-playwright-bridge.md`.
-> File ini dipertahankan sebagai detail reference (metodologi/checklist lama) selama transisi;
-> jangan pakai sebagai entry point untuk pekerjaan baru. Peta lengkap: `Rules/MIGRATION.md`.
-> Isi di bawah TIDAK dihapus untuk menghindari silent degradation pada referensi lama.
-
-# Automation Bridge Rule
+# SatuInbox Playwright Bridge (Integration Adapter)
 
 **Purpose:** Keep `PRDanalisis` and `sixV2Automation` connected so that test case changes can be reflected into automation scripts consistently.
+
+> Loaded only when the task touches the automation bridge (test case TSV → Playwright spec sync). This is SatuInbox/toolchain-specific; it is NOT a universal rule.
 
 ---
 
@@ -21,7 +18,6 @@
 | Automation repo | `C:\Users\MyBook SAGA 12\Desktop\sixV2Automation\` | Playwright spec generation target |
 | Automation manifest | `sixV2Automation/playwright/support/config/conversation-testcases.generated.json` | Sync payload consumed by automation repo |
 | Automation module | `sixV2Automation/playwright/support/config/conversation-testcases.generated.js` | CommonJS export of the sync payload |
-
 
 ---
 
@@ -54,4 +50,4 @@ Whenever `Conversation.tsv` changes:
 - refresh the automation input,
 - then regenerate or patch specs in `sixV2Automation`.
 
-If the automation repo changes its page objects or locators, update the mapping back in this rule or the automation repo AGENTS file.
+If the automation repo changes its page objects or locators, update the mapping back in this adapter or the automation repo AGENTS file.

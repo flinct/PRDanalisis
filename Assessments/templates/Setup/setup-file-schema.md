@@ -118,7 +118,7 @@ Wajib menyimpan versi compile dari config aktif:
 ## 6. Read Flow for Agent
 
 ```text
-CLAUDE.md / Rules/agent-instruction.md
+CLAUDE.md / Rules/core/task-router.md
     ↓
 Setup/runtime.md
     ↓

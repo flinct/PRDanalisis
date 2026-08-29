@@ -16,14 +16,12 @@ Folder `Memory` menyimpan **canonical product memory**, **architecture reference
 > - Lihat comparison files di `Assessments/reference/` atau `Memory/reference-index.md` untuk baseline perbedaan.
 
 README ini harus konsisten dengan aturan di `Rules/`:
-- `requirements-lifecycle-rule.md`
-- `memory-routing-rule.md`
-- `global-memory-write-rule.md`
-- `global-memory-update-rule.md`
-- `memory-write-rule.md`
-- `prd-writing-rule.md`
-- `test-case-rule.md`
-- `qa-analysis-rule.md`
+- `core/change-management.md` (Phase 0 change intake & classification)
+- `core/knowledge-management.md` (routing + write/update memory)
+- `core/requirements.md` (PRD writing)
+- `core/test-design.md` (test case)
+- `core/analysis-and-risk.md` (QA analysis + impact)
+- `profiles/satuinbox.yml` (governance, owner, struktur)
 - `Assessments/README.md`
 
 ## Files Inside Memory
@@ -64,6 +62,11 @@ README ini harus konsisten dengan aturan di `Rules/`:
 ### `CLAUDE-be.md`
 - Fungsi: canonical reference untuk BE repo `omnichannel-satuinbox-be`
 - Pakai saat butuh service boundary, proto contract, schema, RabbitMQ pattern, atau cross-check implementasi BE vs PRD
+
+### `CLAUDE-mobile.md`
+- Fungsi: canonical reference untuk mobile app `satuinbox-mobile` (React Native / Expo)
+- Pakai saat butuh struktur mobile, routing, state management, socket pattern, push notification, auth/RBAC mobile, atau status implementasi mobile vs web vs PRD
+- Mencakup: tech stack, route map, Zustand stores, API integration, realtime (Socket.IO), push notifications, telemetry, native config, build commands, standing constraints
 
 ### `impact-linked-chat-bubble-patch.md`
 - Fungsi: impact analysis reference untuk patch linked chat bubble di Ticket
@@ -127,9 +130,9 @@ Gunakan `Assessments/reference/` untuk reusable PRD analysis berikut:
 
 ## Agent Instructions
 
-Sebelum melakukan tugas apapun, baca `Rules/agent-instruction.md` — ini entry point untuk mendeteksi tipe tugas dan menentukan rule mana yang harus dimuat.
+Sebelum melakukan tugas apapun, baca `Rules/core/task-router.md` (entry point) + `Rules/profiles/satuinbox.yml` (governance) — ini menentukan tipe tugas dan rule core/adapter mana yang harus dimuat.
 
-Jika task berupa request **tambah / ubah / buang feature**, enhancement, atau revive PRD lama / undeveloped feature, jalankan dulu `Rules/requirements-lifecycle-rule.md` sebelum memilih lane PRD / analysis / impact.
+Jika task berupa request **tambah / ubah / buang feature**, enhancement, atau revive PRD lama / undeveloped feature, jalankan dulu `Rules/core/change-management.md` (Phase 0) sebelum memilih lane PRD / analysis / impact.
 
 ## Usage Rule
 
@@ -156,7 +159,7 @@ Jika task berupa request **tambah / ubah / buang feature**, enhancement, atau re
 - implementation summary atau architecture reference perlu dibuka cepat
 - status undeveloped/developed perlu dipakai ulang berkali-kali
 
-Gunakan terutama untuk membantu Phase 0 di `requirements-lifecycle-rule.md`, misalnya saat perlu memastikan request itu benar-benar feature baru atau sebenarnya revive dari PRD / feature undeveloped yang sudah pernah dicatat.
+Gunakan terutama untuk membantu Phase 0 di `Rules/core/change-management.md`, misalnya saat perlu memastikan request itu benar-benar feature baru atau sebenarnya revive dari PRD / feature undeveloped yang sudah pernah dicatat.
 
 ### Tulis ke `Assessments/reference/` jika:
 - reusable deep-dive PRD analysis

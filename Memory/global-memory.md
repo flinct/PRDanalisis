@@ -364,14 +364,14 @@ Mode belum final — perlu keputusan PM/Engineering.
 
 - Summary global untuk domain conversation omnichannel, ticket, dan WhatsApp Web.
 - Detail loophole, conflict, priority impact, QA analysis level-PRD tidak di file ini.
-- **Metodologi analisa QA** (feature dev, bug fix, interconnection, impact, risk) ada di `Rules/qa-analysis-rule.md` — bukan di global memory. Wajib dibaca bersamaan dengan workflow-rule.md sebelum melakukan analisa mendalam.
+- **Metodologi analisa QA** (feature dev, bug fix, interconnection, impact, risk) ada di `Rules/core/analysis-and-risk.md` + `Rules/core/test-design.md` — bukan di global memory. Wajib dibaca bersamaan dengan `Rules/core/task-router.md` sebelum melakukan analisa mendalam.
 
 ### Referenced Rules
 
-- `Rules/qa-analysis-rule.md` — framework analisa QA senior: 3 tipe analisa, 9 impact dimensions, risk matrix, output structure, bug fix methodology, interconnection analysis.
-- `Rules/impact-analysis-rule.md` — blast radius detection for any change.
-- ~~`Rules/analisa-prd-rule.md`~~ — **DEPRECATED.** Merged into `qa-analysis-rule.md`.
-- `Rules/workflow-rule.md` — execution order: rule → global memory → feature memory → task.
+- `Rules/core/analysis-and-risk.md` — framework analisa QA senior: applicability matrix, risk matrix, output structure, bug fix methodology, interconnection analysis.
+- `Rules/core/analysis-and-risk.md` — blast radius detection for any change (impact dimensions).
+- ~~`Rules/analisa-prd-rule.md`~~ — **DEPRECATED / REMOVED.** Merged into `core/analysis-and-risk.md`.
+- `Rules/core/task-router.md` — execution order: rule core + profile → global memory → feature memory → task.
 - **Source of truth:** Conversation V2 (`PRD/Conversationv2/`). V1 (`PRD/Conversation/`) deprecated.
 - **Source of truth:** Ticket V2 (`PRD/ticketv2/`). V1 (`PRD/Ticket/`) deprecated.
 - **Source of truth:** WhatsApp Web V2 (`PRD/Whatsapp web v2/`). V1 (`PRD/Whatsapp web/`) deprecated.

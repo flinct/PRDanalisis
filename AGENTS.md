@@ -1,6 +1,6 @@
-# CLAUDE.md — PRDanalisis Workspace Context
+# AGENTS.md — PRDanalisis Workspace Context
 
-> File ini dibaca otomatis oleh Claude di setiap session baru.
+> File ini dibaca otomatis oleh Codex di setiap session baru.
 > Workspace: `C:\Users\MyBook SAGA 12\Desktop\PRDanalisis`
 > Project: **SatuInbox** — Omnichannel Customer Service Platform
 
@@ -36,7 +36,7 @@ Customer service live chat platform dengan WhatsApp integration.
 
 ```
 PRDanalisis/
-├── CLAUDE.md                    ← file ini
+├── AGENTS.md                    ← file ini
 ├── Rules/                       ← rule files (core universal + profile + adapter)
 │   ├── core/                    ← 7 rule universal (baca sesuai tipe tugas)
 │   │   ├── task-router.md       ← ENTRY POINT — baca ini pertama
@@ -60,9 +60,9 @@ PRDanalisis/
 │   ├── README.md                ← memory index — baca untuk navigasi
 │   ├── global-memory.md         ← canonical product rules (always load)
 │   ├── reference-index.md       ← pointer ke reusable PRD analysis references di `Assessments/reference/`
-│   ├── CLAUDE-be.md             ← BE architecture reference
-│   ├── CLAUDE-fe.md             ← FE architecture reference
-│   ├── CLAUDE-mobile.md         ← Mobile app architecture reference
+│   ├── Codex-be.md             ← BE architecture reference
+│   ├── Codex-fe.md             ← FE architecture reference
+│   ├── Codex-mobile.md         ← Mobile app architecture reference
 │   ├── conversation-undeveloped-features-analysis.md
 │   ├── comprehensive-undeveloped-features-analysis.md
 │   ├── impact-linked-chat-bubble-patch.md
@@ -124,9 +124,9 @@ PRDanalisis/
 
 1. **Selalu load:** `Memory/global-memory.md`
 2. **Load jika butuh reusable PRD deep-dive / comparison:** `Memory/reference-index.md`
-3. **Load jika menyentuh BE:** `Memory/CLAUDE-be.md`
-4. **Load jika menyentuh FE:** `Memory/CLAUDE-fe.md`
-5. **Load jika menyentuh Mobile:** `Memory/CLAUDE-mobile.md`
+3. **Load jika menyentuh BE:** `Memory/Codex-be.md`
+4. **Load jika menyentuh FE:** `Memory/Codex-fe.md`
+5. **Load jika menyentuh Mobile:** `Memory/Codex-mobile.md`
 6. **Load sesuai domain:** lihat `Memory/README.md` dan `Memory/reference-index.md` untuk navigasi
 
 ---
@@ -180,8 +180,8 @@ Ini works untuk loop sequential (worker selesai → baru reviewer jalan) — TID
 | Review umum (PRD/analisa) | `openai/gpt-5.5` | high |
 | Analisa / deep-research | `openai/o3` | high |
 | Debugging | `openai/gpt-5.5` | high |
-| Planning | `cc/claude-opus-4-8` | xhigh |
-| Arsitektur | `cc/claude-opus-4-8` | xhigh |
+| Planning | `cc/Codex-opus-4-8` | xhigh |
+| Arsitektur | `cc/Codex-opus-4-8` | xhigh |
 | Test case / QA | `openai/gpt-5.5` | high |
 
 Kosongkan `delegation.model` (`hermes config set delegation.model ''`) setelah orchestrator loop selesai supaya sesi normal balik inherit model parent (`combo1`). Provider selalu ninerouter (semua model lewat proxy yang sama, port 20128).
@@ -215,3 +215,5 @@ Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding le
 6. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
 7. Jangan overwrite memory — update section relevan saja
 8. **Precedence:** user boleh mengubah default kerja, tetapi TIDAK boleh melewati kontrol proyek yang ditandai wajib/non-bypassable (Phase 0 brief, approval gate, package freeze, retention policy). Kontrol non-bypassable SatuInbox menang atas input user.
+
+## Imported Claude Cowork project instructions

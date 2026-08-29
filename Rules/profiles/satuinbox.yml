@@ -1,0 +1,179 @@
+# =============================================================================
+# SatuInbox Project Profile
+# =============================================================================
+# Kendaraan utama untuk menegakkan governance STRICT setelah core rules dipisah.
+# Core rules default ke risk-based lane (light/standard/governed). Profile ini
+# memaksa SatuInbox KEMBALI ke full-governance untuk SEMUA perubahan product
+# behavior — refactor rules TIDAK boleh melonggarkan disiplin yang sudah ada.
+#
+# Precedence yang benar:
+#   - User BOLEH mengubah default kerja.
+#   - User TIDAK BOLEH melewati kontrol yang ditandai non-bypassable di bawah.
+# =============================================================================
+
+project:
+  name: SatuInbox
+  description: Omnichannel Customer Service Platform dengan WhatsApp integration
+  default_language: id                 # Bahasa Indonesia (UI copy, PRD, release notes user-facing)
+  domains:
+    - Conversation
+    - Ticket
+    - WhatsApp Web
+    - Broadcast
+    - Contact
+    - Auth
+    - Analytics
+  source_of_truth:
+    active:
+      - PRD/Conversationv2
+      - PRD/ticketv2
+      - PRD/Whatsapp web v2
+    deprecated:
+      - PRD/Conversation
+      - PRD/Ticket
+      - PRD/Whatsapp web
+  stack:
+    be: [NestJS, gRPC, RabbitMQ, MongoDB, Socket.IO, "Nx monorepo", "20 microservices"]
+    fe: [Next.js, "React 19", "Zustand 5", "TanStack Query 5", "Tailwind CSS 4", Turborepo]
+
+  repository:
+    root: PRDanalisis/
+    artifacts:
+      requirements: PRD/
+      assessments: Assessments/
+      tests: Test/
+      scripts: Scripts/
+      memory: Memory/
+      release_notes: Release notes/
+      prototypes: prototypes/
+
+  prototype:
+    naming: "prototypes/<YYYY-MM-DD>-<short-descriptor>.html"
+    applies_to: [interactive UI mockup, single-file HTML demo, pre-implementation feature prototype]
+    not_applies_to: [production FE/BE code, Assessment reports, PRDs]
+    design_guidance: >
+      SatuInbox prototypes are real product (not template) prototypes. Avoid the
+      three "AI default" looks: (1) warm cream ~#F4F1EA + high-contrast serif +
+      terracotta accent; (2) near-black + one acid-green/vermilion accent; (3)
+      broadsheet layout (hairline rules, zero radius, newspaper columns). When the
+      brief does not pin a visual direction, do not spend the freedom on a default.
+      Ground in subject (SatuInbox = live-chat/CS elements: bubbles, messages,
+      status, SLA/clock, inbox list). Build a compact token system first: 4-6 named
+      colors, 2+ typeface roles, one layout concept, one memorable signature element.
+      Spend boldness in one place, keep the rest calm (Chanel: remove one accessory).
+      Quality floor: responsive to mobile, visible keyboard focus, honored
+      reduced-motion. Copy is design material: user-side control names, active voice,
+      errors that don't apologize or vague-out, empty states that invite action. Two
+      passes: plan → critique against brief → then code, all colors/type derived
+      from the plan. (Adapted from Anthropic frontend-design, CC-BY.)
+
+  roles: [Product Manager, Engineering Lead, Analyst, QA, Reviewer, Coder, Planner]
+  owners:
+    author: Dany Christian             # semua dokumen: author/owner/created by
+    pm: Dany Christian
+    qa: Dany Christian
+    engineering_lead: Naftal Yunior
+    analyst: Analyst                   # owner default Assessment Report
+
+# -----------------------------------------------------------------------------
+# GOVERNANCE (STRICT — NON-BYPASSABLE)
+# -----------------------------------------------------------------------------
+governance:
+  mode: strict
+
+  non_bypassable:
+    - phase0_change_intake              # wajib untuk tambah/ubah/buang/revive behavior
+    - change_intake_brief               # artifact wajib, dipersist + versioned
+    - stage_transition_confirmation     # 5-check layer; tanpa bypass walau user bilang "lanjut"
+    - protected_existing_behavior       # ditulis eksplisit di brief
+    - impact_analysis_shared            # wajib untuk shared entity/lifecycle/SLA/RBAC/contract
+    - assessment_report_decision        # decision-bearing -> Assessment Report permanen
+    - reviewer_gates                    # Gate A / B / C
+    - requirement_package_freeze        # post-freeze change -> balik ke requirement lane
+    - decision_enum                     # PROCEED / PROCEED_WITH_CAUTION / REVISE_PRD / SPLIT_FEATURE / HOLD_FEATURE
+    - traceability                      # tiap requirement -> test ATAU alasan tidak dapat diuji
+    - no_invented_test_results          # dilarang mengarang hasil eksekusi / Pass-Fail
+    - no_production_pii                 # data test tanpa PII produksi
+    - version_and_changelog             # update substantif wajib naik Version + change summary
+    - memory_conflict_flag              # konflik memory -> flag, jangan auto-overwrite, konfirmasi
+    - summary_transcript_verbatim       # summary session WAJIB + transkrip verbatim lengkap (non-bypassable)
+
+  change_management:
+    phase0_mandatory: true
+    lane: governed                      # semua product behavior change = governed (brief + approval)
+
+  impact_analysis:
+    mandatory_for:
+      - shared_entity
+      - lifecycle
+      - state_machine
+      - sla
+      - assignment
+      - rbac
+      - api_contract
+      - event_contract
+      - report_export
+      - notification
+      - migration
+      - deprecation
+
+  approvals:
+    gates: [GateA, GateB, GateC]
+    requirement_package_freeze: true
+
+# -----------------------------------------------------------------------------
+# DELIVERY / QUALITY CONFIG
+# -----------------------------------------------------------------------------
+delivery:
+  decision_taxonomy: [PROCEED, PROCEED_WITH_CAUTION, REVISE_PRD, SPLIT_FEATURE, HOLD_FEATURE]
+  environments: [dev, staging, staging_migration, production_canary, production_full, rollback_drill]
+  prd_modes: [Lite, Standard, Full, Patch_Addendum]
+  prd_rewrite_threshold_pct: 30        # >30% isi PRD berubah -> rewrite, bukan patch
+
+quality:
+  id_formats:
+    functional: FR-XXX
+    error_handling: EH-XXX
+    edge_case: EC-XXX
+    user_story: US-XXX
+    test_case: TC-{FEATURE}-NNN
+  adapters:
+    test_format: formats/satuinbox-manual-tsv.md
+    automation: integrations/satuinbox-playwright-bridge.md
+    release: integrations/satuinbox-openproject-adapter.md
+
+# -----------------------------------------------------------------------------
+# RELEASE / TRACKER
+# -----------------------------------------------------------------------------
+release:
+  tracker: openproject
+  tracker_project_id: 7
+  tracker_identifier: satuinbox
+  work_package_url: https://project.ordo.co.id/wp/{id}
+  shipped_statuses: [Closed, Tested]
+  notes:
+    default_output: [tech, user, gdoc]   # "buat release notes" -> 3 file, tanpa tanya
+    output_dir: Release notes/
+    gdoc_template_id: 1YxEANfHOf66w4YUsJFwqJmf-_mjgjIclzH5LnvGcSNU
+  uat:
+    template_columns: [Feature, Description, Enhancement, Evidence, Test Results]
+    output_dir: Assessments/openproject/
+
+# -----------------------------------------------------------------------------
+# SESSION SUMMARY / RETENTION (STRICT — transcript verbatim WAJIB)
+# -----------------------------------------------------------------------------
+summary:
+  mandatory: true                      # tiap session WAJIB punya file summary aktif
+  output_dir: summary/
+  filename_format: summary/YYYY-MM-DD-judul-singkat.md
+  update_on:
+    - session_start_scope_clear
+    - substantive_progress
+    - before_wrapping_up
+  transcript:
+    required: true                     # transkrip percakapan WAJIB
+    scope: full_session                 # SEMUA turn sejak awal, kronologis, verbatim
+    labels: ["### Turn N — User", "### Turn N — Assistant"]
+    no_gaps: true                       # turn baru wajib ditambahkan sebelum disimpan ulang
+    no_truncation: true                 # jangan potong walau panjang; taruh paling bawah
+  redaction: [secret, token, password, pii]   # ganti [REDACTED], jangan hilangkan turn

@@ -39,21 +39,21 @@
 `FINAL_APPROVE | REVISE_CODER | REVISE_QA | REOPEN_REQUIREMENT`
 
 ## Active Rules (must be read by agent)
-- Rules/agent-instruction.md
-- Rules/workflow-rule.md
-- Rules/structure-rule.md
-- Rules/requirements-lifecycle-rule.md
-- Rules/qa-analysis-rule.md
-- Rules/impact-analysis-rule.md
-- Rules/prd-writing-rule.md
-- Rules/prd-comparison-rule.md
-- Rules/test-case-rule.md
-- Rules/automation-bridge-rule.md
-- Rules/memory-routing-rule.md
-- Rules/memory-write-rule.md
-- Rules/memory-update-rule.md
-- Rules/global-memory-write-rule.md
-- Rules/global-memory-update-rule.md
+- Rules/core/task-router.md
+- Rules/core/task-router.md
+- Rules/profiles/satuinbox.yml
+- Rules/core/change-management.md
+- Rules/core/analysis-and-risk.md
+- Rules/core/analysis-and-risk.md
+- Rules/core/requirements.md
+- Rules/core/analysis-and-risk.md
+- Rules/core/test-design.md
+- Rules/integrations/satuinbox-playwright-bridge.md
+- Rules/core/knowledge-management.md
+- Rules/core/knowledge-management.md
+- Rules/core/knowledge-management.md
+- Rules/global-core/knowledge-management.md
+- Rules/global-core/knowledge-management.md
 
 ## Active Memory (must be loaded by agent)
 - Memory/README.md
