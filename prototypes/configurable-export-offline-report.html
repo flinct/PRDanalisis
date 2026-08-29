@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatuInbox — Statistik · Laporan Offline (Export Prototype)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'background-border': '#e2e8f0',
+      },
+      gridTemplateColumns: {
+        '20': 'repeat(20,minmax(0,1fr))',
+      }
+    }
+  }
+}
+</script>
+<style>
+  [x-cloak] { display:none !important; }
+  .btn-subtle { color:#475569; background:transparent; }
+  .btn-subtle:hover { background:#f8fafc; }
+  .btn-selected { background:#fff; border:1px solid #cbd5e1; font-weight:600; }
+  .badge-info { background:#dbeafe; color:#1e40af; }
+  .badge-up { background:#dcfce7; color:#166534; }
+  .badge-down { background:#fee2e2; color:#991b1b; }
+  .badge-none { background:#f1f5f9; color:#1e293b; }
+  .stat-card { cursor:default; }
+  .card-click { cursor:pointer; transition:box-shadow .15s, transform .15s, border-color .15s; }
+  .card-click:hover { box-shadow:0 4px 12px rgba(59,91,219,.15); transform:translateY(-1px); border-color:#3b5bdb; }
+  .modal-fade { animation:modalIn .2s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:none} }
+  .toast-fade { animation:toastIn .2s ease; }
+  @keyframes toastIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  .p2-tag { font-size:10px; font-weight:600; color:#059669; background:#ecfdf5; padding:1px 6px; border-radius:999px; }
+  .pii-badge { font-size:10px; padding:1px 6px; border-radius:999px; background:#fee2e2; color:#991b1b; font-weight:600; }
+  .category-header { cursor:pointer; user-select:none; }
+  .category-header:hover { background:#f1f5f9; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-700">
+
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR — exact SatuInbox StatisticNav style -->
+  <aside class="w-1/6 min-w-[220px] bg-slate-50 border-r border-[#e2e8f0] h-full px-5 py-5 overflow-y-auto">
+    <h1 class="text-xl text-slate-700 font-semibold ml-2 mb-4">Statistik</h1>
+    <div class="flex flex-col gap-2">
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-subtle"><span class="text-base">💬</span><span class="text-sm">Percakapan</span></button>
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-subtle"><span class="text-base">🎫</span><span class="text-sm">Tiket</span></button>
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-subtle"><span class="text-base">↔</span><span class="text-sm">Responsivitas</span></button>
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-subtle"><span class="text-base">👥</span><span class="text-sm">Performa Agent</span></button>
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-subtle"><span class="text-base">📢</span><span class="text-sm">Broadcast</span></button>
+      <button class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 btn-selected"><span class="text-base">📋</span><span class="text-sm">Laporan Offline</span></button>
+    </div>
+    <!-- role switcher -->
+    <div class="mt-6 mx-2">
+      <label class="text-[11px] text-slate-400 uppercase tracking-wider">Mode Akses</label>
+      <select class="mt-1 w-full text-sm border border-slate-300 rounded-md px-2 py-1.5 bg-white">
+        <option>Admin · all_access</option>
+        <option>Supervisor · read_team</option>
+        <option>Agent · read_own</option>
+      </select>
+    </div>
+    <!-- subscription tier switcher -->
+    <div class="mt-4 mx-2">
+      <label class="text-[11px] text-slate-400 uppercase tracking-wider">Subscription</label>
+      <select id="tierSel" onchange="setTier(this.value)" class="mt-1 w-full text-sm border border-slate-300 rounded-md px-2 py-1.5 bg-white">
+        <option value="normal">Normal</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise + PKS</option>
+      </select>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 overflow-y-auto">
+
+    <!-- Tab bar -->
+    <div id="tabBar" class="bg-white border-b border-slate-200 px-4 py-0 flex items-center sticky top-0 z-20"></div>
+
+    <!-- Content -->
+    <div class="p-4">
+
+      <!-- Section header -->
+      <div class="block items-center md:flex justify-between mb-4">
+        <div>
+          <p class="text-xl font-semibold">Laporan Offline</p>
+          <p class="text-xs text-slate-400 mt-0.5">Unduh laporan data historis dari sistem</p>
+        </div>
+        <div class="flex space-x-4 mt-3 md:mt-0" id="filterBar"></div>
+      </div>
+
+      <!-- Tab content -->
+      <div id="tabContent"></div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+  <div class="bg-slate-800 text-white rounded-lg px-4 py-3 text-sm shadow-lg toast-fade">
+    <div class="text-xs text-slate-300" id="toastMsg"></div>
+  </div>
+</div>
+
+<script>
+// ═══════ STATE ═══════
+let EXPORT_TAB = 'existing';
+let REPORT_TYPE = 'tiket'; // for configurable tab
+let SELECTED_COLS = new Set();
+let GRANULARITY = 'recipient'; // broadcast
+let PII_ACK = false;
+let TIER = 'normal'; // normal | pro | enterprise
+
+// ═══════ COLUMN REGISTRY ═══════
+const REGISTRY = {
+  tiket: [
+    { group:'Informasi Dasar', cols:[
+      {p:'ticketId',l:'Ticket ID',pii:false},{p:'ticketNumber',l:'Ticket Number',pii:false},{p:'title',l:'Judul',pii:false},{p:'awb',l:'AWB',pii:false},{p:'channel',l:'Channel',pii:false},
+    ]},
+    { group:'Status & Lifecycle', cols:[
+      {p:'status',l:'Status',pii:false},{p:'currentStage',l:'Stage Saat Ini',pii:false},{p:'priority',l:'Prioritas',pii:false},{p:'tribe',l:'Tribe',pii:false},{p:'typeComplaint',l:'Tipe Komplain',pii:false},
+    ]},
+    { group:'Assignee & Team', cols:[
+      {p:'assignee',l:'Assignee',pii:false},{p:'createdBy',l:'Dibuat Oleh',pii:false},{p:'closedBy',l:'Ditutup Oleh',pii:false},{p:'inboxName',l:'Inbox',pii:false},
+    ]},
+    { group:'Waktu & SLA', cols:[
+      {p:'createdAt',l:'Tanggal Dibuat',pii:false},{p:'closedAt',l:'Tanggal Ditutup',pii:false},{p:'firstReplyTimeMs',l:'First Reply Time',pii:false},{p:'handlingTimeMs',l:'Handling Time',pii:false},{p:'timeToCloseMs',l:'Time to Close',pii:false},{p:'slaFrtStatus',l:'SLA FRT',pii:false},{p:'slaResolveStatus',l:'SLA Resolve',pii:false},
+    ]},
+    { group:'Stage Durations', cols:[
+      {p:'stageDurationUnattendedMs',l:'Unattended',pii:false},{p:'stageDurationOpenMs',l:'Open',pii:false},{p:'stageDurationOnProgressMs',l:'On Progress',pii:false},{p:'stageDurationDoneMs',l:'Done',pii:false},
+    ]},
+    { group:'Tag & Kategori', cols:[
+      {p:'tags',l:'Tags',pii:false},{p:'csat',l:'CSAT',pii:false},{p:'reopenedCount',l:'Reopen Count',pii:false},
+    ]},
+  ],
+  percakapan: [
+    { group:'Informasi Dasar', cols:[
+      {p:'conversationId',l:'Conversation ID',pii:false},{p:'status',l:'Status',pii:false},{p:'channel',l:'Channel',pii:false},
+    ]},
+    { group:'Kontak & Identitas', cols:[
+      {p:'contactId',l:'Contact ID',pii:false},{p:'contactName',l:'Nama Kontak',pii:true},{p:'contactPhone',l:'Telepon Kontak',pii:true},{p:'contactEmail',l:'Email Kontak',pii:true},
+    ]},
+    { group:'Assignee & Team', cols:[
+      {p:'assignedTo',l:'Assignee',pii:false},{p:'participants',l:'Participants',pii:false},{p:'closedBy',l:'Ditutup Oleh',pii:false},
+    ]},
+    { group:'Waktu & SLA', cols:[
+      {p:'createdAt',l:'Tanggal Dibuat',pii:false},{p:'closedAt',l:'Tanggal Ditutup',pii:false},{p:'firstReplyTimeMs',l:'First Reply Time',pii:false},{p:'firstResponseTimeMs',l:'First Response Time',pii:false},{p:'timeToCloseMs',l:'Time to Close',pii:false},
+    ]},
+    { group:'Tag & Kategori', cols:[
+      {p:'tags',l:'Tags',pii:false},{p:'topic',l:'Topik',pii:false},{p:'subTopic',l:'Sub-Topik',pii:false},{p:'folder',l:'Folder',pii:false},
+    ]},
+  ],
+  broadcast: [
+    { group:'Informasi Broadcast', cols:[
+      {p:'broadcastId',l:'Broadcast ID',pii:false},{p:'broadcastName',l:'Nama Broadcast',pii:false},{p:'broadcastChannel',l:'Channel',pii:false},
+    ]},
+    { group:'Penerima', cols:[
+      {p:'recipientNumber',l:'Nomor Penerima',pii:true},{p:'recipientName',l:'Nama Penerima',pii:true},
+    ]},
+    { group:'Status & Error', cols:[
+      {p:'status',l:'Status',pii:false},{p:'reason',l:'Alasan',pii:false},{p:'failureSource',l:'Sumber Gagal',pii:false},
+    ]},
+    { group:'Pengirim', cols:[
+      {p:'senderAccountName',l:'Akun Pengirim',pii:false},{p:'senderNumber',l:'Nomor Pengirim',pii:true},{p:'creatorName',l:'Creator',pii:false},{p:'teamInboxNameAtSendTime',l:'Team Inbox',pii:false},
+    ]},
+    { group:'Waktu', cols:[
+      {p:'createdAt',l:'Tanggal Dibuat',pii:false},{p:'scheduledAt',l:'Tanggal Terjadwal',pii:false},
+    ]},
+    { group:'Template & Pesan', cols:[
+      {p:'templateUsed',l:'Template',pii:false},{p:'messageContent',l:'Isi Pesan',pii:false},
+    ]},
+  ],
+};
+
+const CAMPAIGN_COLS = [
+  {group:'Aggregat Kampanye', cols:[
+    {p:'broadcastId',l:'Broadcast ID',pii:false},{p:'broadcastName',l:'Nama Broadcast',pii:false},{p:'broadcastChannel',l:'Channel',pii:false},
+    {p:'createdAt',l:'Tanggal Dibuat',pii:false},{p:'creatorName',l:'Creator',pii:false},{p:'teamInboxName',l:'Team Inbox',pii:false},
+    {p:'senderAccountName',l:'Akun Pengirim',pii:false},
+    {p:'_totalRecipients',l:'Total Penerima',pii:false},{p:'_successCount',l:'Berhasil',pii:false},{p:'_failedCount',l:'Gagal',pii:false},
+    {p:'_pendingCount',l:'Pending',pii:false},{p:'_canceledCount',l:'Dibatalkan',pii:false},{p:'_invalidNumberCount',l:'Nomor Tidak Valid',pii:false},
+  ]},
+];
+
+const STATUS_CHIPS = {
+  tiket:['UNASSIGNED','ONGOING','RESOLVED'],
+  percakapan:['OPEN','PENDING','RESOLVED','SNOOZED'],
+  broadcast:['SUCCESS','IN_PROGRESS','SCHEDULED','FAILED','CANCELED','INVALID_NUMBER','INVALID_REQUEST'],
+};
+
+const SAP_SHEETS = [
+  {name:'Report Ticket', count:35, cols:['Ticket ID','Ticket Number','AWB','Created Datetime (WIB)','Closed Datetime (WIB)','Created By','Closed By','Participants','Status','Current Stage','Assign By','Channel','Tribe','Type Complaint','Diff Time First Assign And First Response','AVG Responsetime','Handling Time','Diff Time Resolved and Created','CSAT','Ticket All Remarks','Title','Priority','Unattended','Open','On Progress','Done']},
+  {name:'Report Conversation', count:23, cols:['Conversation ID','Status','Created Datetime (WIB)','Closed Datetime (WIB)','Closed By','Participants','Assign By','Jam Chat In (T1)','Jam Respon Pertama (T3)','Channel','Diff Time First Assign And First Response','AVG Responsetime','Handling Time','Contact ID','Topic','Sub-Topic','Contact Name','Contact Phone','Contact Email']},
+  {name:'Report Effective Hour', count:6, cols:['Shift Date','User ID','Fullname','Work Hours Shift','Total Shift Away','Effective Work Shift Hour']},
+  {name:'Raw AUX', count:9, cols:['Shift Date','User ID','User Name','Reason Away','Start Shift','End Shift','Start Away','End Away','Total Away']},
+];
+
+// ═══════ TAB SWITCHING ═══════
+function setTier(t) {
+  TIER = t;
+  // Only SAP is gated — if on SAP tab and tier drops, switch to Export
+  if (EXPORT_TAB === 'sap' && TIER !== 'enterprise') EXPORT_TAB = 'existing';
+  renderExport();
+}
+function switchExportTab(t) {
+  EXPORT_TAB = t;
+  renderTabBar();
+  renderExport();
+}
+function renderTabBar() {
+  const t = EXPORT_TAB;
+  const bar = document.getElementById('tabBar');
+  let html = '';
+  // Export + Advance Export — always visible (all tiers)
+  html += `<button onclick="switchExportTab('existing')" class="px-4 py-3 text-sm font-medium border-b-2 ${t==='existing'?'border-blue-600 text-blue-600':'border-transparent text-slate-500 hover:text-slate-700'}">Export</button>`;
+  html += `<button onclick="switchExportTab('configurable')" class="px-4 py-3 text-sm font-medium border-b-2 ${t==='configurable'?'border-blue-600 text-blue-600':'border-transparent text-slate-500 hover:text-slate-700'}">Advance Export</button>`;
+  // SAP — enterprise + PKS only
+  if (TIER === 'enterprise') {
+    html += `<button onclick="switchExportTab('sap')" class="px-4 py-3 text-sm font-medium border-b-2 ${t==='sap'?'border-blue-600 text-blue-600':'border-transparent text-slate-500 hover:text-slate-700'}">👑 SAP Report</button>`;
+  }
+  // Upgrade hint — only show for non-enterprise
+  if (TIER !== 'enterprise') {
+    html += `<div class="ml-2 flex items-center text-[11px] text-slate-400"><span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">👑 Enterprise + PKS untuk SAP Report</span></div>`;
+  }
+  html += `<div class="ml-auto flex items-center gap-2 text-xs text-slate-400 pr-2"><span class="badge-info px-2 py-0.5 rounded-full text-[11px]">all_access</span></div>`;
+  bar.innerHTML = html;
+}
+
+// ═══════ FILTER BAR ═══════
+function renderFilterBar() {
+  let html = '<div class="flex items-center gap-2 flex-wrap">';
+
+  if (EXPORT_TAB === 'configurable') {
+    html += `<div class="w-[180px]"><select id="rtSel" onchange="onReportTypeChange()" class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white">
+      <option value="tiket">Tiket</option><option value="percakapan">Percakapan</option><option value="broadcast">Broadcast</option>
+    </select></div>`;
+
+    if (REPORT_TYPE === 'broadcast') {
+      html += `<div class="flex gap-1">
+        <button onclick="setGran('recipient')" class="h-9 px-3 text-sm rounded-md ${GRANULARITY==='recipient'?'bg-white border border-slate-300 font-semibold':'text-slate-500'}">Per Penerima</button>
+        <button onclick="setGran('campaign')" class="h-9 px-3 text-sm rounded-md ${GRANULARITY==='campaign'?'bg-white border border-slate-300 font-semibold':'text-slate-500'}">Per Kampanye</button>
+      </div>`;
+    }
+  }
+
+  if (EXPORT_TAB === 'sap') {
+    html += `<div class="text-sm text-slate-500 flex items-center gap-2">
+      <span class="font-medium">Template:</span> SAP Report
+      <span class="p2-tag">4 sheet</span>
+    </div>`;
+  }
+
+  // Date picker — exact SatuInbox style
+  html += `<div class="flex items-center gap-1 h-9 px-3 rounded-md border border-slate-300 bg-white text-sm text-slate-600 cursor-pointer min-w-[240px]">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7h18M3 7v14h18V7M8 3v4M16 3v4"/></svg>
+    <span>2026-08-01</span><span class="text-slate-300">→</span><span>2026-08-12</span>
+    <span class="ml-1 text-[11px] text-slate-400">12 Hari</span>
+  </div>`;
+
+  html += '</div>';
+  document.getElementById('filterBar').innerHTML = html;
+}
+
+// ═══════ RENDER TABS ═══════
+function renderExport() {
+  renderTabBar();
+  renderFilterBar();
+  const el = document.getElementById('tabContent');
+  if (EXPORT_TAB === 'existing') renderExistingTab(el);
+  else if (EXPORT_TAB === 'configurable') renderConfigurableTab(el);
+  else renderSAPTab(el);
+}
+
+// ── EXISTING TEMPLATE TAB ──
+function renderExistingTab(el) {
+  el.innerHTML = `
+    <!-- Template selector -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-600 mb-2">Jenis Laporan</label>
+      <div class="flex gap-2">
+        <button class="h-9 px-4 text-sm rounded-md bg-white border border-slate-300 font-semibold">Tiket</button>
+        <button class="h-9 px-4 text-sm rounded-md text-slate-500 hover:bg-white hover:border-slate-300 border border-transparent">Percakapan</button>
+      </div>
+    </div>
+
+    <!-- Template picker -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-600 mb-2">Template</label>
+      <div class="flex gap-2">
+        <button class="h-9 px-4 text-sm rounded-md bg-white border border-slate-300 font-semibold">Default Ticket</button>
+        <button class="h-9 px-4 text-sm rounded-md text-slate-500 hover:bg-white hover:border-slate-300 border border-transparent">Bug Report</button>
+        <button class="h-9 px-4 text-sm rounded-md text-slate-500 hover:bg-white hover:border-slate-300 border border-transparent">Customer Request</button>
+      </div>
+    </div>
+
+    <!-- Status filter -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-600 mb-2">Status</label>
+      <div class="flex flex-wrap gap-1.5">
+        ${STATUS_CHIPS.tiket.map(s => `<button class="px-2.5 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50">${s}</button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button onclick="submitJob('Tiket — Default Ticket')" class="h-10 px-6 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 mt-2">Submit Laporan</button>
+
+    <!-- Job list -->
+    <div class="mt-8">
+      <h3 class="text-sm font-medium text-slate-600 mb-3">Daftar Laporan</h3>
+      ${renderJobList([
+        {name:'Tiket — Default Ticket',type:'Tiket',typeColor:'blue',date:'12/08/2026 09:15',status:'Selesai',statusColor:'green'},
+        {name:'Percakapan — Default Conversation',type:'Percakapan',typeColor:'green',date:'11/08/2026 14:20',status:'Selesai',statusColor:'green'},
+      ])}
+    </div>
+  `;
+}
+
+// ── CONFIGURABLE COLUMN TAB ──
+function renderConfigurableTab(el) {
+  const groups = REPORT_TYPE === 'broadcast' && GRANULARITY === 'campaign' ? CAMPAIGN_COLS : (REGISTRY[REPORT_TYPE] || []);
+  const hasPII = [...SELECTED_COLS].some(p => {
+    for (const g of groups) { const c = g.cols.find(c=>c.p===p); if (c && c.pii) return true; }
+    return false;
+  });
+
+  let colListHTML = '';
+  groups.forEach((g, gi) => {
+    const gid = 'g'+gi;
+    colListHTML += `<div class="column-group">`;
+    colListHTML += `<div class="category-header flex items-center justify-between px-2 py-1.5 rounded text-xs font-semibold text-slate-500 bg-slate-100" onclick="toggleGroup('${gid}')">
+      <span>${g.group} <span class="text-slate-400 font-normal">(${g.cols.length})</span></span>
+      <svg id="arrow_${gid}" class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </div>`;
+    colListHTML += `<div id="${gid}" class="ml-2 mt-1 space-y-0.5">`;
+    g.cols.forEach(c => {
+      const checked = SELECTED_COLS.has(c.p) ? 'checked' : '';
+      colListHTML += `<label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 text-sm cursor-pointer" data-search="${(g.group+' '+c.l+' '+c.p).toLowerCase()}">
+        <input type="checkbox" class="rounded" data-path="${c.p}" data-pii="${c.pii}" ${checked} onchange="onColChange(this)">
+        <span class="flex-1">${c.l} ${c.pii?'<span class="pii-badge">PII</span>':''}</span>
+      </label>`;
+    });
+    colListHTML += '</div></div>';
+  });
+
+  // Status chips for current report type
+  const chips = (STATUS_CHIPS[REPORT_TYPE]||[]).map(s =>
+    `<button onclick="this.classList.toggle('bg-blue-50');this.classList.toggle('border-blue-400');this.classList.toggle('text-blue-700')" class="px-2.5 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50">${s}</button>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <!-- Left: Column picker + filters -->
+      <div class="md:col-span-5 space-y-4">
+
+        <!-- Column picker card -->
+        <div class="border border-slate-200 rounded-lg bg-white p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-medium text-slate-600">Pilih Kolom</h3>
+            <span class="text-xs px-2 py-0.5 rounded-full ${SELECTED_COLS.size?'bg-blue-50 text-blue-700':'bg-slate-100 text-slate-500'} font-medium">${SELECTED_COLS.size} dipilih</span>
+          </div>
+          <div class="flex gap-2 mb-3">
+            <button onclick="selectAll()" class="text-xs text-blue-600 hover:underline">Pilih Semua</button>
+            <span class="text-slate-300">|</span>
+            <button onclick="deselectAll()" class="text-xs text-slate-500 hover:underline">Hapus Semua</button>
+            <span class="text-slate-300">|</span>
+            <button onclick="loadPreset()" class="text-xs text-blue-600 hover:underline">Default Preset</button>
+          </div>
+          <div class="relative mb-3">
+            <input type="text" id="colSearch" placeholder="Cari kolom..." class="w-full h-8 border border-slate-300 rounded-md pl-7 pr-2 text-sm bg-white" oninput="filterCols()">
+            <svg class="absolute left-2 top-2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <div class="max-h-72 overflow-y-auto space-y-1 border border-slate-200 rounded p-2">${colListHTML}</div>
+        </div>
+
+        <!-- PII warning -->
+        ${hasPII ? `<div class="border border-amber-300 bg-amber-50 rounded-lg p-3 text-sm">
+          <div class="flex items-start gap-2">
+            <span class="text-amber-600 mt-0.5">⚠️</span>
+            <div>
+              <p class="font-medium text-amber-800">Kolom PII Terpilih</p>
+              <p class="text-amber-700 text-xs mt-1">Data pribadi akan terekspor ke XLSX.</p>
+              <label class="flex items-center gap-2 mt-2 text-xs text-amber-800">
+                <input type="checkbox" class="rounded" id="piiAck" onchange="PII_ACK=this.checked"> Saya memahami dan menyetujui
+              </label>
+            </div>
+          </div>
+        </div>` : ''}
+
+        <!-- Filters card -->
+        <div class="border border-slate-200 rounded-lg bg-white p-4 space-y-3">
+          <h3 class="text-sm font-medium text-slate-600">Filter</h3>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Status</label>
+            <div class="flex flex-wrap gap-1.5">${chips}</div>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Agent</label>
+            <select class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white">
+              <option>Semua Agent</option><option>Andi Pratama</option><option>Budi Santoso</option><option>Citra Dewi</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Channel</label>
+            <select class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white">
+              <option>Semua Channel</option><option>WhatsApp</option><option>Instagram</option><option>Telegram</option><option>Email</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="submitJob('Kustom — '+SELECTED_COLS.size+' kolom')" class="w-full h-10 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" ${SELECTED_COLS.size===0||(hasPII&&!PII_ACK)?'disabled':''}>Submit Laporan</button>
+      </div>
+
+      <!-- Right: Preview + job list -->
+      <div class="md:col-span-7 space-y-4">
+        <div class="border border-slate-200 rounded-lg bg-white p-4">
+          <h3 class="text-sm font-medium text-slate-600 mb-3">Preview Kolom</h3>
+          ${SELECTED_COLS.size > 0 ? `
+            <div class="flex flex-wrap gap-1.5">
+              ${[...SELECTED_COLS].map(c => `<span class="px-2 py-0.5 text-xs bg-slate-100 rounded border border-slate-200">${c}</span>`).join('')}
+            </div>
+          ` : '<p class="text-sm text-slate-400 italic">Pilih kolom untuk melihat preview.</p>'}
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-600 mb-3">Daftar Laporan</h3>
+          ${renderJobList([
+            {name:'Tiket — 12 kolom dipilih',type:'Tiket',typeColor:'blue',date:'12/08/2026 10:30',status:'Diproses',statusColor:'yellow'},
+            {name:'Percakapan — 8 kolom dipilih',type:'Percakapan',typeColor:'green',date:'11/08/2026 16:45',status:'Selesai',statusColor:'green'},
+          ])}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── SAP REPORT TAB ──
+function renderSAPTab(el) {
+  const sheetChecks = SAP_SHEETS.map(s => `
+    <label class="flex items-center gap-2 px-3 py-2 rounded hover:bg-slate-50 text-sm cursor-pointer border border-slate-200">
+      <input type="checkbox" class="sap-sheet rounded" value="${s.name}" checked onchange="renderSAPPreview()">
+      <span class="flex-1 font-medium">${s.name}</span>
+      <span class="text-xs text-slate-400">${s.count} kolom</span>
+    </label>
+  `).join('');
+
+  let previewHTML = '';
+  SAP_SHEETS.forEach(s => {
+    previewHTML += `<div class="mb-4">
+      <div class="text-xs font-semibold text-slate-600 mb-1.5">📄 ${s.name} <span class="text-slate-400">(${s.count} kolom)</span></div>
+      <div class="flex flex-wrap gap-1">${s.cols.map(c=>`<span class="px-2 py-0.5 text-xs bg-slate-100 rounded border border-slate-200">${c}</span>`).join('')}</div>
+    </div>`;
+  });
+
+  el.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-5 space-y-4">
+        <!-- Sheet selection -->
+        <div class="border border-slate-200 rounded-lg bg-white p-4">
+          <h3 class="text-sm font-medium text-slate-600 mb-3">Pilih Sheet</h3>
+          <div class="space-y-2">${sheetChecks}</div>
+          <p class="text-[11px] text-slate-400 mt-2">Minimal 1 sheet harus dipilih</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="border border-slate-200 rounded-lg bg-white p-4 space-y-3">
+          <h3 class="text-sm font-medium text-slate-600">Filter</h3>
+          <div class="text-[11px] text-slate-500 bg-slate-50 rounded px-2 py-1.5">📋 Filter berlaku untuk semua sheet yang dipilih</div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Status</label>
+            <div class="flex flex-wrap gap-1.5">
+              ${STATUS_CHIPS.tiket.map(s => `<button onclick="this.classList.toggle('bg-blue-50');this.classList.toggle('border-blue-400');this.classList.toggle('text-blue-700')" class="px-2.5 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50">${s}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-500 mb-1">Agent</label>
+            <select class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white"><option>Semua Agent</option><option>Andi Pratama</option><option>Budi Santoso</option></select>
+          </div>
+        </div>
+
+        <button onclick="submitJob('SAP Report')" class="w-full h-10 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700">Submit Laporan</button>
+      </div>
+
+      <!-- Preview -->
+      <div class="md:col-span-7 space-y-4">
+        <div class="border border-slate-200 rounded-lg bg-white p-4">
+          <h3 class="text-sm font-medium text-slate-600 mb-3">Preview Sheet & Kolom</h3>
+          <div id="sapPreview">${previewHTML}</div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-600 mb-3">Daftar Laporan</h3>
+          ${renderJobList([
+            {name:'SAP Report — 4 sheet',type:'SAP',typeColor:'purple',date:'12/08/2026 09:15',status:'Selesai',statusColor:'green',
+             detail:'Sheet: Report Ticket, Report Conversation, Report Effective Hour, Raw AUX'},
+            {name:'SAP Report — 2 sheet',type:'SAP',typeColor:'purple',date:'10/08/2026 11:00',status:'Kedaluwarsa',statusColor:'slate',
+             detail:'Sheet: Report Ticket, Report Conversation'},
+          ])}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════ JOB LIST COMPONENT ═══════
+function renderJobList(jobs) {
+  return `<div class="border border-slate-200 rounded-lg bg-white overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-400 bg-slate-50">
+        <tr><th class="text-left px-4 py-2.5 font-medium">Nama Laporan</th><th class="text-left px-4 py-2.5 font-medium">Jenis</th><th class="text-left px-4 py-2.5 font-medium">Diminta</th><th class="text-left px-4 py-2.5 font-medium">Status</th><th class="text-left px-4 py-2.5 font-medium">Tautan</th></tr>
+      </thead>
+      <tbody id="jobBody">${jobs.map(j => `
+        <tr class="border-t border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <div class="font-medium text-slate-700">${j.name}</div>
+            ${j.detail?`<div class="text-[11px] text-slate-400 mt-0.5">${j.detail}</div>`:''}
+          </td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-${j.typeColor}-50 text-${j.typeColor}-700">${j.type}</span></td>
+          <td class="px-4 py-3 text-slate-500 text-xs">${j.date}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-${j.statusColor}-50 text-${j.statusColor}-700">${j.status}</span></td>
+          <td class="px-4 py-3">${j.status==='Selesai'?'<button class="text-blue-600 hover:underline text-xs">Unduh</button>':j.status==='Diproses'?'<span class="text-slate-400 text-xs">—</span>':'<span class="text-slate-400 text-xs">'+j.status+'</span>'}</td>
+        </tr>
+      `).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+// ═══════ INTERACTIONS ═══════
+function onReportTypeChange() {
+  REPORT_TYPE = document.getElementById('rtSel').value;
+  SELECTED_COLS.clear();
+  PII_ACK = false;
+  renderExport();
+}
+function setGran(g) { GRANULARITY = g; SELECTED_COLS.clear(); PII_ACK = false; renderExport(); }
+function toggleGroup(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById('arrow_'+id);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? '' : 'none';
+  if (arrow) arrow.style.transform = hidden ? '' : 'rotate(-90deg)';
+}
+function selectAll() { document.querySelectorAll('.column-group input[type=checkbox]').forEach(cb=>{cb.checked=true;SELECTED_COLS.add(cb.dataset.path)}); renderExport(); }
+function deselectAll() { document.querySelectorAll('.column-group input[type=checkbox]').forEach(cb=>{cb.checked=false}); SELECTED_COLS.clear(); renderExport(); }
+function loadPreset() { SELECTED_COLS.clear(); document.querySelectorAll('.column-group input[type=checkbox]').forEach(cb=>{if(cb.dataset.pii==='false'){cb.checked=true;SELECTED_COLS.add(cb.dataset.path)}else{cb.checked=false}}); renderExport(); }
+function onColChange(el) { if(el.checked)SELECTED_COLS.add(el.dataset.path); else SELECTED_COLS.delete(el.dataset.path); PII_ACK=false; renderExport(); }
+function filterCols() { const q=document.getElementById('colSearch').value.toLowerCase(); document.querySelectorAll('.column-group label[data-search]').forEach(r=>{r.style.display=r.dataset.search.includes(q)?'':'none'}); }
+function renderSAPPreview() { /* checkbox toggle triggers re-render via parent renderExport */ }
+
+function submitJob(name) {
+  const tbody = document.getElementById('jobBody');
+  if (!tbody) return;
+  const now = new Date();
+  const ds = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const type = EXPORT_TAB==='sap'?'SAP':REPORT_TYPE==='tiket'?'Tiket':REPORT_TYPE==='percakapan'?'Percakapan':'Broadcast';
+  const tc = EXPORT_TAB==='sap'?'purple':REPORT_TYPE==='tiket'?'blue':'green';
+  const row = document.createElement('tr');
+  row.className = 'border-t border-slate-100 hover:bg-slate-50';
+  row.innerHTML = `<td class="px-4 py-3"><div class="font-medium text-slate-700">${name}</div></td>
+    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-${tc}-50 text-${tc}-700">${type}</span></td>
+    <td class="px-4 py-3 text-slate-500 text-xs">${ds}</td>
+    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-50 text-yellow-700">Diproses</span></td>
+    <td class="px-4 py-3"><span class="text-slate-400 text-xs">—</span></td>`;
+  tbody.insertBefore(row, tbody.firstChild);
+  showToast('Permintaan laporan dibuat');
+}
+
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.remove('hidden');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.add('hidden'), 3000);
+}
+
+// ═══════ INIT ═══════
+renderExport();
+</script>
+</body>
+</html>

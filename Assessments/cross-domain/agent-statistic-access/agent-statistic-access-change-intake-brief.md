@@ -525,7 +525,7 @@ console.log('backfill logic OK');
 
 **READY_FOR_PRD** — Brief v1.6 sudah cukup sebagai input untuk PRD writer.
 
-**Update v1.6:** PRD Patch v1.0 (`PRD/Analytics/PRD Analytics - agent statistic access.md`, 349 baris) SUDAH DIWRITE — berisi formal US/AC (US-001 s/d US-004), Functional Requirements (FR-001 s/d FR-011), Error Handling (EH-001 s/d EH-005), Edge Cases (EC-001 s/d EC-011), Permission Matrix, API/Event Contract, Migration & Rollout Plan, NFR, Success Metrics, Limitations. Blocking gaps B-1 s/d B-8 = **resolved di PRD patch v1.0**.
+**Update v1.6:** PRD Patch v1.0 (`PRD/Analytics/Statistic/PRD Analytics - agent statistic access.md`, 349 baris) SUDAH DIWRITE — berisi formal US/AC (US-001 s/d US-004), Functional Requirements (FR-001 s/d FR-011), Error Handling (EH-001 s/d EH-005), Edge Cases (EC-001 s/d EC-011), Permission Matrix, API/Event Contract, Migration & Rollout Plan, NFR, Success Metrics, Limitations. Blocking gaps B-1 s/d B-8 = **resolved di PRD patch v1.0**.
 
 **Path forward:** Brief ini = Phase 0 Change Intake (complete). PRD Patch v1.0 = PRD artifact (complete, Draft). Selanjutnya = PRD review (Gate A/B) → Requirement Package Freeze → implementation.
 

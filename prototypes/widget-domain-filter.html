@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget Domain Topic Filter — Prototype</title>
+<style>
+  /* SatuInbox Design Tokens (from shared-styles.css) */
+  :root {
+    --brand: #155dfc;
+    --brand-hover: #1349e0;
+    --brand-active: #103cb8;
+    --brand-selected: #dbe9ff;
+    --bg-brand: #eff5ff;
+    --bg-brand-hover: #dbe9ff;
+
+    --background: #ffffff;
+    --bg-hover: #f8fafc;
+    --bg-active: #f1f5f9;
+    --bg-selected: #e2e8f0;
+
+    --primary: #1e293b;
+    --secondary-text: #64748b;
+    --tertiary-text: #94a3b8;
+    --disabled-text: #94a3b8;
+
+    --border: #cbd5e1;
+    --border-hover: #94a3b8;
+    --input-border: #94a3b8;
+    --input-focus: #155dfc;
+
+    --critical: #b91c1c;
+    --critical-bg: #fef2f2;
+    --critical-border: #dc2626;
+    --success: #15803d;
+    --success-bg: #f0fdf4;
+    --warning-bg: #fffbeb;
+    --warning-text: #92400e;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f1f5f9;
+    color: var(--primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Layout ─── */
+  .page { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 240px; background: var(--background); border-right: 1px solid var(--border);
+    padding: 16px 0; flex-shrink: 0;
+  }
+  .sidebar-logo { padding: 0 16px 16px; font-weight: 700; font-size: 18px; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+  .sidebar-logo svg { width: 24px; height: 24px; }
+  .sidebar-section { padding: 8px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--tertiary-text); }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 16px; font-size: 14px; color: var(--secondary-text);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .sidebar-item:hover { background: var(--bg-hover); }
+  .sidebar-item.active { background: var(--bg-brand); color: var(--brand); font-weight: 500; }
+
+  .main { flex: 1; display: flex; flex-direction: column; }
+
+  .topbar {
+    height: 56px; background: var(--background); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px; gap: 16px;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; }
+
+  .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+  /* ─── Tabs ─── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab {
+    padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--secondary-text);
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s;
+  }
+  .tab:hover { color: var(--primary); }
+  .tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+  /* ─── Card ─── */
+  .card {
+    background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h3 { font-size: 14px; font-weight: 600; }
+  .card-body { padding: 20px; }
+
+  /* ─── Table ─── */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--secondary-text); background: var(--bg-hover); border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--bg-active); }
+  tr:hover td { background: var(--bg-hover); }
+
+  /* ─── Button ─── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 500;
+    border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--brand); color: white; }
+  .btn-primary:hover { background: var(--brand-hover); }
+  .btn-secondary { background: var(--background); color: var(--primary); border-color: var(--border); }
+  .btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-hover); }
+  .btn-ghost { background: transparent; color: var(--secondary-text); }
+  .btn-ghost:hover { background: var(--bg-hover); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-danger { background: var(--critical-bg); color: var(--critical); border-color: var(--critical-border); }
+  .btn-danger:hover { background: #fee2e2; }
+
+  /* ─── Badge ─── */
+  .badge {
+    display: inline-flex; padding: 2px 8px; font-size: 11px; font-weight: 500;
+    border-radius: 9999px;
+  }
+  .badge-brand { background: var(--bg-brand); color: var(--brand); }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+  .badge-neutral { background: var(--bg-active); color: var(--secondary-text); }
+
+  /* ─── Modal ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--background); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    width: 560px; max-height: 85vh; display: flex; flex-direction: column;
+    transform: translateY(8px); transition: transform 0.2s;
+  }
+  .modal-overlay.show .modal { transform: translateY(0); }
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-size: 15px; font-weight: 600; }
+  .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+  .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* ─── Form ─── */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .form-label .required { color: var(--critical); margin-left: 2px; }
+  .form-hint { font-size: 12px; color: var(--secondary-text); margin-top: 4px; }
+  .form-error { font-size: 12px; color: var(--critical); margin-top: 4px; }
+
+  input[type="text"], select {
+    width: 100%; padding: 8px 12px; font-size: 13px; font-family: inherit;
+    border: 1px solid var(--input-border); border-radius: var(--radius-sm);
+    background: var(--background); color: var(--primary); transition: all 0.15s;
+    outline: none;
+  }
+  input[type="text"]:focus, select:focus {
+    border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(21,93,252,0.1);
+  }
+  input[type="text"]::placeholder { color: var(--tertiary-text); }
+
+  /* ─── Chip Input ─── */
+  .chip-input-wrap {
+    display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px;
+    border: 1px solid var(--input-border); border-radius: var(--radius-sm);
+    background: var(--background); min-height: 38px; cursor: text; transition: all 0.15s;
+  }
+  .chip-input-wrap:focus-within { border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(21,93,252,0.1); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    background: var(--bg-brand); color: var(--brand); border-radius: 4px;
+    font-size: 12px; font-weight: 500;
+  }
+  .chip .chip-remove {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; border-radius: 50%; cursor: pointer;
+    font-size: 10px; line-height: 1; transition: all 0.15s;
+  }
+  .chip .chip-remove:hover { background: var(--brand-hover); color: white; }
+  .chip-input {
+    border: none; outline: none; font-size: 13px; font-family: inherit;
+    flex: 1; min-width: 120px; padding: 2px 0; background: transparent;
+  }
+  .chip-input::placeholder { color: var(--tertiary-text); }
+
+  /* ─── Topic Row ─── */
+  .topic-row {
+    border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;
+    margin-bottom: 12px; transition: all 0.15s;
+  }
+  .topic-row:hover { border-color: var(--border-hover); }
+  .topic-row-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .topic-row-header .topic-name { font-size: 14px; font-weight: 500; }
+  .topic-row-header .topic-badge { font-size: 11px; }
+
+  /* ─── Widget Preview ─── */
+  .widget-preview-container {
+    position: fixed; bottom: 24px; right: 24px; z-index: 50;
+  }
+  .widget-bubble {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--brand);
+    box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .widget-bubble:hover { background: var(--brand-hover); transform: scale(1.05); }
+  .widget-bubble svg { width: 24px; height: 24px; color: white; }
+
+  .widget-window {
+    position: absolute; bottom: 68px; right: 0; width: 380px; height: 520px;
+    background: var(--background); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border); display: none; flex-direction: column; overflow: hidden;
+  }
+  .widget-window.show { display: flex; }
+  .widget-win-header {
+    background: var(--brand); color: white; padding: 16px 20px;
+    font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .widget-win-body { flex: 1; padding: 20px; overflow-y: auto; }
+  .widget-win-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+
+  .topic-select-item {
+    padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md);
+    margin-bottom: 8px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 10px;
+  }
+  .topic-select-item:hover { border-color: var(--brand); background: var(--bg-brand); }
+  .topic-select-item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); flex-shrink: 0; }
+  .topic-select-item .t-name { font-size: 13px; font-weight: 500; }
+  .topic-select-item .t-sub { font-size: 12px; color: var(--secondary-text); }
+
+  /* ─── Preview Domain Selector ─── */
+  .domain-selector {
+    position: fixed; top: 16px; right: 24px; z-index: 60;
+    background: var(--background); border: 1px solid var(--brand); border-radius: var(--radius-md);
+    padding: 10px 16px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 10px;
+  }
+  .domain-selector label { font-size: 12px; font-weight: 600; color: var(--brand); white-space: nowrap; }
+  .domain-selector select { width: 200px; padding: 4px 8px; font-size: 12px; }
+
+  /* ─── Divider ─── */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ─── Tooltip ─── */
+  .info-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%; background: var(--bg-active);
+    color: var(--secondary-text); font-size: 10px; font-weight: 700; cursor: help;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      SatuInbox
+    </div>
+    <div class="sidebar-section">Inbox</div>
+    <div class="sidebar-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Conversation
+    </div>
+    <div class="sidebar-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      Ticket
+    </div>
+    <div class="sidebar-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Contact
+    </div>
+    <div class="sidebar-section">Settings</div>
+    <div class="sidebar-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Channels
+    </div>
+    <div class="sidebar-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Widget
+    </div>
+    <div class="sidebar-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Team
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <span style="color:var(--secondary-text);font-size:14px">Settings</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--tertiary-text)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="topbar-title">Widget</span>
+    </div>
+
+    <div class="content">
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab">Pengaturan Widget</div>
+        <div class="tab">Topik</div>
+        <div class="tab active">Akun Widget</div>
+        <div class="tab">Formulir</div>
+      </div>
+
+      <!-- Widget Account Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Akun Widget</h3>
+          <button class="btn btn-primary" onclick="openModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Tambah Akun
+          </button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Tampilan</th>
+                <th>Topik</th>
+                <th>Domain Filter</th>
+                <th>Status</th>
+                <th style="width:80px">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="accountTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Domain Selector (for preview simulation) -->
+<div class="domain-selector">
+  <label>🌐 Preview sebagai:</label>
+  <select id="previewDomain" onchange="updatePreview()">
+    <option value="toko-a.com">toko-a.com</option>
+    <option value="toko-b.com">toko-b.com</option>
+    <option value="shop.toko-a.com">shop.toko-a.com</option>
+    <option value="lainnya.com">lainnya.com</option>
+  </select>
+</div>
+
+<!-- Widget Preview -->
+<div class="widget-preview-container">
+  <div class="widget-window" id="widgetWindow">
+    <div class="widget-win-header">
+      <span>💬 Chat dengan kami</span>
+      <span style="font-size:12px;opacity:0.8;font-weight:400" id="widgetDomainLabel">toko-a.com</span>
+    </div>
+    <div class="widget-win-body">
+      <h4>Pilih topik:</h4>
+      <div id="topicList"></div>
+      <div id="noTopics" style="display:none;text-align:center;padding:24px 0;color:var(--secondary-text)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--tertiary-text)" stroke-width="1.5" style="margin:0 auto 8px"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        <div style="font-size:13px">Tidak ada topik untuk domain ini</div>
+      </div>
+    </div>
+  </div>
+  <div class="widget-bubble" onclick="toggleWidget()">
+    <svg id="widgetIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </div>
+</div>
+
+<!-- Modal: Create/Edit Widget Account -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Tambah Akun Widget</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nama Tampilan <span class="required">*</span></label>
+        <input type="text" id="inputDisplayName" placeholder="Contoh: Toko A — Customer Support">
+        <p class="form-hint">Nama yang akan dilihat oleh pengunjung widget.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">Topik & Domain yang Diizinkan</label>
+        <p class="form-hint" style="margin-bottom:12px">Atur topik dan domain yang diizinkan. Kosongkan domain untuk menampilkan topik di semua website.</p>
+
+        <div id="topicRows">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" onclick="saveAccount()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Data ───
+const ALL_TOPICS = [
+  { id: 't1', name: 'Umum', sub: 'Pertanyaan umum tentang produk' },
+  { id: 't2', name: 'Support Teknis', sub: 'Bantuan teknis & troubleshooting' },
+  { id: 't3', name: 'Billing', sub: 'Pembayaran & tagihan' },
+  { id: 't4', name: 'Kerjasama', sub: 'Partnership & bisnis' },
+];
+
+let accounts = [
+  {
+    id: 'a1',
+    displayName: 'Toko A — Support',
+    topicDomains: {
+      't1': ['toko-a.com', '*.toko-a.com'],
+      't2': ['toko-a.com'],
+    }
+  },
+  {
+    id: 'a2',
+    displayName: 'Toko B — Help Center',
+    topicDomains: {
+      't1': ['toko-b.com'],
+      't3': [],  // all domains
+    }
+  }
+];
+
+let editingId = null;
+
+// ─── matchDomain (from PRD spec) ───
+function matchDomain(domain, patterns) {
+  if (!patterns || patterns.length === 0) return true;
+  const d = domain.toLowerCase().replace(/^www\./, '');
+  return patterns.some(p => {
+    const pattern = p.toLowerCase().replace(/^www\./, '');
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(d) || /^\d{1,3}(\.\d{1,3}){3}$/.test(pattern)) {
+      return d === pattern;
+    }
+    if (pattern.startsWith('*.')) {
+      const base = pattern.slice(2);
+      return d === base || d.endsWith('.' + base);
+    }
+    return d === pattern;
+  });
+}
+
+// ─── Render Account Table ───
+function renderTable() {
+  const tbody = document.getElementById('accountTable');
+  tbody.innerHTML = accounts.map(a => {
+    const topicCount = Object.keys(a.topicDomains).length;
+    const withDomain = Object.values(a.topicDomains).filter(d => d.length > 0).length;
+    return `<tr>
+      <td style="font-weight:500">${a.displayName}</td>
+      <td>${topicCount} topik</td>
+      <td>${withDomain > 0
+        ? `<span class="badge badge-brand">${withDomain} topik dengan domain</span>`
+        : `<span class="badge badge-neutral">Semua domain</span>`}</td>
+      <td><span class="badge badge-success">Aktif</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="editAccount('${a.id}')">Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Modal ───
+function openModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Tambah Akun Widget';
+  document.getElementById('inputDisplayName').value = '';
+  renderTopicRows({});
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function editAccount(id) {
+  const a = accounts.find(x => x.id === id);
+  if (!a) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Akun Widget';
+  document.getElementById('inputDisplayName').value = a.displayName;
+  renderTopicRows(a.topicDomains);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+// ─── Topic Rows in Modal ───
+function renderTopicRows(topicDomains) {
+  const container = document.getElementById('topicRows');
+  container.innerHTML = ALL_TOPICS.map(t => {
+    const domains = topicDomains[t.id] || [];
+    const hasRestriction = domains.length > 0;
+    return `<div class="topic-row">
+      <div class="topic-row-header">
+        <div>
+          <span class="topic-name">${t.name}</span>
+          <span style="font-size:12px;color:var(--secondary-text);margin-left:6px">${t.sub}</span>
+        </div>
+        ${hasRestriction
+          ? `<span class="badge badge-brand topic-badge">Terbatas</span>`
+          : `<span class="badge badge-neutral topic-badge">Semua domain</span>`}
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <div class="chip-input-wrap" onclick="this.querySelector('input').focus()">
+          ${domains.map(d => `<span class="chip">${d}<span class="chip-remove" onclick="removeChip(this,'${t.id}','${d}')">×</span></span>`).join('')}
+          <input class="chip-input" type="text" placeholder="${hasRestriction ? '' : 'Kosongkan = semua website'}"
+                 data-topic="${t.id}" onkeydown="handleChipKey(event,'${t.id}')">
+        </div>
+        <p class="form-hint">Contoh: toko-a.com, *.toko-a.com &nbsp; <span class="info-icon" title="Gunakan *.domain.com untuk semua subdomain. Maks 10 domain.">?</span></p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function handleChipKey(e, topicId) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (!val) return;
+    // Validation
+    if (val.includes('/') || val.includes(':') || val.includes('?') || val.includes('#')) {
+      alert('Domain tidak valid: hostname saja, tanpa protokol/port/path');
+      return;
+    }
+    addChip(topicId, val);
+    e.target.value = '';
+  }
+}
+
+function addChip(topicId, domain) {
+  const row = document.querySelector(`.chip-input[data-topic="${topicId}"]`).closest('.topic-row');
+  const wrap = row.querySelector('.chip-input-wrap');
+  const existing = wrap.querySelectorAll('.chip');
+  if (existing.length >= 10) { alert('Maksimal 10 domain per topik'); return; }
+  const chip = document.createElement('span');
+  chip.className = 'chip';
+  chip.innerHTML = `${domain}<span class="chip-remove" onclick="removeChip(this,'${topicId}','${domain}')">×</span>`;
+  wrap.insertBefore(chip, wrap.querySelector('input'));
+  updateTopicBadge(row, wrap.querySelectorAll('.chip').length);
+}
+
+function removeChip(el, topicId, domain) {
+  const row = el.closest('.topic-row');
+  el.parentElement.remove();
+  const wrap = row.querySelector('.chip-input-wrap');
+  updateTopicBadge(row, wrap.querySelectorAll('.chip').length);
+}
+
+function updateTopicBadge(row, count) {
+  const badge = row.querySelector('.topic-badge');
+  if (count > 0) {
+    badge.className = 'badge badge-brand topic-badge';
+    badge.textContent = 'Terbatas';
+  } else {
+    badge.className = 'badge badge-neutral topic-badge';
+    badge.textContent = 'Semua domain';
+  }
+}
+
+function saveAccount() {
+  const name = document.getElementById('inputDisplayName').value.trim();
+  if (!name) { alert('Nama tampilan wajib diisi'); return; }
+
+  const topicDomains = {};
+  ALL_TOPICS.forEach(t => {
+    const wrap = document.querySelector(`.chip-input[data-topic="${t.id}"]`).closest('.chip-input-wrap');
+    const chips = wrap.querySelectorAll('.chip');
+    const domains = Array.from(chips).map(c => c.firstChild.textContent.trim());
+    if (domains.length > 0) topicDomains[t.id] = domains;
+  });
+
+  if (editingId) {
+    const a = accounts.find(x => x.id === editingId);
+    a.displayName = name;
+    a.topicDomains = topicDomains;
+  } else {
+    accounts.push({ id: 'a' + Date.now(), displayName: name, topicDomains });
+  }
+
+  closeModal();
+  renderTable();
+  updatePreview();
+}
+
+// ─── Widget Preview ───
+function toggleWidget() {
+  const w = document.getElementById('widgetWindow');
+  w.classList.toggle('show');
+  if (w.classList.contains('show')) updatePreview();
+}
+
+function updatePreview() {
+  const domain = document.getElementById('previewDomain').value;
+  document.getElementById('widgetDomainLabel').textContent = domain;
+
+  // Gather all topics from all accounts, filtered by domain
+  const visibleTopics = [];
+  const seen = new Set();
+  accounts.forEach(a => {
+    Object.entries(a.topicDomains).forEach(([topicId, domains]) => {
+      if (seen.has(topicId)) return;
+      if (matchDomain(domain, domains)) {
+        seen.add(topicId);
+        const t = ALL_TOPICS.find(x => x.id === topicId);
+        if (t) visibleTopics.push(t);
+      }
+    });
+  });
+
+  const topicList = document.getElementById('topicList');
+  const noTopics = document.getElementById('noTopics');
+
+  if (visibleTopics.length === 0) {
+    topicList.style.display = 'none';
+    noTopics.style.display = 'block';
+  } else {
+    topicList.style.display = 'block';
+    noTopics.style.display = 'none';
+    topicList.innerHTML = visibleTopics.map(t =>
+      `<div class="topic-select-item">
+        <div class="dot"></div>
+        <div>
+          <div class="t-name">${t.name}</div>
+          <div class="t-sub">${t.sub}</div>
+        </div>
+      </div>`
+    ).join('');
+  }
+}
+
+// ─── Init ───
+renderTable();
+updatePreview();
+</script>
+</body>
+</html>

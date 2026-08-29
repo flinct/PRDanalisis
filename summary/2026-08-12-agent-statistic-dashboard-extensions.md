@@ -54,3 +54,7 @@ Intersection = 1 titik kritis: Export RBAC. Patch 1 `statistic:export` → gates
 ## Change Intake Briefs Created (2026-08-12)
 - **Patch 2:** `statistic-parameter-improvement-change-intake-brief.md` — filter fix + new metrics. Route: ROUTE_PATCH_EXISTING_PRD (addendum PRD Analytics). 5 OQ, semua open.
 - **Patch 3:** `statistic-interactive-dashboard-change-intake-brief.md` — clickable drill-down. Route: ROUTE_NEW_PRD. 6 OQ, semua open. Phased (3a→3b→3c→3d). Depend P1+P2.
+
+## PRDs Written (2026-08-12)
+- **Patch 2:** `PRD/Analytics/Statistic/PRD Analytics - statistic parameter improvement.md` — 407 lines, 37.6KB. 10 FR, 9 US, 5 EH, 9 EC, 5 OQ open. Filter fix + conversation/ticket/CSAT parameters.
+- **Patch 3:** `PRD/Analytics/Statistic/PRD Analytics - statistic interactive dashboard.md` — 478 lines, 44.5KB. 15 FR, 7 EH, 11 EC, 6 OQ open. StatisticCard clickable + drill endpoint + phased rollout. Draft status, semua OQ "Open — PM decision".

@@ -45,32 +45,32 @@
 
 ---
 
-## 1.5 Selector readiness — live `data-cy` audit (2026-08-06)
+## 1.5 Selector readiness — live `data-cy` audit (2026-08-11, RE-VERIFIED)
 
-> Method: logged into `https://dev-v2.satuinbox.com/id/conversation/your-inbox` (`cekerayam01`), opened a room, scraped every `[data-cy]` from the deployed DOM; cross-checked each expected hook against FE source (branch `data-cy`) and the `sixV2Automation` page objects. This dimension is **orthogonal to real/stub**: it answers *"will the selector this stub depends on resolve against the build under test?"* — which §1/§2 do not track.
+> Method: logged into `https://dev-v2.satuinbox.com/id/conversation/your-inbox` (`cekerayam01`), opened rooms in Your Inbox + Unassigned, scraped every `[data-cy]` from the deployed DOM (148 unique). **2026-08-06 audit is STALE — FE `data-cy` branch has since deployed to dev-v2.** All previously "MERGE-PENDING" and "NO-SOURCE" hooks below are now confirmed LIVE.
 
-**3-tier hook classification (evidence-based):**
+**3-tier hook classification (evidence-based, re-verified 2026-08-11):**
 
 | Tier | Meaning | Hooks | Evidence |
 |---|---|---|---|
-| 🟢 **LIVE** | deployed on dev-v2 now (28) | shell: `Main-Container`, `Sidebar-Navigation`, `Satuinbox-Logo`, `Sidebar-Navigation-List`, `Main-Section`, `Conversation-Section`, `Conversation-Sidebar-Navigation`, `Conversation-Chat-List-Container`, `Conversation-Chat-List-Header`, `Conversation-Chat-List-Page-Section` · items: `chat-list-1..16`, `tag-list` · input: `autogrowing-textarea` | live DOM |
-| 🟡 **MERGE-PENDING** | in FE branch `data-cy`, not deployed | `inbox-nav-*`, `channel-nav-*`, `quick-action-*`, `chatList-filter-*`, `chatList-searchButton`, `chatList-navPanelControlButton`, `conversation-list`, `conversation-empty-state`, `chatRoom-closeConversationButton`, `chatRoom-reopenConversationButton`, `Chat-Detail-*` (16 files), `Chat-Detail-Sla-*` | FE grep >0 files, live 0 |
-| 🔴 **NO-SOURCE** | absent from FE source; page object references them anyway → fails even after merge | `Chat-Room-Header`, `Chat-Room-Header-Contact-Name`, `Messages-Container`, `Message-Bubble-*`, `Day-Separator`, `Message-Text-Input`, `Send-Button`, `Emoji-Button`, `Macro-Button`, `Attach-File-Button`, `Account-Channel-Selector`, `User-Menu`, `Logout-Button` | FE grep **0 files**, each referenced in `inbox.page.js` |
+| 🟢 **LIVE** | deployed on dev-v2 now (148 unique) | shell: `Main-Container`, `Sidebar-Navigation`, `Satuinbox-Logo`, `Sidebar-Navigation-List`, `User-Menu`, `Main-Section`, `Conversation-Section`, `Conversation-Sidebar-Navigation` · nav: `inbox-nav-your-inbox/unassigned/all/spam/starred/junk` · list: `conversation-list`, `Conversation-Chat-List-Header`, `Conversation-Chat-List-Page-Section`, `chatList-navPanelControlButton`, `chatList-searchButton`, `chatList-filter-status/read/sort/visibility/advance` · items: `chat-list-N`, `chat-list-N-avatar/checkbox/channel-icon/name/timestamp/quick-action/latest-message/unread-count/ticket-badge/account-channel-number/tag-container/tag-M` · room: `Chat-Room-Header`, `Chat-Room-Header-Contact-Avatar`, `Chat-Room-Header-Contact-Name`, `chatRoom-closeConversationButton`, `Chat-Room-Expired-Whatsapp-Banner`, `Chat-Room-Send-Template-Button`, `Message-Bubble-<id>` (dynamic per message), `Day-Separator` · input: `Input-Area-Container`, `Message-Text-Input`, `Macro-Button`, `Attach-File-Button`, `Emoji-Button`, `Send-Button` · detail (13, via btn[3] toggle): `Chat-Detail-Title`, `Chat-Detail-Copy-Id-Button`, `Chat-Detail-Section-assignee`, `Chat-Detail-Sla-frt/ttc/rlt/wait-time`, `Chat-Detail-Section-attributes/session/client-data/notes/events/tags` | live DOM, 2026-08-11 + 2026-08-14 detail audit |
+| 🟡 **UNCONFIRMED** | not seen in audit — may be conditional | `chatRoom-reopenConversationButton` (needs closed conversation) | absent; re-check with closed convo |
+| ~~🔴 NO-SOURCE~~ | **RETIRED — was based on stale 2026-08-06 audit** | ~~`Chat-Room-Header`, `Message-Text-Input`, `Send-Button`, etc.~~ | **all confirmed LIVE 2026-08-11 — see above** |
 
-**Per-spec readiness (overlay on §1):**
+**Per-spec readiness (overlay on §1, re-verified 2026-08-11):**
 
 | Spec | Real/stub | Selector readiness | Corrected verdict |
 |---|---|---|---|
-| convo-nav | 28/46 | 🟢 core nav LIVE · 🟡 channel/team MERGE-PENDING | core runs; rest gated on FE deploy |
+| convo-nav | 74/0 (activated) | 🟢 ALL LIVE (was: core-only + MERGE-PENDING) | ✅ safe to activate fully — MERGE-PENDING tag was stale |
 | convo-list-overview | 13/19 | 🟢 list render LIVE | running part is safe |
 | chat-list / empty-state / inbox / agent-validation / conversation-history / inbound-outbound | all real | 🟢 LIVE | ✅ genuinely running |
 | sla-metrics | 3/0 | 🟢 badge LIVE (values still unasserted) | shallow, but resolves |
-| **convo-room** | **0/284** | 🔴 **NO-SOURCE** (room input/header/send absent from FE) | **NOT "activate now" — blocked on FE hooks. Reclassify Class B → blocked-FE** |
-| **convo-detail-panel** | **0/167** | 🟡 **MERGE-PENDING** | activate *after* branch deploy |
-| **convo-list-features** | **0/118** | 🟡 **MERGE-PENDING** | activate *after* branch deploy |
-| convo-supplement | 0/39 | 🟡 mixed | depends on target hooks |
+| **convo-room** | 0/284 (pre-activation) | 🟢 **LIVE — reclassified from NO-SOURCE** | **UNBLOCKED — activate now, no FE dependency left** |
+| **convo-detail-panel** | 174/0 (activated) | 🟢 **LIVE** — Chat-Detail-* confirmed 2026-08-14 (btn[3] toggle) | **✅ already activated** |
+| **convo-list-features** | 118/0 (activated) | 🟢 LIVE (was: MERGE-PENDING) | ✅ already activated correctly |
+| convo-supplement | 131/0 (activated) | 🟢 mostly LIVE | ✅ already activated |
 
-**Note on message input:** the real, live input is `autogrowing-textarea` (placeholder "Ketik Pesan"), and it sits **outside** `#conversation-chatroom-container`. Page objects target `Message-Text-Input` + `Send-Button` (both 🔴 NO-SOURCE). Any room send-path activation must either wait for FE to add those hooks or rewrite the selector to `autogrowing-textarea` + `getByRole`.
+**Note on message input:** `Message-Text-Input` + `Send-Button` are CONFIRMED LIVE as of 2026-08-11 (`<textarea data-cy="Message-Text-Input">` inside `Input-Area-Container`). The 2026-08-06 claim that only `autogrowing-textarea` existed was stale — page objects can use `Message-Text-Input` directly, no rewrite needed.
 
 ---
 

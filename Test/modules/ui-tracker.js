@@ -1200,7 +1200,7 @@ window.TrackerModule = (function(){
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: var(--app-bg); color: var(--text-1); font-family: -apple-system, Segoe UI, Roboto, sans-serif; }
   .deck { position: relative; height: 100vh; overflow: hidden; }
-  .slide { position: absolute; inset: 0; padding: 40px 56px 72px; display: flex; flex-direction: column; gap: 16px; opacity: 0; pointer-events: none; transform: translateX(30px); transition: opacity .25s ease, transform .25s ease; }
+  .slide { position: absolute; inset: 0; padding: 40px 56px 72px; display: flex; flex-direction: column; gap: 16px; opacity: 0; pointer-events: none; transform: translateX(40px) scale(.98); transition: opacity .35s cubic-bezier(.22,.61,.36,1), transform .35s cubic-bezier(.22,.61,.36,1); }
   .slide.active { opacity: 1; pointer-events: auto; transform: none; }
   .slide-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-1); flex: 0 0 auto; }
   .slide-title { font-size: 20px; color: var(--text-1); }
@@ -1213,13 +1213,43 @@ window.TrackerModule = (function(){
   .divider-eyebrow { font-size: 14px; letter-spacing: 4px; text-transform: uppercase; color: var(--text-3); margin-bottom: 20px; }
   .divider-title { font-size: 72px; font-weight: 800; color: var(--text-1); margin-bottom: 24px; line-height: 1.05; }
   .divider-meta { font-size: 14px; color: var(--text-3); }
-  .nav { position: fixed; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; z-index: 10; }
+  .nav { position: fixed; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; z-index: 10; transition: opacity .2s ease; }
   .nav button { background: var(--sidebar-bg); color: var(--text-1); border: 1px solid var(--border-1); padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer; }
   .nav button:disabled { opacity: .4; cursor: not-allowed; }
   .nav .counter { font-size: 12px; color: var(--text-3); min-width: 60px; text-align: center; }
   .dots { display: flex; gap: 4px; }
   .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-1); display: inline-block; }
   .dots i.on { background: #2563eb; width: 14px; border-radius: 3px; }
+  body.presenting .nav { opacity: 0; pointer-events: none; }
+  #bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: #2563eb; z-index: 20; display: none; }
+  body.presenting #bar { display: block; animation: grow 8s linear; }
+  body.presenting.paused #bar { animation-play-state: paused; }
+  @keyframes grow { from { width: 0; } to { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .slide { transition-duration: .12s; transform: none; } .op-onair .op-frame { animation-duration: .12s; } }
+  /* ---- Operator / Presenter mode ---- */
+  body.operator { overflow: auto; }
+  body.operator .deck, body.operator .nav, body.operator #bar { display: none !important; }
+  #operator { display: none; }
+  body.operator #operator { display: flex; flex-direction: column; gap: 20px; min-height: 100vh; padding: 20px 28px 40px; }
+  .op-head { display: flex; align-items: center; gap: 12px; }
+  .op-head h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-3); margin: 0; }
+  .op-live-badge { background: #dc2626; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; }
+  .op-onair { border: 2px solid #dc2626; border-radius: 10px; overflow: hidden; height: 46vh; position: relative; background: var(--app-bg); }
+  .op-onair .op-frame { position: absolute; inset: 0; transform-origin: top left; animation: onair-in .3s ease; }
+  @keyframes onair-in { from { opacity: 0; } }
+  .op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .op-thumb { position: relative; border: 2px solid var(--border-1); border-radius: 8px; overflow: hidden; cursor: pointer; aspect-ratio: 16/9; background: var(--app-bg); }
+  .op-thumb:hover { border-color: var(--text-3); }
+  .op-thumb.live { border-color: #dc2626; }
+  .op-thumb .op-frame { position: absolute; inset: 0; transform-origin: top left; pointer-events: none; }
+  .op-thumb .op-num { position: absolute; top: 4px; left: 4px; z-index: 2; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  .op-thumb .op-livetag { position: absolute; top: 4px; right: 4px; z-index: 2; background: #dc2626; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 1px 6px; border-radius: 4px; }
+  .op-controls { position: sticky; bottom: 0; display: flex; justify-content: center; gap: 10px; padding: 12px 0; background: linear-gradient(transparent, var(--app-bg) 40%); }
+  .op-controls button { background: var(--sidebar-bg); color: var(--text-1); border: 1px solid var(--border-1); padding: 8px 16px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .op-controls button:disabled { opacity: .4; cursor: not-allowed; }
+  /* ---- Viewer mode ---- */
+  body.viewer .nav, body.viewer #bar, body.viewer #operator { display: none !important; }
+  #syncwarn { position: fixed; bottom: 12px; right: 12px; background: #dc2626; color: #fff; font-size: 12px; padding: 8px 12px; border-radius: 6px; z-index: 30; display: none; }
   svg { max-width: 100%; height: auto; }
   @media print {
     html, body { overflow: visible; height: auto; }
@@ -1233,21 +1263,49 @@ window.TrackerModule = (function(){
   }
 </style></head>
 <body>
+<div id="bar"></div>
 <div class="deck" id="deck">${slideHtml}</div>
+<div id="operator">
+  <div class="op-head"><h2>On Air</h2><span class="op-live-badge">LIVE</span><span id="opLiveLabel" style="font-size:13px;color:var(--text-3)"></span></div>
+  <div class="op-onair" id="opOnAir"></div>
+  <div class="op-head" style="margin-top:4px"><h2>All Slides</h2></div>
+  <div class="op-grid" id="opGrid"></div>
+  <div class="op-controls">
+    <button id="opPrev">◀ Prev</button>
+    <button id="opNext">Next ▶</button>
+    <button id="opViewer">Open Viewer ↗</button>
+    <button id="opDeck">Slideshow biasa ↩</button>
+    <button id="opPrint">🖨 PDF</button>
+  </div>
+</div>
+<div id="syncwarn">Sync tidak aktif — buka lewat tombol Slideshow, bukan file HTML.</div>
 <div class="nav">
   <button id="prev" title="Previous (←)">◀</button>
   <span class="counter" id="counter">1/${total}</span>
   <button id="next" title="Next (→ / Space)">▶</button>
+  <button id="present" title="Present: fullscreen + auto-advance (Esc exits, P pauses)">▶ Present</button>
+  <button id="operatorBtn" title="Operator / Presenter view">◫ Operator</button>
   <button id="fs" title="Fullscreen (F)">⛶</button>
   <button id="printBtn" title="Print / Save as PDF">🖨</button>
   <span class="dots" id="dots">${slides.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
 </div>
 <script>
 (function(){
-  var slides = document.querySelectorAll('.slide');
+  var slides = document.querySelectorAll('.deck .slide'); // scope to real deck; operator thumbnail clones live in #operator
   var dots = document.querySelectorAll('#dots i');
   var counter = document.getElementById('counter');
+  var bar = document.getElementById('bar');
   var idx = 0;
+  var timer = null;
+  var SLIDE_MS = 8000; // ponytail: must match #bar animation duration in CSS (8s)
+  // ---- cross-window channel (operator -> viewer) ----
+  var CH = 'tracker-slideshow';
+  var bc = null; try { bc = new BroadcastChannel(CH); } catch (e) {}
+  function broadcast(i){
+    if (bc) bc.postMessage({ type:'SHOW_SLIDE', idx:i });
+    // ponytail: localStorage fallback for browsers w/o BroadcastChannel; value+ts so repeat idx still fires
+    try { localStorage.setItem(CH, JSON.stringify({ idx:i, ts:Date.now() })); } catch (e) {}
+  }
   function go(n){
     idx = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach(function(s, i){ s.classList.toggle('active', i === idx); });
@@ -1255,23 +1313,138 @@ window.TrackerModule = (function(){
     counter.textContent = (idx + 1) + '/' + slides.length;
     document.getElementById('prev').disabled = idx === 0;
     document.getElementById('next').disabled = idx === slides.length - 1;
+    if (document.body.classList.contains('presenting')) restartBar();
+    if (document.body.classList.contains('operator')) { broadcast(idx); renderOperator(); }
+  }
+  function restartBar(){
+    if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+    clearTimeout(timer);
+    if (document.body.classList.contains('presenting') && !document.body.classList.contains('paused') && idx < slides.length - 1) {
+      timer = setTimeout(function(){ go(idx + 1); }, SLIDE_MS);
+    }
+  }
+  function togglePresent(){
+    var on = !document.body.classList.contains('presenting');
+    document.body.classList.toggle('presenting', on);
+    document.body.classList.remove('paused');
+    if (on) document.documentElement.requestFullscreen();
+    restartBar();
   }
   document.getElementById('prev').onclick = function(){ go(idx - 1); };
   document.getElementById('next').onclick = function(){ go(idx + 1); };
+  document.getElementById('present').onclick = togglePresent;
+  document.getElementById('operatorBtn').onclick = function(){ location.hash = '#operator'; enterOperator(); };
   document.getElementById('fs').onclick = function(){
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
   };
   document.getElementById('printBtn').onclick = function(){ window.print(); };
   document.addEventListener('keydown', function(ev){
+    if (ev.key === 'p' || ev.key === 'P') {
+      if (document.body.classList.contains('presenting')) { document.body.classList.toggle('paused'); restartBar(); }
+      return;
+    }
     if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); go(idx + 1); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); go(idx - 1); }
-    else if (ev.key === 'Home') go(0);
-    else if (ev.key === 'End') go(slides.length - 1);
+    else if (ev.key === 'Home') { ev.preventDefault(); go(0); }
+    else if (ev.key === 'End') { ev.preventDefault(); go(slides.length - 1); }
     else if (ev.key === 'f' || ev.key === 'F') document.getElementById('fs').click();
-    else if (ev.key === 'Escape' && document.fullscreenElement) document.exitFullscreen();
+    else if (ev.key === 'Escape') {
+      if (document.body.classList.contains('presenting')) { document.body.classList.remove('presenting'); restartBar(); }
+      if (document.fullscreenElement) document.exitFullscreen();
+    }
   });
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement) { document.body.classList.remove('presenting'); restartBar(); }
+  });
+  // ---- operator view: clone each slide as a scaled thumbnail; click = set live ----
+  function scaleFrame(host, node){
+    host.innerHTML = '';
+    var frame = document.createElement('div');
+    frame.className = 'op-frame';
+    var clone = node.cloneNode(true);
+    clone.classList.add('active');
+    clone.style.cssText = 'position:absolute;inset:0;opacity:1;transform:none;pointer-events:none;display:flex;';
+    frame.style.width = window.innerWidth + 'px';
+    frame.style.height = window.innerHeight + 'px';
+    frame.appendChild(clone);
+    host.appendChild(frame);
+    // fit slide (viewport-sized) into host box; retry until host has laid out (aspect-ratio/flex).
+    var fit = function(tries){
+      var w = host.clientWidth, h = host.clientHeight;
+      if ((!w || !h) && tries > 0) { requestAnimationFrame(function(){ fit(tries - 1); }); return; }
+      frame.style.transform = 'scale(' + Math.min(w / window.innerWidth, h / window.innerHeight) + ')';
+    };
+    requestAnimationFrame(function(){ fit(20); });
+  }
+  function renderOperator(){
+    document.getElementById('opLiveLabel').textContent = 'Slide ' + (idx + 1) + ' / ' + slides.length;
+    scaleFrame(document.getElementById('opOnAir'), slides[idx]);
+    var grid = document.getElementById('opGrid');
+    if (grid.children.length !== slides.length) {
+      grid.innerHTML = '';
+      slides.forEach(function(s, i){
+        var t = document.createElement('div');
+        t.className = 'op-thumb';
+        scaleFrame(t, s);
+        var num = document.createElement('span');
+        num.className = 'op-num';
+        num.textContent = (i + 1);
+        t.appendChild(num); // after scaleFrame (which clears t) so it stays on top
+        t.onclick = function(){ go(i); };
+        grid.appendChild(t);
+      });
+    }
+    Array.from(grid.children).forEach(function(t, i){
+      t.classList.toggle('live', i === idx);
+      var tag = t.querySelector('.op-livetag');
+      if (i === idx && !tag) { tag = document.createElement('span'); tag.className = 'op-livetag'; tag.textContent = 'LIVE'; t.appendChild(tag); }
+      else if (i !== idx && tag) tag.remove();
+    });
+    document.getElementById('opPrev').disabled = idx === 0;
+    document.getElementById('opNext').disabled = idx === slides.length - 1;
+  }
+  function enterOperator(){
+    document.body.classList.remove('presenting', 'viewer');
+    document.body.classList.add('operator');
+    renderOperator();
+    broadcast(idx);
+  }
+  document.getElementById('opPrev').onclick = function(){ go(idx - 1); };
+  document.getElementById('opNext').onclick = function(){ go(idx + 1); };
+  document.getElementById('opPrint').onclick = function(){ window.print(); };
+  document.getElementById('opDeck').onclick = function(){ document.body.classList.remove('operator', 'viewer', 'presenting'); go(idx); };
+  document.getElementById('opViewer').onclick = function(){
+    // ponytail: blob-URL window.open is unreliable; write a copy of THIS document into a
+    // blank window and mark it via window.name so the copied script boots in viewer mode.
+    var w = window.open('', 'tracker-viewer');
+    if (!w) { alert('Popup blocked. Izinkan popup untuk membuka Viewer.'); return; }
+    var html = '<!doctype html>' + document.documentElement.outerHTML;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  };
+  // ---- viewer view: listen for operator, show only the live slide ----
+  function enterViewer(){
+    document.body.classList.remove('presenting', 'operator');
+    document.body.classList.add('viewer');
+    var got = false;
+    var apply = function(i){ got = true; go(i); };
+    if (bc) bc.onmessage = function(ev){ if (ev.data && ev.data.type === 'SHOW_SLIDE') apply(ev.data.idx); };
+    window.addEventListener('storage', function(ev){
+      if (ev.key === CH && ev.newValue) { try { apply(JSON.parse(ev.newValue).idx); } catch (e) {} }
+    });
+    // pull last known state (operator may already be live)
+    try { var last = JSON.parse(localStorage.getItem(CH) || 'null'); if (last) apply(last.idx); } catch (e) {}
+    // warn if no operator answers in 2s
+    setTimeout(function(){ if (!got) document.getElementById('syncwarn').style.display = 'block'; }, 2000);
+  }
   slides[0].classList.add('active');
+  // ponytail: viewer window is a written copy of this doc, tagged via window.name (hash
+  // doesn't survive document.write). Slideshow button opens via window.open (opener exists)
+  // → operator mode. Standalone HTML download (no opener) → regular slideshow.
+  if (window.name === 'tracker-viewer') enterViewer();
+  else if (window.opener) enterOperator();
 })();
 </script>
 </body></html>`;

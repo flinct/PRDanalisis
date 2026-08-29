@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GTM Marketing Dashboard — SatuInbox Super Admin</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f4; --surface: #fff; --surface2: #f0efed; --surface3: #faf9f7;
+      --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
+      --text: #1a1a18; --text-muted: #6b6b67; --text-hint: #9e9e9a;
+      --blue: #2563eb; --blue-light: #eff6ff;
+      --teal: #0d9488; --teal-light: #f0fdfa;
+      --purple: #7c3aed; --purple-light: #f5f3ff;
+      --amber: #d97706; --amber-light: #fffbeb;
+      --coral: #dc2626; --coral-light: #fef2f2;
+      --gray: #6b7280; --gray-light: #f9fafb;
+      --radius: 10px; --radius-sm: 6px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#0f0f0e; --surface:#1a1a18; --surface2:#222220; --surface3:#1e1e1c;
+        --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.15);
+        --text:#e8e8e4; --text-muted:#9e9e9a; --text-hint:#6b6b67;
+        --blue-light:#172554; --teal-light:#042f2e; --purple-light:#1e1536;
+        --amber-light:#451a03; --coral-light:#450a0a; --gray-light:#1a1a18;
+      }
+    }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:13px; line-height:1.5; }
+    .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; height:48px; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .topbar-logo { font-size:14px; font-weight:700; color:var(--blue); }
+    .topbar-sep { color:var(--border-strong); font-size:11px; }
+    .pill-sm { font-size:10px; color:var(--text-muted); background:var(--surface2); padding:2px 8px; border-radius:12px; border:1px solid var(--border); font-weight:500; }
+    .topbar-date { font-size:11px; color:var(--text-hint); }
+    .shell { max-width:1280px; margin:0 auto; padding:1.25rem 1.5rem 4rem; }
+    .page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:1.25rem; }
+    .page-header h1 { font-size:18px; font-weight:600; }
+    .page-header p { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:1rem; flex-wrap:wrap; }
+    .source-nav { display:flex; gap:4px; flex-wrap:wrap; }
+    .pill { padding:5px 14px; border-radius:16px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-muted); font-size:12px; cursor:pointer; transition:all .12s; font-family:inherit; font-weight:500; }
+    .pill:hover { background:var(--surface2); color:var(--text); }
+    .pill.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+    .date-group { display:flex; gap:6px; align-items:center; }
+    .date-input { padding:5px 10px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-size:12px; font-family:inherit; }
+    .btn-apply { padding:5px 14px; border-radius:var(--radius-sm); border:none; background:var(--blue); color:#fff; font-size:12px; cursor:pointer; font-family:inherit; font-weight:500; }
+    .kpi-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:1rem; }
+    .kpi-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.75rem .875rem; box-shadow:var(--shadow-sm); }
+    .kpi-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600; margin-bottom:4px; }
+    .kpi-value { font-size:20px; font-weight:700; color:var(--text); line-height:1; margin-bottom:2px; }
+    .kpi-sub { font-size:10px; color:var(--text-hint); }
+    .kpi-card.accent { border-left:3px solid var(--blue); }
+
+    .section-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600; margin-bottom:.5rem; display:flex; align-items:center; gap:6px; }
+    .section-divider { border:none; border-top:1px solid var(--border); margin:1.25rem 0; }
+    .ga4-badge { font-size:8px; font-weight:700; color:var(--blue); background:var(--blue-light); padding:1px 5px; border-radius:6px; letter-spacing:.03em; text-transform:none; }
+
+    /* Internal metrics */
+    .internal-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:1rem; }
+    .internal-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.75rem .875rem; position:relative; overflow:hidden; box-shadow:var(--shadow-sm); }
+    .internal-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
+    .internal-card.ic-owner::before { background:var(--blue); }
+    .internal-card.ic-member::before { background:var(--purple); }
+    .internal-card.ic-verified::before { background:var(--teal); }
+    .internal-card.ic-subs::before { background:var(--amber); }
+    .ic-icon { font-size:14px; margin-bottom:4px; }
+    .ic-value { font-size:18px; font-weight:700; color:var(--text); }
+    .ic-label { font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+    .ic-sub { font-size:10px; color:var(--text-hint); margin-top:2px; }
+    .ic-trend { font-size:10px; margin-top:2px; }
+    .ic-trend.up { color:var(--teal); }
+    .ic-trend.down { color:var(--coral); }
+
+    /* Sync status */
+    .sync-bar { display:flex; gap:12px; align-items:center; margin-bottom:1rem; font-size:11px; color:var(--text-hint); flex-wrap:wrap; }
+    .sync-item { display:flex; align-items:center; gap:4px; }
+    .sync-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .sync-dot.ok { background:var(--teal); }
+    .sync-dot.err { background:var(--coral); }
+    .sync-dot.off { background:var(--text-hint); }
+
+    /* Visit journey funnel (Phase 3) */
+    .funnel-row { display:flex; align-items:stretch; gap:0; margin-bottom:1rem; }
+    .funnel-step { flex:1; background:var(--surface); border:1px solid var(--border); padding:.75rem 1rem; position:relative; box-shadow:var(--shadow-sm); }
+    .funnel-step:not(:last-child) { border-right:none; }
+    .funnel-step:first-child { border-radius:var(--radius) 0 0 var(--radius); }
+    .funnel-step:last-child { border-radius:0 var(--radius) var(--radius) 0; }
+    .funnel-step-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+    .funnel-step-value { font-size:20px; font-weight:700; margin:2px 0; }
+    .funnel-step-sub { font-size:10px; color:var(--text-hint); }
+    .funnel-arrow { display:flex; align-items:center; justify-content:center; width:32px; color:var(--text-hint); font-size:14px; background:var(--surface3); border-top:1px solid var(--border); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .funnel-conv { font-size:9px; color:var(--teal); font-weight:600; }
+
+    /* Ads efficiency 8-metric strip (Phase 3) */
+    .efficiency-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:1rem; }
+    .eff-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.65rem .8rem; box-shadow:var(--shadow-sm); }
+    .eff-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+    .eff-value { font-size:16px; font-weight:700; margin-top:2px; }
+    .eff-value.dim { color:var(--text-hint); font-size:13px; font-weight:500; }
+    .eff-note { font-size:9px; color:var(--text-hint); margin-top:1px; }
+
+    /* GA4 user journey (Phase 3) */
+    .ga4-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:1rem; }
+    .ga4-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.75rem .875rem; box-shadow:var(--shadow-sm); }
+
+    .charts-row { display:grid; grid-template-columns:1fr 2fr; gap:8px; margin-bottom:1rem; }
+    .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; box-shadow:var(--shadow-sm); }
+    .panel-head { font-size:12px; font-weight:600; color:var(--text); margin-bottom:.75rem; display:flex; align-items:center; justify-content:space-between; }
+    .panel-head .tag { font-size:9px; color:var(--text-hint); font-weight:400; text-transform:uppercase; }
+    .chart-wrap { position:relative; width:100%; }
+    .legend { display:flex; gap:10px; flex-wrap:wrap; font-size:10px; color:var(--text-muted); margin-bottom:8px; }
+    .legend span { display:flex; align-items:center; gap:3px; }
+    .ld { width:8px; height:8px; border-radius:2px; }
+    .badge { font-size:10px; font-weight:600; padding:1px 7px; border-radius:10px; }
+    .badge-google { background:var(--blue-light); color:var(--blue); }
+    .badge-meta { background:var(--purple-light); color:var(--purple); }
+    .badge-tiktok { background:var(--amber-light); color:var(--amber); }
+    .badge-organic { background:var(--teal-light); color:var(--teal); }
+    .badge-untracked { background:var(--gray-light); color:var(--gray); }
+    .table-wrap { overflow-x:auto; }
+    .attr-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .attr-table th { padding:8px 10px; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--border); background:var(--surface3); text-align:right; white-space:nowrap; }
+    .attr-table th:nth-child(1), .attr-table th:nth-child(2), .attr-table th:nth-child(3) { text-align:left; }
+    .attr-table td { padding:7px 10px; border-bottom:1px solid var(--border); color:var(--text); text-align:right; vertical-align:middle; }
+    .attr-table td:nth-child(1), .attr-table td:nth-child(2), .attr-table td:nth-child(3) { text-align:left; }
+    .attr-table tr:last-child td { border-bottom:none; }
+    .attr-table tr:hover td { background:var(--surface2); }
+    .attr-table tfoot td { font-weight:700; background:var(--surface3); border-top:1px solid var(--border-strong); font-size:11px; }
+    .row-source { background:var(--surface3); }
+    .camp-name { font-size:11px; font-weight:500; }
+    .content-name { font-size:11px; color:var(--text-muted); font-family:monospace; }
+    .indent1 { padding-left:24px !important; }
+    .indent2 { padding-left:40px !important; }
+    .pct-bar { display:inline-block; height:3px; border-radius:2px; background:var(--blue); vertical-align:middle; margin-left:4px; opacity:.6; }
+    .cpl-good { color:var(--teal); } .cpl-warn { color:var(--amber); } .cpl-bad { color:var(--coral); }
+    .insight { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:.875rem 1.25rem; display:flex; gap:10px; }
+    .insight-icon { font-size:16px; flex-shrink:0; }
+    .insight-body { font-size:12px; color:var(--text-muted); line-height:1.6; }
+    .insight-body strong { color:var(--text); }
+
+    @media(max-width:900px){
+      .kpi-strip,.internal-strip,.efficiency-strip,.ga4-strip{grid-template-columns:repeat(2,1fr);}
+      .charts-row{grid-template-columns:1fr;}
+      .toolbar{flex-direction:column;align-items:flex-start;}
+      .funnel-row{flex-direction:column;}
+      .funnel-arrow{width:auto;height:20px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">SatuInbox</span>
+    <span class="topbar-sep">›</span>
+    <span class="pill-sm">Super Admin</span>
+    <span class="pill-sm">Marketing Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-date" id="currentDate"></span>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="page-header">
+    <div>
+      <h1>GTM Marketing Attribution</h1>
+      <p>utm_source → utm_campaign → utm_content · Super Admin only</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="source-nav">
+      <button class="pill active" data-src="all">Semua</button>
+      <button class="pill" data-src="google_ads">Google Ads</button>
+      <button class="pill" data-src="meta_ads">Meta Ads</button>
+      <button class="pill" data-src="tiktok_ads">TikTok Ads</button>
+      <button class="pill" data-src="organic">Organic</button>
+      <button class="pill" data-src="untracked">Untracked</button>
+    </div>
+    <div class="date-group">
+      <input type="date" class="date-input" id="startDate">
+      <span style="color:var(--text-hint);font-size:11px">—</span>
+      <input type="date" class="date-input" id="endDate">
+      <button class="btn-apply" onclick="refresh()">Terapkan</button>
+    </div>
+  </div>
+
+  <!-- KPI (Phase 1+2) -->
+  <div class="kpi-strip" id="kpiStrip"></div>
+
+  <!-- Phase 3: Visit Journey funnel -->
+  <div class="section-label">Visit Journey <span class="ga4-badge">GA4 + Internal</span></div>
+  <div class="funnel-row" id="visitFunnel"></div>
+
+  <!-- Phase 3: Ads Efficiency 8-metric -->
+  <div class="section-label">Platform Ads Journey <span class="ga4-badge">Ads API</span></div>
+  <div class="efficiency-strip" id="efficiencyStrip"></div>
+  <!-- Phase 3: Ads Efficiency per-platform table -->
+  <div class="panel" style="margin-bottom:1rem">
+    <div class="panel-head">Platform Ads Breakdown <span class="tag">per platform</span></div>
+    <div class="table-wrap">
+      <table class="attr-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:110px">Platform</th>
+            <th>Klik</th><th>Impression</th><th>CPM</th><th>CTR</th><th>CPR</th><th>ROAS</th><th>CAC</th><th>Total Spend</th>
+          </tr>
+        </thead>
+        <tbody id="efficiencyTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 3: User Journey (GA4) -->
+  <div class="section-label">User Journey <span class="ga4-badge">GA4</span></div>
+  <div class="ga4-strip" id="ga4Strip"></div>
+
+  <hr class="section-divider">
+
+  <!-- Internal SatuInbox Metrics (Phase 2) -->
+  <div class="section-label">SatuInbox Internal Metrics</div>
+  <div class="internal-strip" id="internalStrip"></div>
+
+  <!-- Sync Status -->
+  <div class="sync-bar" id="syncBar"></div>
+
+  <hr class="section-divider">
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="panel">
+      <div class="panel-head">Register per Source <span class="tag">Distribusi</span></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="sourceChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">Trend Mingguan <span class="tag">6 minggu terakhir</span></div>
+      <div class="legend" id="trendLegend"></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Attribution Table -->
+  <div class="panel">
+    <div class="panel-head">Attribution Detail <span class="tag">Grouped: source › campaign › content</span></div>
+    <div class="table-wrap">
+      <table class="attr-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:120px">Source</th>
+            <th style="text-align:left;width:200px">Campaign</th>
+            <th style="text-align:left;width:160px">Content</th>
+            <th style="width:80px">Register</th>
+            <th style="width:70px">% Total</th>
+            <th style="width:100px">Spend</th>
+            <th style="width:80px">CPL</th>
+          </tr>
+        </thead>
+        <tbody id="mainTbody"></tbody>
+        <tfoot id="mainTfoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Insight -->
+  <div class="insight" style="margin-top:1rem">
+    <div class="insight-icon">✦</div>
+    <div class="insight-body" id="insightBody"></div>
+  </div>
+</div>
+
+<script>
+/* ═══ MOCK DATA — Ads attribution (Phase 1+2) ═══ */
+const sources = [
+  { id:'google_ads', label:'Google Ads', badge:'badge-google', campaigns:[
+    { name:'search_satuinbox_brand', label:'Search — Brand', contents:[
+      { name:'text_brand_v1', register:320, spend:6400000 },
+      { name:'text_brand_v2', register:280, spend:5200000 },
+      { name:'sitelink_ext', register:95, spend:1900000 },
+    ]},
+    { name:'search_cs_platform_kw', label:'Search — CS Platform Keywords', contents:[
+      { name:'text_customer_service', register:210, spend:8400000 },
+      { name:'text_livechat_tools', register:175, spend:6300000 },
+      { name:'text_omnichannel_id', register:130, spend:4550000 },
+    ]},
+    { name:'pmax_smb_trial', label:'Performance Max — SMB Trial', contents:[
+      { name:'image_free_trial', register:190, spend:5700000 },
+      { name:'video_demo_30s', register:145, spend:5800000 },
+    ]},
+    { name:'display_retarget', label:'Display — Retargeting', contents:[
+      { name:'banner_300x250', register:88, spend:1760000 },
+      { name:'banner_leaderboard', register:62, spend:1240000 },
+    ]},
+  ]},
+  { id:'meta_ads', label:'Meta Ads', badge:'badge-meta', campaigns:[
+    { name:'awareness_video_cs', label:'Awareness — CS Video', contents:[
+      { name:'video_testimoni_15s', register:180, spend:5400000 },
+      { name:'carousel_fitur', register:150, spend:3750000 },
+      { name:'reel_demo', register:120, spend:3600000 },
+    ]},
+    { name:'lead_gen_wa_form', label:'Lead Gen — WhatsApp Form', contents:[
+      { name:'image_promo_bulanan', register:165, spend:4125000 },
+      { name:'video_case_study', register:130, spend:3900000 },
+    ]},
+    { name:'retarget_web_visitor', label:'Retargeting — Web Visitors', contents:[
+      { name:'dynamic_product_ad', register:110, spend:2750000 },
+      { name:'static_cta_signup', register:85, spend:1700000 },
+    ]},
+  ]},
+  { id:'tiktok_ads', label:'TikTok Ads', badge:'badge-tiktok', campaigns:[
+    { name:'infeed_tutorial_cs', label:'In-Feed — CS Tutorial', contents:[
+      { name:'tutorial_setup_15s', register:95, spend:1900000 },
+      { name:'tutorial_wa_30s', register:72, spend:1800000 },
+    ]},
+    { name:'spark_ugc_review', label:'Spark Ads — UGC Reviews', contents:[
+      { name:'ugc_creator_A', register:88, spend:1760000 },
+      { name:'ugc_creator_B', register:65, spend:1300000 },
+    ]},
+  ]},
+  { id:'organic', label:'Organic', badge:'badge-organic', campaigns:[
+    { name:'seo_blog', label:'SEO — Blog', contents:[
+      { name:'blog_cara_pilih_cs', register:140, spend:0 },
+      { name:'blog_omnichannel_id', register:110, spend:0 },
+      { name:'blog_integrasi_wa', register:95, spend:0 },
+    ]},
+    { name:'direct_traffic', label:'Direct Traffic', contents:[{ name:'direct', register:280, spend:0 }]},
+    { name:'referral_partner', label:'Referral — Partner', contents:[{ name:'partner_link', register:120, spend:0 }]},
+  ]},
+  { id:'untracked', label:'Untracked', badge:'badge-untracked', campaigns:[
+    { name:'pre_go_live', label:'Pre Go-Live (no UTM)', contents:[{ name:'no_utm', register:450, spend:0 }]},
+  ]}
+];
+
+// Internal SatuInbox metrics (Phase 2)
+const internalMetrics = {
+  ownerRegistered: { value: 127, trend: +18, label: 'Owner Registered', sub: 'company owner signups' },
+  memberRegistered: { value: 342, trend: +35, label: 'Member Registered', sub: 'team member invitations accepted' },
+  emailVerified: { value: 389, total: 469, label: 'Email Verified', sub: 'dari total registrasi (82.9%)' },
+  subsCreated: { value: 48, trend: +12, label: 'Subscription Baru', sub: 'NEW_SUBSCRIPTION bulan ini' },
+};
+
+const syncStatus = [
+  { platform: 'Google Ads', status: 'ok', lastSync: '2 jam lalu' },
+  { platform: 'Meta Ads', status: 'ok', lastSync: '3 jam lalu' },
+  { platform: 'TikTok Ads', status: 'off', lastSync: 'Belum dikoneksikan' },
+  { platform: 'GA4', status: 'off', lastSync: 'Belum di-setup — Phase 3' },
+];
+
+// Phase 3: Visit Journey (Visitor → Register → Leads)
+const visitJourney = {
+  visitor: { value: 24580, sub: 'GA4 sessions (mock — belum connect)', placeholder: true },
+  register: { value: 1272, sub: 'dari auths collection (real)' },
+  leads: { value: 340, sub: 'demo_requests (mock — form belum ada)', placeholder: true },
+};
+
+// Phase 3: Platform Ads Journey — 8 metrics (aggregate)
+const adsEfficiency = {
+  clicks: { value: 3021, note: 'Ads API — sum semua platform' },
+  impressions: { value: 187400, note: 'Ads API' },
+  cpm: { value: 168000, note: 'cost/1000 impression', unit:'rp' },
+  ctr: { value: 1.61, note: 'clicks/impressions', unit:'pct' },
+  cpr: { value: 42500, note: 'cost/result (conversion)', unit:'rp' },
+  roas: { value: null, note: 'butuh join subscription revenue — Phase 3C, belum tersedia', placeholder:true },
+  cac: { value: null, note: 'butuh join subscription revenue — Phase 3C, belum tersedia', placeholder:true },
+  totalSpend: { value: 78975000, note: 'sum spend semua campaign', unit:'rp' },
+};
+
+// Phase 3: Platform Ads Journey — per-platform breakdown (for table)
+const adsByPlatform = [
+  {
+    platform: 'Google Ads', badge: 'badge-google',
+    clicks: 956, impressions: 9191,
+    spend: 1090000, conversions: 91.8,
+    roas: null, cac: null, // Phase 3C
+  },
+  {
+    platform: 'Meta Ads', badge: 'badge-meta',
+    clicks: 1524, impressions: 89200,
+    spend: 30225000, conversions: 68.0,
+    roas: null, cac: null,
+  },
+  {
+    platform: 'TikTok Ads', badge: 'badge-tiktok',
+    clicks: 541, impressions: 89009,
+    spend: 6760000, conversions: 5.6,
+    roas: null, cac: null,
+  },
+];
+
+// Phase 3: User Journey — GA4 native
+const ga4Users = {
+  totalUsers: { value: 17210, sub: 'GA4 totalUsers (mock)' },
+  newUsers: { value: 6362, sub: 'GA4 newUsers (mock)' },
+  activeUserWeb: { value: 4102, sub: 'GA4 activeUsers — visitor website' },
+  activeUserProduk: { value: 891, sub: 'Auth.lastLoginAt — login app (field belum ada, mock)' },
+};
+
+/* ═══ HELPERS ═══ */
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const textC = isDark ? '#9e9e9a' : '#6b6b67';
+const gridC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const C = { blue:'#3b82f6', purple:'#7c3aed', amber:'#d97706', teal:'#0d9488', coral:'#dc2626', gray:'#6b7280' };
+const srcColor = { google_ads:C.blue, meta_ads:C.purple, tiktok_ads:C.amber, organic:C.teal, untracked:C.gray };
+
+let charts = {};
+function destroyChart(k){ if(charts[k]){ charts[k].destroy(); delete charts[k]; } }
+function fmt(n){ return n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':n; }
+function fmtRp(n){ if(n===0||n==null)return'—'; return n>=1000000?'Rp'+(n/1000000).toFixed(1)+'jt':'Rp'+(n/1000).toFixed(0)+'rb'; }
+function pct(a,b){ return b===0?'—':(a/b*100).toFixed(1)+'%'; }
+function cpl(s,r){ return r===0||s===0?'—':'Rp'+Math.round(s/r).toLocaleString('id-ID'); }
+function cplClass(v){ return v<=25000?'cpl-good':v<=45000?'':'cpl-warn'; }
+function sumCt(a,f){ return a.reduce((s,c)=>s+c[f],0); }
+function sumCamp(c,f){ return c.reduce((s,x)=>s+sumCt(x.contents,f),0); }
+
+let activeSource = 'all';
+function getFiltered(){ return activeSource==='all'?sources:sources.filter(s=>s.id===activeSource); }
+
+/* ═══ KPI ═══ */
+function renderKpi(srcs){
+  const total = srcs.reduce((s,src)=>s+sumCamp(src.campaigns,'register'),0);
+  const totalSpend = srcs.reduce((s,src)=>s+sumCamp(src.campaigns,'spend'),0);
+  const paidReg = srcs.filter(s=>s.id!=='organic'&&s.id!=='untracked').reduce((s,src)=>s+sumCamp(src.campaigns,'register'),0);
+  const avgCpl = paidReg>0?totalSpend/paidReg:0;
+  const topSrc = srcs.slice().sort((a,b)=>sumCamp(b.campaigns,'register')-sumCamp(a.campaigns,'register'))[0];
+  document.getElementById('kpiStrip').innerHTML = `
+    <div class="kpi-card accent"><div class="kpi-label">Total Register</div><div class="kpi-value">${fmt(total)}</div><div class="kpi-sub">periode ini</div></div>
+    <div class="kpi-card"><div class="kpi-label">Top Source</div><div class="kpi-value">${topSrc?topSrc.label:'—'}</div><div class="kpi-sub">${topSrc?fmt(sumCamp(topSrc.campaigns,'register'))+' register':'—'}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Spend</div><div class="kpi-value">${fmtRp(totalSpend)}</div><div class="kpi-sub">semua paid source</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg CPL</div><div class="kpi-value" style="color:${avgCpl<=30000?C.teal:avgCpl<=50000?'':C.coral}">${fmtRp(avgCpl)}</div><div class="kpi-sub">cost per lead (paid)</div></div>
+  `;
+}
+
+/* ═══ Phase 3: Visit Journey funnel ═══ */
+function renderVisitFunnel(){
+  const v = visitJourney;
+  const steps = [
+    { key:'visitor', label:'Visitor', ...v.visitor },
+    { key:'register', label:'Register', ...v.register },
+    { key:'leads', label:'Leads', ...v.leads },
+  ];
+  let html = '';
+  steps.forEach((s,i)=>{
+    const conv = i>0 ? pct(s.value, steps[i-1].value) : null;
+    html += `<div class="funnel-step">
+      <div class="funnel-step-label">${s.label}${s.placeholder?' <span style="color:var(--text-hint)">(mock)</span>':''}</div>
+      <div class="funnel-step-value">${fmt(s.value)}</div>
+      <div class="funnel-step-sub">${s.sub}</div>
+      ${conv?`<div class="funnel-conv">↳ ${conv} dari step sebelumnya</div>`:''}
+    </div>`;
+    if(i<steps.length-1) html += `<div class="funnel-arrow">→</div>`;
+  });
+  document.getElementById('visitFunnel').innerHTML = html;
+}
+
+/* ═══ Phase 3: Ads Efficiency 8-metric ═══ */
+function renderEfficiency(){
+  const e = adsEfficiency;
+  const items = [
+    { label:'Klik', v:e.clicks },
+    { label:'Impression', v:e.impressions },
+    { label:'CPM (Cost/Mille)', v:e.cpm },
+    { label:'CTR', v:e.ctr },
+    { label:'CPR (Cost/Result)', v:e.cpr },
+    { label:'ROAS', v:e.roas },
+    { label:'CAC', v:e.cac },
+    { label:'Total Ads Spend', v:e.totalSpend },
+  ];
+  document.getElementById('efficiencyStrip').innerHTML = items.map(it=>{
+    let val;
+    if(it.v.placeholder) val = '—';
+    else if(it.v.unit==='rp') val = fmtRp(it.v.value);
+    else if(it.v.unit==='pct') val = it.v.value+'%';
+    else val = fmt(it.v.value);
+    return `<div class="eff-card">
+      <div class="eff-label">${it.label}</div>
+      <div class="eff-value ${it.v.placeholder?'dim':''}">${val}</div>
+      <div class="eff-note">${it.v.note}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ Phase 3: Ads Efficiency per-platform table ═══ */
+function renderEfficiencyTable(){
+  const tbody = document.getElementById('efficiencyTbody');
+  if(!tbody) return;
+  let html = '';
+  let tClicks=0, tImp=0, tSpend=0, tConv=0;
+  adsByPlatform.forEach(p=>{
+    const cpm = p.impressions>0 ? (p.spend/p.impressions*1000) : 0;
+    const ctr = p.impressions>0 ? (p.clicks/p.impressions*100) : 0;
+    const cpr = p.conversions>0 ? (p.spend/p.conversions) : 0;
+    tClicks+=p.clicks; tImp+=p.impressions; tSpend+=p.spend; tConv+=p.conversions;
+    html += `<tr>
+      <td style="text-align:left"><span class="badge ${p.badge}">${p.platform}</span></td>
+      <td>${fmt(p.clicks)}</td>
+      <td>${fmt(p.impressions)}</td>
+      <td>${fmtRp(cpm)}</td>
+      <td>${ctr.toFixed(1)}%</td>
+      <td>${fmtRp(cpr)}</td>
+      <td style="color:var(--text-hint)">${p.roas!=null?p.roas:'—'}</td>
+      <td style="color:var(--text-hint)">${p.cac!=null?fmtRp(p.cac):'—'}</td>
+      <td>${fmtRp(p.spend)}</td>
+    </tr>`;
+  });
+  // Total row
+  const tCpm = tImp>0?(tSpend/tImp*1000):0;
+  const tCtr = tImp>0?(tClicks/tImp*100):0;
+  const tCpr = tConv>0?(tSpend/tConv):0;
+  html += `<tr style="font-weight:700;background:var(--surface3)">
+    <td style="text-align:left;font-size:11px">Total</td>
+    <td>${fmt(tClicks)}</td><td>${fmt(tImp)}</td>
+    <td>${fmtRp(tCpm)}</td><td>${tCtr.toFixed(1)}%</td><td>${fmtRp(tCpr)}</td>
+    <td style="color:var(--text-hint)">—</td><td style="color:var(--text-hint)">—</td>
+    <td>${fmtRp(tSpend)}</td>
+  </tr>`;
+  tbody.innerHTML = html;
+}
+
+/* ═══ Phase 3: GA4 User Journey ═══ */
+function renderGa4(){
+  const g = ga4Users;
+  const items = [
+    { label:'Total User', v:g.totalUsers },
+    { label:'New User', v:g.newUsers },
+    { label:'Active User (Web)', v:g.activeUserWeb },
+    { label:'Active User (Produk)', v:g.activeUserProduk },
+  ];
+  document.getElementById('ga4Strip').innerHTML = items.map(it=>`
+    <div class="ga4-card">
+      <div class="kpi-label">${it.label}</div>
+      <div class="kpi-value">${fmt(it.v.value)}</div>
+      <div class="kpi-sub">${it.v.sub}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══ Internal metrics (Phase 2) ═══ */
+function renderInternal(){
+  const m = internalMetrics;
+  const cards = [
+    { cls:'ic-owner', icon:'👤', value:fmt(m.ownerRegistered.value), label:m.ownerRegistered.label, sub:m.ownerRegistered.sub, trend:m.ownerRegistered.trend },
+    { cls:'ic-member', icon:'👥', value:fmt(m.memberRegistered.value), label:m.memberRegistered.label, sub:m.memberRegistered.sub, trend:m.memberRegistered.trend },
+    { cls:'ic-verified', icon:'✓', value:pct(m.emailVerified.value,m.emailVerified.total), label:m.emailVerified.label, sub:m.emailVerified.sub, trend:null },
+    { cls:'ic-subs', icon:'📦', value:fmt(m.subsCreated.value), label:m.subsCreated.label, sub:m.subsCreated.sub, trend:m.subsCreated.trend },
+  ];
+  document.getElementById('internalStrip').innerHTML = cards.map(c=>`
+    <div class="internal-card ${c.cls}">
+      <div class="ic-icon">${c.icon}</div>
+      <div class="ic-value">${c.value}</div>
+      <div class="ic-label">${c.label}</div>
+      <div class="ic-sub">${c.sub}</div>
+      ${c.trend!==null?`<div class="ic-trend ${c.trend>=0?'up':'down'}">${c.trend>=0?'↑':'↓'} ${Math.abs(c.trend)}% vs bulan lalu</div>`:''}
+    </div>
+  `).join('');
+}
+
+function renderSync(){
+  document.getElementById('syncBar').innerHTML = syncStatus.map(s=>
+    `<div class="sync-item"><span class="sync-dot ${s.status}"></span> <strong>${s.platform}</strong>: ${s.lastSync}</div>`
+  ).join('');
+}
+
+/* ═══ TABLE ═══ */
+function renderTable(srcs){
+  const grandTotal = srcs.reduce((s,src)=>s+sumCamp(src.campaigns,'register'),0);
+  const maxReg = Math.max(...srcs.map(s=>sumCamp(s.campaigns,'register')));
+  let html='', totReg=0, totSpend=0;
+  srcs.forEach(src=>{
+    const sReg=sumCamp(src.campaigns,'register'), sSpend=sumCamp(src.campaigns,'spend');
+    totReg+=sReg; totSpend+=sSpend;
+    const barW=Math.round(sReg/maxReg*60);
+    html+=`<tr class="row-source"><td colspan="3" style="padding:7px 10px"><div style="display:flex;align-items:center;gap:6px"><span class="badge ${src.badge}">${src.label}</span><span style="font-size:10px;color:var(--text-hint)">${fmt(sReg)} reg · ${pct(sReg,grandTotal)}</span></div></td><td style="font-weight:700;font-size:13px">${fmt(sReg)}</td><td><span class="pct-bar" style="width:${barW}px"></span> ${pct(sReg,grandTotal)}</td><td style="font-size:11px">${fmtRp(sSpend)}</td><td style="font-size:11px">${sSpend>0?cpl(sSpend,sReg):'—'}</td></tr>`;
+    src.campaigns.forEach(camp=>{
+      const cReg=sumCt(camp.contents,'register'), cSpend=sumCt(camp.contents,'spend');
+      html+=`<tr><td></td><td class="indent1 camp-name">${camp.label}</td><td></td><td>${fmt(cReg)}</td><td style="font-size:10px;color:var(--text-hint)">${pct(cReg,grandTotal)}</td><td style="font-size:11px">${fmtRp(cSpend)}</td><td style="font-size:11px" class="${cSpend>0?cplClass(cSpend/cReg):''}">${cSpend>0?cpl(cSpend,cReg):'—'}</td></tr>`;
+      camp.contents.forEach(ct=>{
+        const v=ct.spend>0?ct.spend/ct.register:0;
+        html+=`<tr><td></td><td></td><td class="indent2 content-name">${ct.name}</td><td>${ct.register}</td><td style="font-size:10px;color:var(--text-hint)">${pct(ct.register,grandTotal)}</td><td style="font-size:11px">${fmtRp(ct.spend)}</td><td style="font-size:11px" class="${v>0?cplClass(v):''}">${ct.spend>0?cpl(ct.spend,ct.register):'—'}</td></tr>`;
+      });
+    });
+  });
+  document.getElementById('mainTbody').innerHTML=html;
+  const avgAll=totSpend>0?totSpend/totReg:0;
+  document.getElementById('mainTfoot').innerHTML=`<tr><td colspan="3" style="text-align:left;padding:8px 10px">Grand Total</td><td>${fmt(totReg)}</td><td>100%</td><td>${fmtRp(totSpend)}</td><td>${fmtRp(avgAll)}</td></tr>`;
+}
+
+/* ═══ CHARTS ═══ */
+function renderCharts(srcs){
+  destroyChart('d');
+  charts['d']=new Chart(document.getElementById('sourceChart'),{
+    type:'doughnut', data:{labels:srcs.map(s=>s.label),datasets:[{data:srcs.map(s=>sumCamp(s.campaigns,'register')),backgroundColor:srcs.map(s=>srcColor[s.id]||C.gray),borderWidth:isDark?1:0,borderColor:isDark?'rgba(0,0,0,0.3)':'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:textC,font:{size:10},boxWidth:10,padding:8}}}}
+  });
+  const weeks=['W1 Jul','W2 Jul','W3 Jul','W4 Jul','W1 Agu','W2 Agu'];
+  const td={google_ads:[52,68,75,82,90,95],meta_ads:[35,42,48,55,58,62],tiktok_ads:[12,18,22,28,30,32],organic:[45,48,52,55,58,60]};
+  document.getElementById('trendLegend').innerHTML=Object.keys(td).map(k=>`<span><span class="ld" style="background:${srcColor[k]}"></span>${k.replace('_ads','').replace(/^\w/,c=>c.toUpperCase())}</span>`).join('');
+  destroyChart('t');
+  charts['t']=new Chart(document.getElementById('trendChart'),{
+    type:'line', data:{labels:weeks,datasets:Object.entries(td).map(([k,v])=>({label:k,data:v,borderColor:srcColor[k],backgroundColor:srcColor[k]+'18',fill:true,tension:.35,borderWidth:2,pointRadius:3,pointBackgroundColor:srcColor[k]}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{ticks:{color:textC,font:{size:10}},grid:{color:gridC}},y:{ticks:{color:textC,font:{size:10}},grid:{color:gridC}}},interaction:{mode:'index',intersect:false}}
+  });
+}
+
+/* ═══ INSIGHT ═══ */
+function renderInsight(srcs){
+  const total=srcs.reduce((s,src)=>s+sumCamp(src.campaigns,'register'),0);
+  const gR=srcs.find(s=>s.id==='google_ads')?sumCamp(srcs.find(s=>s.id==='google_ads').campaigns,'register'):0;
+  let bestCamp=null,bestCpl=Infinity;
+  srcs.forEach(src=>src.campaigns.forEach(camp=>{
+    const cs=sumCt(camp.contents,'spend'),cr=sumCt(camp.contents,'register');
+    if(cs>0&&cr>0&&cs/cr<bestCpl){bestCpl=cs/cr;bestCamp={name:camp.label,src:src.label};}
+  }));
+  document.getElementById('insightBody').innerHTML=`<strong>Google Ads</strong> menghasilkan register terbanyak (${fmt(gR)}, ${pct(gR,total)}). CPL terbaik: <strong>${bestCamp?bestCamp.name:'—'}</strong> (${fmtRp(bestCpl)}/lead). <strong>ROAS/CAC</strong> dan <strong>GA4 Visit/User Journey</strong> masih mock — butuh GA4 property + join subscription revenue (Phase 3, belum diimplementasi).`;
+}
+
+function refresh(){ const srcs=getFiltered(); renderKpi(srcs); renderCharts(srcs); renderTable(srcs); renderInsight(srcs); }
+document.querySelectorAll('.pill[data-src]').forEach(btn=>{btn.addEventListener('click',()=>{activeSource=btn.dataset.src;document.querySelectorAll('.pill[data-src]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');refresh();});});
+const now=new Date();document.getElementById('startDate').value=new Date(now-30*86400000).toISOString().slice(0,10);document.getElementById('endDate').value=now.toISOString().slice(0,10);document.getElementById('currentDate').textContent=now.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+renderVisitFunnel();renderEfficiency();renderEfficiencyTable();renderGa4();renderInternal();renderSync();refresh();
+</script>
+</body>
+</html>

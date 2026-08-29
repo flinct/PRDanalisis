@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatuInbox — Statistik Prototype (Patch 2 & 3)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'background-border': '#e2e8f0', // slate-200 as slatuinbox border
+      },
+      gridTemplateColumns: {
+        '20': 'repeat(20,minmax(0,1fr))',
+      }
+    }
+  }
+}
+</script>
+<style>
+  [x-cloak] { display:none !important; }
+  /* exact SatuInbox button styles */
+  .btn-subtle { color:#475569; background:transparent; }
+  .btn-subtle:hover { background:#f8fafc; }
+  .btn-selected { background:#fff; border:1px solid #cbd5e1; font-weight:600; }
+  /* self-filter chip */
+  .badge-info { background:#dbeafe; color:#1e40af; }
+  /* summary changes */
+  .badge-up { background:#dcfce7; color:#166534; }
+  .badge-down { background:#fee2e2; color:#991b1b; }
+  .badge-none { background:#f1f5f9; color:#1e293b; }
+  /* card hover — exact StatisticCard */
+  .stat-card { cursor:default; }
+  /* P3 interactive */
+  .card-click { cursor:pointer; transition:box-shadow .15s, transform .15s, border-color .15s; }
+  .card-click:hover { box-shadow:0 4px 12px rgba(59,91,219,.15); transform:translateY(-1px); border-color:#3b5bdb; }
+  .card-click:focus-visible { outline:2px solid #3b5bdb; outline-offset:2px; }
+  .card-noclick { opacity:.65; }
+  /* drill badges */
+  .drill-badge { position:absolute; top:8px; right:8px; font-size:10px; padding:1px 6px; border-radius:999px; font-weight:600; letter-spacing:.02em; }
+  .badge-nav { background:#dcfce7; color:#166534; }
+  .badge-modal { background:#fef3c7; color:#92400e; }
+  /* modal */
+  .modal-fade { animation:modalIn .2s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:none} }
+  /* toast */
+  .toast-fade { animation:toastIn .2s ease; }
+  @keyframes toastIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  /* P2 new-param tag */
+  .p2-tag { font-size:10px; font-weight:600; color:#059669; background:#ecfdf5; padding:1px 6px; border-radius:999px; }
+  /* chart — matches SatuInbox Recharts container feel */
+  .chart-box { background:#fff; border:1px solid #e2e8f0; border-radius:.75rem; padding:1rem; position:relative; height:240px; }
+  .chart-box canvas { width:100%!important; height:100%!important; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-700">
+
+<!-- ========= APP SHELL ========= -->
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR — exact StatisticNav.tsx style -->
+  <aside class="w-1/6 min-w-[220px] bg-slate-50 border-r border-[#e2e8f0] h-full px-5 py-5 overflow-y-auto">
+    <h1 class="text-xl text-slate-700 font-semibold ml-2 mb-4">Statistik</h1>
+    <div class="flex flex-col gap-2" id="statnav"></div>
+    <!-- role switcher -->
+    <div class="mt-6 mx-2">
+      <label class="text-[11px] text-slate-400 uppercase tracking-wider">Mode Akses</label>
+      <select id="roleSel" onchange="setRole(this.value)" class="mt-1 w-full text-sm border border-slate-300 rounded-md px-2 py-1.5 bg-white">
+        <option value="all">Admin · all_access</option>
+        <option value="team">Supervisor · read_team</option>
+        <option value="own">Agent · read_own (self-only)</option>
+      </select>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 overflow-y-auto">
+    <!-- Tab bar -->
+    <div class="bg-white border-b border-slate-200 px-4 py-0 flex items-center sticky top-0 z-20">
+      <button onclick="switchTab('p2')" id="tab-p2" class="px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600">Patch 2 · Parameter & Filter</button>
+      <button onclick="switchTab('p3')" id="tab-p3" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700">Patch 3 · Interactive Drill</button>
+      <div class="ml-auto flex items-center gap-2 text-xs text-slate-400 pr-2">
+        <span id="accessBadge" class="badge-info px-2 py-0.5 rounded-full text-[11px]">all_access</span>
+      </div>
+    </div>
+    <!-- Section container -->
+    <div id="sectionRoot" class="w-full"></div>
+  </main>
+
+</div>
+
+<!-- ========= DRILL MODAL (P3) ========= -->
+<div id="modal" class="fixed inset-0 bg-black/30 z-40 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col modal-fade shadow-xl">
+    <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-200">
+      <div>
+        <div id="modalTitle" class="text-lg font-semibold text-slate-800">Drill-down</div>
+        <div id="modalSub" class="text-xs text-slate-400 mt-0.5 font-mono"></div>
+      </div>
+      <button onclick="closeModal()" class="ml-auto text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+    </div>
+    <div id="modalBody" class="p-5 overflow-auto flex-1"></div>
+    <div id="modalFooter" class="px-5 py-3 border-t border-slate-100 text-xs text-slate-400"></div>
+  </div>
+</div>
+
+<!-- NAVIGATE TOAST (P3 clean cards) -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+  <div class="bg-slate-800 text-white rounded-lg px-4 py-3 text-sm shadow-lg toast-fade max-w-sm">
+    <div class="text-xs text-slate-300 font-mono" id="toastMsg"></div>
+  </div>
+</div>
+
+<script>
+// ═══════ STATE ═══════
+let TAB = 'p2';
+let ROLE = 'all';
+let CURRENT_SECTION = 'conversations';
+let RESP_TAB = 'all'; // ResponsivenessType: all|conversation|ticket — BE simpan metricType terpisah per domain
+const dateRange = { start:'2026-08-01', end:'2026-08-12' };
+
+const SECTIONS = [
+  {key:'conversations', label:'Percakapan', icon:'💬'},
+  {key:'ticket', label:'Tiket', icon:'🎫'},
+  {key:'responsiveness', label:'Responsivitas', icon:'↔'},
+  {key:'member-performance', label:'Performa Agent', icon:'👥'},
+  {key:'broadcast', label:'Broadcast', icon:'📢'},
+  {key:'offline-report', label:'Laporan Offline', icon:'📋'},
+];
+
+// ═══════ KPI CARDS — exact data from verified codebase ═══════
+const CARDS = {
+  conversations: {
+    items: [
+      {key:'total', label:'Total Percakapan', value:1284, drill:'nav', filter:'date-range only'},
+      {key:'closed', label:'Percakapan Selesai', value:918, drill:'nav', filter:'status=close + date'},
+      {key:'open', label:'Percakapan Terbuka', value:342, drill:'nav', filter:'status=open + date'},
+      {key:'unassigned', label:'Percakapan Belum Di-assign', value:24, drill:'nav', filter:'unassign + date'},
+      {key:'replied', label:'Percakapan Sudah Dibalas', value:1102, drill:'modal', filter:'drill endpoint (NO list filter replied)'},
+      {key:'reply_sent', label:'Total Balasan Terkirim', value:4821, drill:'none', reason:'count message, bukan conversation'},
+      {key:'screenshots', label:'Total Screenshot', value:210, drill:'none', reason:'count screenshot'},
+      {key:'closed_ss', label:'Percakapan Selesai + Screenshot', value:187, drill:'modal', filter:'drill endpoint (NO screenshot filter)'},
+    ],
+    // grid: md:grid-cols-20, all cards md:col-span-5 → 4 per row
+    gridCols:'grid-cols-1 md:grid-cols-20', colSpan:'md:col-span-5',
+    // charts below
+    charts: [
+      {type:'bar', label:'Percakapan per Jam', h:200},
+      {type:'grid2', children:[
+        {type:'donut', label:'Percakapan per Channel', h:200},
+        {type:'line', label:'Balasan per Jam', h:200},
+      ]},
+      {type:'bar', label:'Tag yang Digunakan', h:180},
+    ]
+  },
+  ticket: {
+    items: [
+      {key:'t_total', label:'Total Tiket', value:512, drill:'nav', filter:'date-range'},
+      {key:'t_solved', label:'Tiket Selesai', value:389, drill:'nav', filter:'status=solved + date'},
+      {key:'t_unsolved', label:'Tiket Dalam Proses', value:88, drill:'nav', filter:'status=in-progress + date'},
+      {key:'t_unassigned', label:'Tiket Belum Di-assign', value:21, drill:'nav', filter:'unassign + date'},
+      {key:'t_reopen', label:'Tiket Dibuka Ulang', value:14, drill:'nav', filter:'status=reopened + date'},
+      {key:'t_onetouch', label:'One-touch Ticket', value:'71.2%', drill:'none', reason:'rasio (%)'},
+      {key:'t_sla_rate', label:'SLA Achievement Rate', value:'93.5%', drill:'none', reason:'rasio (%)'},
+      {key:'t_overdue', label:'Overdue SLA', value:33, drill:'modal', filter:'drill endpoint (NO overdue filter)'},
+      {key:'t_sla_met', label:'SLA Tercapai', value:479, drill:'modal', filter:'drill endpoint (NO sla_met filter)'},
+      {key:'t_sla_active', label:'SLA Aktif', value:50, drill:'modal', filter:'drill endpoint (NO sla_active filter)'},
+    ],
+    // grid: md:grid-cols-[repeat(20,...)], first 10 = col-span-4 (5/row), after = col-span-5 (4/row)
+    gridCols:'grid-cols-1 md:grid-cols-20', colSpanFn:(i) => i < 10 ? 'md:col-span-4' : 'md:col-span-5',
+    charts: [
+      {type:'grid2', children:[{type:'bar',label:'Tiket per Jam',h:200},{type:'bar',label:'Tiket per Hari',h:200}]},
+      {type:'grid2', children:[{type:'bar',label:'First Reply Time',h:200},{type:'bar',label:'Time Response',h:200}]},
+      {type:'bar', label:'Average Reply Time', h:180},
+      {type:'bar', label:'Distribusi Wait Time (RLT)', h:180}, // BE: getTicketWaitTimeDistribution — ada di ticket-metrics.service.ts:323, belum ada chart di FE
+    ]
+  },
+  responsiveness: {
+    // BE: metricType per-domain (conversation_frt / ticket_frt / conversation_ttc / ticket_ttc, dst)
+    // → summary + SLA breakdown BEDA nilai per tab (bukan satu angka gabungan)
+    byTab: {
+      all: {
+        summaryCards: [
+          {key:'avg_rt', label:'Average Response Time', value:'5m 12s', changes:'1m 30s', status:'down', indicate:'down'},
+          {key:'avg_frt', label:'Average First Response Time', value:'2m 14s', changes:'45s', status:'down', indicate:'down'},
+          {key:'avg_wt', label:'Average Wait Time in Queue', value:'1m 20s', changes:'10s', status:'down', indicate:'down'}, // GAP: waitTimeInQueueMs ADA di schema+repository, tidak masuk ResponsivenessMetricType enum
+          {key:'avg_rlt', label:'Average Response Lead Time', value:'3m 05s', changes:'20s', status:'up', indicate:'down'}, // GAP: RLT dihitung di conversation-sla-metrics.service.ts calculateRltMs() tapi TIDAK ADA di ResponsivenessMetricType enum — belum pernah sampai ke analytics-service/FE
+          {key:'avg_ttc', label:'Average Time to Close', value:'1h 38m', changes:'12m', status:'up', indicate:'down'},
+        ],
+        slaBreakdown: {
+          frt: { inSlaCount:1840, inSlaPercent:87, overSlaCount:276, overSlaPercent:13 },
+          ttc: { inSlaCount:1650, inSlaPercent:78, overSlaCount:466, overSlaPercent:22 },
+          closedRate: { inSlaCount:1920, inSlaPercent:91, overSlaCount:196, overSlaPercent:9 },
+          rlt: { inSlaCount:1650, inSlaPercent:78, overSlaCount:466, overSlaPercent:22 }, // depends Patch 4: CONVERSATION_RLT enum + rltConfiguredMs/rltSlaMet schema
+        },
+      },
+      conversation: {
+        summaryCards: [
+          {key:'avg_rt', label:'Average Response Time', value:'3m 40s', changes:'50s', status:'down', indicate:'down'},
+          {key:'avg_frt', label:'Average First Response Time', value:'1m 05s', changes:'20s', status:'down', indicate:'down'},
+          {key:'avg_wt', label:'Average Wait Time in Queue', value:'42s', changes:'8s', status:'down', indicate:'down'},
+          {key:'avg_rlt', label:'Average Response Lead Time', value:'2m 20s', changes:'15s', status:'up', indicate:'down'},
+          {key:'avg_ttc', label:'Average Time to Close', value:'42m', changes:'5m', status:'down', indicate:'down'},
+        ],
+        slaBreakdown: {
+          frt: { inSlaCount:1120, inSlaPercent:92, overSlaCount:97, overSlaPercent:8 },
+          ttc: { inSlaCount:1040, inSlaPercent:85, overSlaCount:184, overSlaPercent:15 },
+          closedRate: { inSlaCount:1180, inSlaPercent:97, overSlaCount:37, overSlaPercent:3 },
+          rlt: { inSlaCount:1040, inSlaPercent:85, overSlaCount:184, overSlaPercent:15 }, // depends Patch 4: CONVERSATION_RLT
+        },
+      },
+      ticket: {
+        summaryCards: [
+          {key:'avg_rt', label:'Average Response Time', value:'8m 55s', changes:'2m 10s', status:'up', indicate:'down'},
+          {key:'avg_frt', label:'Average First Response Time', value:'4m 30s', changes:'1m 15s', status:'up', indicate:'down'},
+          {key:'avg_wt', label:'Average Wait Time in Queue', value:'N/A', changes:'', status:'none', indicate:'down'}, // waitTimeInQueueMs cuma di conversation-sla-metrics, tidak ada di ticket-service
+          {key:'avg_rlt', label:'Average Response Lead Time', value:'N/A', changes:'', status:'none', indicate:'down'}, // RLT hanya dihitung di conversation-sla-metrics.service.ts, tidak ada logic RLT di ticket-service
+          {key:'avg_ttc', label:'Average Time to Close', value:'2h 51m', changes:'20m', status:'up', indicate:'down'},
+        ],
+        slaBreakdown: {
+          frt: { inSlaCount:720, inSlaPercent:80, overSlaCount:179, overSlaPercent:20 },
+          ttc: { inSlaCount:610, inSlaPercent:68, overSlaCount:282, overSlaPercent:32 },
+          closedRate: { inSlaCount:740, inSlaPercent:84, overSlaCount:159, overSlaPercent:16 },
+        },
+      },
+    },
+    summaryCards: true, // marker: this section uses byTab, not items grid
+    items: [], gridCols:'', colSpan:'',
+    charts: [
+      {type:'bar', label:'Response Time per Jam', h:200},
+      {type:'grid2', children:[
+        {type:'line', label:'Avg First Response Time per Jam', h:200},
+        {type:'line', label:'Avg Time to Close per Jam', h:200},
+      ]},
+    ]
+  },
+  'member-performance': {
+    items: [
+      {key:'mp_frt', label:'Avg First Response', value:'1m 52s', drill:'none', reason:'rata-rata per-agent'},
+      {key:'mp_resolved', label:'Total Resolved', value:246, drill:'none', reason:'count per-agent'},
+      {key:'mp_csat', label:'CSAT Score', value:'4.7', drill:'none', reason:'rata-rata'},
+    ],
+    gridCols:'grid-cols-1 md:grid-cols-20', colSpan:'md:col-span-6',
+    charts: [{type:'bar', label:'Performance per Agent', h:220}]
+  },
+  broadcast: {
+    items: [
+      {key:'b_total', label:'Total Broadcast', value:18, drill:'none', reason:'company-level'},
+      {key:'b_sent', label:'Total Terkirim', value:4521, drill:'none', reason:'count'},
+      {key:'b_delivered', label:'Terkirim', value:4401, drill:'none', reason:'count'},
+      {key:'b_read', label:'Dibaca', value:3890, drill:'none', reason:'count'},
+    ],
+    gridCols:'grid-cols-1 md:grid-cols-20', colSpan:'md:col-span-5',
+    charts: [{type:'bar', label:'Broadcast per Channel', h:200}]
+  },
+  'offline-report': {
+    items: [
+      {key:'or_reports', label:'Total Report', value:5, drill:'none', reason:'company-level'},
+    ],
+    gridCols:'grid-cols-1 md:grid-cols-20', colSpan:'md:col-span-5',
+    charts: []
+  }
+};
+
+// P2 new parameters (additive to existing section)
+const P2_NEW = {
+  conversations: [
+    {key:'prio_high', label:'Prioritas Tinggi', value:96, src:'conversation.priority'},
+    {key:'prio_med', label:'Prioritas Sedang', value:512, src:'conversation.priority'},
+    {key:'prio_low', label:'Prioritas Rendah', value:676, src:'conversation.priority'},
+    {key:'spam', label:'Spam', value:38, src:'conversation.isSpam'},
+    {key:'junked', label:'Junked', value:12, src:'conversation.isJunked'},
+    {key:'group', label:'Percakapan Grup', value:214, src:'conversation.isGroup'},
+    {key:'non_group', label:'Non-Grup', value:1070, src:'conversation.isGroup'},
+  ],
+  ticket: [
+    {key:'t_prio_h', label:'Tiket Prioritas Tinggi', value:96, src:'ticket.priority'},
+    {key:'t_prio_m', label:'Tiket Prioritas Sedang', value:210, src:'ticket.priority'},
+    {key:'t_prio_l', label:'Tiket Prioritas Rendah', value:206, src:'ticket.priority'},
+    {key:'t_type_bug', label:'Tiket Bug', value:180, src:'ticket-type'},
+    {key:'t_type_req', label:'Tiket Request', value:210, src:'ticket-type'},
+    {key:'t_type_q', label:'Tiket Question', value:122, src:'ticket-type'},
+    {key:'t_ch_wa', label:'Tiket WhatsApp', value:412, src:'ticket.platform'},
+    {key:'t_ch_ig', label:'Tiket Instagram', value:66, src:'ticket.platform'},
+    {key:'t_ch_fb', label:'Tiket Facebook', value:34, src:'ticket.platform'},
+  ]
+};
+
+// CSAT sub-section under conversations (P2)
+const CSAT_CARDS = [
+  {key:'csat_score', label:'CSAT Score', value:'4.6 / 5', drill:'none', reason:'rata-rata'},
+  {key:'csat_good', label:'Positif (Good)', value:412, drill:'modal', filter:'drill endpoint'},
+  {key:'csat_neutral', label:'Netral', value:87, drill:'modal', filter:'drill endpoint'},
+  {key:'csat_bad', label:'Negatif (Bad)', value:31, drill:'modal', filter:'drill endpoint'},
+  {key:'csat_channel', label:'CSAT per Channel', value:'WA:4.7 · IG:4.3', drill:'none', reason:'breakdown'}, // P2
+  {key:'csat_rate', label:'CSAT Response Rate', value:'34%', drill:'none', reason:'rasio'}, // P2
+];
+
+// ═══════ FILTER SPEC per section — P2 unified mode ═══════
+const FILTER_MODE = {
+  conversations:['date','team','agent','channel'],  // P2: +channel
+  ticket:['date','team','agent','channel'],           // P2: +channel
+  responsiveness:['date','team','agent'],              // P2 fix: was date-only, re-enable team+agent
+  'member-performance':['date','agent'],
+  broadcast:['date','team'],
+  'offline-report':['date']
+};
+
+// ═══════ MOCK DRILL DATA ═══════
+function mockRows(metric, n){
+  const names=['Andi Pratama','Budi Santoso','Citra Dewi','Dian Kusuma','Eko Wijaya','Fitri Handayani','Gilang Rahmat','Hesti Nuraini'];
+  const ch=['WhatsApp','Instagram','Facebook','Telegram'];
+  const rows=[];
+  for(let i=0;i<n;i++){
+    rows.push({
+      id:'#'+(10000+Math.floor(Math.random()*89999)),
+      customer:names[i%names.length],
+      channel:ch[i%ch.length],
+      agent:ROLE==='own'?'Anda (self)':names[(i+2)%names.length],
+      date:'2026-08-'+String(1+i%11).padStart(2,'0')+' '+(9+i%9)+':'+String((10+i*7)%60).padStart(2,'0'),
+      status:metric.match(/close|solved|slamet/)?'Selesai':metric.match(/overdue/)?'Overdue':'Aktif'
+    });
+  }
+  return rows;
+}
+
+// ═══════ RENDER ═══════
+
+function switchTab(t){
+  TAB=t;
+  document.getElementById('tab-p2').className = 'px-4 py-3 text-sm font-medium border-b-2 '+(t==='p2'?'border-blue-600 text-blue-600':'border-transparent text-slate-500 hover:text-slate-700');
+  document.getElementById('tab-p3').className = 'px-4 py-3 text-sm font-medium border-b-2 '+(t==='p3'?'border-blue-600 text-blue-600':'border-transparent text-slate-500 hover:text-slate-700');
+  render();
+}
+function switchRespTab(t){
+  RESP_TAB=t;
+  render();
+}
+function setRole(r){
+  ROLE=r;
+  const label={all:'all_access',team:'read_team',own:'read_own · self-only'};
+  document.getElementById('accessBadge').textContent=label[r];
+  render();
+}
+
+function renderNav(){
+  const nav=document.getElementById('statnav');
+  nav.innerHTML = SECTIONS.map(s => {
+    const active = s.key===CURRENT_SECTION;
+    return `<button onclick="selectSection('${s.key}')" class="w-full h-fit p-2 rounded-md justify-start text-left flex items-center gap-2 ${active?'btn-selected':'btn-subtle'}">
+      <span class="text-base">${s.icon}</span><span class="text-sm">${s.label}</span>
+    </button>`;
+  }).join('');
+}
+function selectSection(s){ CURRENT_SECTION=s; render(); }
+
+function renderFilter(){
+  const sec = CURRENT_SECTION;
+  const modes = FILTER_MODE[sec]||['date'];
+  const isSelf = ROLE==='own';
+  const interactive = TAB==='p3';
+
+  let html = '<div class="flex items-center gap-2 flex-wrap">';
+
+  // SelfFilterChip for agent
+  if(isSelf && (modes.includes('agent') || modes.includes('team'))){
+    html += `<div class="badge-info flex items-center gap-1 h-9 px-3 rounded-md text-sm select-none">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Saya</span>
+    </div>`;
+  }
+
+  // Team combobox
+  if(modes.includes('team')){
+    html += `<div class="w-[200px]"><select ${isSelf?'disabled':''} class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white ${isSelf?'bg-slate-50 text-slate-400':''}"><option>All Team</option><option>Support</option><option>Sales</option><option>CS</option></select></div>`;
+    if(TAB==='p2' && sec==='responsiveness') html += `<span class="text-[11px] text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full">P2: di-re-enable</span>`;
+  }
+
+  // Agent select
+  if(modes.includes('agent')){
+    if(isSelf){
+      html += `<div class="flex items-center gap-1 h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-400 w-[200px]">🔒 Anda (self)</div>`;
+    } else {
+      html += `<div class="w-[200px]"><select class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white"><option>All Agent</option><option>Andi Pratama</option><option>Budi Santoso</option><option>Citra Dewi</option></select></div>`;
+    }
+  }
+
+  // Channel dropdown — P2 NEW
+  if(modes.includes('channel')){
+    html += `<div class="w-[200px]"><select class="w-full h-9 text-sm border border-slate-300 rounded-md px-2 bg-white"><option>All Channel</option><option>WhatsApp</option><option>Instagram</option><option>Facebook</option><option>Telegram</option><option>Website</option></select></div>`;
+    if(TAB==='p2') html += `<span class="p2-tag">P2: baru</span>`;
+  }
+
+  // Date picker
+  html += `<div class="flex items-center gap-1 h-9 px-3 rounded-md border border-slate-300 bg-white text-sm text-slate-600 cursor-pointer min-w-[240px]">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7h18M3 7v14h18V7M8 3v4M16 3v4"/></svg>
+    <span>${dateRange.start}</span><span class="text-slate-300">→</span><span>${dateRange.end}</span>
+    <span class="ml-1 text-[11px] text-slate-400">Bulan Ini</span>
+  </div>`;
+
+  html += '</div>';
+
+  // P2 CSAT fix note
+  if(TAB==='p2' && sec==='conversations'){
+    html += `<div class="mt-2 text-[11px] text-emerald-600 bg-emerald-50 rounded-lg px-3 py-1.5">✓ P2 fix: CSAT section sekarang punya filter + selfContext. Channel dropdown ditambah ke semua section relevan.</div>`;
+  }
+
+  return html;
+}
+
+// SummaryChanges badge — exact match SummaryChanges.tsx (rounded-full px-1.5 py-0.5 text-[11px])
+function renderSummaryChanges(changes, status, indicate){
+  if(!status || status==='none') return '<span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold badge-none">-</span>';
+  const isUp = status==='up';
+  const positive = (indicate==='up'&&isUp)||(indicate==='down'&&!isUp);
+  const cls = positive?'badge-up':'badge-down';
+  const arrow = isUp?'↑':'↓';
+  return '<span class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold '+cls+'">'+arrow+' '+changes+'</span>';
+}
+
+function renderCard(c, interactive, colSpan){
+  const clickable = interactive && (c.drill==='nav'||c.drill==='modal');
+  const noclick = interactive && c.drill==='none';
+  const tag = c.tag?`<span class="p2-tag ml-1">${c.tag}</span>`:'';
+
+  let badge = '';
+  if(interactive && c.drill==='nav') badge = '<span class="drill-badge badge-nav">navigate</span>';
+  if(interactive && c.drill==='modal') badge = '<span class="drill-badge badge-modal">drill</span>';
+
+  let changeHtml = '';
+  // SummaryChanges mock — exact SatuInbox style (badge rounded-full px-1.5 py-0.5 text-[11px])
+  if(c.changes !== undefined && c.status !== 'none'){
+    const cls = c.status==='up'?'badge-up':'badge-down';
+    const arrow = c.status==='up'?'↑':'↓';
+    changeHtml = `<span class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${cls}">${arrow} ${c.changes}</span>`;
+  }
+
+  const cls = [
+    'stat-card relative w-full border border-slate-300 p-3 rounded-lg hover:bg-slate-50',
+    colSpan||'',
+    clickable?'card-click':'',
+    noclick?'card-noclick':''
+  ].join(' ');
+
+  const handler = clickable ? `onclick="drill('${c.key}','${c.label.replace(/'/g,'')}','${c.drill}','${(c.filter||'').replace(/'/g,'')}',${typeof c.value==='number'?c.value:0})" tabindex="0" onkeydown="if(event.key==='Enter')this.click()"` : '';
+
+  return `<div ${handler} class="${cls}">
+    ${badge}
+    <div class="flex flex-col space-y-2">
+      <div class="flex justify-between items-center">
+        <div class="flex space-x-1">
+          <p class="text-sm font-normal leading-5 text-slate-500">${c.label}${tag}</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-4">
+      <p class="text-3xl font-semibold text-slate-700">${c.value}</p>
+      ${changeHtml}
+    </div>
+    ${c.src?`<div class="text-[10px] text-slate-300 mt-1 font-mono">${c.src}</div>`:''}
+    ${noclick?`<div class="text-[10px] text-slate-400 mt-1 italic">${c.reason}</div>`:''}
+  </div>`;
+}
+
+let _chartInstances = {};
+function destroyCharts(){ for(const k in _chartInstances){ _chartInstances[k].destroy(); } _chartInstances={}; }
+
+function renderChartBox(chart, id){
+  if(chart.type==='grid2'){
+    return `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${chart.children.map((c,i)=>renderChartBox(c,id+'_'+i)).join('')}</div>`;
+  }
+  return `<div class="chart-box"><canvas id="${id}"></canvas></div>`;
+}
+
+function renderCharts(){
+  destroyCharts();
+  const sec = CARDS[CURRENT_SECTION];
+  if(!sec||!sec.charts) return;
+  const COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+  const labels8 = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+  const labels7 = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  const channels = ['WhatsApp','Instagram','Facebook','Telegram','Website','Email'];
+  const tags = ['Urgent','Follow-up','Pending','VIP','Refund','Info'];
+  const agents = ['Andi','Budi','Citra','Dian','Eko','Fitri'];
+  const buckets = ['0-15m','15-30m','30m-1h','1-2h','2-4h','>4h'];
+  const rnd=(n,m)=>Array.from({length:n},()=>Math.floor(Math.random()*(m||100))+10);
+  let ci=0;
+  function renderOne(chart, idPrefix){
+    if(chart.type==='grid2'){ chart.children.forEach((c,i)=>renderOne(c,idPrefix+'_'+i)); return; }
+    const el = document.getElementById(idPrefix);
+    if(!el) return;
+    const ctx = el.getContext('2d');
+    ci++;
+    let cfg;
+    if(chart.type==='bar'){
+      const lbls = chart.label.includes('Jam')?labels8:chart.label.includes('Hari')||chart.label.includes('Week')?labels7:chart.label.includes('Tag')?tags:chart.label.includes('Wait Time')||chart.label.includes('RLT')?buckets:chart.label.includes('Agent')?agents:chart.label.includes('Channel')?channels:labels8;
+      cfg = {type:'bar', data:{labels:lbls, datasets:[{label:chart.label, data:rnd(lbls.length), backgroundColor:COLORS[ci%COLORS.length]+'99', borderRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:chart.label,align:'start',font:{size:13,weight:'600'},color:'#334155',padding:{bottom:12}}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}};
+    } else if(chart.type==='line'){
+      cfg = {type:'line', data:{labels:labels8, datasets:[{label:chart.label, data:rnd(8), borderColor:'#3b82f6', backgroundColor:'#3b82f622', fill:true, tension:.35, pointRadius:3}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:chart.label,align:'start',font:{size:13,weight:'600'},color:'#334155',padding:{bottom:12}}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}};
+    } else if(chart.type==='doughnut'||chart.type==='donut'){
+      cfg = {type:'doughnut', data:{labels:channels.slice(0,5), datasets:[{data:rnd(5,200), backgroundColor:COLORS.slice(0,5)}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:11}}},title:{display:true,text:chart.label,align:'start',font:{size:13,weight:'600'},color:'#334155',padding:{bottom:12}}}}};
+    }
+    if(cfg) _chartInstances[idPrefix] = new Chart(ctx, cfg);
+  }
+  sec.charts.forEach((c,i)=>renderOne(c,'ch_'+CURRENT_SECTION+'_'+i));
+}
+
+function render(){
+  renderNav();
+
+  const sec = CARDS[CURRENT_SECTION];
+  if(!sec){
+    document.getElementById('sectionRoot').innerHTML = '<div class="p-8 text-center text-slate-400 text-sm">Section belum tersedia di prototype ini.</div>';
+    return;
+  }
+
+  const interactive = TAB==='p3';
+  const secLabel = SECTIONS.find(s=>s.key===CURRENT_SECTION)?.label || CURRENT_SECTION;
+
+  // header — exact ConversationsSection layout: p-4 > block md:flex > left(title+lastUpdated) right(filter)
+  let html = `<div class="p-4">
+    <div class="block items-center md:flex justify-between">
+      <div>
+        <p class="text-xl font-semibold">${secLabel}</p>
+        <p class="text-xs text-slate-400 mt-0.5">Terakhir diperbarui: 12 Agustus 2026, 14:30 WIB</p>
+      </div>
+      <div class="flex space-x-4 mt-3 md:mt-0">
+        ${renderFilter()}
+      </div>
+    </div>
+  </div>`;
+
+  html += '<div class="px-4 flex flex-col gap-4">';
+
+  // ── RESPONSIVENESS: summaryCards + SLA breakdown + charts ──
+  if(CURRENT_SECTION==='responsiveness' && sec.summaryCards){
+    // Tabs — All / Conversations / Ticket (ResponsivenessType filter — mempengaruhi summaryCards+SLA breakdown karena BE simpan metricType terpisah per domain: conversation_frt vs ticket_frt)
+    html += `<div class="border-b border-slate-200 flex gap-0 mb-2">
+      <button onclick="switchRespTab('all')" class="px-4 py-2 text-sm font-medium border-b-2 ${RESP_TAB==='all'?'border-blue-600 text-blue-600':'border-transparent text-slate-500'}">All</button>
+      <button onclick="switchRespTab('conversation')" class="px-4 py-2 text-sm font-medium border-b-2 ${RESP_TAB==='conversation'?'border-blue-600 text-blue-600':'border-transparent text-slate-500'}">Conversations</button>
+      <button onclick="switchRespTab('ticket')" class="px-4 py-2 text-sm font-medium border-b-2 ${RESP_TAB==='ticket'?'border-blue-600 text-blue-600':'border-transparent text-slate-500'}">Ticket</button>
+    </div>`;
+    // P2 filter note
+    if(TAB==='p2') html += `<div class="text-[11px] text-emerald-600 bg-emerald-50 rounded-lg px-3 py-1.5 mb-2">✓ P2 fix: filter Tim + Agent di-re-enable (sebelumnya hideTeamFilter + hideAgentFilter = true)</div>`;
+
+    const rd = sec.byTab[RESP_TAB];
+    // 3 summary cards — horizontal flex (responsive: flex-col md:flex-row)
+    html += '<div class="flex flex-col md:flex-row gap-4">';
+    rd.summaryCards.forEach(c => {
+      const changeHtml = renderSummaryChanges(c.changes, c.status, c.indicate);
+      html += `<div class="stat-card w-full flex-1 border border-slate-300 p-3 rounded-lg hover:bg-slate-50">
+        <div class="flex flex-col space-y-2">
+          <div class="flex justify-between items-center"><div class="flex space-x-1">
+            <p class="text-sm font-normal leading-5 text-slate-500">${c.label}</p>
+          </div></div>
+        </div>
+        <div class="flex items-center gap-2 mt-4">
+          <p class="text-3xl font-semibold text-slate-700">${c.value}</p>
+          ${changeHtml}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+
+    // SLA Breakdown — from SLABreakdownSection.tsx
+    if(rd.slaBreakdown){
+      html += '<div class="mt-6">';
+      html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+      // In SLA column
+      html += '<div class="space-y-4"><h3 class="text-lg font-semibold mb-4 text-green-700">In SLA</h3>';
+      const labels = {frt:'First Response Time', ttc:'Time to Close (TTC)', solving:'Solving', rlt:'Response Lead Time (RLT)'};
+      for(const [k,label] of Object.entries(labels)){
+        if(k === 'rlt' && RESP_TAB === 'ticket') continue; // Patch 4 OQ-05: RLT hide di tab Ticket (ticket-service tidak punya assignment-based logic)
+        const m = rd.slaBreakdown[k]; if(!m) continue;
+        html += `<div class="p-4 rounded-lg bg-green-50"><p class="text-sm text-gray-600 mb-2">${label}</p><div class="flex items-baseline gap-2"><span class="text-2xl font-semibold text-green-700">${m.inSlaCount}</span><span class="text-lg text-green-700">${m.inSlaPercent}%</span></div></div>`;
+      }
+      html += '</div>';
+      // Over SLA column
+      html += '<div class="space-y-4"><h3 class="text-lg font-semibold mb-4 text-red-700">Over SLA</h3>';
+      for(const [k,label] of Object.entries(labels)){
+        if(k === 'rlt' && RESP_TAB === 'ticket') continue; // Patch 4 OQ-05
+        const m = rd.slaBreakdown[k]; if(!m) continue;
+        html += `<div class="p-4 rounded-lg bg-red-50"><p class="text-sm text-gray-600 mb-2">${label}</p><div class="flex items-baseline gap-2"><span class="text-2xl font-semibold text-red-700">${m.overSlaCount}</span><span class="text-lg text-red-700">${m.overSlaPercent}%</span></div></div>`;
+      }
+      html += '</div>';
+      html += '</div></div>';
+    }
+
+  } else {
+    // ── DEFAULT: card grid (conversations, ticket, etc.) ──
+    const colSpan = sec.colSpan || '';
+    const colSpanFn = sec.colSpanFn;
+    if(sec.items && sec.items.length){
+      html += `<div class="grid gap-4 ${sec.gridCols}">`;
+      sec.items.forEach((c,i) => {
+        const cs = colSpanFn ? colSpanFn(i) : colSpan;
+        html += renderCard(c, interactive, cs);
+      });
+      html += '</div>';
+    }
+  }
+
+  // P2 new parameters (additive)
+  const p2new = P2_NEW[CURRENT_SECTION];
+  if(p2new && p2new.length){
+    html += `<div class="text-sm font-medium text-emerald-700 mt-2">Parameter Baru <span class="p2-tag">Patch 2</span></div>`;
+    html += '<div class="grid gap-4 grid-cols-1 md:grid-cols-20">';
+    p2new.forEach(c => {
+      html += renderCard({...c, drill:'none'}, false, 'md:col-span-4');
+    });
+    html += '</div>';
+  }
+
+  // CSAT sub-block under conversations
+  if(CURRENT_SECTION==='conversations'){
+    html += '<div class="mt-2">';
+    html += `<div class="text-sm font-medium text-slate-600 mb-2">CSAT ${TAB==='p2'?'<span class="p2-tag ml-1">P2: filter + channel</span>':''}</div>`;
+    html += '<div class="grid gap-4 grid-cols-1 md:grid-cols-20">';
+    CSAT_CARDS.forEach(c => {
+      html += renderCard(c, interactive, 'md:col-span-4');
+    });
+    html += '</div></div>';
+  }
+
+  // charts
+  if(sec.charts){
+    sec.charts.forEach((chart,i) => {
+      html += renderChartBox(chart, 'ch_'+CURRENT_SECTION+'_'+i);
+    });
+  }
+
+  html += '</div>';
+  document.getElementById('sectionRoot').innerHTML = html;
+
+  // render Chart.js after DOM paint (wait for Chart.js CDN if needed)
+  function tryRenderCharts(){
+    if(typeof Chart !== 'undefined') renderCharts();
+    else setTimeout(tryRenderCharts, 200);
+  }
+  requestAnimationFrame(tryRenderCharts);
+}
+
+// ═══════ P3 DRILL INTERACTION ═══════
+function drill(key, label, type, filter, val){
+  if(type==='nav'){
+    const q = `?startDate=${dateRange.start}&endDate=${dateRange.end}`;
+    const tgt = key.startsWith('t_') ? '/ticket' : '/conversation';
+    showToast(`GET ${tgt}${q}\nfilter: ${filter}\n↳ date-range WAJIB di-inject dari StatisticFilter`);
+    return;
+  }
+  // modal
+  const rows = mockRows(key, Math.min(val||8, 10));
+  const scopeNote = ROLE==='own' ? '🔒 self-only → resolveAgentId force user.id' : ROLE==='team' ? '🔒 team-scoped → resolveTeamId' : '🌐 all data (no scope restriction)';
+  document.getElementById('modalTitle').textContent = label;
+  document.getElementById('modalSub').innerHTML = `POST /analytics/drill  ·  metric=<b>${key}</b>  ·  ${dateRange.start} → ${dateRange.end}`;
+  document.getElementById('modalFooter').innerHTML = `
+    <div class="flex items-center justify-between w-full">
+      <span>⚖️ <b>totalFromMetric = ${val}</b> harus == angka card &nbsp;·&nbsp; ${scopeNote}</span>
+      <span class="text-[10px] text-slate-300">Endpoint: POST /analytics/drill</span>
+    </div>`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="text-xs text-slate-400 mb-3">Filter: ${filter}</div>
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-xs text-slate-400 border-b border-slate-200">
+        <th class="pb-2">ID</th><th class="pb-2">Customer</th><th class="pb-2">Channel</th><th class="pb-2">Agent</th><th class="pb-2">Waktu</th><th class="pb-2">Status</th>
+      </tr></thead>
+      <tbody>${rows.map(r => `<tr class="border-b border-slate-50 hover:bg-slate-50">
+        <td class="py-2 font-mono text-blue-600">${r.id}</td>
+        <td class="py-2">${r.customer}</td>
+        <td class="py-2">${r.channel}</td>
+        <td class="py-2 text-slate-500">${r.agent}</td>
+        <td class="py-2 text-slate-400 text-xs">${r.date}</td>
+        <td class="py-2"><span class="text-xs px-2 py-0.5 rounded-full ${r.status==='Overdue'?'bg-red-50 text-red-600':r.status==='Selesai'?'bg-green-50 text-green-700':'bg-blue-50 text-blue-600'}">${r.status}</span></td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div class="mt-3 text-xs text-slate-400">Menampilkan ${rows.length} dari ${val} · halaman 1 (paginasi)</div>`;
+
+  const m = document.getElementById('modal');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+}
+function closeModal(){
+  const m = document.getElementById('modal');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+}
+function showToast(msg){
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.remove('hidden');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.add('hidden'), 4000);
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+// ═══════ INIT ═══════
+render();
+</script>
+</body>
+</html>

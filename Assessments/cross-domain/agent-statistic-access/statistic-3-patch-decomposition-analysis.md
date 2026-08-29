@@ -10,7 +10,7 @@
 > **Rules Applied:** `Rules/requirements-lifecycle-rule.md`, `Rules/impact-analysis-rule.md`
 > **Supporting Artifacts:**
 > - Change Intake Brief v1.5 — `Assessments/cross-domain/agent-statistic-access/agent-statistic-access-change-intake-brief.md`
-> - PRD Patch v1.0 — `PRD/Analytics/PRD Analytics - agent statistic access.md`
+> - PRD Patch v1.0 — `PRD/Analytics/Statistic/PRD Analytics - agent statistic access.md`
 > - Parameter Inventory — `Assessments/cross-domain/agent-statistic-access/statistic-parameter-inventory-conversation-ticket.md`
 > - Extensions Analysis — `Assessments/cross-domain/agent-statistic-access/agent-statistic-dashboard-extensions-analysis.md`
 
@@ -46,7 +46,7 @@ PM propose split statistic work jadi 3 patch terpisah, berurutan:
 | Artifact | Path | Status |
 |----------|------|--------|
 | Change Intake Brief v1.5 | `Assessments/cross-domain/agent-statistic-access/agent-statistic-access-change-intake-brief.md` | ✅ Complete — semua OQ resolved |
-| PRD Patch v1.0 | `PRD/Analytics/PRD Analytics - agent statistic access.md` | ✅ Draft complete — 349 baris, US/FR/EH/EC/migration/API contract |
+| PRD Patch v1.0 | `PRD/Analytics/Statistic/PRD Analytics - agent statistic access.md` | ✅ Draft complete — 349 baris, US/FR/EH/EC/migration/API contract |
 
 ### 1.3 Scope (sudah terdefinisi)
 

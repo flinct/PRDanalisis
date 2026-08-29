@@ -1,0 +1,120 @@
+{
+  "respond_io": {
+    "pricing": {
+      "title": "Pricing | Plans Built to Scale Your Business",
+      "description": "Respond.io offers 4 plans: Starter ($79/mo), Growth ($159/mo), Advanced ($279/mo) &amp; Enterprise. Pay only for the contacts you talk to. Enjoy a free 7-day trial.",
+      "jsonld_count": 0,
+      "html_length": 49891
+    },
+    "home": {
+      "title": "Respond.io | #1 AI-Powered Customer Conversation Management Software",
+      "description": "Trusted by 10,000+ B2C businesses to scale customer chats, calls &amp; campaigns. Unify WhatsApp, TikTok, Instagram &amp; Facebook in a team inbox with AI Agents on respond.io",
+      "jsonld_count": 0,
+      "html_length": 49881
+    },
+    "features": {
+      "title": "Respond.io | #1 AI-Powered Customer Conversation Management Software",
+      "description": "Trusted by 10,000+ B2C businesses to scale customer chats, calls &amp; campaigns. Unify WhatsApp, TikTok, Instagram &amp; Facebook in a team inbox with AI Agents on respond.io",
+      "jsonld_count": 0,
+      "html_length": 49881
+    }
+  },
+  "wati": {
+    "pricing": {
+      "title": "Wati Pricing | WhatsApp Business API",
+      "description": "Find the perfect Wati plan for your business needs. Explore our different options with various features. Start your free trial today!",
+      "jsonld_count": 1,
+      "html_length": 49901
+    },
+    "home": {
+      "title": "Wati | #1 AI-powered customer engagement platform",
+      "description": "AI-powered customer engagement platform turning WhatsApp, Instagram &amp; Messenger into revenue. Trusted by 16,000+ businesses in 190+ countries.",
+      "jsonld_count": 1,
+      "html_length": 49900
+    }
+  },
+  "sleekflow": {
+    "pricing": {
+      "title": "Pricing &amp; Plans | SleekFlow",
+      "description": "See pricing for SleekFlow's social messaging team platform for WhatsApp, Facebook, WeChat etc. to help you convert more happy customers.",
+      "jsonld_count": 0,
+      "html_length": 49879
+    },
+    "home": {
+      "title": "AI Suite for Revenue-Driving Conversations | SleekFlow",
+      "description": "Internationally trusted AI omnichannel messaging suite &amp; agents to unlock more revenue. Connect WhatsApp, Instagram, SMS &amp; more to automate campaigns, leads &amp; support.",
+      "jsonld_count": 5,
+      "html_length": 49903
+    }
+  },
+  "freshworks_freshchat": {
+    "pricing": {
+      "title": "Freshdesk Pricing &amp; Plans | Freshworks",
+      "description": "Freshdesk pricing starts at $15. Get the Free Program for 2 users and explore features across all plans. Compare options and choose the right helpdesk for you.",
+      "jsonld_count": 0,
+      "html_length": 49891
+    },
+    "home": {
+      "title": "Freshdesk: AI-powered platform for modern customer service | Freshworks",
+      "description": "Freshdesk is an AI-powered customer service solution that\u2019s easy to set up, simple to use, and built to boost agent productivity and deliver seamless customer experiences. Try it free!",
+      "jsonld_count": 0,
+      "html_length": 49891
+    }
+  },
+  "zendesk": {
+    "pricing": {
+      "title": "Just a moment...",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 5536
+    },
+    "home": {
+      "title": "Just a moment...",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 5512
+    }
+  },
+  "aisensy": {
+    "pricing": {
+      "title": "WhatsApp Business API Pricing in India (2026) - AiSensy",
+      "description": "WhatsApp Business API Pricing in India for AiSensy Platform. Starts at \u20b91500/month. Affordable Pricing for the Best WhatsApp Marketing Platform in India",
+      "jsonld_count": 1,
+      "html_length": 49897
+    },
+    "home": {
+      "title": "AiSensy - AI WhatsApp Marketing Platform",
+      "description": "AiSensy is the AI-first WhatsApp Marketing Platform built on official WhatsApp Business APIs. Broadcast offers, automate notifications &amp; solve for support.",
+      "jsonld_count": 0,
+      "html_length": 49897
+    }
+  },
+  "intercom": {
+    "pricing": {
+      "title": "",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 49901
+    },
+    "home": {
+      "title": "",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 49901
+    }
+  },
+  "crisp": {
+    "pricing": {
+      "title": "Pricing and plans - Crisp best deals - Crisp",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 49901
+    },
+    "home": {
+      "title": "The AI Customer Support Platform for Every Business - Crisp",
+      "description": "",
+      "jsonld_count": 0,
+      "html_length": 49901
+    }
+  }
+}

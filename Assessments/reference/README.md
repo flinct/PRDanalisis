@@ -23,3 +23,5 @@ Isi folder ini **bukan** Assessment Report final dan **bukan** canonical memory 
 - `whatsapp-web-v1-vs-v2-comparison.md`
 - `sla-conversation-ticket.md`
 - `contact-context-visibility.md`
+
+> **Market/competitor/strategy analysis** (bukan PRD cross-analysis) dipindah ke `Assessments/strategy/` — lihat `Assessments/strategy/README.md`.

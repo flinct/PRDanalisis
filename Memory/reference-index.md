@@ -26,6 +26,7 @@ Gunakan index ini ketika butuh:
 | Ticket V1 vs V2 Comparison | Baseline migrasi Ticket V1 → V2 vs FE / SLA implementation | `Assessments/reference/ticket-v1-vs-v2-comparison.md` |
 | WhatsApp Web V1 vs V2 Comparison | Baseline migrasi WA Web V1 → V2 vs FE + BE implementation | `Assessments/reference/whatsapp-web-v1-vs-v2-comparison.md` |
 | SLA Conversation Ticket | Cross-PRD alignment risk antara SLA Conversation V2 dan Ticket V2 | `Assessments/reference/sla-conversation-ticket.md` |
+| SLA System Full Analysis | Peta lengkap 5 lapis SLA (setting → conversation → ticket → member → statistic), formula code-verified, gap/konflik konsolidasi | `Assessments/reference/sla-system-full-analysis.md` |
 | Contact Context Visibility | RBAC / visibility scope reference untuk Contact list/detail/picker | `Assessments/reference/contact-context-visibility.md` |
 
 ## How To Use

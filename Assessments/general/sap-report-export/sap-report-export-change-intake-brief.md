@@ -515,10 +515,10 @@ User selects data domain (Conversation / Ticket / Broadcast / Multi)
 
 | Downstream Artifact | Path | How This Brief Is Reused |
 |---------------------|------|--------------------------|
-| PRD: Analytics Row-Level Collections (Sub-PRD A) | `PRD/Analytics/` (new) | Gap analysis §5A, collection completeness table, zero-impact constraint |
-| PRD: Column Registry + Configurable Export (Sub-PRD B) | `PRD/Analytics/` (new) | Export flexibility gap §5B, architecture comparison |
-| PRD: Broadcast Export (Sub-PRD C) | `PRD/Analytics/` (new) | Gap analysis §5A.3, scope boundary, recipient+campaign requirement |
-| PRD: SAP Template Preset (Sub-PRD D) | `PRD/Analytics/` (new) or patch existing | §5C comparison, cross-domain brief column specs, stage duration mapping |
+| PRD: Analytics Row-Level Collections (Sub-PRD A) | `PRD/Analytics/Export/` | Gap analysis §5A, collection completeness table, zero-impact constraint |
+| PRD: Column Registry + Configurable Export (Sub-PRD B) | `PRD/Analytics/Export/` | Export flexibility gap §5B, architecture comparison |
+| PRD: Broadcast Export (Sub-PRD C) | `PRD/Analytics/Export/` | Gap analysis §5A.3, scope boundary, recipient+campaign requirement |
+| PRD: SAP Template Preset (Sub-PRD D) | `PRD/Analytics/Export/` or patch existing | §5C comparison, cross-domain brief column specs, stage duration mapping |
 | Cross-Domain Brief (consumed) | `Assessments/cross-domain/sap-report-export/` | SAP column specs (35+27+6+9), OQ carryover for Sub-PRD D |
 | Assessment Report | `Assessments/general/sap-report-export/` | Impact flags, routing rationale, gap tables |
 | QA Pre-Implementation Review | TBD | Impact flags, parity validation strategy |
