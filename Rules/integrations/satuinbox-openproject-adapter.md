@@ -52,7 +52,35 @@
 2. `v<X.Y.Z>-user.md` — user-facing (Bahasa Indonesia awam)
 3. `v<X.Y.Z>-gdoc.md` — format Google Docs (sama dengan tech, struktur beda)
 
-Flat di `Release notes/`, tanpa subfolder per version.
+Flat di `Release notes/`, tanpa subfolder per version. **Acuan format = `v2.8.0-*.md`** (bukan file `ver 2-x-0.md` lama — itu format legacy pre-standar).
+
+### Tech Format (`-tech.md`) — struktur wajib
+
+Header (semua varian):
+1. `# Release Notes v<X.Y.Z> — Technical` (multi-version: `v2.7.0 (termasuk v2.7.0.2 & v2.7.0.3)`).
+2. `**Product:** SatuInbox · **OpenProject version id(s):** ... · **Source:** ...`
+3. `**Scope:**` — status yang masuk (`Closed`/`Tested`), sebut item not-shipped/meeting dikeluarkan.
+4. Mermaid `pie title WP ... by type (shipped only)` — hitung Feature / Bug fix / Infra (shipped only).
+
+**Varian A — single version** (acuan `v2.8.0-tech.md`): langsung section-per-kategori.
+- `## Features` — table `WP | Judul | Detail teknis`.
+- `## Bug Fixes` — table `WP | Judul | Root cause / fix`.
+- `## Infra / Internal` — bullet (deployment, env var, research).
+- `## Not shipped (excluded, status ≠ Closed/Tested)` — table `WP | Judul | Status`.
+- `## Excluded from this doc (meetings/admin, no product content)` — daftar WP id inline.
+
+**Varian B — multi-version gabungan** (acuan `v2.7.0-tech.md`): section-per-version.
+- Setelah pie kombinasi, satu `## v<X.Y.Z>` per version (`## v2.7.0`, `## v2.7.0.2 — Hotfix Performance`, …).
+- Tiap version berisi sub-section `### Features` / `### Bug Fixes` / `### Infra` seperlunya (table sama).
+- `## Not shipped` dan `## Excluded from this doc` sekali di akhir untuk seluruh gabungan.
+- Pakai varian ini kalau menggabung ≥2 version dalam satu file.
+
+### User Format (`-user.md`) — struktur wajib
+
+1. `## ✨ Fitur Baru` — bullet awam per fitur shipped.
+2. `## 🐞 Perbaikan Bug` — bullet awam per bug shipped.
+3. `## ⏳ Belum Rilis (masih dalam proses, tidak masuk versi ini)` — bullet not-shipped.
+4. Footer: pointer ke `-tech.md`.
 
 ### Google Docs Format (`-gdoc.md`)
 

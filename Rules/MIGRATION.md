@@ -38,14 +38,15 @@
 
 ```
 Rules/
-├── core/                          ← 7 rule universal (tanpa token produk/repo/tracker/orang/path)
+├── core/                          ← 8 rule universal (tanpa token produk/repo/tracker/orang/path)
 │   ├── task-router.md             ← ENTRY POINT — precedence + klasifikasi
 │   ├── change-management.md       ← Phase 0 + lane light/standard/governed
 │   ├── requirements.md            ← PRD writing
 │   ├── analysis-and-risk.md       ← QA analysis + impact (applicability matrix)
 │   ├── test-design.md             ← test case + traceability
 │   ├── knowledge-management.md    ← memory routing + write/update + conflict flag
-│   └── artifact-governance.md     ← versioning, naming, transcript (opt-in default)
+│   ├── artifact-governance.md     ← versioning, naming, transcript (opt-in default)
+│   └── audit.md                   ← struktur + main-file sync untuk corpus audit
 ├── profiles/
 │   ├── satuinbox.yml              ← governance STRICT (15 non-bypassable controls)
 │   └── _examples/                 ← simple-greenfield + high-compliance (test harness)

@@ -5,11 +5,16 @@
  **Engineering Lead**: Naftal  
  **Design Lead**: Resky
 
+> **⚑ PHASE / PRECONDITION FLAG (added 2026-08-31):** This PRD is **Phase 2** of the Email Summary initiative. It depends on **Phase 1** — `PRD/Transcript email/PRD Email Summary - SatuInbox send mode.md` — which makes SatuInbox send the transcript email directly via the tenant connected mailbox (controlled by the per-tenant flag `TRANSCRIPT_EMAIL_SEND_MODE` = `webhook` (default) \| `email` \| `both`).
+>
+> **Reply continuity in this PRD only applies when send mode is `email` or `both`.** In the current codebase (`omnichannel-satuinbox-be@v2.7.0`) the transcript is delivered as a **webhook** (tenant sends the email), which is a noreply, one-way copy — reply-via-email cannot function there. Build Phase 1 first; Phase 2 (this PRD) activates on top of it. Source: `Assessments/cross-domain/email-summary-customer/email-summary-customer-change-intake-brief.md` (v1.4).
+
 ## **1\. Revision History**
 
 | Version | Date | Author | Changes |
 | ----- | ----- | ----- | ----- |
 | v1.0 | 2026-04-29 | Yusril Ibnu Maulana | Initial PRD for improving existing Live Chat transcript email with reply-to-email continuity, workspace default email sender, inbound email conversation creation, and auto-linked conversation grouping. |
+| v1.1 | 2026-08-31 | Dany Christian | Added Phase/precondition flag: this PRD is Phase 2, depends on Phase 1 (`PRD Email Summary - SatuInbox send mode.md`) and the per-tenant `TRANSCRIPT_EMAIL_SEND_MODE` flag. Reply continuity only applies when send mode is `email`/`both`. No functional-requirement changes. |
 
 ## **2\. Overview**
 

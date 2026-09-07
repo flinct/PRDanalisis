@@ -3,10 +3,10 @@
 > **Artifact Type:** Change Intake Brief
 > **Source Request / BRD:** Diskusi PM (Dany Christian) — request E-Mail Summary, 2026-08-03; webhook existing untuk SAP, SAP minta solusi tanpa proses webhook
 > **Artifact Path:** `Assessments/cross-domain/email-summary-customer/email-summary-customer-change-intake-brief.md`
-> **Version:** `v1.0`
-> **Previous Version:** `none`
+> **Version:** `v1.4`
+> **Previous Version:** `v1.3`, `v1.2`, `v1.1`, `v1.0` (di `versions/`)
 > **Rules Applied:** `Rules/requirements-lifecycle-rule.md`, `Rules/workflow-rule.md`, `Rules/impact-analysis-rule.md`
-> **Supporting Context:** `PRD/Transcript email/PRD Inbox Conversation - reply via email.md` (transcript email + reply continuity), `Memory/CLAUDE-be.md` (email service `:50066` — IMAP/SMTP, transcript emails)
+> **Supporting Context:** `PRD/Transcript email/PRD Inbox Conversation - reply via email.md` (spec reply-via-email, **belum shipped**); **kode BE `omnichannel-satuinbox-be@v2.7.0`** — `docs/livechat-transcript-email.md`, `apps/conversation-service/src/app/services/livechat-transcript-webhook.service.ts`, `libs/common/src/lib/interfaces/livechat-transcript-webhook.interface.ts` (transcript = **webhook**, bukan email-send)
 > **Tanggal Intake:** 2026-08-03
 > **Status:** Draft
 
@@ -14,8 +14,56 @@
 
 ## 0. Ringkasan Update Brief
 
-- Initial version. Request "E-Mail Summary: ringkasan percakapan email ke customer setelah conversation ditutup, webhook existing untuk SAP, SAP minta solusi lain tanpa proses webhook" diklarifikasi Q3: **email langsung berisi data yang bisa dipakai SAP** — bukan webhook, bukan JSON/attachment terstruktur.
-- Routing decision: `ADDITIVE_IMPROVEMENT` + `ROUTE_PATCH_EXISTING_PRD` — infrastruktur transcript email sudah ada; tambah summary email + hentikan/menggantikan webhook.
+### v1.4 (2026-08-31) — Lock keputusan produk, siap PRD
+PM lock 3 keputusan yang tadinya blocker. Brief siap jadi PRD.
+
+**Keputusan (final):**
+1. **Webhook mode = COEXIST**, bukan replace. Feature flag `TRANSCRIPT_EMAIL_SEND_MODE` per tenant: `webhook` (default, existing) | `email` (SatuInbox-send) | `both`. Alasan PM: tenant lain mungkin masih pakai webhook — jangan paksa migrasi.
+2. **Mailbox tenant = precondition wajib.** Tenant HARUS connect Email channel account dulu untuk aktifkan mode `email`/`both`. Kalau belum connect → mode `email` tidak bisa diaktifkan (blocked). Bukan onboarding otomatis — tenant setup sendiri.
+3. **1 PRD, 2 phase:**
+   - **Phase 1** — SatuInbox-send transcript email via mailbox tenant (`EMAIL_SEND_MESSAGE`), feature flag coexist, mailbox precondition. **BARU** (belum ada di PRD manapun).
+   - **Phase 2** — reply→Email conversation + auto-link + primary promotion. **Sudah displesifikasi di PRD #1286** (`PRD/Transcript email/`) — Phase 2 = reference/inherit dari sana, bukan tulis ulang.
+
+**Artifact PRD:**
+- PRD baru khusus Phase 1 + phasing = `PRD/Transcript email/PRD Email Summary - SatuInbox send mode.md` (dibuat v1.4).
+- PRD #1286 existing dikasih **flag pointer** ke PRD baru (Phase 1 precondition) + dicatat: send-mode ditentukan flag `TRANSCRIPT_EMAIL_SEND_MODE`.
+
+### v1.3 (2026-08-31) — Review ulang kode (koreksi detail teknis v1.2)
+Deep-verify `omnichannel-satuinbox-be@v2.7.0`. Reklasifikasi v1.2 (NEEDS_DEVELOPMENT) **tetap benar**, tapi beberapa detail teknis dikoreksi:
+
+**Koreksi terhadap v1.2:**
+1. **Trigger BUKAN "resolved/timeout"** → **widget CLOSE (scheduled)**. `conversation.service.ts::handleConversationClosedEffects` panggil `transcriptQueueService.scheduleOnClose(conversationId)` hanya jika `isWidgetConversation()`. Ada delay window terjadwal, bukan langsung. Queue: `LIVECHAT_TRANSCRIPT_SEND` (RabbitMQ + DLX). Processor: `transcript-send.processor.ts` → `livechatTranscriptWebhookService.sendTranscriptWebhook()`.
+2. **Send path bukan SES pool** → email CHANNEL outbound pakai **nodemailer SMTP per-account**. `app.controller.ts::sendMessage` (`EMAIL_SEND_MESSAGE`) → `sessionService.getSession(channelAccountId).sendMessage()`. SMTP config dari `emailProperties.smtp` (mailbox connected tenant, per channel account). Catatan: `@aws-sdk/client-sesv2` **ada di dependency** (transactional path lain), tapi email-channel + transcript **tidak lewat SES** — sender = mailbox tenant.
+3. **Infra kirim email SUDAH ADA** (`sendMailWithRetry`, retry config, port rotation) — cuma **belum di-wire ke transcript**. Transcript sekarang cuma emit webhook, tidak pernah masuk email-service. Ini **menurunkan effort**: reuse `EMAIL_SEND_MESSAGE`, bukan bangun pipeline email dari nol.
+4. **Reply-via-email / auto-link / primary promotion = 0 match** di seluruh `conversation-service` (grep `autoLink|linkedGroup|primaryConversation|transcriptReference`). Konfirmasi hard: **belum ada sama sekali di v2.7.0**.
+
+**Konsekuensi arsitektur build:**
+- **Sender = channel-account email connected** (SMTP mailbox tenant), BUKAN "workspace default email" generik. Butuh tenant punya Email channel account aktif. Kalau SAP belum connect mailbox → blocker keras.
+- Effort ulang: (a) wire `transcript-send.processor` kirim via `EMAIL_SEND_MESSAGE` pakai mailbox tenant [medium — infra ada], (b) inbound reply matching → Email conversation + auto-link + primary [besar — 0% ada]. Phase split makin masuk akal.
+
+### v1.2 (2026-08-19) — Reclassify jadi NEEDS_DEVELOPMENT (verifikasi kode BE)
+Verifikasi langsung ke kode BE `omnichannel-satuinbox-be@v2.7.0` membatalkan kesimpulan v1.1:
+
+**Realita kode (bukan asumsi PRD):**
+- Transcript email existing = **webhook-based**. SatuInbox POST payload (berisi `email.subject/html/text` siap-pakai) ke webhook URL tenant (`/settings/developer/webhook`, type `LIVECHAT_TRANSCRIPT`). **Tenant (SAP) yang forward ke email service mereka sendiri** — SatuInbox tidak mengirim email sama sekali.
+- Body email eksplisit: **"Please do not reply to this email"** — noreply, one-way. Continuity via link "Continue chat" (resume token widget), bukan email reply.
+- PRD `PRD/Transcript email/` (reply-via-email, workspace default sender, inbound→Email conversation, auto-link, primary promotion) = **masih "In specification"** (impact matrix 2.7.0 #1286, effort 18 poin). **Belum dibangun.**
+
+**Konsekuensi terhadap request:**
+- Request = "SAP tidak mau proses webhook; SatuInbox yang kirim email summary ke customer, pakai email milik workspace SAP, customer boleh reply" → **persis fitur PRD reply-via-email #1286 yang belum shipped**.
+- v1.1 `ALREADY_COVERED` **dibatalkan** — dibuat dari deskripsi PRD tanpa cek kode.
+- Routing: **`NEEDS_DEVELOPMENT`** — implementasikan PRD `PRD/Transcript email/PRD Inbox Conversation - reply via email.md` (spec sudah lengkap, tidak perlu PRD baru).
+
+**Scope development (dari PRD #1286):**
+1. SatuInbox kirim transcript email langsung via email-service/SES (ganti jalur webhook untuk tenant yang opt-in) — sender + Reply-To = workspace default connected email (FR-006/007).
+2. Inbound reply → Email conversation + auto-link + primary promotion (FR-016–FR-037).
+3. Transisi: webhook existing tetap jalan untuk tenant lain; feature flag per workspace.
+
+### v1.1 (2026-08-19) — DIBATALKAN
+Klasifikasi `ALREADY_COVERED` berdasarkan asumsi PRD transcript sudah shipped. Salah — PRD itu spec, bukan implementasi. Model bisnis yang diklarifikasi tetap valid: SatuInbox menghubungkan customer SAP (widget) ↔ agent SAP (client SatuInbox); summary dikirim ke customer; widget close = resolved; customer boleh reply; konten = transcript.
+
+### v1.0 (2026-08-03) — dibatalkan sebagian
+Interpretasi webhook→SAP-mailbox dibatalkan di v1.1. Fakta yang bertahan: webhook existing memang diproses SAP (terbukti di kode — SAP = tenant yang forward payload webhook jadi email).
 
 ---
 
@@ -37,16 +85,16 @@
 
 | Item | Value |
 |------|-------|
-| Change Class | `BEHAVIOR_CHANGE` (webhook → email) + `ADDITIVE_IMPROVEMENT` (summary email) → `MIXED_REQUEST` |
-| Primary Domain | `Conversation` / `Cross-domain` (email service) |
-| Request Shape | Change (kontrak integrasi SAP) + Add (email summary) |
-| Initial Complexity Signal | High |
-| Needs Split? | No (satu kesatuan: summary email menggantikan webhook) |
+| Change Class | **`NEEDS_DEVELOPMENT`** (v1.1 `ALREADY_COVERED` dibatalkan; v1.0 `MIXED_REQUEST` dibatalkan) |
+| Primary Domain | `Conversation` (livechat transcript, trigger close) + `email` service (reuse `EMAIL_SEND_MESSAGE` SMTP send) |
+| Request Shape | Add — wire transcript ke email-service send (sender = mailbox tenant) + reply continuity (bukan webhook forwarder) |
+| Initial Complexity Signal | **High** (~18 poin per impact matrix #1286) |
+| Needs Split? | Opsional — Phase 1: SatuInbox-send email (ganti webhook). Phase 2: reply→Email conversation + auto-link |
 
-### Classification Rationale
-- Mengubah kontrak integrasi dengan pihak eksternal (SAP) = behavior change, perlu sinkronisasi/kesepakatan format.
-- Menambah mekanisme email summary = additive improvement di atas transcript email existing.
-- Kompleksitas tinggi karena: trigger saat close, template email, kontrak format SAP, koordinasi eksternal, testing email real.
+### Classification Rationale (v1.2)
+- Kode BE v2.7.0: transcript = webhook, tenant (SAP) yang kirim email. Noreply. Reply continuity belum ada.
+- Request minta SatuInbox yang kirim email (pakai workspace email) + customer bisa reply → butuh bangun PRD reply-via-email #1286 yang masih spec.
+- Spec sudah lengkap (FR-001–FR-056) → tidak perlu PRD baru, langsung build dari PRD existing.
 
 ---
 
@@ -55,21 +103,25 @@
 ### 3.1 PRD Status
 | Item | Finding |
 |------|---------|
-| Relevant existing PRD | `PRD/Transcript email/PRD Inbox Conversation - reply via email.md` (transcript email saat resolved/timeout, sender = workspace default email, Reply-To continuity) |
-| PRD status | Existing (shipped) |
-| PRD treatment candidate | Patch (tambah email summary + kontrak SAP) |
+| Relevant existing PRD | `PRD/Transcript email/PRD Inbox Conversation - reply via email.md` (reply-via-email, workspace default sender, inbound→Email conv, auto-link) |
+| PRD status | **Spec — "In specification", belum shipped** (impact matrix 2.7.0 #1286) |
+| PRD treatment candidate | **Build as-is** — spec lengkap (FR-001–FR-056), tidak perlu PRD baru |
 
-### 3.2 Implementation Status
+### 3.2 Implementation Status (verified against code — v2.7.0)
 | Surface | Finding | Evidence / Source |
 |---------|---------|-------------------|
-| FE | N/A (email flow BE-side) | |
-| BE | Shipped — email service `:50066` IMAP/SMTP + transcript emails; trigger transcript saat resolve/inactivity timeout | `Memory/CLAUDE-be.md` |
-| Runtime / Current Behavior | Webhook terkirim ke SAP saat conversation ditutup (mekanisme existing, diproses SAP) | Request user; detail implementasi webhook perlu diverifikasi BE |
+| BE — trigger | **Widget CLOSE (scheduled)**, bukan resolve/timeout. `handleConversationClosedEffects` → `transcriptQueueService.scheduleOnClose()` jika `isWidgetConversation()`. Queue `LIVECHAT_TRANSCRIPT_SEND` (RabbitMQ + DLX). | `conversation.service.ts:1690`; `extended-rmq.provider.ts`; `transcript-send.processor.ts` |
+| BE — transcript delivery | **Webhook, bukan email-send.** Processor → `livechatTranscriptWebhookService.sendTranscriptWebhook()` POST payload (`email.{subject,html,text}` siap-pakai) ke webhook URL tenant; **tenant (SAP) yang kirim email**. | `transcript-send.processor.ts:70`; `livechat-transcript-webhook.service.ts:103`; `livechat-transcript-webhook.interface.ts` |
+| BE — sender | **Bukan email SatuInbox** — email dikirim client. Body: "Please do not reply to this email" (noreply). | `docs/livechat-transcript-email.md` §8 |
+| BE — reply continuity | **0% ada.** grep `autoLink\|linkedGroup\|primaryConversation\|transcriptReference` di conversation-service = 0 match. Continuity existing = link "Continue chat" (resume widget), bukan email reply. | grep verified; PRD #1286 "In specification" |
+| BE — email-service send | **SMTP per-account (nodemailer), BUKAN AWS SES.** `EMAIL_SEND_MESSAGE` → `sessionService.getSession(channelAccountId).sendMessage()`; SMTP config `emailProperties.smtp` (mailbox connected tenant). `sendMailWithRetry` + retry + port rotation. **Infra send ADA, belum di-wire ke transcript.** | `app.controller.ts:213`; `imapflow.service.ts:1588,1752` |
+| FE | Setting: webhook URL (`/settings/developer/webhook`), transcript toggle (`/settings/channels/widget`). | `docs/…` §1–3 |
+| Runtime / Current Behavior | Widget close → schedule → SatuInbox POST webhook ke SAP → SAP kirim email transcript ke customer (noreply). | Kode v2.7.0 |
 
 ### 3.3 Related Sources
-- `PRD/Transcript email/`: FR-001–FR-015 (trigger, sender, konten transcript, dedup, retry 3x) — pola yang bisa dipakai ulang untuk summary email
-- `Memory/CLAUDE-be.md`: email service, event-driven pattern (denormalized snapshots via events), retry pattern transcript
-- Webhook SAP existing: path/format perlu diverifikasi di repo BE (belum ditemukan di PRD — `grep webhook` tidak menemukan dokumen khusus)
+- Kode BE `omnichannel-satuinbox-be@v2.7.0`: transcript feature (webhook path lengkap, verified).
+- `PRD/Transcript email/`: spec target implementasi (FR-001–FR-056) — SatuInbox-send + reply continuity + auto-link.
+- Impact matrix 2.7.0 #1286: "Customer replies to livechat transcript email create/auto-link Email conversation as Primary" — status In specification, 18 poin.
 
 ---
 
@@ -119,27 +171,34 @@
 
 | Item | Value |
 |------|-------|
-| Routing Decision | `ROUTE_PATCH_EXISTING_PRD` |
-| Recommended Next Rules | `Rules/prd-writing-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md` |
-| Recommended Next Artifact | Patch PRD Transcript email (section E-Mail Summary + kontrak SAP) |
-| Can Proceed to PRD? | Yes setelah OQ-01 (format email) dikunci dengan SAP |
+| Routing Decision | **`ROUTE_BUILD_FROM_SPEC`** (v1.1 `NO_PRD_NEEDED` dibatalkan) |
+| Recommended Next Rules | `Rules/impact-analysis-rule.md`, `Rules/qa-analysis-rule.md`, `Rules/test-case-rule.md` |
+| Recommended Next Artifact | Assessment Report (impact + regression) → QA pre-implementation review → build PRD #1286 |
+| Can Proceed to PRD? | **YES (v1.4)** — semua blocker locked. PRD baru: `PRD/Transcript email/PRD Email Summary - SatuInbox send mode.md` (Phase 1 + phasing; Phase 2 reference PRD #1286). |
 
-### Routing Rationale
-- Infra email + transcript sudah ada; perubahan = template summary + trigger + deprecate webhook. Patch PRD existing lebih tepat.
-- Kontrak format email harus dikunci sebelum PRD final — kalau SAP belum jawab, stage Hold.
+### Routing Rationale (v1.2)
+- Fitur yang diminta = PRD reply-via-email #1286, masih spec. Bukan enablement, bukan patch — **build**.
+- Spec lengkap → skip PRD writing, langsung Assessment Report + impact + QA strategy, lalu implementasi.
+- Keputusan produk: apakah SatuInbox-send email **menggantikan** webhook (per tenant opt-in) atau **coexist**. Webhook existing tetap dipakai tenant lain.
 
 ---
 
 ## 7. Blocking Questions & Decisions Needed
 
-| ID | Question / Gap | Why It Matters | Blocking? | Owner |
-|----|----------------|----------------|-----------|-------|
-| OQ-01 | Format email summary yang bisa dipakai SAP: struktur body/subject/field apa? (perlu meeting dengan SAP) | Ini kontrak baru pengganti webhook — wajib disepakati | Yes | PM / SAP |
-| OQ-02 | Webhook existing: dihapus total setelah email live, atau masa transisi parallel? Berapa lama? | Menentukan deprecation & rollback plan | Yes | PM / SAP |
-| OQ-03 | Trigger summary email: semua channel atau hanya channel tertentu (Email/Live Chat)? Bagaimana dengan conversation yang di-close otomatis (timeout)? | Cakupan trigger & volume email | Yes | PM |
-| OQ-04 | Isi ringkasan: apa saja field yang sekarang dikirim via webhook? (verifikasi implementasi webhook di BE) | Sumber data konten email | Yes | BE |
-| OQ-05 | Kalau conversation sudah pernah dapat transcript email (Live Chat resolve), summary email tetap dikirim? | Anti email ganda | Yes | PM |
-| OQ-06 | Email gagal kirim (provider down) — retry 3x lalu status failed; perlu notifikasi ke siapa? | Error handling | No | PM |
+| ID | Question / Gap | Status v1.2 | Owner |
+|----|----------------|-------------|-------|
+| OQ-01 | Format email summary yang bisa dipakai SAP | **Terjawab** — PRD #1286 sudah define konten (FR-011–FR-015: summary fields + transcript body + public link + reply guidance). SAP tinggal terima. | PM |
+| OQ-02 | Webhook existing: hapus/parallel? | **Terjawab (v1.4)** — **COEXIST**. Feature flag `TRANSCRIPT_EMAIL_SEND_MODE` per tenant (`webhook` default \| `email` \| `both`). Tenant lain tetap pakai webhook, tidak terganggu. | PM ✓ |
+| OQ-03 | Trigger: semua channel / channel tertentu? | **Terjawab (koreksi v1.3)** — widget (Live Chat) saja, trigger = **conversation CLOSE (scheduled via `scheduleOnClose`)**, bukan resolve/inactivity timeout. | PM |
+| OQ-04 | Field yang dikirim via webhook | **Terjawab** — payload webhook sudah define: `conversation{id,startTime,agentName}`, `customer{name,email,phone}`, `transcript[]`, `branding{tenantName,logoUrl,themeColor}`, `links{publicTranscriptUrl,continueChatUrl}`, `email{subject,html,text}`. PRD #1286 extend ini dengan reply-to + reference. | BE |
+| OQ-05 | Kalau sudah dapat transcript email, summary tetap dikirim? | **Terjawab** — sama email (transcript = summary), dedup existing (FR-003). | PM |
+| OQ-06 | Email gagal kirim → notifikasi siapa? | **Terjawab** — retry 3x + audit failed (FR-005, EH-004). | — |
+
+**Open decisions (v1.4) — SEMUA LOCKED:**
+- [x] **Webhook coexist vs replace:** → **COEXIST**, feature flag `TRANSCRIPT_EMAIL_SEND_MODE` = `webhook` (default) \| `email` \| `both`. (PM ✓)
+- [x] **Mailbox tenant:** → **precondition wajib**. Tenant connect Email channel account dulu untuk mode `email`/`both`. Belum connect = mode `email` blocked. (PM ✓)
+- [x] **Phase split:** → **1 PRD, 2 phase**. Phase 1 = send mode (baru), Phase 2 = reply continuity (reference PRD #1286). (PM ✓)
+- [ ] **SMTP deliverability (SPF/DKIM domain tenant):** non-blocking untuk PRD, masuk NFR/risk section. Perlu guidance tenant setup SPF/DKIM saat connect mailbox.
 
 ---
 
@@ -171,3 +230,7 @@
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-08-03 | Initial brief created | Dany Christian |
+| 2026-08-19 | v1.1 — model bisnis clear, reclassify ALREADY_COVERED. **Dibatalkan di v1.2.** | Dany Christian |
+| 2026-08-19 | v1.2 — verifikasi kode BE v2.7.0: transcript = webhook (bukan email-send), noreply, reply continuity belum ada. Reclassify NEEDS_DEVELOPMENT / ROUTE_BUILD_FROM_SPEC. PRD #1286 = spec target. v1.1 ALREADY_COVERED dibatalkan (asumsi dari PRD tanpa cek kode). | Dany Christian |
+| 2026-08-31 | v1.3 — review ulang kode. Koreksi detail teknis: trigger = widget CLOSE scheduled (bukan resolve/timeout); email-channel outbound = nodemailer SMTP per-account (SES v2 ada di dep tapi transcript/channel tidak lewat SES — sender = mailbox tenant); infra send `EMAIL_SEND_MESSAGE` sudah ada tapi belum di-wire ke transcript (effort turun); reply continuity 0 match (konfirmasi hard). Mailbox tenant connected jadi blocker keras. Reklasifikasi NEEDS_DEVELOPMENT tetap valid. | Dany Christian |
+| 2026-08-31 | v1.4 — PM lock 3 keputusan: (1) webhook COEXIST via flag `TRANSCRIPT_EMAIL_SEND_MODE`, (2) mailbox tenant precondition wajib, (3) 1 PRD 2 phase (Phase 1 send mode baru, Phase 2 reply continuity reference #1286). Can-proceed-to-PRD = YES. PRD baru dibuat: `PRD Email Summary - SatuInbox send mode.md`; PRD #1286 dikasih flag pointer. | Dany Christian |

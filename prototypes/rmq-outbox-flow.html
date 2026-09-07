@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --db:#3b82f6; --rmq:#a855f7;
+          --fg:#f1f5f9; --fg-dim:#cbd5e1; --bg:#0f172a; --card:#1e293b; --bd:#475569; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); }
+  .wrap { font-family: system-ui, sans-serif; color: var(--fg); max-width: 920px; padding: 8px; }
+  h2 { font-size: 15px; margin: 18px 0 8px; color: var(--fg); }
+  h2 .tag { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 5px; margin-left: 8px; vertical-align: middle; }
+  .tag.bad { background: rgba(220,38,38,.15); color: var(--bad); border: 1px solid var(--bad); }
+  .tag.ok  { background: rgba(22,163,74,.15); color: var(--ok); border: 1px solid var(--ok); }
+  .row { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+  .step { position: relative; border: 1px solid var(--bd); border-radius: 8px; padding: 9px 12px; min-width: 108px; background: var(--card); }
+  .step .n { font-size: 10px; opacity: .7; }
+  .step .t { font-size: 12.5px; font-weight: 600; margin-top: 2px; line-height: 1.25; }
+  .step .s { font-size: 10.5px; opacity: .85; margin-top: 3px; }
+  .db  { border-color: var(--db);  }
+  .rmq { border-color: var(--rmq); }
+  .act { border-color: var(--ok); }
+  .arrow { display: flex; align-items: center; font-size: 18px; color: var(--fg-dim); padding: 0 6px; }
+  .arrow.down { width: 100%; justify-content: flex-start; padding: 4px 0 4px 48px; }
+  .pill { display:inline-block; font-size:10px; padding:1px 6px; border-radius:4px; margin-left:6px; }
+  .pill.db  { background: rgba(37,99,235,.18); color:#60a5fa; }
+  .pill.rmq { background: rgba(124,58,237,.18); color:#a78bfa; }
+  .pill.ext { background: rgba(217,119,6,.18); color:#fbbf24; }
+  .note { border-left: 3px solid var(--warn); padding: 8px 12px; margin: 8px 0; font-size: 12px; background: rgba(217,119,6,.06); border-radius: 0 6px 6px 0; }
+  .note b { color: var(--warn); }
+  .crit { border-left: 3px solid var(--bad); background: rgba(220,38,38,.06); }
+  .crit b { color: var(--bad); }
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:11px; margin:6px 0 14px; opacity:.85; }
+  .legend span::before { content:"■ "; }
+  .lg-db::before{color:var(--db);} .lg-rmq::before{color:var(--rmq);} .lg-ext::before{color:var(--warn);} .lg-act::before{color:var(--ok);}
+  table { border-collapse: collapse; font-size: 12px; margin-top: 6px; width:100%; }
+  td, th { border: 1px solid var(--bd); padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { font-weight: 600; opacity: .9; }
+  .x { color: var(--bad); font-weight: 700; }
+  .c { color: var(--ok); font-weight: 700; }
+  code { font-size: 11.5px; background: rgba(255,255,255,.06); padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="legend">
+    <span class="lg-db">DB write/read</span>
+    <span class="lg-rmq">RabbitMQ</span>
+    <span class="lg-ext">Channel provider (WA/IG)</span>
+    <span class="lg-act">Action / ack</span>
+  </div>
+
+  <h2>Journey kamu <span class="tag bad">ada celah</span></h2>
+  <div class="row">
+    <div class="step"><div class="n">1</div><div class="t">input</div></div>
+    <div class="arrow">→</div>
+    <div class="step db"><div class="n">2</div><div class="t">check db</div></div>
+    <div class="arrow">→</div>
+    <div class="step db"><div class="n">3</div><div class="t">update db</div><div class="s">status = ?</div></div>
+    <div class="arrow">→</div>
+    <div class="step ext"><div class="n">4</div><div class="t">kirim</div></div>
+    <div class="arrow">→</div>
+    <div class="step db"><div class="n">5</div><div class="t">cek db</div></div>
+    <div class="arrow">→</div>
+    <div class="step db"><div class="n">6</div><div class="t">update db</div></div>
+  </div>
+  <div class="note crit"><b>Celah:</b> kalau step 3 nandain <code>sent</code> SEBELUM kirim (step 4) — dan kirim gagal — DB bohong "terkirim", pesan hilang diam-diam, ga ke-retry.</div>
+  <div class="note crit"><b>Celah:</b> "cek db" (step 5) cuma read → race. Dua consumer bisa baca <code>pending</code> barengan → double-send. Dan <b>ga ada recovery</b> kalau RMQ restart: queue kosong, ga ada yang re-trigger row <code>pending</code>.</div>
+
+  <h2>Flow usulan (Transactional Outbox) <span class="tag ok">restart-safe</span></h2>
+
+  <div class="row" style="flex-direction:column; gap:0;">
+
+    <div class="row">
+      <div class="step"><div class="n">1</div><div class="t">input</div><div class="s">request kirim pesan</div></div>
+      <div class="arrow">→</div>
+      <div class="step db"><div class="n">2 · WRITE</div><div class="t">tulis outbox</div><div class="s"><code>status=pending</code><br>+ messageId, payload</div></div>
+      <div class="arrow">→</div>
+      <div class="step rmq"><div class="n">3 · PUBLISH</div><div class="t">publish RMQ</div><div class="s">bawa <code>messageId</code> aja<br>durable + persistent</div></div>
+    </div>
+
+    <div class="arrow down">↓</div>
+
+    <div class="row">
+      <div class="step rmq"><div class="n">4 · CONSUME</div><div class="t">consumer ambil</div><div class="s">dapat messageId</div></div>
+      <div class="arrow">→</div>
+      <div class="step db"><div class="n">5 · GUARD</div><div class="t">atomic claim</div><div class="s"><code>update ...<br>where status=pending<br>set status=sending</code></div></div>
+      <div class="arrow">→</div>
+      <div class="step ext"><div class="n">6 · SEND</div><div class="t">kirim ke provider</div><div class="s">WA / IG / dll</div></div>
+    </div>
+
+    <div class="arrow down">↓</div>
+
+    <div class="row">
+      <div class="step db"><div class="n">7 · WRITE</div><div class="t">update outbox</div><div class="s">sukses → <code>status=sent</code>, sentAt<br>gagal → attempts++, requeue/DLQ</div></div>
+      <div class="arrow">→</div>
+      <div class="step act"><div class="n">8 · ACK</div><div class="t">manual ack RMQ</div><div class="s">TERAKHIR — setelah DB update</div></div>
+    </div>
+
+  </div>
+
+  <div class="note"><b>Kunci #1 — ack di paling akhir (step 8):</b> crash antara kirim & update DB → pesan belum di-ack → RMQ redeliver → guard atomic (step 5) + messageId cegah double-send.</div>
+  <div class="note"><b>Kunci #2 — atomic claim (step 5):</b> <code>update where status=pending</code>. Kena 0 row = udah dikirim proses lain, skip. Ga perlu read-lalu-write yang bisa balapan.</div>
+
+  <h2>Recovery setelah RMQ restart <span class="tag ok">jawaban isu awal</span></h2>
+  <div class="row">
+    <div class="step act"><div class="n">SWEEPER</div><div class="t">cron job</div><div class="s">@nestjs/schedule<br>(sudah ada)</div></div>
+    <div class="arrow">→</div>
+    <div class="step db"><div class="n">SCAN</div><div class="t">query outbox</div><div class="s"><code>status=pending<br>AND createdAt &lt; now-Xs</code></div></div>
+    <div class="arrow">→</div>
+    <div class="step rmq"><div class="n">RE-PUBLISH</div><div class="t">isi ulang queue</div><div class="s">queue yg hilang<br>di-refill dari DB</div></div>
+  </div>
+  <div class="note"><b>Ini yang bikin restart-safe:</b> RMQ boleh hilang total, DB tetap source of truth. Sweeper ngisi ulang queue dari row <code>pending</code>. Tanpa ini, restart = row nyangkut selamanya.</div>
+
+  <h2>Beda kamu vs usulan</h2>
+  <table>
+    <tr><th>Aspek</th><th>Journey kamu</th><th>Usulan</th></tr>
+    <tr><td>Urutan tandai sent</td><td class="x">bisa sebelum kirim</td><td class="c">selalu setelah provider konfirmasi</td></tr>
+    <tr><td>Cegah double-send</td><td class="x">read biasa (race)</td><td class="c">atomic update-where-pending</td></tr>
+    <tr><td>Titik ack RMQ</td><td class="x">tak jelas</td><td class="c">paling akhir, setelah DB</td></tr>
+    <tr><td>Recovery restart</td><td class="x">tidak ada</td><td class="c">sweeper re-publish dari DB</td></tr>
+  </table>
+
+  <p style="font-size:11px;opacity:.6;margin-top:14px;">Konsep kamu ~80% sama. Yang beda: urutan update-setelah-kirim, atomic guard, ack terakhir, sweeper.</p>
+
+</div>
+</body>
+</html>

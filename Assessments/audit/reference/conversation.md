@@ -1,3 +1,5 @@
+> **FLAG: DRAFT / KNOWLEDGE NOTE**  \n> Breakdown pengetahuan. Bukan bukti audit final dan bukan backlog source.
+
 # Features
 
 Conversations

@@ -2492,6 +2492,57 @@
     }, [selected?.sectionId]);
 
     // ── Render sidebar tree nodes ────────────────────────────────────────────────
+    function TreeDir({ node, sectionId, pad, forceOpen, activePath, creating, creatingBusy, setCreating, createItem, children }) {
+      const inPath = activePath && activePath.startsWith(node.path + '\\');
+      // persisted open/collapse per folder path; default collapsed except root-level or saved-open
+      const [open, setOpen] = useState(() => folderOpenState(node.path, depthDefaultOpen(pad)) || inPath);
+      // auto-expand when the selected file lands inside this folder
+      useEffect(() => { if (inPath) setOpen(true); }, [inPath]);
+      const toggle = () => setOpen(o => { const n = !o; setFolderOpenState(node.path, n); return n; });
+      const isOpen = forceOpen || open;
+      return (
+        <div>
+          <div style={{ padding:`4px 8px 4px ${pad}px`, display:'flex', alignItems:'center', gap:5, cursor:'pointer' }}
+            onClick={toggle}>
+            <span style={{ fontSize:10, width:10, flexShrink:0, color:'#fbbf24', textAlign:'center' }}>{isOpen ? '▾' : '▸'}</span>
+            <span style={{ fontSize:12, color:'#fbbf24', flexShrink:0 }}>{isOpen ? '📂' : '📁'}</span>
+            <span style={{ flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+              fontWeight:700, color:'#fde68a', textTransform:'uppercase', letterSpacing:0.6, fontSize:10.5 }}>{node.name}</span>
+            <button onClick={e=>{ e.stopPropagation(); setCreating({ path: node.path, sectionId }); }} title="New folder / TSV"
+              style={{ fontSize:12, lineHeight:1, background:'none', border:'none', color:'#fbbf24', cursor:'pointer', padding:'0 4px' }}>+</button>
+          </div>
+          {creating && creating.path === node.path && (
+            <NewItemForm pad={pad + 14} busy={creatingBusy} onCreate={createItem} onCancel={()=>setCreating(null)} />
+          )}
+          {isOpen && (
+            // guideline for open folder — vertical rule at this folder's indent, children keep their own pad
+            <div style={{ position:'relative' }}>
+              <div style={{ position:'absolute', left:`${pad + 5}px`, top:0, bottom:0, width:1.5, background:'rgba(253,230,138,0.35)' }} />
+              {children}
+            </div>
+          )}
+        </div>
+      );
+    }
+    // ponytail: only root folders open by default; deeper collapsed, but user toggle persists
+    function depthDefaultOpen(pad) { return pad <= 12; }
+    // persisted per-folder open/collapse (localStorage). Returns saved value or fallback.
+    function folderOpenState(pathKey, fallback) {
+      try {
+        const raw = localStorage.getItem('qab-folder-open');
+        if (!raw) return fallback;
+        const m = JSON.parse(raw);
+        return pathKey in m ? m[pathKey] : fallback;
+      } catch { return fallback; }
+    }
+    function setFolderOpenState(pathKey, isOpen) {
+      try {
+        const m = JSON.parse(localStorage.getItem('qab-folder-open') || '{}');
+        m[pathKey] = isOpen;
+        localStorage.setItem('qab-folder-open', JSON.stringify(m));
+      } catch {}
+    }
+
     function renderTree(nodes, sectionId, depth = 0) {
       if (!nodes) return null;
       const section = allSections?.find(s => s.id === sectionId);
@@ -2503,19 +2554,12 @@
           const sub = renderTree(node.children, sectionId, depth + 1);
           if (sideSearch && !sub?.length) return [];
           return [
-            <div key={node.path}>
-              <div style={{ padding:`4px 8px 4px ${pad}px`, display:'flex', alignItems:'center', gap:5, cursor:'default' }}>
-                <span style={{ fontSize:11, color:'#d97706', flexShrink:0 }}>📂</span>
-                <span style={{ flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-                  fontWeight:600, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:0.5, fontSize:10 }}>{node.name}</span>
-                <button onClick={e=>{ e.stopPropagation(); setCreating({ path: node.path, sectionId }); }} title="New folder / TSV"
-                  style={{ fontSize:12, lineHeight:1, background:'none', border:'none', color:'var(--text-4)', cursor:'pointer', padding:'0 4px' }}>+</button>
-              </div>
-              {creating && creating.path === node.path && (
-                <NewItemForm pad={pad + 14} busy={creatingBusy} onCreate={createItem} onCancel={()=>setCreating(null)} />
-              )}
+            <TreeDir key={node.path} node={node} sectionId={sectionId} pad={pad}
+              forceOpen={!!sideSearch} activePath={selected?.path}
+              creating={creating} creatingBusy={creatingBusy}
+              setCreating={setCreating} createItem={createItem}>
               {sub}
-            </div>
+            </TreeDir>
           ];
         }
         if (sideSearch && !node.name.toLowerCase().includes(sideSearch.toLowerCase())) return [];
@@ -3192,7 +3236,7 @@
             }
 
             // ── Memory ─────────────────────────────────────────────────
-            if (mainNav === 'tracker') return <div style={{ flex:1, minHeight:0, overflowY:'auto', overflowX:'hidden', padding:'20px 24px', background:'var(--app-bg)' }}><window.TrackerModule.TrackerView user={user} onDirtyChange={handleTrackerDirty} tab={trackerTab} onTabChange={setTrackerTab} selectedSheet={trackerSheet} onSelectedSheetChange={setTrackerSheet} onSheetTabsChange={setTrackerSheetTabs} /></div>;
+            if (mainNav === 'tracker') return <div style={{ flex:1, minHeight:0, overflow:'hidden', background:'var(--app-bg)' }}><window.TrackerModule.TrackerView user={user} onDirtyChange={handleTrackerDirty} tab={trackerTab} onTabChange={setTrackerTab} selectedSheet={trackerSheet} onSelectedSheetChange={setTrackerSheet} onSheetTabsChange={setTrackerSheetTabs} /></div>;
             if (mainNav === 'new-request') return renderNewRequestView();
             if (mainNav === 'memory') return renderMemoryView();
 

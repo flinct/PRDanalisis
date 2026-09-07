@@ -38,7 +38,7 @@ Customer service live chat platform dengan WhatsApp integration.
 PRDanalisis/
 ├── CLAUDE.md                    ← file ini
 ├── Rules/                       ← rule files (core universal + profile + adapter)
-│   ├── core/                    ← 7 rule universal (baca sesuai tipe tugas)
+│   ├── core/                    ← 8 rule universal (baca sesuai tipe tugas)
 │   │   ├── task-router.md       ← ENTRY POINT — baca ini pertama
 │   │   ├── change-management.md ← Phase 0 change intake & classification
 │   │   ├── requirements.md      ← PRD writing
@@ -105,6 +105,7 @@ PRDanalisis/
 |---|---|
 | Requirement / Change Intake | `core/change-management.md`, `core/analysis-and-risk.md` (jika shared behavior / removal / blast radius besar) |
 | PRD Analysis / Review | `core/analysis-and-risk.md` |
+| Audit Corpus / Folder Audit | `core/audit.md`, `core/analysis-and-risk.md` (jika ada keputusan/risiko) |
 | PRD Writing | `core/requirements.md`, `core/analysis-and-risk.md` |
 | Test Case / QA / UAT | `core/test-design.md`, `core/analysis-and-risk.md` |
 | Bug Fix | `core/analysis-and-risk.md` |
@@ -213,5 +214,6 @@ Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding le
 4. `Rules/profiles/satuinbox.yml` adalah source of truth untuk governance strict (Phase 0, Gate A/B/C, freeze, approval — non-bypassable)
 5. Setiap session wajib punya file summary aktif di `summary/` sesuai `core/artifact-governance.md`
 6. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
-7. Jangan overwrite memory — update section relevan saja
-8. **Precedence:** user boleh mengubah default kerja, tetapi TIDAK boleh melewati kontrol proyek yang ditandai wajib/non-bypassable (Phase 0 brief, approval gate, package freeze, retention policy). Kontrol non-bypassable SatuInbox menang atas input user.
+7. Corpus audit wajib mengikuti `Rules/core/audit.md`: root berisi README + file bernomor; detail di sub-folder; update file utama; tambah file utama root harus konfirmasi dulu
+8. Jangan overwrite memory — update section relevan saja
+9. **Precedence:** user boleh mengubah default kerja, tetapi TIDAK boleh melewati kontrol proyek yang ditandai wajib/non-bypassable (Phase 0 brief, approval gate, package freeze, retention policy). Kontrol non-bypassable SatuInbox menang atas input user.

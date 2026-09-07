@@ -2,7 +2,7 @@
 
 # SatuInbox — Audit Master Register
 
-> **Version:** v1.2 | **Changelog:** v1.2 — synthesis audit-3 (t_ba1b1ec2): tambah DI-06 (RetryTracker in-memory), promote V17 config-trap ke confirmed (dup INT-01, close needs-validation part). v1.1 — tambah ENV-01 (branch conflict jadi finding, D3), tabel decision-taxonomy mapping (D2), blok versi (D4), per re-audit t_f4c645c2. v1.0 — baseline 59 temuan.
+> **Version:** v1.5 | **Changelog:** v1.5 — fold Track G 10 Critical jadi ID resmi INFRA-01..10 (committed secrets, no alerting, 2× SPOF, CORS wildcard, FE/BE test coverage, docs, EKS public). Track G status di Cakupan: orphan → folded (Critical only; High/Medium/Low tetap di source `detail-infra/satuinbox-infra-audit.md`). Arsip 9 file source 09-01/09-02 → `_source/`; conversation source → `conversation/_source/` + merged file. Statistik 61 → 71. v1.4 — review corpus 2026-09-03: tambah Track G? (orphan infra `detail-infra/satuinbox-infra-audit.md`, 69 temuan) + Track B ke peta Cakupan; warning konflik layer RBAC (SEC-03 BE vs Track F C1 FE); konflik antar-file terdokumentasi di reading-list §5 (K1–K6). NO finding baru di-fold. v1.3 — tambah section "Cakupan Audit" (peta track A–F). Register kini eksplisit sebagai master peta seluruh audit, bukan hanya Track A. v1.2 — synthesis audit-3 (t_ba1b1ec2): tambah DI-06 (RetryTracker in-memory), promote V17 config-trap ke confirmed (dup INT-01, close needs-validation part). v1.1 — tambah ENV-01 (branch conflict jadi finding, D3), tabel decision-taxonomy mapping (D2), blok versi (D4), per re-audit t_f4c645c2. v1.0 — baseline 59 temuan.
 >
 > **Single source of truth** untuk semua temuan audit. Laporan detail tetap di file asli — register ini untuk prioritisasi & tracking eksekusi.
 >
@@ -13,6 +13,27 @@
 > **Repo baseline:** BE `prod-2.7.0`, FE `prod-2.7.0-11` (bukan v2.8.0)
 >
 > **Owner default:** PM = Dany Christian, Eng Lead = Naftal Yunior
+
+---
+
+## Cakupan Audit (peta semua track)
+
+> Register ini = **backlog eksekusi ter-triase**, bukan dump semua finding. Track A sudah di-fold jadi ID resmi di bawah. Track B/D/E/F **belum di-fold** (raw, banyak overlap antar-track + dgn register) — di-index di `02-reading-list-and-conflicts.md` (§1 peta, §4 khusus Conversation). Fold ke register hanya setelah dedup + ENV-01 branch-lock.
+
+| Track | Scope | Finding | Di register? | Baca |
+|---|---|---|---|---|
+| **A** | Code + PRD audit system-wide (security, integrity, broadcast, contact, ops) | 61 (ter-triase) | ✅ **folded** (isi register ini) | register + `detail-infra/security-integrity-code-verified.md` |
+| **B** | UI/UX heuristic (Nielsen, FE-only) | 33 | ❌ belum | `detail-uiux/uiux-audit-report-sabrina.md`, `detail-uiux/uiux-impact-assessment.md` |
+| **D** | Conversation FE UX flow (first-time + returning user) | 41 | ❌ belum | `detail-conversation/2026-09-02-conversation-audit-merged.md` (Track D) |
+| **E** | Conversation BE deep-dive (data model, security, perf, functional) | 64 | ❌ belum | `detail-conversation/2026-09-02-conversation-audit-merged.md` (Track E) |
+| **F** | Conversation sidebar nav RBAC + counter (FE+BE cross-verified) | 3 | ❌ belum | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` |
+| **G** | Infra/DevOps (secrets, CORS, SPOF, alerting, test coverage) | 69 (10 Critical/22 High/25 Med/12 Low) | ⚠️ **partial**: 10 Critical folded (INFRA-01..10); High/Med/Low belum | `detail-infra/satuinbox-infra-audit.md` (source lengkap 59 non-Critical) |
+| — | Conversation coverage gap-check (meta) | verdict PARTIAL, ~40% belum di-audit | n/a | `03-coverage-gap-check.md` |
+
+**Gate fold Track B/D/E/F/G:** (a) ENV-01 branch-lock resolve, (b) dedup per overlap yang dicatat di `02-reading-list-and-conflicts.md` §4 (mis. Track E DB-index ↔ register V8/P-01; Track F RBAC ↔ Track B/D visibility). Fold tanpa dedup = double-count backlog.
+
+> **⚠️ Konflik layer RBAC (jangan salah baca):** P1 **SEC-03** di bawah = kontrol positif RBAC di **BE gateway** (benar, enforced). Track F **C1** = gate visibility RBAC di **FE sidebar** (RUSAK — `role.name` vs `role.code`). Dua-duanya benar di layer berbeda. SEC-03 positif TIDAK berarti FE gate aman.
+> **⚠️ Track G infra (INFRA-01..10 folded):** 10 Critical dari `detail-infra/satuinbox-infra-audit.md` kini jadi ID resmi di section **CONFIRMED — Track G Infra/DevOps** di bawah. Severity Track G = `Critical` (skala infra), setara **Major/Catastrophe** di skala produk register. Sisa 59 (High/Med/Low) TETAP di source, belum di-fold. INFRA-01 (committed secrets) time-sensitive — active risk, rotate segera.
 
 ---
 
@@ -68,6 +89,25 @@
 | C14 | QA-03 | QA | Rollback strategy tidak terdokumentasi | Medium | CI stages verified (no rollback) | confirmed | Dokumentasikan rollback per service |
 | C15 | UX-07 | UX | `SOCKER_ERROR_MESSAGE` typo di konstanta | Low | `packages/constants/src/socket.ts` verified | confirmed | Rename ke `SOCKET_ERROR_MESSAGE` |
 | C16 | DI-06 | Data Integrity | `retryTracker` = `Map` in-memory (broadcast) — state retry tidak persist antar-restart → potensi retry tanpa batas. Follow-up dari koreksi FS-05 (X1). | Medium | `broadcast.processor.ts` verified (evidence DI-02) | confirmed | Persist retry count ke document broadcast atau AMQP `x-death` header |
+
+---
+
+## CONFIRMED — Track G Infra/DevOps (10 Critical folded dari `detail-infra/satuinbox-infra-audit.md`)
+
+> Severity `Critical` = skala infra (setara Major/Catastrophe skala produk). Owner default **Naftal**. Sisa 59 Track G (High/Med/Low) belum di-fold — baca source. **INFRA-01 = active risk, kerjakan lebih dulu.**
+
+| # | ID | Domain | Finding | Severity | Evidence | Status | Remediation | Effort |
+|---|---|---|---|---|---|---|---|---|
+| G1 | INFRA-01 | Security / Secrets | **Committed secrets di git** — `docker/local/.env` (tracked), `atlas-search/conversation-indexes.sh` (Mongo password hardcoded), `docker/dev/docker-compose.yml` (Redash+Mongo password). Siapapun dengan akses repo punya DB password + API key. | Critical | source-verified (t_4544c1c3 C-1/2/3) | **confirmed** | `git rm --cached`, **rotate SEMUA** credential terekspos, `.gitignore`. | 30 min |
+| G2 | INFRA-02 | Observability | **Zero alerting** — Prometheus collect metric tapi 0 PrometheusRule CRD. Tidak ada yang di-page. Failure baru ketahuan saat customer lapor. | Critical | t_f652d37d IV-1 | **confirmed** | Alertmanager: pod-not-ready >5min, MongoDB RS unhealthy, gRPC error >5%, mem >85%. | 1 day |
+| G3 | INFRA-03 | Architecture / SPOF | **API Gateway single-replica** — satu-satunya entry HTTP/WS, no HPA (VPA only). Crash = outage total semua traffic. | Critical | t_f652d37d I-1 | **confirmed** | HPA min 2 replica. | 1 hr |
+| G4 | INFRA-04 | Architecture / SPOF | **WhatsApp Service single-replica** — Baileys session stateful, tak bisa scale horizontal. Crash = semua sesi WA hilang, butuh re-auth. | Critical | t_f652d37d I-2 | **confirmed** | Session persistence untuk fast recovery; long-term migrasi WA Business API akun non-kritikal. | M |
+| G5 | INFRA-05 | Security / CORS | **CORS wildcard** — `CORS_ORIGINS` unset → `'*'`. Plus env var name mismatch (plural/singular di `.env.example`). Domain manapun bisa authenticated cross-origin. | Critical | `api-gateway/src/main.ts:70-77` + WS gateway | **confirmed** | Default ke domain produksi, fix nama env var. | 30 min |
+| G6 | INFRA-06 | Code Quality / Test | **FE zero test coverage** — 1 test file / 1.777 source, no test runner. Regresi ship diam-diam. | Critical | t_865726e9 | **confirmed** | Vitest + critical-path test (auth, conversation list). Tie C12/QA-01. | 1-2 days |
+| G7 | INFRA-07 | Quality / Test | **BE e2e semua stub** — 18 e2e app test endpoint `/api` yang tak ada. 0% real e2e. False confidence. | Critical | t_1e8f8b8c | **confirmed** | Ganti dgn integration test nyata, mulai auth-service. Tie C12. | 2-3 days |
+| G8 | INFRA-08 | Documentation | **Zero per-service docs** — 0/38 service punya README di arsitektur 19-microservice. Onboarding blocker. | Critical | t_1e8f8b8c | **confirmed** | Template README, mulai conversation-service. | 2-3 days |
+| G9 | INFRA-09 | Documentation | **No CHANGELOG / release process** — tak ada CHANGELOG.md, semver, release notes. | Critical | t_1e8f8b8c | **confirmed** | keepachangelog format, backfill dari git history. | 0.5 day |
+| G10 | INFRA-10 | Security / Infra | **EKS public endpoint** — cluster API internet-accessible, private access disabled. | Critical | t_f652d37d III-4 | **confirmed** | Enable private access, VPN/bastion untuk kubectl. | 1 day |
 
 ---
 
@@ -133,10 +173,11 @@
 | Confirmed (prioritas) | 8 |
 | Confirmed (kontrol positif) | 10 |
 | Confirmed (non-prioritas) | 16 |
+| Confirmed (Track G infra Critical) | 10 |
 | Needs-validation | 25 |
 | Corrected | 1 |
 | Closed (dup) | 1 |
-| **Total** | **61** |
+| **Total** | **71** |
 
 ---
 

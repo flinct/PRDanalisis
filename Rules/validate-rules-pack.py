@@ -47,7 +47,7 @@ def load_profile_text(name):
 
 def test_core_is_universal():
     core_files = sorted(CORE.glob("*.md"))
-    assert len(core_files) == 7, f"expected 7 core rules, got {len(core_files)}"
+    assert len(core_files) == 8, f"expected 8 core rules, got {len(core_files)}"
     for f in core_files:
         text = f.read_text(encoding="utf-8")
         for tok in FORBIDDEN_CORE:

@@ -360,6 +360,19 @@ Mode belum final — perlu keputusan PM/Engineering.
 - Role login menentukan visibility sejak awal, bukan hanya hasil filter.
 
 
+### Product Positioning & Deployment
+
+- SatuInbox = **SaaS multi-tenant ONLY**. Tidak ada opsi self-hosted / on-prem (user correction 2026-08-26, supersedes koreksi lebih awal 'SaaS+self-hosted').
+- Klaim "deployment flexibility" sebagai USP di `Assessments/strategy/*.md` **SALAH** — perlu dipurge, jangan dikutip tanpa fix.
+- Competitor pembanding: **Chatwoot** (self-host-only).
+
+### Workspace & Artifact Conventions
+
+- Prototypes: hanya root `prototypes/` (subdir per-PRD sudah dihapus).
+- PRD default di-push ke **OpenProject WP descriptions**, bukan file repo.
+- Audit package canonical: `Assessments/audit/01-audit-master-register.md` = source decision/backlog (v1.5, 71 findings). Baca `Assessments/audit/README.md` untuk jalur baca (00 brief → 01 register → 02 reading-list+konflik → 03 coverage-gap; detail di `detail-conversation/`, `detail-infra/`, `detail-uiux/`; konteks produk di `reference/`; arsip di `_source/`). Report code-verified = evidence. Dok audit lain flagged supporting/needs-validation/draft.
+- Release notes default: lihat `Rules/release-notes-rule.md` (3 file di `Release notes/`: `-tech.md`, `-user.md` Bahasa Indonesia awam, `-gdoc.md`). Build hanya file yang disebut user.
+
 ### File Positioning
 
 - Summary global untuk domain conversation omnichannel, ticket, dan WhatsApp Web.

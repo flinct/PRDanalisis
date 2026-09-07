@@ -1,3 +1,5 @@
+> **FLAG: LEGACY SUPPORTING ASSESSMENT**  \n> Dokumen pendukung lama. Jangan pakai sebagai decision source; cek `audit-master-register.md`.
+
 # Assessment Report: UI/UX Audit Findings — Analysis & Repo Impact
 
 > **Assessment Type:** Type 3 — Interconnection Analysis (cross-domain UI/UX) + Type 2 — Bug Fix Analysis (per-finding)

@@ -38,7 +38,7 @@ Customer service live chat platform dengan WhatsApp integration.
 PRDanalisis/
 ├── AGENTS.md                    ← file ini
 ├── Rules/                       ← rule files (core universal + profile + adapter)
-│   ├── core/                    ← 7 rule universal (baca sesuai tipe tugas)
+│   ├── core/                    ← 8 rule universal (baca sesuai tipe tugas)
 │   │   ├── task-router.md       ← ENTRY POINT — baca ini pertama
 │   │   ├── change-management.md ← Phase 0 change intake & classification
 │   │   ├── requirements.md      ← PRD writing
@@ -105,6 +105,7 @@ PRDanalisis/
 |---|---|
 | Requirement / Change Intake | `core/change-management.md`, `core/analysis-and-risk.md` (jika shared behavior / removal / blast radius besar) |
 | PRD Analysis / Review | `core/analysis-and-risk.md` |
+| Audit Corpus / Folder Audit | `core/audit.md`, `core/analysis-and-risk.md` (jika ada keputusan/risiko) |
 | PRD Writing | `core/requirements.md`, `core/analysis-and-risk.md` |
 | Test Case / QA / UAT | `core/test-design.md`, `core/analysis-and-risk.md` |
 | Bug Fix | `core/analysis-and-risk.md` |
@@ -156,35 +157,28 @@ PRDanalisis/
 
 > ⚠️ **Koreksi penting (2026-08-20):** `delegate_task` TIDAK punya parameter `kind`, dan `delegation.role_models` bukan config asli Hermes (0% dibaca kode — verified di `hermes-agent/hermes_cli/config_defaults.py` + `tools/delegate_tool.py`). Model subagent di-resolve dari **`delegation.model`/`delegation.reasoning_effort`** — flat, global, satu nilai untuk SEMUA subagent yang jalan saat itu. Tidak ada auto-routing per task type.
 
-**Cara dapat model berbeda per role (manual swap, WAJIB sebelum tiap panggilan sequential):**
+**Cara delegasi per role — pakai `delegate_as` (BUKAN swap manual buta):**
+
+Resolver `~/.hermes/scripts/delegate_as.py` mengikat **model + effort + skill** per role dari satu sumber (`~/.hermes/skills/_role-routing/model-routing.yaml`). Jalankan sebelum tiap delegasi:
+
 ```bash
-hermes config set delegation.model <model>
-hermes config set delegation.reasoning_effort <effort>
-# baru panggil delegate_task(role="leaf", goal=...)
+python ~/.hermes/scripts/delegate_as.py <role>
 ```
-Ini works untuk loop sequential (worker selesai → baru reviewer jalan) — TIDAK works untuk batch paralel (`tasks=[...]` dalam satu panggilan selalu share model yang sama, karena `delegate_task` resolve model sekali di awal sebelum loop task).
+Output = recipe siap-eksekusi: 2 baris `hermes config set` (model+effort), 1 baris kontrak `delegate_task` yang WAJIB menginjeksi `context='FIRST load skill <skill> via skill_view and follow its rules. <task>'`, plus baris restore `delegation.model ''`.
+
+- **Role governance** (`analysis`, `coding`, `planning`, `qa`, `review`, `orchestrator`) → skill = `workflow-*` (Assessment Report, Gate A/B/C, Rules/core). Ini yang menang saat menyentuh SatuInbox.
+- **Role utility** (`architecture`, `code-writing`, `code-review`, `debugging`, `ui-review`, `test-generation`, `documentation`, `markdown`, `filesystem`, `summarize`, `translation`, `release-note`, `changelog`) → skill generik sama-nama.
+- Lihat semua: `python ~/.hermes/scripts/delegate_as.py --list`. Ubah model → edit `model-routing.yaml`, jangan hardcode di sini.
+
+Swap ini works untuk loop **sequential** — TIDAK untuk batch paralel (`tasks=[...]` share satu model, resolve sekali sebelum loop task).
 
 **Alur loop (worker → review → revise):**
-1. **Swap model dulu** (lihat tabel referensi di bawah) → **Delegate worker** — beri goal + konteks lengkap (subagent tidak tahu isi chat ini).
-2. **Swap model lagi** ke role reviewer → **Delegate reviewer** — kirim output worker + kriteria. Reviewer WAJIB akhiri dengan verdict eksplisit: `PASS` atau `NEEDS_REVISION: <daftar hal yang harus diperbaiki>`.
-3. **Jika `NEEDS_REVISION`** → swap balik ke model worker → delegate worker lagi dengan feedback reviewer, lalu ulang dari langkah 2.
-4. **Jika `PASS`** → selesai, laporkan hasil final ke user.
+1. **`delegate_as <role-worker>`** → jalankan 2 baris config set → **delegate worker** dengan context wajib load skill (subagent tidak tahu isi chat ini).
+2. **`delegate_as review`** → config set → **delegate reviewer** — kirim output worker + kriteria. Reviewer WAJIB akhiri verdict eksplisit: `PASS` atau `NEEDS_REVISION: <daftar>`.
+3. **Jika `NEEDS_REVISION`** → `delegate_as <role-worker>` lagi → delegate worker + feedback reviewer, ulang dari langkah 2.
+4. **Jika `PASS`** → **restore `hermes config set delegation.model ''`** → laporkan hasil final ke user.
 
-**Tabel referensi manual-swap (bukan auto-routing — orchestrator harus `hermes config set` sendiri sebelum tiap panggilan):**
-
-| Task | Model swap ke... | Effort |
-|---|---|---|
-| Coding fitur/bugfix | `openai/gpt-5.5` | medium |
-| Nulis kode mekanis/boilerplate | `cmc/deepseek/deepseek-v4-flash` | medium |
-| Review kode | `openai/gpt-5.5` | high |
-| Review umum (PRD/analisa) | `openai/gpt-5.5` | high |
-| Analisa / deep-research | `openai/o3` | high |
-| Debugging | `openai/gpt-5.5` | high |
-| Planning | `cc/Codex-opus-4-8` | xhigh |
-| Arsitektur | `cc/Codex-opus-4-8` | xhigh |
-| Test case / QA | `openai/gpt-5.5` | high |
-
-Kosongkan `delegation.model` (`hermes config set delegation.model ''`) setelah orchestrator loop selesai supaya sesi normal balik inherit model parent (`combo1`). Provider selalu ninerouter (semua model lewat proxy yang sama, port 20128).
+> Model routing hidup lewat `delegate_as`; blok `delegation.role_models` di config sudah DIHAPUS (dead — runtime tidak pernah membacanya). Provider selalu ninerouter (proxy 127.0.0.1:20128).
 
 **Rem (wajib, biar tidak loop selamanya):**
 - Maksimal **3 putaran revisi**. Kalau putaran ke-3 masih `NEEDS_REVISION` → STOP, laporkan ke user output terbaik + sisa isu yang belum beres. Jangan lanjut sendiri.
@@ -213,7 +207,8 @@ Setelah baca file ini, lihat **`WORKFLOW_CONTEXT.md`** — dokumen onboarding le
 4. `Rules/profiles/satuinbox.yml` adalah source of truth untuk governance strict (Phase 0, Gate A/B/C, freeze, approval — non-bypassable)
 5. Setiap session wajib punya file summary aktif di `summary/` sesuai `core/artifact-governance.md`
 6. Hasil analisa decision-bearing dipermanenkan di `Assessments/` sebagai **Assessment Report**
-7. Jangan overwrite memory — update section relevan saja
-8. **Precedence:** user boleh mengubah default kerja, tetapi TIDAK boleh melewati kontrol proyek yang ditandai wajib/non-bypassable (Phase 0 brief, approval gate, package freeze, retention policy). Kontrol non-bypassable SatuInbox menang atas input user.
+7. Corpus audit wajib mengikuti `Rules/core/audit.md`: root berisi README + file bernomor; detail di sub-folder; update file utama; tambah file utama root harus konfirmasi dulu
+8. Jangan overwrite memory — update section relevan saja
+9. **Precedence:** user boleh mengubah default kerja, tetapi TIDAK boleh melewati kontrol proyek yang ditandai wajib/non-bypassable (Phase 0 brief, approval gate, package freeze, retention policy). Kontrol non-bypassable SatuInbox menang atas input user.
 
 ## Imported Claude Cowork project instructions

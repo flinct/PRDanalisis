@@ -1,3 +1,5 @@
+> **FLAG: DRAFT / KNOWLEDGE NOTE**  \n> Peta domain pendukung. Bukan bukti audit final dan bukan backlog source.
+
 # Product Module Map
 
 > This document provides a high-level overview of the SatuInbox product structure.

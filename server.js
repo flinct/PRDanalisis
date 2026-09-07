@@ -562,54 +562,21 @@ app.put("/api/tracker", async (req, res) => {
 });
 
 // ─── API: FILES ──────────────────────────────────────────────────────────────
+// Single source of truth for sidebar sections — both /api/files and the file
+// watcher read this, so a new section folder is auto-served AND auto-watched.
+const SECTIONS = [
+  { id: "test", folderName: "Test", label: "Test Cases", color: "#60a5fa" },
+  { id: "prd", folderName: "PRD", label: "PRD", color: "#a78bfa" },
+  { id: "brd", folderName: "BRD", label: "BRD", color: "#f9a8d4" },
+  { id: "assessments", folderName: "Assessments", label: "Assessments", color: "#34d399" },
+  { id: "feature", folderName: "Feature List", label: "Feature List", color: "#fbbf24" },
+  { id: "incident-report", folderName: "incident report", label: "Incident Report", color: "#f87171" },
+  { id: "summary", folderName: "summary", label: "Summary", color: "#38bdf8" },
+  { id: "release-notes", folderName: "Release notes", label: "Release Notes", color: "#fb923c" },
+  { id: "uat", folderName: "UAT", label: "UAT", color: "#c084fc" },
+  { id: "presentation", folderName: "presentation", label: "Presentation", color: "#f59e0b" },
+];
 app.get("/api/files", (_req, res) => {
-  const SECTIONS = [
-    { id: "test", folderName: "Test", label: "Test Cases", color: "#60a5fa" },
-    { id: "prd", folderName: "PRD", label: "PRD", color: "#a78bfa" },
-    { id: "brd", folderName: "BRD", label: "BRD", color: "#f9a8d4" },
-    {
-      id: "assessments",
-      folderName: "Assessments",
-      label: "Assessments",
-      color: "#34d399",
-    },
-    {
-      id: "feature",
-      folderName: "Feature List",
-      label: "Feature List",
-      color: "#fbbf24",
-    },
-    {
-      id: "incident-report",
-      folderName: "incident report",
-      label: "Incident Report",
-      color: "#f87171",
-    },
-    {
-      id: "summary",
-      folderName: "summary",
-      label: "Summary",
-      color: "#38bdf8",
-    },
-    {
-      id: "release-notes",
-      folderName: "Release notes",
-      label: "Release Notes",
-      color: "#fb923c",
-    },
-    {
-      id: "uat",
-      folderName: "UAT",
-      label: "UAT",
-      color: "#c084fc",
-    },
-    {
-      id: "presentation",
-      folderName: "presentation",
-      label: "Presentation",
-      color: "#f59e0b",
-    },
-  ];
   const result = SECTIONS.map((s) => {
     const dir = path.join(BASE, s.folderName);
     return { ...s, tree: fs.existsSync(dir) ? walkDir(dir, s.folderName) : [] };
@@ -1565,8 +1532,9 @@ function tryJSON(str, fallback) {
 
 // ─── FILE WATCHER — auto re-import on TSV/MD change ─────────────────────────
 function startWatcher() {
-  const WATCH_DIRS = ["Test", "PRD", "BRD"]
-    .map((d) => path.join(BASE, d))
+  // Watch every sidebar section folder (derived from SECTIONS — add a section, it's auto-watched)
+  const WATCH_DIRS = SECTIONS
+    .map((s) => path.join(BASE, s.folderName))
     .filter(fs.existsSync);
   if (!WATCH_DIRS.length) return;
 

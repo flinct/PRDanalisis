@@ -1,3 +1,5 @@
+> **FLAG: HISTORICAL UX REFERENCE**  \n> Audit heuristic lama. Pakai sebagai referensi UX, bukan backlog prioritas tanpa register.
+
 # **UI/UX AUDIT REPORT**
 
 | Tanggal | Penguji | Platform |

@@ -1,3 +1,5 @@
+> **FLAG: DRAFT / ROADMAP NOTE**  \n> Roadmap draft pendukung. Bukan sumber prioritas final; cek `audit-master-register.md`.
+
 # Feature Dependency Flow (FDF) Development Roadmap
 
 > This document outlines the proposed development phases for building the **Feature Dependency Flow (FDF)** of SatuInbox.

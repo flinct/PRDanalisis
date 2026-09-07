@@ -20,10 +20,20 @@ silently drop the control.
 ## Classification
 Classify work as one or more of: discovery/change request, requirements writing,
 requirements review, impact/risk analysis, defect investigation, test design,
-test execution/validation, release communication, knowledge maintenance, or
-repository maintenance.
+test execution/validation, release communication, knowledge maintenance,
+audit corpus maintenance, or repository maintenance.
 
 Load only the core rule and optional adapters required by that classification.
 If the task is ambiguous, state the assumed classification and continue with
 the least irreversible action; ask only when a missing decision materially
 changes scope, safety, cost, or external impact.
+
+## Core rules
+| Classification | Core rule |
+|---|---|
+| Change intake / requirements | `change-management.md`, `requirements.md` |
+| Analysis / impact / risk | `analysis-and-risk.md` |
+| Test design / QA | `test-design.md` |
+| Knowledge / memory | `knowledge-management.md` |
+| Versioning / naming / transcript | `artifact-governance.md` |
+| **Audit corpus (folder of audit/assessment reports)** | **`audit.md`** — structure + main-file sync contract; mechanics in skill `audit-corpus-index-maintenance` |
