@@ -4316,19 +4316,41 @@
 
           // Strip common trailing punctuation from plain text/code mentions.
           const clean = raw.replace(/[\])}.!,;:]+$/g, "").replace(/\\/g, "/");
-          const last = clean.split("/").filter(Boolean).pop() || "";
-          if (!/\.(md|markdown|txt)$/i.test(last) || clean.includes(".."))
+          const rel = clean.replace(/^\.\//, "").replace(/^\//, "");
+          const last = rel.split("/").filter(Boolean).pop() || "";
+          if (!/\.(md|markdown|txt)$/i.test(last) || rel.includes(".."))
             return null;
-          if (clean.includes("/")) return clean.replace(/^\.\//, "");
+
+          const workspaceRoots = [
+            "Assessments",
+            "BRD",
+            "Feature List",
+            "PRD",
+            "Release notes",
+            "Test",
+            "UAT",
+            "incident report",
+            "presentation",
+            "summary",
+          ];
+          if (
+            workspaceRoots.some(
+              (root) => rel === root || rel.startsWith(root + "/"),
+            )
+          )
+            return rel;
 
           const currentDir = currentPath?.includes("/")
             ? currentPath.split("/").slice(0, -1).join("/")
             : "";
-          return currentDir ? `${currentDir}/${clean}` : clean;
+          return currentDir ? `${currentDir}/${rel}` : rel;
         }
 
         function workspaceMarkdownOpenUrl(path) {
-          return "/api/files/open?path=" + encodeURIComponent(path);
+          const url = new URL(window.location.href);
+          url.searchParams.set("open", path);
+          url.hash = "";
+          return url.toString();
         }
 
         function markWorkspaceMarkdownAnchor(a, path) {
@@ -5324,15 +5346,19 @@
             gdocId: value.gdocId || "",
           };
         }
-        const savedNavState = readAppNavState();
-        const initialMainNav = normalizeMainNav(savedNavState.mainNav);
-        const initialWorkspaceNav = normalizeWorkspaceNav(
-          savedNavState.workspaceNav,
-          initialMainNav,
+        const urlOpenPath = new URLSearchParams(window.location.search).get(
+          "open",
         );
+        const savedNavState = readAppNavState();
+        const initialMainNav = urlOpenPath
+          ? "workspace"
+          : normalizeMainNav(savedNavState.mainNav);
+        const initialWorkspaceNav = urlOpenPath
+          ? null
+          : normalizeWorkspaceNav(savedNavState.workspaceNav, initialMainNav);
         const [sections, setSections] = useState([]);
         const [selected, setSelected] = useState(() =>
-          normalizeSelected(savedNavState.selected),
+          urlOpenPath ? null : normalizeSelected(savedNavState.selected),
         ); // { path, sectionId, name, ext }
         const [fileData, setFileData] = useState(null);
         const [loading, setLoading] = useState(false);
@@ -6304,6 +6330,18 @@
         const allSections = gdocsSection
           ? [...sections, gdocsSection]
           : sections;
+
+        useEffect(() => {
+          if (!urlOpenPath || !allSections.length || fileData) return;
+          const section = allSections.find(
+            (sec) =>
+              sec.id !== "gdocs" && findNodeByPath(sec.tree || [], urlOpenPath),
+          );
+          if (!section) return;
+          const node = findNodeByPath(section.tree || [], urlOpenPath);
+          if (!node) return;
+          openFile(node, section.id);
+        }, [urlOpenPath, allSections, fileData]);
 
         // ── Nav items ───────────────────────────────────────────────────────────
         const NAV_ITEMS = [
