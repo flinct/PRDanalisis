@@ -1560,22 +1560,22 @@
         }
       }
 
-      async function saveRoadmapIDB(tasks) {
+      async function saveRoadmapIDB(tasks, key = "roadmap_v1") {
         try {
           const db = await openIDB();
           db.transaction("handles", "readwrite")
             .objectStore("handles")
-            .put(tasks, "roadmap_v1");
+            .put(tasks, key);
         } catch {}
       }
-      async function loadRoadmapIDB() {
+      async function loadRoadmapIDB(key = "roadmap_v1") {
         try {
           const db = await openIDB();
           return new Promise((res) => {
             const r = db
               .transaction("handles", "readonly")
               .objectStore("handles")
-              .get("roadmap_v1");
+              .get(key);
             r.onsuccess = () => res(r.result || null);
             r.onerror = () => res(null);
           });
@@ -5462,6 +5462,11 @@
    left set per-cell in JS from offsetLeft; z-index keeps them above week cells. */
 .task-table .sl{position:sticky;z-index:15;background:var(--app-bg)}
 .task-table tbody tr:nth-child(even) .sl{background:var(--elevated-2)}
+/* row hover must reach frozen cells too, overriding zebra (both parities) */
+.task-table tbody tr:hover .sl{background:var(--hover-bg)}
+/* an open combo's cell must rise above sibling sticky cells so its dropdown
+   isn't painted over by later rows' .sl (each sticky cell is its own context) */
+.task-table .sl:has(.rm-combo.open){z-index:50}
 .task-table thead .sl{z-index:35}
 .task-table tbody tr.grp td{background:var(--elevated-2)}
 .grp-label{position:sticky;left:0;display:inline-block}
@@ -5751,6 +5756,8 @@
 
       function RoadmapView({ themeId }) {
         const [tasks, setTasks] = React.useState(null);
+        const RM_DEFAULT_MONTHS = ["Sep", "Oct", "Nov", "Dec"];
+        const [months, setMonths] = React.useState(RM_DEFAULT_MONTHS);
         const [err, setErr] = React.useState("");
         const [saved, setSaved] = React.useState(false);
         const [q, setQ] = React.useState("");
@@ -5764,6 +5771,9 @@
           ensureBpTokenCss();
           (async () => {
             try {
+              const storedMonths = await loadRoadmapIDB("roadmap_months_v1");
+              if (alive && Array.isArray(storedMonths) && storedMonths.length)
+                setMonths(storedMonths);
               const stored = await loadRoadmapIDB();
               if (!alive) return;
               if (Array.isArray(stored) && stored.length) {
@@ -5803,6 +5813,17 @@
         }, []);
 
         const [focusId, setFocusId] = React.useState(null);
+        const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const addMonth = React.useCallback(() => {
+          setMonths((prev) => {
+            const last = prev[prev.length - 1];
+            const li = MONTH_NAMES.indexOf(last);
+            const nextName = MONTH_NAMES[(li + 1) % 12]; // wrap Dec→Jan
+            const next = [...prev, nextName];
+            saveRoadmapIDB(next, "roadmap_months_v1");
+            return next;
+          });
+        }, []);
         const addTask = React.useCallback((cur) => {
           const id = "t" + Date.now().toString(36);
           setTasks((prev) => {
@@ -5843,13 +5864,14 @@
            span. Backlog stays a single cell (clear schedule). Schedule stores
            {month,week} at both ends; internally we use a linear week-slot index
            0..15 (Sep w1 = 0 … Dec w4 = 15). */
-        const RM_MONTHS = ["Sep", "Oct", "Nov", "Dec"];
-        const RM_SLOTS = RM_MONTHS.length * 4; // 16
+        const RM_SLOTS = months.length * 4; // 4 weeks per month
         const slotOf = (month, week) => {
-          const mi = RM_MONTHS.indexOf(month);
+          const mi = months.indexOf(month);
           return mi < 0 ? -1 : mi * 4 + (week - 1);
         };
-        const slotMonth = (i) => RM_MONTHS[Math.floor(i / 4)];
+        const slotMonth = (i) => months[Math.floor(i / 4)];
+        // total table columns: 11 frozen + weeks + 1 backlog
+        const RM_COLSPAN = 11 + RM_SLOTS + 1;
         const slotWeek = (i) => (i % 4) + 1;
         const [drag, setDrag] = React.useState(null); // {id, a, b} week-slot indices
         React.useEffect(() => {
@@ -5914,17 +5936,43 @@
               .filter(Boolean)
               .some((s) => s.toLowerCase().includes(needle));
           const list = (tasks || []).filter(hit).sort(cmp);
+          // enforce dependency order within a section: a task appears below all
+          // its deps. Stable topo (Kahn) using cmp for the ready-set tiebreak so
+          // priority order is preserved except where a dep forces a later slot.
+          const depsOf = (t) =>
+            (Array.isArray(t.dependency)
+              ? t.dependency
+              : t.dependency
+              ? [t.dependency]
+              : []);
+          const ordered = (rows) => {
+            const byId = new Map(rows.map((t) => [t.id, t]));
+            const done = new Set();
+            const out = [];
+            let guard = rows.length + 1;
+            while (out.length < rows.length && guard-- > 0) {
+              for (const t of rows) {
+                if (done.has(t.id)) continue;
+                // ready when every in-section dep is already placed
+                const ready = depsOf(t).every(
+                  (d) => !byId.has(d) || done.has(d)
+                );
+                if (ready) {
+                  out.push(t);
+                  done.add(t.id);
+                }
+              }
+            }
+            // cycle fallback: append any leftover in cmp order
+            if (out.length < rows.length)
+              for (const t of rows) if (!done.has(t.id)) out.push(t);
+            return out;
+          };
+          const cur = ordered(list.filter((t) => t.current));
+          const rest = ordered(list.filter((t) => !t.current));
           return [
-            {
-              key: "current",
-              label: "Current tasks — start now",
-              rows: list.filter((t) => t.current),
-            },
-            {
-              key: "rest",
-              label: "Next & backlog",
-              rows: list.filter((t) => !t.current),
-            },
+            { key: "current", label: "Current tasks — start now", rows: cur },
+            { key: "rest", label: "Next & backlog", rows: rest },
           ].filter((g) => g.rows.length);
         }, [tasks, q]);
 
@@ -6040,6 +6088,9 @@
                   <button type="button" className="rm-addbtn rm-addnext" onClick={() => addTask(false)}>
                     + Next
                   </button>
+                  <button type="button" className="rm-addbtn rm-addnext" onClick={addMonth} title="Tambah bulan berikutnya ke timeline">
+                    + Month
+                  </button>
                   <span className={"rm-saved" + (saved ? " on" : "")}>Saved</span>
                 </div>
 
@@ -6116,15 +6167,15 @@
                         <th rowSpan={2} className="sl">Dependency</th>
                         <th rowSpan={2} className="sl">Priority</th>
                         <th rowSpan={2} className="sl sl-edge">Status</th>
-                        {RM_MONTHS.map((m) => (
-                          <th key={m} className="mo" colSpan={4}>{m}</th>
+                        {months.map((m, mi) => (
+                          <th key={mi} className="mo" colSpan={4}>{m}</th>
                         ))}
                         <th rowSpan={2} className="mo">Backlog</th>
                       </tr>
                       <tr>
-                        {RM_MONTHS.map((m) =>
+                        {months.map((m, mi) =>
                           [1, 2, 3, 4].map((w) => (
-                            <th key={m + w} className={"wk" + (w === 1 ? " mo-start" : "")}>W{w}</th>
+                            <th key={mi + "-" + w} className={"wk" + (w === 1 ? " mo-start" : "")}>W{w}</th>
                           ))
                         )}
                       </tr>
@@ -6133,7 +6184,7 @@
                       {groups.map((g) => (
                         <React.Fragment key={g.key}>
                           <tr className="grp">
-                            <td colSpan={28}><span className="grp-label">{g.label}</span></td>
+                            <td colSpan={RM_COLSPAN}><span className="grp-label">{g.label}</span></td>
                           </tr>
                           {g.rows.map((t) => (
                             <tr key={t.id} data-tid={t.id}>
@@ -6210,7 +6261,10 @@
                                           { v: "", label: "+ add dependency" },
                                           ...(tasks || [])
                                             .filter(
-                                              (o) => o.id !== t.id && !picked.has(o.id)
+                                              (o) =>
+                                                o.id !== t.id &&
+                                                !picked.has(o.id) &&
+                                                !!o.current === !!t.current
                                             )
                                             .map((o) => ({ v: o.id, label: o.task })),
                                         ]}
