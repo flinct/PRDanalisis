@@ -1,0 +1,442 @@
+URL: https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages
+FETCHED_AS: https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages
+
+Set up and manage object pipelines 
+
+Skip to content 
+
+English : Select a language 
+Español 
+
+Deutsch 
+
+日本語 
+
+Português 
+
+Français 
+
+Nederlands 
+
+Italiano 
+
+Polski 
+
+Svenska 
+
+Suomi 
+
+中文 - 繁體 
+
+Dansk 
+
+Norsk 
+
+한국어 
+
+ไทย 
+
+中文 - 简体 
+
+English 
+
+Go to my account 
+
+Get a demo 
+
+Get started free 
+
+Home 
+Knowledge Base Menu 
+
+Help Center 
+
+Documentation 
+
+Knowledge Base Setup, how-to, and troubleshooting guides 
+
+Developer Documentation Reference for API & CMS development 
+
+Training 
+
+Academy Content Library A complete library of Academy’s free online video lessons and certification courses. 
+
+Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy. 
+
+Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience. 
+
+Community 
+
+CRM & Sales Hub Ask and answer questions about using HubSpot’s CRM and Sales Hub. 
+
+Marketing Hub Discuss and learn HubSpot’s marketing tools and inbound strategy. 
+
+Service Hub Learn about Service Hub and share your expertise. 
+
+Meet the Experts Learn how to get the most out of HubSpot from those who know it best. 
+
+Submit Ideas Search, vote for, and submit ideas to improve the HubSpot platform. 
+
+HubSpot Developers Ask questions and connect with users building on HubSpot. 
+
+HubSpot User Groups Meet regularly with your local community of HubSpot users. 
+
+Blogs 
+
+HubSpot Blog Marketing, sales, agency, and customer success blog content. 
+
+Customer Blog Examples of how real customers use HubSpot for their business. 
+
+Product Updates Blog Updates on the latest releases from HubSpot’s Product team. 
+
+Knowledge Base 
+
+CRM 
+
+Object Settings 
+
+Set up and manage object pipelines 
+
+Set up and manage object pipelines 
+
+Last updated: September 4, 2026 
+
+Available with any of the following subscriptions , except where noted: 
+
+All products and plans 
+
+Additional subscriptions required for certain features 
+
+Pipelines help visualize your processes through stages, which are steps that signal where a record is in a process. For example, create deal pipelines to track revenue, ticket pipelines to track customer issues, or listing pipelines to track for-sale properties. 
+
+Please note: your account may use personalized names for each object (e.g., account instead of company). This article refers to objects by their HubSpot default names. 
+
+Build custom solutions 
+Learn more about building custom solutions using the Pipelines API . 
+
+Before you get started 
+
+Subscription required 
+
+A Sales Hub Professional or Enterprise subscription is required to manage lead object pipelines . 
+
+An Enterprise subscription is required to manage custom object pipelines. 
+
+Permissions required Edit property settings permissions are required to create and edit pipelines or stages. 
+
+The following objects have pipelines: 
+
+Appointments (if activated ) 
+
+Courses (if activated ) 
+
+Custom objects 
+
+Deals 
+
+Leads 
+
+Listings (if activated ) 
+
+Orders 
+
+Projects (if activated ) 
+
+Services (if activated ) 
+
+Tasks 
+
+Tickets 
+
+Users 
+
+Tasks only have the one default pipeline without conditional stage logic. Once you've set up pipelines, learn how to manage your records in board view . 
+
+Manage pipelines (BETA) 
+
+Permissions required Super Admin permissions are required to enroll your account in a public beta. 
+
+If you're a user in an account enrolled in the Simplified Pipeline Limits public beta, you have updated pipeline limits and access to create custom deal and ticket pipelines without a Service Hub or Sales Hub subscription. The number of available custom pipelines is a shared pool across all objects and excludes the HubSpot default pipeline for each object. The pipeline limits are: 
+
+Free tools : 0 custom pipelines. 
+
+Starter : 15 custom pipelines. 
+
+Professional : 100 custom pipelines. 
+
+Enterprise : 350 custom pipelines. 
+
+To review your custom pipeline breakdown: 
+
+In your HubSpot account, click More , then navigate to Data Management > Data Model . If More doesn't appear in your account, navigate to Data Management > Data Model directly. 
+
+Click the Limits tab. 
+
+In the Definition Limits section, click Pipelines . 
+
+In the table, review the number of custom pipelines per object. 
+
+Hover over an object and click View pipeline settings to edit or delete pipelines . 
+
+Create a new pipeline 
+
+Subscription required 
+
+A Starter , Professional or Enterprise subscription is required to create a custom pipeline. 
+
+A Professional or Enterprise subscription is required to restrict a pipeline by team. 
+
+If your account has more than one unique process, you can create additional pipelines. Separate pipelines are only recommended if your processes have unique stages that require different pipelines. Otherwise, you can use the same pipeline across multiple users and teams and manage access via user permissions. For example: 
+
+Your business has an online direct to consumer sales process with a few stages, such as In cart , Closed Won , and Closed Lost . You also have a wholesale sales process that requires more stages, such as appointment scheduling and contract negotiation. In this scenario, you should create separate pipelines. 
+
+Your business sells multiple brands and your HubSpot account has teams for each brand. The process to sell products for each brand is the same and you can use the same stages for all sales. In this scenario, it's not recommended to create separate pipelines. Instead, you can use the same pipeline and set Team only user permissions so each team can only access their brand's deals. 
+
+Please note: 
+
+Leads in a custom pipeline aren't eligible for default lead stage automation. 
+
+Learn more about the maximum number of pipelines you can create depending on your subscription. 
+
+To create a new pipeline: 
+
+In your HubSpot account, click the settings icon in the top navigation bar. 
+
+In the left sidebar menu, in the Data Management section, click Objects . 
+
+On the Objects page, click the Select an object dropdown menu and select the object for which you want to create a pipeline. 
+
+Click the Pipelines tab. 
+
+Click the Create pipeline dropdown menu and select Create from scratch . 
+
+In the dialog box, enter a Pipeline name and click Create . 
+
+Once you've added records to your pipeline, learn how to edit the records in a pipeline . 
+
+You can also use Breeze Assistant to create an object pipeline. 
+
+Clone a pipeline 
+
+Subscription required A Professional or Enterprise subscription is required to clone a pipeline. 
+
+You can clone an existing pipeline to copy over information such as pipeline rules, automations, and conditional stage properties. 
+
+In your HubSpot account, click the settings icon in the top navigation bar. 
+
+In the left sidebar menu, in the Data Management section, click Objects . 
+
+On the Objects page, click the Select an object dropdown menu and select the object for which you want to clone a pipeline. 
+
+Click the Pipelines tab. 
+
+Click the Create pipeline dropdown menu and select Clone from existing . 
+
+In the dialog box, configure the following: 
+Pipeline name : in the Pipeline name text field, enter a name for the cloned pipeline. 
+
+Pipeline to clone : click the Select pipeline to clone dropdown menu and select a pipeline . 
+
+Features to clone : in the Choose features to clone section, select the checkboxes next to the features you want to clone. 
+Conditional stage properties 
+
+Pipeline rules (control editing access, require approval) 
+
+Pipeline automations (templated and custom) 
+
+Deal tags 
+
+Pipeline access 
+
+When you're finished, click Clone pipeline . 
+
+Edit or delete pipelines 
+
+Subscription required A Starter , Professional or Enterprise subscription is required to use object tags. 
+
+Please note: if you connect an e-commerce integration to HubSpot, a deal pipeline will be automatically added to your account that you cannot modify. 
+
+You can also rename, reorder, manage access to, or delete pipelines. 
+
+In your HubSpot account, click the settings icon in the top navigation bar. 
+
+In the left sidebar menu, in the Data Management section, click Objects . 
+
+On the Objects page, click the Select an object dropdown menu and select the object for which you want to edit a pipeline. 
+
+Click the Pipelines tab. 
+
+In the Set pipeline display colors section, select a color option for the Pipeline property. The selected option applies to all pipelines of the object. 
+
+Hover on a pipeline in the table and click the color selector button , then select a color for the pipeline. 
+
+Click the name of a pipeline you want to edit. 
+
+Click the code code icon to view the pipeline's internal name. The internal name is used by integrations and APIs . 
+
+On the right, click Actions , then select one of the following: 
+
+Rename this pipeline : change the pipeline’s name. In the dialog box, enter the new name , then click Rename . 
+
+Reorder pipelines : change the order of your pipelines. In the pop-up box, drag the pipelines to move them to a new position, then click Save . 
+
+Manage access : manage which users can view and edit the pipeline. 
+
+Clone this pipeline : create a new pipeline using the selected pipeline as a template. 
+
+Delete this pipeline : delete the pipeline. In the dialog box, click Delete pipeline to confirm. You can't delete a pipeline if it contains records or is used in other HubSpot tools or integrations. Before deleting, you'll need to delete or move records to another pipeline and remove references to the pipeline from other tools. 
+
+Click Customize board and card view to select the properties that are displayed on the board and board cards for the pipeline. 
+
+Click the Automate tab to customize automation settings for a pipeline. 
+
+Click Customize [object] tags to create and manage color-coded labels that categorize records. 
+
+Click the Pipeline Rules tab to set up rules for a pipeline. 
+
+Manage stages in a pipeline 
+
+Use stages to categorize and track the progress of your records through pipelines. 
+
+Default pipeline stages 
+
+Depending on the object, there is a default pipeline with default stages: 
+
+Appointments : a default appointment pipeline with five stages: Scheduled , In Progress , Completed , Canceled , Rescheduled . 
+
+Courses : a default course pipeline with an Open Stage and a Closed Stage . 
+
+Deals : a default Sales Pipeline for which each stage has an associated probability that indicates the likelihood of closing deals in that stage. Stage probability is used to determine the weighted amount shown in board view, which is calculated by multiplying the total amount in each stage by the stage probability. The default pipeline has seven deal stages: Appointment scheduled (20%), Qualified to buy (40%), Presentation scheduled (60%), Decision maker bought-in (80%), Contract sent (90%), Closed won (100%, Won), Closed lost (0%, Lost). 
+
+Leads : a default Lead pipeline with five lead stages: New , Attempting , Connected , Qualified , Disqualified . 
+
+Listings : a default listing pipeline with an Open Stage and a Closed Stage . 
+
+Orders : a default new order pipeline with two stages: In Progress , Contract Signed . 
+
+Projects : a default project pipeline with six stages: Planning , Execution , Review , Completed , On Hold , Cancelled . 
+
+Services : a default service pipeline with three stages: New , In Progress , Closed . 
+
+Tasks : a default task pipeline with five stages: Not Started , In Progress , Waiting , Completed , Deferred . 
+
+Tickets : a default Support Pipeline with four ticket statuses: New , Waiting on contact , Waiting on us , Closed . 
+
+Please note: for tickets, pipeline stages are called statuses by default, but they are the same as other object stages. 
+
+Add, edit, or delete pipeline stages 
+
+You can also add your own stages or edit and delete existing stages. To customize the stages in a pipeline: 
+
+In your HubSpot account, click the settings icon in the top navigation bar. 
+
+In the left sidebar menu, in the Data Management section, click Objects . 
+
+On the Objects page, click the Select an object dropdown menu and select the object for which you want to edit pipeline stages. 
+
+Click the Pipelines tab. 
+
+Click the name of the pipeline you want to edit. 
+
+To add a new stage: 
+
+Under the existing stages, click + Add stage . 
+
+Enter a stage name . 
+
+For all objects except deals, select whether the stage will be Open or Closed . 
+
+For deals, click the Deal probability dropdown menu and select a probability . To use a custom probability, enter a custom value , then click Add option and select the new probability . Won and Lost are closed stages. 
+
+Please note: for deals, to ensure all sales reports, custom deal or revenue reports, and sales analytics tools process your deals correctly, you must include stages for both Won and Lost under Deal probability. 
+
+To add color indicators per pipeline stage: 
+In the Color column, click the color button and select a color . 
+
+If desired, set a color for each stage in the pipeline. 
+
+Click the stage's name , then enter a new name in the text box to change the name of an existing stage. 
+
+Click the stage and drag it to a new position to reorder it in the pipeline. 
+
+Hover over the stage and click the code internal name icon . The internal name is used by integrations and APIs . 
+
+To delete a stage: 
+Navigate to the Used in column in the table, then click the number to review and remove delete blocking references (e.g., records in the stage, conditional properties in use). 
+
+Navigate to the Delete column in the table, then click the delete delete stage icon . 
+
+Hover over the Conditional stage properties column and click Edit properties t o edit the properties shown when a record moves to a certain stage . 
+
+Once you're done editing, click Save in the bottom left. 
+
+Set up conditional stage properties 
+
+Permissions required Edit property settings permissions are required to set up conditional stage properties. 
+
+Set up conditional stage logic to show certain properties when users manually create a record in or move a record to a specific stage. This can help you organize and maintain data in your pipelines. Ensure the dependent property exists prior to configuring conditional stage logic. 
+
+In your HubSpot account, click the settings icon in the top navigation bar. 
+
+In the left sidebar menu, in the Data Management section, click Objects . 
+
+On the Objects page, click the Select an object dropdown menu and select the object for which you want to edit conditional stage properties. 
+
+Click the Pipelines tab. 
+
+Click the name of the pipeline you want to edit. 
+
+In the row of a stage, hover over the Conditional logic rules column and click Add rule . 
+
+In the pipeline property logic editor, configure the following: 
+Click the operator dropdown menu, then select an operator (e.g., is equal to, is none of, is known). 
+
+Click the [object] stage dropdown menu, then select additional stages if you selected is any of or is none of operators. 
+
+In the Dependent properties section, click Add property , then select the property . 
+
+Please note: properties with read-only values (i.e. that aren't set by users, such as score or calculation properties) cannot be used as stage properties, and will not appear as options to select. Learn how to include these properties in a properties section on a record instead . 
+
+Select the Required checkbox to require a property. If a property is required, users cannot create or update the record until they set a value for it. 
+
+Click and drag a property to reorder it, if you added multiple dependent properties. The properties will be displayed in this order when they appear in the create record form or when editing a record. 
+
+In the upper right, click Save logic . The properties you've selected will automatically appear when manually creating a new record in that stage or when moving an existing record to that stage. 
+
+Learn more about editing existing conditional logic or adding secondary logic for a pipeline stage. 
+
+CRM Object Settings 
+
+Was this article helpful? Yes No 
+Thanks for letting us know. How would you describe this article? 
+Inaccurate: it doesn’t reflect what I see in the product 
+Unclear: it’s difficult to understand 
+Missing information: it’s not comprehensive enough 
+Irrelevant: it doesn’t match what I searched for 
+Great! Is there anything we could change to make it even more helpful? Is there anything we could change to make this article helpful? 
+Allow HubSpot to contact me about my documentation feedback. 
+Email address 
+Only used if we need clarification on your feedback. 
+
+Thank you for your feedback, it means a lot to us. 
+This form is used for documentation feedback only. Learn how to get help with HubSpot . 
+
+0 / 0 
+
+Table of contents Menu 
+
+Related content 
+
+Manage deals in the sales workspace 
+
+Manage companies in the sales workspace 
+
+Use line items with deals 
+
+Copyright © 2026 HubSpot, Inc. 
+
+Legal Stuff 
+
+Privacy Policy 
+
+Cookie Settings

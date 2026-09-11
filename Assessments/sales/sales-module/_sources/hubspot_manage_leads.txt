@@ -1,0 +1,331 @@
+URL: https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace
+FETCHED_AS: https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace
+
+Manage leads 
+
+Skip to content 
+
+English : Select a language 
+Español 
+
+Deutsch 
+
+日本語 
+
+Português 
+
+Français 
+
+Nederlands 
+
+Italiano 
+
+Polski 
+
+Svenska 
+
+Suomi 
+
+中文 - 繁體 
+
+Dansk 
+
+Norsk 
+
+한국어 
+
+ไทย 
+
+中文 - 简体 
+
+English 
+
+Go to my account 
+
+Get a demo 
+
+Get started free 
+
+Home 
+Knowledge Base Menu 
+
+Help Center 
+
+Documentation 
+
+Knowledge Base Setup, how-to, and troubleshooting guides 
+
+Developer Documentation Reference for API & CMS development 
+
+Training 
+
+Academy Content Library A complete library of Academy’s free online video lessons and certification courses. 
+
+Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy. 
+
+Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience. 
+
+Community 
+
+CRM & Sales Hub Ask and answer questions about using HubSpot’s CRM and Sales Hub. 
+
+Marketing Hub Discuss and learn HubSpot’s marketing tools and inbound strategy. 
+
+Service Hub Learn about Service Hub and share your expertise. 
+
+Meet the Experts Learn how to get the most out of HubSpot from those who know it best. 
+
+Submit Ideas Search, vote for, and submit ideas to improve the HubSpot platform. 
+
+HubSpot Developers Ask questions and connect with users building on HubSpot. 
+
+HubSpot User Groups Meet regularly with your local community of HubSpot users. 
+
+Blogs 
+
+HubSpot Blog Marketing, sales, agency, and customer success blog content. 
+
+Customer Blog Examples of how real customers use HubSpot for their business. 
+
+Product Updates Blog Updates on the latest releases from HubSpot’s Product team. 
+
+Knowledge Base 
+
+Sales 
+
+Sales Workspace 
+
+Manage leads 
+
+Manage leads 
+
+Last updated: July 24, 2026 
+
+Available with any of the following subscriptions , except where noted: 
+
+Sales Hub Professional, Enterprise 
+
+Seats required for certain features 
+
+After you have created leads , you can manage them from the leads index page or the sales workspace . Create custom filtered views of leads to organize your prospecting efforts. You can create new leads, edit existing leads, or delete leads as you work through your sales prospects. To deactivate or rename the leads object, learn how to manage your CRM object data model . 
+
+Before you get started 
+
+Users with Super Admin permissions or View sales workspace as another user permissions can view all leads in the sales workspace. 
+
+For a lead to appear in the sales workspace, it must have an assigned owner. Unassigned leads will still appear on the leads index page and on the associated contact or company record. 
+
+Manage leads on the leads index page 
+
+Permissions required 
+
+Super Admin permissions or Edit permissions for leads are required to manage leads on the leads index page. 
+
+Super Admin permissions are required to edit a lead's stage after it has moved to a Qualified or Disqualified stage. 
+
+Bulk delete permissions are required to delete leads directly from the leads index page. 
+
+View leads on the leads index page 
+
+In your HubSpot account, click More , then navigate to CRM > Leads . If More doesn't appear in your account, navigate to CRM > Leads directly. 
+
+To filter your leads , click the filters at the top of the table or click Advanced filters to further customize your filters . 
+
+To edit the information that's displayed in the table , click Edit columns . 
+
+To view the lead's individual record , click the lead name . 
+
+Edit and delete leads from the leads index page 
+
+To edit leads on the leads index page: 
+
+In your HubSpot account, click More , then navigate to CRM > Leads . If More doesn't appear in your account, navigate to CRM > Leads directly. 
+
+Select the checkboxes next to the leads you want to edit, and click Edit at the top of the table. 
+
+In the pop-up box, click the Property to update dropdown menu and select the property you want to edit. Choose the desired values and click Update . 
+
+You can also edit lead properties from the right panel. Learn more about viewing and editing individual lead record properties. 
+
+To reassign leads: 
+
+In your HubSpot account, click More , then navigate to CRM > Leads . If More doesn't appear in your account, navigate to CRM > Leads directly. 
+
+Select the checkboxes next to the leads you want to reassign, and click Assign at the top of the table. 
+
+In the pop-up box, click the Lead owner dropdown menu and select a lead owner . Then, click Update . 
+
+To delete leads: 
+
+In your HubSpot account, click More , then navigate to CRM > Leads . If More doesn't appear in your account, navigate to CRM > Leads directly. 
+
+Select the checkboxes next to the leads you want to delete, and click Delete at the top of the table. 
+
+In the pop-up box, confirm how many leads you want to delete, and click Delete . 
+
+Manage leads in the sales workspace 
+
+Please note: the following content applies to accounts created before Aug. 27, 2025, whose users had previously been active in the sales workspace. For accounts created after Aug. 27, 2025, (or for accounts who are newly using the sales workspace), learn how to manage sales activities in the updated sales workspace . 
+
+Seats required for certain features An assigned Sales seat is required to access the sales workspace. 
+
+Permissions required Access to the Leads tab is required to view leads in the sales workspace. 
+
+View leads in the sales workspace 
+
+View leads that are associated to a contact or company in the sales workspace using preset views or saved views. You can also view and manage leads using the Manage leads in a board view (BETA) . 
+
+To view leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+On the left sidebar, click Leads . 
+
+To change the view, click the Preset view or Saved view . Learn more about custom saved views . 
+Open leads: leads that are not in a qualified or disqualified stage. 
+
+Target Accounts: leads that are associated to Target accounts . 
+
+Recent Activity: leads that have had recent activity. 
+
+Not in Sequence: leads that are not currently enrolled in a sequence. 
+
+All: all leads assigned to the user in any lead stage. 
+
+To filter your leads , click the filters at the top of the table or click Advanced filters to further customize your filters . 
+
+To change the lead pipeline, click the pipelines dropdown menu and select the pipeline you want to view, or select All pipelines. 
+
+To edit the information that's displayed in the table , click Edit columns . 
+
+To view the lead's individual record , click the lead name . 
+
+To view and manage leads in a board view: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+On the left sidebar, click Leads . 
+
+Click the gridIcon board icon. 
+
+If you have Super Admin permissions or View sales workspace as another user permissions , you can view all leads. To view all leads, click the Actions dropdown menu on the top right and select View all leads . 
+
+Create and edit a saved view 
+
+You can create or edit custom views for your leads. This means you can create views tailored to your specific needs . 
+
+To create a saved view for your leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+On the left sidebar, click + Create view . 
+
+In the dialog box, enter a name for your view, then click Create view . 
+
+To filter your leads , click the filters at the top of the table or click Advanced filters to further customize your filters . 
+
+Click Save view in the upper right. 
+
+To edit a saved view for your leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+On the left sidebar, under Saved views , click your saved view . 
+
+Click the filters at the top of the table or click Advanced filters to further customize your filters . 
+
+Click Save view in the upper right. 
+
+Edit and delete leads in the sales workspace 
+
+Permissions required 
+
+Super Admin permissions are required to edit a lead's stage after it has moved to a Qualified or Disqualified stage. 
+
+View Sales Workspace as another user permissions are required to bulk-reassign leads in the sales workspace. 
+
+Bulk delete permissions are required to delete leads directly from the sales workspace. 
+
+To edit your leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+Click the name of the lead you want to edit. 
+
+In the right panel, click the edit pencil icon or value to edit properties. 
+
+Click Save . Learn more about viewing and editing individual records . 
+
+To bulk-reassign leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+Select the checkboxes next to the leads you want to reassign, and click Assign at the top of the table. 
+
+In the pop-up box, click the Lead owner dropdown menu and select a lead owner . Then, click Update . 
+
+To delete your leads in the sales workspace: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospects tab. 
+
+Select the checkboxes next to the leads you want to delete, and click delete Delete at the top of the table. 
+
+In the pop-up box, confirm how many leads you want to delete. Then, click Delete . 
+
+To enroll the contacts associated with your leads into a sequence: 
+
+In your HubSpot account, click More , then navigate to Sales > Sales Workspace . If More doesn't appear in your account, navigate to Sales > Sales Workspace directly. 
+
+Click the Prospecting tab. 
+
+Select the checkboxes next to the leads you want to enroll, and click sequences Enroll in a sequence at the top of the table. 
+
+In the pop-up box, select the sequence . 
+
+Continue enrolling contacts in the sequence . 
+
+Prospecting leads records 
+
+Was this article helpful? Yes No 
+Thanks for letting us know. How would you describe this article? 
+Inaccurate: it doesn’t reflect what I see in the product 
+Unclear: it’s difficult to understand 
+Missing information: it’s not comprehensive enough 
+Irrelevant: it doesn’t match what I searched for 
+Great! Is there anything we could change to make it even more helpful? Is there anything we could change to make this article helpful? 
+Allow HubSpot to contact me about my documentation feedback. 
+Email address 
+Only used if we need clarification on your feedback. 
+
+Thank you for your feedback, it means a lot to us. 
+This form is used for documentation feedback only. Learn how to get help with HubSpot . 
+
+0 / 0 
+
+Table of contents Menu 
+
+Related content 
+
+Create and manage leads using the HubSpot mobile app 
+
+Copyright © 2026 HubSpot, Inc. 
+
+Legal Stuff 
+
+Privacy Policy 
+
+Cookie Settings

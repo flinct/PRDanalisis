@@ -1,0 +1,58 @@
+URL: https://www.zoho.com/crm/help/leads/create-leads.html
+FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://www.zoho.com/crm/help/leads/create-leads.html
+
+Title: Zoho Corporation
+
+URL Source: https://www.zoho.com/crm/help/leads/create-leads.html
+
+Markdown Content:
+###### Welcome to Portal
+
+[Skip to Content](https://www.zoho.com/crm/help/leads/create-leads.html#layoutContainer)[Skip to Menu](https://www.zoho.com/crm/help/leads/create-leads.html#headerContainer)[Skip to Footer](https://www.zoho.com/crm/help/leads/create-leads.html#footer)
+
+[![Image 1: Zoho Corporation](https://help.zoho.com/portal/api/publicImages/205219028040263104?portalId=edbsn3857479fd7bb83e29368ff05a1860319f4481b7f04184d0e9b6e93712995a590)](https://www.zoho.com/) Zoho Corporation 
+
+* [Home](https://www.zoho.com/portal/en/home)
+* [My Area](https://www.zoho.com/portal/en/myarea)
+* [Knowledge Base](https://www.zoho.com/portal/en/kb)
+* [Community](https://www.zoho.com/portal/en/community)
+* * Sign In [As a customer To submit requests, browse through articles and participate in the community.](https://help.zoho.com/accounts/p/50026469102/clientidprequest?servicename=ZohoSupport&service_language=en&provider=ZOHO&serviceurl=https%3A%2F%2Fwww.zoho.com%2Fportal%2Fen%2Fhome)[As an agent To access the agent interface where you can handle your tickets.](https://accounts.zoho.in/login?servicename=ZohoSupport&serviceurl=%2Fsupport%2Fzohocorp) 
+
+* 
+* 
+ English 
+
+**Languages** 
+ * العربية
+ * 中文(简体)
+ * 中文(台灣)
+ * Nederlands
+ * English
+ * English (United Kingdom)
+ * Français (France)
+ * Deutsch
+ * हिन्दी
+ * Bahasa Indonesia
+ * 日本語
+ * Português
+ * Español (España)
+ * Tiếng Việt
+
+Default : **English**
+
+## Welcome to Zoho Corporation
+
+Search our knowledge base, ask the community or submit a request.
+
+Knowledge Base
+
+Community
+
+* [Add Request](https://www.zoho.com/portal/en/newticket)
+* [Add Topic](https://www.zoho.com/portal/en/community/topics/new)
+
+Powered by [Zoho Desk](https://zoho.com/desk)
+
+We're Online!
+
+How may I help you today?

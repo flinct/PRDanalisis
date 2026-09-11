@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatuInbox – Task Prioritization & Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ─── RESET & BASE ───────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 13px; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f0f4fa;
+    color: #1a2540;
+    min-width: 1300px;
+  }
+
+  /* ─── TOKENS ─────────────────────────────────────── */
+  :root {
+    --blue-primary: #1e4fdb;
+    --blue-pale:    #e8f0fe;
+    --green:        #16a34a;
+    --green-bright: #22c55e;
+    --green-pale:   #dcfce7;
+    --blue-med:     #3b82f6;
+    --blue-med-pale:#dbeafe;
+    --purple:       #7c3aed;
+    --purple-pale:  #ede9fe;
+    --orange:       #ea580c;
+    --orange-pale:  #fff7ed;
+    --red-pale:     #fef2f2;
+    --gray-border:  #dde3ef;
+    --gray-bg:      #f7f9fc;
+    --text-dark:    #0f1e40;
+    --text-mid:     #374151;
+    --text-light:   #6b7280;
+    --white:        #ffffff;
+
+    /* effort/impact tags */
+    --tag-h-bg:  #fee2e2; --tag-h-tx: #b91c1c;
+    --tag-m-bg:  #fef9c3; --tag-m-tx: #854d0e;
+    --tag-l-bg:  #dcfce7; --tag-l-tx: #166534;
+
+    /* priority badge */
+    --p1-bg: #16a34a;
+    --p2-bg: #3b82f6;
+    --p3-bg: #8b5cf6;
+    --p4-bg: #f97316;
+
+    /* gantt bar colors */
+    --bar-p1: #16a34a;
+    --bar-p2: #3b82f6;
+    --bar-p3: #8b5cf6;
+    --bar-p4: #f97316;
+  }
+
+  /* ─── PAGE ───────────────────────────────────────── */
+  .page {
+    width: 1340px;
+    margin: 0 auto;
+    background: #f0f4fa;
+    padding: 0 0 24px;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .logo-block { display: flex; flex-direction: column; min-width: 200px; }
+  .logo { font-size: 26px; font-weight: 800; color: var(--blue-primary); letter-spacing: -0.5px; line-height: 1; }
+  .logo span { font-weight: 400; color: var(--text-dark); }
+  .logo-sub { font-size: 11px; color: var(--text-light); margin-top: 3px; font-weight: 500; }
+  .header-divider { width: 1px; height: 50px; background: var(--gray-border); flex-shrink: 0; }
+  .header-center { flex: 1; }
+  .header-center h1 { font-size: 22px; font-weight: 800; color: var(--text-dark); line-height: 1.1; }
+  .header-center .subtitle { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .header-right { text-align: right; min-width: 200px; }
+  .header-quote {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--blue-primary);
+    line-height: 1.7;
+    font-weight: 600;
+  }
+  .roadmap-label {
+    font-size: 10px;
+    color: var(--text-light);
+    font-weight: 500;
+    margin-top: 6px;
+  }
+
+  /* ─── BODY LAYOUT ────────────────────────────────── */
+  .body-wrap {
+    display: flex;
+    gap: 0;
+    padding: 16px 20px 0;
+  }
+
+  /* ─── LEFT SIDEBAR ───────────────────────────────── */
+  .sidebar {
+    width: 170px;
+    flex-shrink: 0;
+    padding-right: 14px;
+  }
+  .sidebar-title { font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-mid);
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+  }
+  .sidebar-item:hover { background: var(--blue-pale); }
+  .sidebar-item.active {
+    background: var(--blue-pale);
+    color: var(--blue-primary);
+    font-weight: 700;
+  }
+  .sidebar-dot {
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  /* ─── RIGHT CONTENT ──────────────────────────────── */
+  .content { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+  /* ─── SUMMARY STATS ROW ──────────────────────────── */
+  .stats-row {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .stat-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 20px;
+    margin-right: 20px;
+    border-right: 1px solid var(--gray-border);
+  }
+  .stat-block:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+  .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .si-total  { background: #f3f4f6; }
+  .si-high   { background: var(--green-pale); }
+  .si-medium { background: var(--blue-med-pale); }
+  .si-low    { background: var(--purple-pale); }
+  .stat-num  { font-size: 22px; font-weight: 800; color: var(--text-dark); line-height: 1; }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-light);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .stat-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-bottom: 2px;
+  }
+  .sb-green  { background: var(--green-pale); color: var(--green); }
+  .sb-blue   { background: var(--blue-med-pale); color: var(--blue-med); }
+  .sb-purple { background: var(--purple-pale); color: var(--purple); }
+
+  /* priority rule + timeline codes */
+  .rules-area {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+  }
+  .rule-box {
+    background: var(--gray-bg);
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    min-width: 160px;
+  }
+  .rule-title { font-size: 10.5px; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+  .rule-item  { font-size: 10px; color: var(--text-mid); line-height: 1.8; }
+
+  /* ─── TABLE PANEL ────────────────────────────────── */
+  .table-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+  }
+  thead tr {
+    background: var(--gray-bg);
+    border-bottom: 2px solid var(--gray-border);
+  }
+  th {
+    padding: 9px 8px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-mid);
+    white-space: nowrap;
+  }
+  th.center { text-align: center; }
+  td {
+    padding: 7px 8px;
+    color: var(--text-mid);
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f2f7;
+  }
+  td.center { text-align: center; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #fafbfd; }
+  tr:hover td { background: var(--blue-pale); }
+
+  .task-name { font-weight: 600; color: var(--text-dark); font-size: 11.5px; }
+  .task-desc { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+  .area-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px 2px 4px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .area-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .effort-tag, .impact-tag, .test-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+  }
+  .tag-h { background: var(--tag-h-bg); color: var(--tag-h-tx); }
+  .tag-m { background: var(--tag-m-bg); color: var(--tag-m-tx); }
+  .tag-l { background: var(--tag-l-bg); color: var(--tag-l-tx); }
+
+  .priority-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    color: white;
+    white-space: nowrap;
+  }
+  .pb-p1 { background: var(--p1-bg); }
+  .pb-p2 { background: var(--p2-bg); }
+  .pb-p3 { background: var(--p3-bg); }
+  .pb-p4 { background: var(--p4-bg); }
+
+  /* ─── GANTT BARS ─────────────────────────────────── */
+  .gantt-col { width: 60px; text-align: center; }
+  .gantt-bar {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    margin: 0 auto;
+    min-width: 8px;
+  }
+  .bar-p1 { background: var(--bar-p1); }
+  .bar-p2 { background: var(--bar-p2); }
+  .bar-p3 { background: var(--bar-p3); }
+  .bar-p4 { background: var(--bar-p4); }
+
+  /* ─── KEY TAKEAWAYS ──────────────────────────────── */
+  .takeaways {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .takeaway-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dark);
+    white-space: nowrap;
+    min-width: 140px;
+  }
+  .tk-icon {
+    width: 28px; height: 28px;
+    background: var(--blue-pale);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .takeaway-items { display: flex; gap: 14px; flex: 1; }
+  .tk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+  }
+  .tk-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .tn-1 { background: #dbeafe; color: var(--blue-primary); }
+  .tn-2 { background: #dcfce7; color: var(--green); }
+  .tn-3 { background: #fef9c3; color: #92400e; }
+  .tn-4 { background: #ede9fe; color: var(--purple); }
+  .tk-text .tk-title { font-size: 11px; font-weight: 700; color: var(--text-dark); }
+  .tk-text .tk-desc  { font-size: 10px; color: var(--text-light); margin-top: 2px; line-height: 1.4; }
+  .exec-clarity {
+    background: var(--blue-primary);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+  .ec-icon { font-size: 22px; }
+  .ec-title { font-size: 12px; font-weight: 800; }
+  .ec-desc  { font-size: 9.5px; opacity: 0.85; margin-top: 2px; }
+
+  /* number col */
+  .num-col { color: var(--text-light); font-weight: 600; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HEADER ──────────────────────────────── -->
+  <div class="header">
+    <div class="logo-block">
+      <div class="logo">Satu<span>Inbox</span></div>
+      <div class="logo-sub">One Conversation. More Possibilities.</div>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-center">
+      <h1>Task Prioritization &amp; Timeline</h1>
+      <div class="subtitle">Focused execution to deliver the biggest impact for SatuInbox.</div>
+    </div>
+    <div class="header-right">
+      <div class="header-quote">"Build today<br>for a bigger tomorrow."</div>
+      <div class="roadmap-label">Roadmap Sep – Dec 2026</div>
+    </div>
+  </div>
+
+  <!-- ── BODY ────────────────────────────────── -->
+  <div class="body-wrap">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-title">Strategic Areas</div>
+      <div class="sidebar-item active">
+        <div class="sidebar-dot" style="background:#dbeafe;">⊞</div>
+        All Areas
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fee2e2;">💬</div>
+        Omnichannel Chat
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fff7ed;">🎫</div>
+        Ticket
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#dcfce7;">📈</div>
+        Sales
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fef9c3;">📢</div>
+        Broadcast
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#dbeafe;">📊</div>
+        Analytics
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#f0fdf4;">✨</div>
+        AI
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fef3c7;">🧩</div>
+        Tools / Add-ons
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#e0f2fe;">🎨</div>
+        Theme
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fce7f3;">🤝</div>
+        Affiliate
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#ede9fe;">💳</div>
+        Payment
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#fef2f2;">🔔</div>
+        Notification
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#f0f9ff;">📱</div>
+        Mobile App
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#f0fdf4;">🔌</div>
+        Open API
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#f3f4f6;">🏗️</div>
+        Infrastructure
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-dot" style="background:#f3f4f6;">🛡️</div>
+        Internal / Superadmin
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-block">
+          <div class="stat-icon si-total">📋</div>
+          <div>
+            <div class="stat-num">23</div>
+            <div class="stat-label">Total Tasks</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon si-high">🟢</div>
+          <div>
+            <div><span class="stat-badge sb-green">● High Priority</span></div>
+            <div class="stat-num">9</div>
+            <div class="stat-label">(Schedule first)</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon si-medium">🔵</div>
+          <div>
+            <div><span class="stat-badge sb-blue">● Medium Priority</span></div>
+            <div class="stat-num">8</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon si-low">⭐</div>
+          <div>
+            <div><span class="stat-badge sb-purple">● Low Priority</span></div>
+            <div class="stat-num">6</div>
+            <div class="stat-label">(Later / Backlog)</div>
+          </div>
+        </div>
+
+        <div class="rules-area">
+          <div class="rule-box">
+            <div class="rule-title">🎯 Priority Rule (LHL)</div>
+            <div class="rule-item">1. Impact (H &gt; M &gt; L)</div>
+            <div class="rule-item">2. Effort (L &gt; M &gt; H)</div>
+            <div class="rule-item">3. Testing (L &gt; M &gt; H)</div>
+            <div class="rule-item">4. Dependency (if any)</div>
+          </div>
+          <div class="rule-box">
+            <div class="rule-title">📅 Timeline Codes</div>
+            <div class="rule-item">S = September &nbsp;&nbsp; D = December</div>
+            <div class="rule-item">O = October &nbsp;&nbsp;&nbsp;&nbsp; B = Backlog</div>
+            <div class="rule-item">N = November</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Table -->
+      <div class="table-panel">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:28px;">#</th>
+              <th style="width:180px;">Task</th>
+              <th style="width:130px;">Strategic Area</th>
+              <th>Description</th>
+              <th class="center" style="width:50px;">Effort</th>
+              <th class="center" style="width:50px;">Impact</th>
+              <th class="center" style="width:52px;">Testing</th>
+              <th class="center" style="width:52px;">Priority</th>
+              <th class="center gantt-col">Sep (S)</th>
+              <th class="center gantt-col">Oct (O)</th>
+              <th class="center gantt-col">Nov (N)</th>
+              <th class="center gantt-col">Dec (D)</th>
+              <th class="center gantt-col">Backlog (B)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- P1 tasks -->
+            <tr>
+              <td class="num-col">1</td>
+              <td><div class="task-name">UI conversation redesign</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Audit &amp; redesign UI/UX conversation halaman (desktop &amp; mobile).</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">2</td>
+              <td><div class="task-name">Notification service improvement</div></td>
+              <td><span class="area-chip" style="background:#fef2f2;color:#ef4444;"><span class="area-dot" style="background:#ef4444;"></span>Notification</span></td>
+              <td><div class="task-desc">Improved notification targeting &amp; delivery.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">3</td>
+              <td><div class="task-name">Ticketing KPI card and dynamic status</div></td>
+              <td><span class="area-chip" style="background:#fff7ed;color:#ea580c;"><span class="area-dot" style="background:#f97316;"></span>Ticket</span></td>
+              <td><div class="task-desc">KPI card &amp; dynamic status di halaman utama ticket.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">4</td>
+              <td><div class="task-name">Simplicity settings</div></td>
+              <td><span class="area-chip" style="background:#fef3c7;color:#b45309;"><span class="area-dot" style="background:#f59e0b;"></span>Tools / Add-ons</span></td>
+              <td><div class="task-desc">Redesign halaman setting, lebih simple &amp; user friendly.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">5</td>
+              <td><div class="task-name">Wizard setting onboarding</div></td>
+              <td><span class="area-chip" style="background:#fef3c7;color:#b45309;"><span class="area-dot" style="background:#f59e0b;"></span>Tools / Add-ons</span></td>
+              <td><div class="task-desc">Quick guide / onboarding (muncul sekali, bisa diulang).</div></td>
+              <td class="center"><span class="effort-tag tag-l">L</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-l">L</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:28px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">6</td>
+              <td><div class="task-name">Informative utilities</div></td>
+              <td><span class="area-chip" style="background:#fef3c7;color:#b45309;"><span class="area-dot" style="background:#f59e0b;"></span>Tools / Add-ons</span></td>
+              <td><div class="task-desc">Deskripsi/penjelasan fitur penting &amp; message utility.</div></td>
+              <td class="center"><span class="effort-tag tag-l">L</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-l">L</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:28px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">7</td>
+              <td><div class="task-name">Create prospect from conversation</div></td>
+              <td><span class="area-chip" style="background:#dcfce7;color:#166534;"><span class="area-dot" style="background:#22c55e;"></span>Sales</span></td>
+              <td><div class="task-desc">Buat data prospect langsung dari conversation.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">8</td>
+              <td><div class="task-name">DB topology (HOT/WARM/COLD)</div></td>
+              <td><span class="area-chip" style="background:#f3f4f6;color:#374151;"><span class="area-dot" style="background:#6b7280;"></span>Infrastructure</span></td>
+              <td><div class="task-desc">MongoDB tiered storage untuk conversation &amp; ticket.</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">9</td>
+              <td><div class="task-name">Superadmin internal (GTM, Demo DB)</div></td>
+              <td><span class="area-chip" style="background:#f3f4f6;color:#374151;"><span class="area-dot" style="background:#9ca3af;"></span>Internal</span></td>
+              <td><div class="task-desc">Approval pendaftaran, GTM analytics, demo database.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p1">P1</span></td>
+              <td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p1" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+            </tr>
+
+            <!-- P2 tasks -->
+            <tr>
+              <td class="num-col">10</td>
+              <td><div class="task-name">Grouping contact</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Gabungkan contact lintas channel menjadi 1 contact.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">11</td>
+              <td><div class="task-name">Sales module improvement</div></td>
+              <td><span class="area-chip" style="background:#dcfce7;color:#166534;"><span class="area-dot" style="background:#22c55e;"></span>Sales</span></td>
+              <td><div class="task-desc">Rombak / improve tampilan &amp; workflow sales module.</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">12</td>
+              <td><div class="task-name">Advance export</div></td>
+              <td><span class="area-chip" style="background:#dbeafe;color:#1e40af;"><span class="area-dot" style="background:#3b82f6;"></span>Analytics</span></td>
+              <td><div class="task-desc">Export data statistik secara dinamis.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">13</td>
+              <td><div class="task-name">Cost simulation WA official &amp; guarding</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Menampilkan used cost &amp; metode biaya guarding.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-h">H</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">14</td>
+              <td><div class="task-name">Fraud dashboard</div></td>
+              <td><span class="area-chip" style="background:#fef9c3;color:#713f12;"><span class="area-dot" style="background:#eab308;"></span>Broadcast</span></td>
+              <td><div class="task-desc">Kirim invoice fraud, integrasi Lincah, dashboard statistik.</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">15</td>
+              <td><div class="task-name">Conversation AI summary</div></td>
+              <td><span class="area-chip" style="background:#f0fdf4;color:#15803d;"><span class="area-dot" style="background:#22c55e;"></span>AI</span></td>
+              <td><div class="task-desc">Summary singkat isi conversation oleh AI agent.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p2">P2</span></td>
+              <td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p2" style="width:44px;"></span></td>
+              <td class="center"></td><td class="center"></td>
+            </tr>
+
+            <!-- P3 tasks -->
+            <tr>
+              <td class="num-col">16</td>
+              <td><div class="task-name">Chat bot auto response</div></td>
+              <td><span class="area-chip" style="background:#f0fdf4;color:#15803d;"><span class="area-dot" style="background:#22c55e;"></span>AI</span></td>
+              <td><div class="task-desc">Auto response dengan AI agent, eskalasi ke human agent.</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">17</td>
+              <td><div class="task-name">Widget module</div></td>
+              <td><span class="area-chip" style="background:#fef3c7;color:#b45309;"><span class="area-dot" style="background:#f59e0b;"></span>Tools / Add-ons</span></td>
+              <td><div class="task-desc">Improvement UI/UX &amp; workflow widget (domain specific).</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">18</td>
+              <td><div class="task-name">FAQ</div></td>
+              <td><span class="area-chip" style="background:#fef3c7;color:#b45309;"><span class="area-dot" style="background:#f59e0b;"></span>Tools / Add-ons</span></td>
+              <td><div class="task-desc">Halaman FAQ di dalam app.</div></td>
+              <td class="center"><span class="effort-tag tag-l">L</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-l">L</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">19</td>
+              <td><div class="task-name">Chat tools API</div></td>
+              <td><span class="area-chip" style="background:#f0fdf4;color:#15803d;"><span class="area-dot" style="background:#22c55e;"></span>Open API</span></td>
+              <td><div class="task-desc">Integrasi dengan pihak ketiga (communication layer).</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-m">M</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">20</td>
+              <td><div class="task-name">Widget app (web &amp; mobile)</div></td>
+              <td><span class="area-chip" style="background:#f0f9ff;color:#0369a1;"><span class="area-dot" style="background:#0ea5e9;"></span>Mobile App</span></td>
+              <td><div class="task-desc">Aplikasi web &amp; mobile, auth dengan Google login.</div></td>
+              <td class="center"><span class="effort-tag tag-h">H</span></td>
+              <td class="center"><span class="impact-tag tag-l">L</span></td>
+              <td class="center"><span class="test-tag tag-h">H</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+            <tr>
+              <td class="num-col">21</td>
+              <td><div class="task-name">WA official adjustment research</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Riset perubahan API Meta &amp; potensi biaya per message.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-l">L</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p3">P3</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p3" style="width:44px;"></span></td>
+              <td class="center"></td>
+            </tr>
+
+            <!-- P4 tasks -->
+            <tr>
+              <td class="num-col">22</td>
+              <td><div class="task-name">Telegram</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Telegram sebagai channel baru (pending).</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-l">L</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p4">P4</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p4" style="width:44px;"></span></td>
+            </tr>
+            <tr>
+              <td class="num-col">23</td>
+              <td><div class="task-name">Shopee chat</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">Shopee sebagai channel baru (pending, butuh akun test).</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-l">L</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p4">P4</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p4" style="width:44px;"></span></td>
+            </tr>
+            <tr>
+              <td class="num-col">23</td>
+              <td><div class="task-name">TikTok chat</div></td>
+              <td><span class="area-chip" style="background:#fee2e2;color:#b91c1c;"><span class="area-dot" style="background:#ef4444;"></span>Omnichannel Chat</span></td>
+              <td><div class="task-desc">TikTok sebagai channel baru.</div></td>
+              <td class="center"><span class="effort-tag tag-m">M</span></td>
+              <td class="center"><span class="impact-tag tag-l">L</span></td>
+              <td class="center"><span class="test-tag tag-m">M</span></td>
+              <td class="center"><span class="priority-badge pb-p4">P4</span></td>
+              <td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td>
+              <td class="center"><span class="gantt-bar bar-p4" style="width:44px;"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Key Takeaways -->
+      <div class="takeaways">
+        <div class="takeaway-label">
+          <div class="tk-icon">📈</div>
+          Key Takeaways
+        </div>
+        <div class="takeaway-items">
+          <div class="tk-item">
+            <div class="tk-num tn-1">1</div>
+            <div class="tk-text">
+              <div class="tk-title">Focus on High Impact</div>
+              <div class="tk-desc">Prioritize LHL → LHM → MHM.</div>
+            </div>
+          </div>
+          <div class="tk-item">
+            <div class="tk-num tn-2">2</div>
+            <div class="tk-text">
+              <div class="tk-title">Consider Dependencies</div>
+              <div class="tk-desc">Some high-impact tasks may depend on foundational work.</div>
+            </div>
+          </div>
+          <div class="tk-item">
+            <div class="tk-num tn-3">3</div>
+            <div class="tk-text">
+              <div class="tk-title">Feature Needs Discovery</div>
+              <div class="tk-desc">New capabilities require PRD/assessment before scheduling.</div>
+            </div>
+          </div>
+          <div class="tk-item">
+            <div class="tk-num tn-4">4</div>
+            <div class="tk-text">
+              <div class="tk-title">Backlog ≠ Low Priority</div>
+              <div class="tk-desc">Backlog means not ready yet (e.g. waiting for PRD, dependency, or external party).</div>
+            </div>
+          </div>
+        </div>
+        <div class="exec-clarity">
+          <div class="ec-icon">📊</div>
+          <div>
+            <div class="ec-title">Execute with Clarity</div>
+            <div class="ec-desc">Build a stronger SatuInbox.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /body-wrap -->
+
+</div><!-- /page -->
+</body>
+</html>

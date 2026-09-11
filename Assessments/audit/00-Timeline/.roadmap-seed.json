@@ -1,0 +1,588 @@
+[
+  {
+    "id": "t01",
+    "rank": 1,
+    "task": "super admin internal (paket: approval pendaftaran)",
+    "strategicArea": "Growth & Internal Ops",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "Internal-only superadmin, in-flight; regression risk ke customer rendah.",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Sep",
+        "week": 1
+      },
+      "end": {
+        "month": "Sep",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t02",
+    "rank": 2,
+    "task": "GTM (statistik Google Ads, bagian superadmin internal)",
+    "strategicArea": "Growth & Internal Ops",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "Satu paket dengan superadmin internal; brief GTM sudah ada.",
+    "effort": "M",
+    "impact": "M",
+    "testing": "L",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Sep",
+        "week": 1
+      },
+      "end": {
+        "month": "Sep",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t03",
+    "rank": 3,
+    "task": "demo data base and dashboard (kandidat request demo)",
+    "strategicArea": "Growth & Internal Ops",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "Satu paket superadmin internal; data internal, testing rendah.",
+    "effort": "M",
+    "impact": "M",
+    "testing": "L",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Sep",
+        "week": 1
+      },
+      "end": {
+        "month": "Sep",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t04",
+    "rank": 4,
+    "task": "wa official adujstmen research (perubahan pricing Meta)",
+    "strategicArea": "Payment",
+    "sourceColumn": "FEATURE",
+    "desc": "LHL murni. Output = decision memo pricing per-message; prasyarat cost simulation.",
+    "effort": "L",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P1",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Sep",
+        "week": 1
+      },
+      "end": {
+        "month": "Sep",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t05",
+    "rank": 5,
+    "task": "infra stability — slice 1: SLO + top incident fixes",
+    "strategicArea": "Growth & Internal Ops",
+    "sourceColumn": "FEATURE",
+    "desc": "Stability 50% = impact tertinggi. Mulai sebagai track bulanan ber-slice, bukan redesign big-bang.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P1",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Sep",
+        "week": 1
+      },
+      "end": {
+        "month": "Sep",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t06",
+    "rank": 6,
+    "task": "notification service improvement (targeting tepat sasaran)",
+    "strategicArea": "Notification",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "Correctness fix bernilai tinggi; testing tinggi (multi-role/tenant), butuh regression matrix notif.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t07",
+    "rank": 7,
+    "task": "sales module — PRD + P0 fixes (security scope, transition guard, team transfer)",
+    "strategicArea": "Sales",
+    "sourceColumn": "FEATURE",
+    "desc": "P0 dari assessment existing (GAP-002/003/004, transition guard) dulu; revamp UI/workflow belakangan.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P1",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t08",
+    "rank": 8,
+    "task": "cost simulation WA official + guarding",
+    "strategicArea": "Payment",
+    "sourceColumn": "FEATURE",
+    "desc": "Build setelah research #4. Guarding menyentuh send path → test hati-hati.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t09",
+    "rank": 9,
+    "task": "advance exporting (export statistik dinamis)",
+    "strategicArea": "Analytics",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "High effort; testing butuh window data incremental — jangan ditumpuk dengan #6 di sprint sama.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t10",
+    "rank": 10,
+    "task": "informative utilities (deskripsi fitur + utility message conversation)",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "UI/UX",
+    "desc": "Menurunkan kebingungan user; mostly FE + copy, testing sedang.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t11",
+    "rank": 11,
+    "task": "faq (halaman FAQ in-app)",
+    "strategicArea": "Tools / Add-ons",
+    "sourceColumn": "UI/UX",
+    "desc": "Quick win filler; konten sudah ada di landing page.",
+    "effort": "L",
+    "impact": "M",
+    "testing": "L",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t12",
+    "rank": 12,
+    "task": "ticketing KPI card + dynamic status",
+    "strategicArea": "Ticket",
+    "sourceColumn": "UI/UX",
+    "desc": "Improvement UI halaman ticket; dynamic status config butuh test per-tenant.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t13",
+    "rank": 13,
+    "task": "simplicity settings (redesign + guidance)",
+    "strategicArea": "Tools / Add-ons",
+    "sourceColumn": "UI/UX",
+    "desc": "UI redesign settings; regression lintas settings tinggi.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t14",
+    "rank": 14,
+    "task": "grouping contact (unifikasi contact lintas channel)",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "FEATURE",
+    "desc": "Identity merge = blast radius besar (broadcast, visibility, duplicate merge race). Wajib PRD + migration/dedupe plan dulu.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t15",
+    "rank": 15,
+    "task": "create prospect from conversation",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "UI/UX",
+    "desc": "Interconnection conversation→sales; jalan setelah sales PRD/P0 (#7).",
+    "effort": "M",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t16",
+    "rank": 16,
+    "task": "UI conversation redesign — audit UX",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "UI/UX",
+    "desc": "Audit dulu (reuse Track B uiux existing), implementasi di D.",
+    "effort": "L",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t17",
+    "rank": 17,
+    "task": "UI conversation redesign — implementasi",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "UI/UX",
+    "desc": "Eksekusi hasil audit #16; scope dari pain-point list, bukan full rewrite.",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t18",
+    "rank": 18,
+    "task": "wizard setting onboarding (quick guide sekali muncul)",
+    "strategicArea": "Tools / Add-ons",
+    "sourceColumn": "UI/UX",
+    "desc": "FE-only; P1 requirement replay guide masuk fase ini juga.",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t19",
+    "rank": 19,
+    "task": "widget module (UI/UX + workflow + domain per widget)",
+    "strategicArea": "Tools / Add-ons",
+    "sourceColumn": "FEATURE",
+    "desc": "Improvement widget existing; jalan setelah settings/onboarding beres.",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t20",
+    "rank": 20,
+    "task": "sales module — revamp UI/workflow",
+    "strategicArea": "Sales",
+    "sourceColumn": "FEATURE",
+    "desc": "Fase 2 setelah PRD+P0 (#7) stabil.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 4
+      }
+    }
+  },
+  {
+    "id": "t21",
+    "rank": 21,
+    "task": "DB topology HOT/WARM/COLD (+ exclude conversation group)",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "FEATURE",
+    "desc": "Assessment existing: HOLD_FEATURE (audit/database). Butuh RCA/perf evidence + keputusan exclude-group sebelum maju.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t22",
+    "rank": 22,
+    "task": "fraud dashboard (invoice fraud via broadcast + integrasi Lincah)",
+    "strategicArea": "Broadcast",
+    "sourceColumn": "CURRENT TASK",
+    "desc": "Blocked: menunggu final requirement user fraud & Lincah. Jangan masuk bulan delivery.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P3",
+    "current": true,
+    "schedule": null
+  },
+  {
+    "id": "t23",
+    "rank": 23,
+    "task": "chat bot auto response (AI agent + eskalasi human)",
+    "strategicArea": "AI",
+    "sourceColumn": "BACKLOG",
+    "desc": "Feature besar; butuh PRD, guard, SLA/escalation design.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t24",
+    "rank": 24,
+    "task": "converesation AI summary",
+    "strategicArea": "AI",
+    "sourceColumn": "BACKLOG",
+    "desc": "Menyusul setelah AI agent foundation (#23).",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t25",
+    "rank": 25,
+    "task": "chat tools API (communication layer pihak ketiga)",
+    "strategicArea": "Open API",
+    "sourceColumn": "BACKLOG",
+    "desc": "Public API: auth, tenant isolation, versioning — butuh design dulu.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t26",
+    "rank": 26,
+    "task": "widget app (web/mobile app, Google login)",
+    "strategicArea": "Tools / Add-ons",
+    "sourceColumn": "BACKLOG",
+    "desc": "Produk baru; discovery dulu.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t27",
+    "rank": 27,
+    "task": "telegram channel (resume pending dev)",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "BACKLOG",
+    "desc": "Resume saat kapasitas ada; estimasi lama ~18 FS-days (impact matrix #168).",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t28",
+    "rank": 28,
+    "task": "shopee chat",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "BACKLOG",
+    "desc": "Blocked: menunggu seller test account.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  },
+  {
+    "id": "t29",
+    "rank": 29,
+    "task": "tiktok chat",
+    "strategicArea": "Omnichannel Chat",
+    "sourceColumn": "BACKLOG",
+    "desc": "Setelah shopee/foundation channel marketplace.",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P3",
+    "current": false,
+    "schedule": null
+  }
+]

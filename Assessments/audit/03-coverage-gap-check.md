@@ -129,7 +129,7 @@ Tally: full **6**, partial **13**, none **16** (of 35 aspects). Weighted by risk
 ---
 
 ## 6. Assumptions
-- Track E audited against actual repo state; branch reality is `prod-2.7.0` (ENV-01 gate) per reading-list, while memory captures `v2.8.0` — coverage claims here are branch-agnostic (aspect-level).
+- Branch target operasional sekarang `prod-2.8.1`; memory FE/BE menjadi patokan utama. Coverage claims here remain branch-agnostic (aspect-level).
 - UX & Accessibility source audit (t_ee1a7a9d) has no standalone file; its 17 findings taken from the consolidated report as authoritative.
 - "none" = not opened by any Track E/D file read; not a claim the code is defective, only that the aspect is un-audited.
 - Track D treated as adjacent coverage (FE UX + interconnection), not part of the Track E kanban being gap-checked, but credited where it covers an aspect.
@@ -140,7 +140,7 @@ Tally: full **6**, partial **13**, none **16** (of 35 aspects). Weighted by risk
 - Multi-tenant READ-path gap (#3): Track E proved one isolation break on send (D3) — sibling read paths are statistically likely to share the pattern and are unaudited (IDOR blast radius).
 
 ## 8. Follow-up Tasks
-1. Spawn a Track F audit: **SLA engine BE vs SLA Engine Contract** + Hold/Snooze/SLA 3-way + reopen (P0 #1/#2).
+1. Spawn a new SLA audit track: **SLA engine BE vs SLA Engine Contract** + Hold/Snooze/SLA 3-way + reopen (P0 #1/#2).
 2. Spawn **multi-tenant READ-path isolation sweep** across all conversation read endpoints (P0 #3).
 3. Author **migration/rollback runbook** for the 7 P0s before ticketing them (P0 #4) — non-bypassable per profile impact_analysis(migration).
 4. Spawn **infra-concerns audit**: RabbitMQ semantics + socket reconnect + observability + cron + gRPC versioning (P1 #5–#10) as one track.

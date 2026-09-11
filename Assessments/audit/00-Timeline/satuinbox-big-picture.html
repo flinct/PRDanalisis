@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatuInbox — Big Picture & Product Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ─── RESET ─── */
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { font-size:13px; }
+
+  /* ═══ SEMANTIC THEME TOKENS ═══
+     Dark-native. navy = default (:root + .bp-root). slate/charcoal/zinc via [data-theme].
+     Selectors match BOTH standalone (html/body root) and embedded (.bp-root wrapper). */
+  :root,
+  .bp-root,
+  [data-theme="navy"], .bp-root[data-theme="navy"]{
+    --app-bg:#080c14; --elevated-bg:#0f1725; --elevated-2:#16202f; --sidebar-bg:#0b1220;
+    --text-1:#f1f5f9; --text-2:#cbd5e1; --text-3:#94a3b8; --text-4:#64748b;
+    --border-1:#243244; --border-2:#1c2839; --border-3:#16202f;
+    --accent-primary:#3b82f6; --accent-secondary:#60a5fa; --accent-success:#22c55e; --accent-warning:#f59e0b; --accent-danger:#ef4444;
+    --icon-bg:#16263f; --icon-fg:#93c5fd;
+    --channel-bg:#111c2e; --channel-text:#e2e8f0;
+    --connector:#3b567e;
+    --next-bg:#132a4a; --next-border:#1e4272; --next-fg:#93c5fd;
+    --hover-bg:#16263f;
+    --priority-p1-bg:#0e2a1a; --priority-p1-fg:#4ade80;
+    --priority-p2-bg:#122845; --priority-p2-fg:#60a5fa;
+    --priority-p3-bg:#241a3d; --priority-p3-fg:#c4b5fd;
+    --priority-backlog-bg:#3a2410; --priority-backlog-fg:#fbbf24;
+    --accent-glow:rgba(59,130,246,.28);
+  }
+  [data-theme="slate"], .bp-root[data-theme="slate"]{
+    --app-bg:#111827; --elevated-bg:#1a2334; --elevated-2:#222d40; --sidebar-bg:#151d2c;
+    --text-1:#f8fafc; --text-2:#d1d9e6; --text-3:#9aa6b8; --text-4:#6b7789;
+    --border-1:#2c384c; --border-2:#232f42; --border-3:#1c2739;
+    --accent-primary:#6366f1; --accent-secondary:#818cf8; --accent-success:#2dd4bf; --accent-warning:#f59e0b; --accent-danger:#f43f5e;
+    --icon-bg:#232f4a; --icon-fg:#a5b4fc;
+    --channel-bg:#1c2740; --channel-text:#e6ebf4;
+    --connector:#495a7c;
+    --next-bg:#1e2c4d; --next-border:#324472; --next-fg:#a5b4fc;
+    --hover-bg:#232f4a;
+    --priority-p1-bg:#0f2b28; --priority-p1-fg:#5eead4;
+    --priority-p2-bg:#1a2450; --priority-p2-fg:#818cf8;
+    --priority-p3-bg:#271d44; --priority-p3-fg:#c4b5fd;
+    --priority-backlog-bg:#3a2712; --priority-backlog-fg:#fbbf24;
+    --accent-glow:rgba(99,102,241,.28);
+  }
+  [data-theme="charcoal"], .bp-root[data-theme="charcoal"]{
+    --app-bg:#1c1917; --elevated-bg:#262220; --elevated-2:#302b28; --sidebar-bg:#211d1b;
+    --text-1:#faf7f5; --text-2:#e0d8d2; --text-3:#a99f97; --text-4:#7a716a;
+    --border-1:#3c3430; --border-2:#2f2925; --border-3:#26211e;
+    --accent-primary:#a78bfa; --accent-secondary:#c4b5fd; --accent-success:#4ade80; --accent-warning:#fbbf24; --accent-danger:#f87171;
+    --icon-bg:#2f2a3d; --icon-fg:#22d3ee;
+    --channel-bg:#2a2522; --channel-text:#ebe4de;
+    --connector:#5a4f47;
+    --next-bg:#2b2438; --next-border:#4a3d63; --next-fg:#c4b5fd;
+    --hover-bg:#302b28;
+    --priority-p1-bg:#182c1a; --priority-p1-fg:#4ade80;
+    --priority-p2-bg:#1b2438; --priority-p2-fg:#60a5fa;
+    --priority-p3-bg:#2b2140; --priority-p3-fg:#c4b5fd;
+    --priority-backlog-bg:#3a2a12; --priority-backlog-fg:#fbbf24;
+    --accent-glow:rgba(167,139,250,.28);
+  }
+  [data-theme="zinc"], .bp-root[data-theme="zinc"]{
+    --app-bg:#18181b; --elevated-bg:#222226; --elevated-2:#2b2b30; --sidebar-bg:#1d1d20;
+    --text-1:#fafafa; --text-2:#d4d4d8; --text-3:#a1a1aa; --text-4:#71717a;
+    --border-1:#35353b; --border-2:#2a2a2f; --border-3:#232327;
+    --accent-primary:#6366f1; --accent-secondary:#818cf8; --accent-success:#22c55e; --accent-warning:#eab308; --accent-danger:#ef4444;
+    --icon-bg:#26263a; --icon-fg:#818cf8;
+    --channel-bg:#26262b; --channel-text:#e4e4e7;
+    --connector:#52525b;
+    --next-bg:#232342; --next-border:#3a3a63; --next-fg:#a5b4fc;
+    --hover-bg:#2b2b30;
+    --priority-p1-bg:#14271a; --priority-p1-fg:#4ade80;
+    --priority-p2-bg:#1a2340; --priority-p2-fg:#60a5fa;
+    --priority-p3-bg:#252041; --priority-p3-fg:#c4b5fd;
+    --priority-backlog-bg:#382712; --priority-backlog-fg:#eab308;
+    --accent-glow:rgba(99,102,241,.24);
+  }
+
+  body{
+    font-family:'Inter','Segoe UI',sans-serif;
+    background:var(--app-bg);
+    color:var(--text-2);
+    min-width:1300px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* embedded: wrapper carries the surface */
+  .bp-root{background:var(--app-bg);color:var(--text-2);min-width:1300px;
+    transition:background-color 160ms ease,color 160ms ease;}
+  /* §6/§38 — one composition, small bottom padding (no huge empty canvas) */
+  .wrap{max-width:1400px;margin:0 auto;padding:20px 20px 24px}
+
+  /* theme-aware transition on surfaces */
+  .header,.channels-panel,.platform-panel,.modules-panel,.value-card,.strategic-section,
+  .strat-card,.scard,.stats-row,.table-panel,.takeaways,.channel-item,.tab,.pf-item,.pillar-item{
+    transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease;
+  }
+
+  /* ─── TABS ─── */
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{padding:9px 20px;border-radius:999px;border:1px solid var(--border-1);background:var(--elevated-bg);cursor:pointer;font-weight:600;font-size:13px;color:var(--text-3);font-family:inherit}
+  .tab:hover{color:var(--text-1);border-color:var(--accent-secondary)}
+  .tab.active{background:var(--accent-primary);color:#fff;border-color:var(--accent-primary)}
+  .page{display:none}
+  .page.active{display:block}
+
+  /* ─── HEADER ─── */
+  .header{
+    background:var(--elevated-bg);
+    border:1px solid var(--border-1);
+    border-radius:14px;
+    padding:18px 32px;
+    display:flex;align-items:center;gap:28px;margin-bottom:16px;
+  }
+  .logo-block{display:flex;flex-direction:column;min-width:200px}
+  .logo{font-size:26px;font-weight:800;color:var(--accent-secondary);letter-spacing:-0.5px;line-height:1}
+  .logo span{font-weight:400;color:var(--text-1)}
+  .logo-sub{font-size:11px;color:var(--text-3);margin-top:3px;font-weight:500}
+  .header-divider{width:1px;height:50px;background:var(--border-1);flex-shrink:0}
+  .header-center{flex:1}
+  .header-center h1{font-size:22px;font-weight:800;color:var(--text-1);line-height:1.1}
+  .header-center .subtitle{font-size:13px;font-weight:600;color:var(--text-2);margin-top:2px}
+  .header-center .desc{font-size:11.5px;color:var(--text-3);margin-top:3px}
+  .header-right{text-align:right;min-width:210px}
+  .header-quote{font-family:'Georgia',serif;font-style:italic;font-size:13px;color:var(--accent-secondary);line-height:1.6;font-weight:600}
+  .quote-swoosh{display:block;margin-left:auto;margin-top:2px}
+  .roadmap-label{font-size:10px;color:var(--text-4);font-weight:500;margin-top:6px}
+
+  /* ═══ TAB 1 — BIG PICTURE ═══ */
+  /* §4/§53 — single proportional parent grid; §39 gap 28px; §5 shared top baseline */
+  .main-grid{
+    display:grid;
+    grid-template-columns:minmax(220px,1fr) minmax(560px,2.8fr) minmax(210px,1fr) minmax(180px,.9fr);
+    gap:36px;align-items:start;position:relative;
+  }
+  .main-grid>*{position:relative;z-index:2} /* §56 cards above connector layer */
+
+  .section-label{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:2px}
+  .section-sublabel{font-size:10.5px;color:var(--text-3);margin-bottom:12px}
+
+  /* §22/§54 — inter-section flow node: sits in the gap, vertically centred, never a floating FAB */
+  .flow-node{
+    position:absolute;top:50%;left:-31px;transform:translateY(-50%);
+    width:34px;height:34px;border-radius:50%;
+    background:var(--next-bg);border:1px solid var(--next-border);color:var(--next-fg);
+    display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;
+    z-index:3;pointer-events:none;
+  }
+
+  /* channels panel — omnichannel spec */
+  .channels-panel{position:relative;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px;overflow:hidden}
+  .channels-panel .section-label{font-size:18px;font-weight:700;color:var(--text-1);margin-bottom:0}
+  .channels-panel .section-sublabel{font-size:12px;font-weight:400;color:var(--text-3);margin:4px 0 18px}
+  .omnichannel-flow{display:flex;align-items:center;gap:0;position:relative}
+  .channel-list{display:flex;flex-direction:column;gap:8px;position:relative;z-index:2}
+  .channel-item{
+    height:40px;display:flex;align-items:center;gap:9px;padding:0 12px;border-radius:20px;
+    background:var(--channel-bg);color:var(--channel-text);font-size:13px;font-weight:500;white-space:nowrap;
+    min-width:170px;border:1px solid var(--border-2);
+  }
+  .channel-item:hover{background:var(--hover-bg)}
+  .channel-icon{width:28px;height:28px;flex:0 0 28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--icon-bg);color:var(--icon-fg)}
+  .channel-icon svg{width:16px;height:16px;display:block}
+  .connector-layer{position:relative;flex:0 0 46px;align-self:stretch;z-index:1}
+  .connector-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .connector-svg path{fill:none;stroke:var(--connector);stroke-width:1.2px;stroke-dasharray:2 5;stroke-linecap:round;opacity:.75} /* §20/§21/§46 */
+  .next-flow{
+    width:34px;height:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:var(--next-bg);border:1px solid var(--next-border);color:var(--next-fg);font-size:17px;font-weight:600;z-index:3;
+  }
+
+  /* platform panel */
+  .platform-panel{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px}
+  .platform-panel h2{font-size:17px;font-weight:800;color:var(--text-1);text-align:center}
+  .platform-panel .p-sub{font-size:11px;color:var(--text-3);text-align:center;margin-top:3px;margin-bottom:14px}
+  .platform-features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .pf-item{text-align:center;padding:10px 8px;border-radius:10px;background:var(--elevated-2);border:1px solid var(--border-2)}
+  .pf-icon{color:var(--accent-secondary);margin-bottom:5px;display:flex;justify-content:center}
+  .pf-icon svg{width:20px;height:20px}
+  .pf-title{font-size:12.5px;font-weight:700;color:var(--text-1)}
+  .pf-desc{font-size:10px;color:var(--text-3);margin-top:2px;line-height:1.4}
+
+  /* mock inbox */
+  .mock-inbox{background:var(--elevated-2);border:1px solid var(--border-2);border-radius:10px;overflow:hidden} /* §8 L2 */
+  .mock-topbar{background:var(--sidebar-bg);border-bottom:1px solid var(--border-2);padding:7px 12px;display:flex;align-items:center;gap:8px}
+  .mock-logo-text{font-size:12px;font-weight:700;color:var(--accent-secondary)}
+  .mock-logo-text span{font-weight:400;color:var(--text-1)}
+  .mock-search{flex:1;background:var(--app-bg);border:1px solid var(--border-2);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--text-4)}
+  .mock-icons{display:flex;gap:6px;color:var(--text-4)}
+  .mock-icons svg{width:12px;height:12px}
+  .mock-body{display:flex}
+  .mock-sidebar{width:128px;border-right:1px solid var(--border-2);padding:5px 0;flex-shrink:0}
+  .mock-nav-item{padding:4px 10px;font-size:9.5px;color:var(--text-3);display:flex;justify-content:space-between;align-items:center}
+  .mock-nav-item.active{background:var(--priority-p2-bg);color:var(--accent-secondary);font-weight:600}
+  .mock-badge{background:var(--accent-primary);color:#fff;border-radius:10px;padding:1px 6px;font-size:8px;font-weight:700}
+  .mock-count{font-size:9px;color:var(--text-4)}
+  .mock-content{flex:1;padding:7px}
+  .mock-conv{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-3)}
+  .mock-avatar{width:24px;height:24px;border-radius:50%;flex-shrink:0}
+  .mock-lines{flex:1}
+  .mock-line-a{height:6px;background:var(--border-1);border-radius:3px;margin-bottom:4px}
+  .mock-line-b{height:5px;background:var(--border-2);border-radius:3px;width:70%}
+  .mock-chat-area{border-left:1px solid var(--border-2);background:var(--app-bg);flex:1;padding:7px;display:flex;flex-direction:column;justify-content:flex-end}
+  .mock-bubble{background:var(--elevated-bg);border-radius:8px 8px 8px 0;height:18px;width:60%;margin-bottom:5px}
+  .mock-bubble.right{align-self:flex-end;background:var(--accent-primary);border-radius:8px 8px 0 8px;width:40%}
+  .mock-input-bar{display:flex;align-items:center;gap:6px;margin-top:3px}
+  .mock-input{flex:1;background:var(--elevated-bg);border:1px solid var(--border-2);border-radius:6px;height:20px;font-size:9px;color:var(--text-4);padding:0 8px;display:flex;align-items:center}
+  .mock-send{background:var(--accent-primary);color:#fff;border-radius:6px;padding:3px 10px;font-size:9px;font-weight:700}
+
+  .platform-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .pillar-item{text-align:center;padding:9px 8px;border-radius:10px;background:var(--elevated-2);border:1px solid var(--border-2)}
+  .pillar-icon{color:var(--accent-secondary);margin-bottom:3px;display:flex;justify-content:center}
+  .pillar-icon svg{width:18px;height:18px}
+  .pillar-title{font-size:11.5px;font-weight:700;color:var(--text-1)}
+  .pillar-desc{font-size:9.5px;color:var(--text-3);margin-top:2px}
+
+  /* modules panel — §24 proper section, §40 padding, §7/§41 radius */
+  .modules-panel{position:relative;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px 14px}
+  .module-item{display:flex;align-items:flex-start;gap:9px;padding:6px 8px;border-radius:9px;margin-bottom:2px;border:1px solid transparent;transition:all .15s}
+  .module-item:hover{border-color:var(--border-2);background:var(--hover-bg)}
+  .module-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;background:var(--icon-bg);color:var(--icon-fg)}
+  .module-icon svg{width:14px;height:14px}
+  .module-text{flex:1}
+  .module-name{font-size:11px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:5px}
+  .module-desc{font-size:9.5px;color:var(--text-3);margin-top:1px;line-height:1.3}
+  .st{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .st-live{background:var(--accent-success)}
+  .st-build{background:var(--accent-warning)}
+  .st-plan{background:var(--text-4)}
+
+  /* value panel — §30 proper primary container, §49 cards not brighter than platform */
+  .value-panel{position:relative;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px 14px;display:flex;flex-direction:column;gap:10px}
+  .value-card{background:var(--elevated-2);border:1px solid var(--border-2);border-radius:10px;padding:12px}
+  .value-header{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  .value-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--icon-bg);color:var(--icon-fg)}
+  .value-avatar svg{width:16px;height:16px}
+  .value-name{font-size:12px;font-weight:700;color:var(--text-1)}
+  .value-check{display:flex;align-items:flex-start;gap:6px;font-size:10.5px;color:var(--text-2);margin-bottom:4px;line-height:1.35}
+  .check-dot{width:13px;height:13px;background:var(--accent-success);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:7px;flex-shrink:0;margin-top:1px}
+
+  /* §35/§36/§37 — legend sits directly under the module list, footnote on its own line */
+  .legend{display:flex;gap:12px 14px;flex-wrap:wrap;align-items:center;
+    margin:10px 0 0;padding-top:9px;border-top:1px solid var(--border-3);
+    font-size:10px;color:var(--text-4)}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .lg{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .legend-note{flex:0 0 100%;display:block;margin-top:6px;font-size:9.5px;color:var(--text-4);line-height:1.4}
+
+  /* strategic section */
+  .strategic-section{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px 20px;margin-top:20px}
+  .strategic-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .strategic-title-area{display:flex;align-items:center;gap:10px}
+  .strategic-icon{width:36px;height:36px;background:var(--icon-bg);color:var(--icon-fg);border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .strategic-icon svg{width:18px;height:18px}
+  .strategic-title{font-size:15px;font-weight:800;color:var(--text-1)}
+  .strategic-desc{font-size:11px;color:var(--text-3);margin-top:1px}
+  .s-legend{display:flex;align-items:center;gap:14px}
+  .s-legend-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text-2);font-weight:500}
+  .s-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .strategic-divider{border:none;border-top:1px solid var(--border-1);margin:10px 0 14px}
+  .strategic-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:12px}
+  .strategic-grid-2{display:grid;grid-template-columns:repeat(6,1fr) 1.3fr;gap:10px;margin-bottom:16px}
+  .strat-card{border-radius:10px;padding:9px 10px 8px;border:1px solid var(--border-2);background:var(--elevated-2)}
+  .strat-num{font-size:9px;font-weight:700;color:var(--text-4);margin-bottom:3px;display:block}
+  .strat-icon-label{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+  .strat-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--icon-bg);color:var(--icon-fg)}
+  .strat-icon svg{width:12px;height:12px}
+  .strat-name{font-size:10.5px;font-weight:700;color:var(--text-1)}
+  .strat-desc{font-size:9px;color:var(--text-2);line-height:1.35}
+  .bigger-together{background:var(--accent-primary);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;color:#fff}
+  .bt-icon svg{width:22px;height:22px}
+  .bt-text .bt-title{font-size:12px;font-weight:800;margin-bottom:3px}
+  .bt-text .bt-desc{font-size:9.5px;opacity:.9;line-height:1.5}
+
+  /* roadmap theme cards */
+  .themes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .scard{background:var(--elevated-2);border:1px solid var(--border-1);border-radius:12px;padding:14px}
+  .scard .head{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--text-1);margin-bottom:8px}
+  .scard ul{list-style:none;font-size:11px;color:var(--text-2);line-height:1.7}
+  .scard li{padding-left:12px;position:relative}
+  .scard li::before{content:"\2022";position:absolute;left:0;color:var(--accent-secondary)}
+
+  /* ═══ TAB 2 — ROADMAP ═══ */
+  .sticky-top{position:sticky;top:0;z-index:20;background:var(--app-bg);padding-top:2px}
+  .stats-row{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:12px;padding:14px 18px;display:flex;align-items:center;margin-bottom:12px}
+  .stat-block{display:flex;align-items:center;gap:10px;padding-right:18px;margin-right:18px;border-right:1px solid var(--border-1)}
+  .stat-block:last-of-type{border-right:none}
+  .stat-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--icon-bg);color:var(--icon-fg)}
+  .stat-icon svg{width:16px;height:16px}
+  .stat-num{font-size:21px;font-weight:800;color:var(--text-1);line-height:1}
+  .stat-label{font-size:10px;color:var(--text-3);margin-top:2px;font-weight:500}
+  .stat-badge{display:inline-block;font-size:9px;font-weight:700;border-radius:4px;padding:1px 5px;margin-bottom:2px}
+  .rules-area{margin-left:auto;display:flex;gap:14px}
+  .rule-box{background:var(--elevated-2);border:1px solid var(--border-1);border-radius:8px;padding:8px 12px;min-width:170px}
+  .rule-title{font-size:10.5px;font-weight:700;color:var(--text-1);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+  .rule-item{font-size:10px;color:var(--text-2);line-height:1.8}
+
+  /* task table */
+  .table-panel{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:12px;overflow:hidden;margin-bottom:12px}
+  .task-table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .task-table thead tr{background:var(--elevated-2);border-bottom:2px solid var(--border-1)}
+  .task-table th{padding:9px 8px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text-2);white-space:nowrap}
+  .task-table th.mo{width:56px;min-width:56px;text-align:center;padding:9px 3px}
+  .task-table tbody td{padding:7px 8px;color:var(--text-2);vertical-align:middle;border-bottom:1px solid var(--border-3)}
+  .task-table tbody td.mo{padding:7px 3px;text-align:center}
+  .task-table tbody tr:nth-child(even){background:var(--elevated-2)}
+  .task-table tbody tr:hover td{background:var(--hover-bg)}
+  .grp td{background:var(--priority-p2-bg)!important;font-weight:700;font-size:11.5px;color:var(--accent-secondary);padding:8px 10px}
+  .num{color:var(--text-4);font-weight:600;font-size:11px;width:28px}
+  .tname{font-weight:600;color:var(--text-1);min-width:165px;font-size:11.5px}
+  .area{font-size:10px;min-width:120px}
+  .area-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px 2px 4px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;background:var(--channel-bg);color:var(--text-2);border:1px solid var(--border-2)}
+  .area-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .tdesc{color:var(--text-3);font-size:10.5px;max-width:270px;line-height:1.45}
+  .dep{font-size:10.5px;color:var(--text-3);max-width:135px}
+
+  .metric{display:inline-block;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:28px;text-align:center}
+  .metric-high{background:var(--priority-backlog-bg);color:var(--accent-danger)}
+  .metric-medium{background:var(--priority-backlog-bg);color:var(--accent-warning)}
+  .metric-low{background:var(--priority-p1-bg);color:var(--priority-p1-fg)}
+  .metric-unknown{background:var(--elevated-2);color:var(--text-4)}
+
+  .prio{display:inline-block;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:800;white-space:nowrap}
+  .prio-p1{background:var(--priority-p1-bg);color:var(--priority-p1-fg);border:1px solid var(--priority-p1-fg)}
+  .prio-p2{background:var(--priority-p2-bg);color:var(--priority-p2-fg);border:1px solid var(--priority-p2-fg)}
+  .prio-p3{background:var(--priority-p3-bg);color:var(--priority-p3-fg);border:1px solid var(--priority-p3-fg)}
+  .prio-backlog{background:var(--priority-backlog-bg);color:var(--priority-backlog-fg);border:1px solid var(--priority-backlog-fg)}
+
+  .bar{display:block;height:8px;border-radius:4px;width:44px;margin:0 auto;background:transparent}
+  .bar.on-p1{background:var(--priority-p1-fg)}
+  .bar.on-p2{background:var(--priority-p2-fg)}
+  .bar.on-p3{background:var(--priority-p3-fg)}
+  .bar.on-backlog{background:var(--priority-backlog-fg)}
+
+  /* takeaways footer */
+  .takeaways{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px}
+  .takeaway-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-1);white-space:nowrap}
+  .tk-icon{width:28px;height:28px;background:var(--icon-bg);color:var(--icon-fg);border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .tk-icon svg{width:14px;height:14px}
+  .takeaway-items{display:flex;gap:16px;flex:1;flex-wrap:wrap;font-size:11px;color:var(--text-2);align-items:center}
+  .takeaway-items span{display:flex;align-items:center;gap:6px}
+  .exec-clarity{background:var(--accent-primary);border-radius:10px;padding:11px 15px;display:flex;align-items:center;gap:10px;color:#fff;min-width:175px;flex-shrink:0}
+  .ec-icon svg{width:20px;height:20px}
+  .ec-title{font-size:12px;font-weight:800}
+  .ec-desc{font-size:9.5px;opacity:.9;margin-top:2px}
+
+  @media print{
+    .tabs{display:none}
+    .page{display:block!important;page-break-after:always}
+    .task-table{font-size:10px}
+  }
+
+  /* responsive — §50 */
+  @media (max-width:1199px){
+    .channel-item{font-size:12px;min-width:150px}
+    .channel-icon{width:26px;height:26px;flex:0 0 26px}
+    /* tablet: Channels / Platform full-width rows, Modules + Value side by side */
+    .main-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+    #p0 .channels-panel,#p0 .platform-panel{grid-column:1 / -1}
+    .flow-node{display:none} /* §51 — relationship kept by stacking order */
+  }
+  @media (max-width:767px){
+    .main-grid{grid-template-columns:1fr}
+    #p0 .channels-panel,#p0 .platform-panel{grid-column:auto}
+    .omnichannel-flow{flex-direction:column;gap:10px}
+    .connector-layer{display:none}
+    .next-flow{align-self:center;transform:rotate(90deg)}
+    .channel-list{width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="go(0)">1 · Big Picture</button>
+    <button class="tab" onclick="go(1)">2 · Task Prioritization &amp; Roadmap</button>
+  </div>
+
+  <!-- ================= TAB 1 — BIG PICTURE ================= -->
+  <div class="page active" id="p0">
+
+    <div class="header">
+      <div class="logo-block">
+        <div class="logo">Satu<span>Inbox</span></div>
+        <div class="logo-sub">One Conversation. More Possibilities.</div>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-center">
+        <h1>Big Picture</h1>
+        <div class="subtitle">Omnichannel Chat Platform to Grow Your Business</div>
+        <div class="desc">Unify conversations, streamline operations, and unlock new opportunities — all in one platform.</div>
+      </div>
+      <div class="header-right">
+        <div class="header-quote">
+          "More conversations.<br>
+          Happier customers.<br>
+          A bigger tomorrow."
+          <svg class="quote-swoosh" width="150" height="10" viewBox="0 0 150 10" fill="none">
+            <path d="M2 6.5 C 30 1.5, 60 9, 92 3.5 S 132 1.5, 148 5" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="roadmap-label">Status per September 2026</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- §33/§54 — inter-section connector is the .flow-node in each 28px gap; the
+           previous absolute overlay used hardcoded viewport coordinates (§54 "bad"). -->
+      <!-- Col 1: Omnichannel Channels -->
+      <div class="channels-panel" role="region" aria-labelledby="ch-title">
+        <h2 class="section-label" id="ch-title">Omnichannel Channels</h2>
+        <p class="section-sublabel">Meet your customers everywhere</p>
+        <div class="omnichannel-flow">
+          <div class="channel-list">
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div><span>Website Widget</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.5.7.7-2.4-.2-.3A8 8 0 0 1 12 4zm-2.7 3.6c-.2 0-.5.1-.6.4-.2.4-.7 1.6.4 3s2.8 2.3 3.9 2.6c1 .3 1.5.2 1.9-.1.3-.3.4-.9.3-1.1l-.9-.5c-.2-.1-.4-.1-.6.1l-.4.5c-.1.1-.2.1-.4 0-.6-.3-1.2-.6-1.8-1.4-.1-.2 0-.3.1-.4l.3-.4c.1-.2.1-.3 0-.5l-.5-1.2c-.1-.3-.3-.3-.5-.3h-.4z"/></svg></div><span>WhatsApp Official (BSP)</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 1 1-4.2 14.8l-.3-.2-2.5.7.7-2.4-.2-.3A8 8 0 0 1 12 4zm-2.7 3.6c-.2 0-.5.1-.6.4-.2.4-.7 1.6.4 3s2.8 2.3 3.9 2.6c1 .3 1.5.2 1.9-.1.3-.3.4-.9.3-1.1l-.9-.5c-.2-.1-.4-.1-.6.1l-.4.5c-.1.1-.2.1-.4 0-.6-.3-1.2-.6-1.8-1.4-.1-.2 0-.3.1-.4l.3-.4c.1-.2.1-.3 0-.5l-.5-1.2c-.1-.3-.3-.3-.5-.3h-.4z"/></svg></div><span>WhatsApp Web</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div><span>Instagram</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></div><span>Facebook</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></div><span>Email</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 3v2.6a5.5 5.5 0 0 0 4 3.4v2.6a8 8 0 0 1-4-1.3V15a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v2.7a3.3 3.3 0 1 0 2.3 3.2V3H16z"/></svg></div><span>TikTok Chat</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg></div><span>Shopee Chat</span></div>
+            <div class="channel-item"><div class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg></div><span>API Integration</span></div>
+          </div>
+          <!-- ponytail: 9 SVG paths hardcoded for 9×40px items + 8×8px gaps = 424px viewBox. Regenerate if item count changes. -->
+          <div class="connector-layer" aria-hidden="true">
+            <svg class="connector-svg" viewBox="0 0 46 424" preserveAspectRatio="none">
+              <path d="M 0 20 C 20 20, 30 212, 46 212"/>
+              <path d="M 0 68 C 20 68, 30 212, 46 212"/>
+              <path d="M 0 116 C 20 116, 30 212, 46 212"/>
+              <path d="M 0 164 C 20 164, 30 212, 46 212"/>
+              <path d="M 0 212 L 46 212"/>
+              <path d="M 0 260 C 20 260, 30 212, 46 212"/>
+              <path d="M 0 308 C 20 308, 30 212, 46 212"/>
+              <path d="M 0 356 C 20 356, 30 212, 46 212"/>
+              <path d="M 0 404 C 20 404, 30 212, 46 212"/>
+            </svg>
+          </div>
+          <div class="next-flow" aria-hidden="true">→</div>
+        </div>
+      </div>
+
+      <!-- Col 2: Platform -->
+      <div class="platform-panel">
+        <div class="flow-node" aria-hidden="true">→</div>
+        <h2>SatuInbox Platform</h2>
+        <div class="p-sub">Omnichannel Customer Service Platform · 20 microservices · NestJS · MongoDB · RabbitMQ</div>
+
+        <div class="platform-features">
+          <div class="pf-item">
+            <span class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+            <div class="pf-title">Unify</div>
+            <div class="pf-desc">All channels in one inbox</div>
+          </div>
+          <div class="pf-item">
+            <span class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+            <div class="pf-title">Manage</div>
+            <div class="pf-desc">Assign, collaborate, resolve faster</div>
+          </div>
+          <div class="pf-item">
+            <span class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L16.5 3h-4l-.4 2.6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.4h4l.4-2.6a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6a7 7 0 0 0 .1-1z"/></svg></span>
+            <div class="pf-title">Automate</div>
+            <div class="pf-desc">Work smarter with AI &amp; tools</div>
+          </div>
+        </div>
+
+        <div class="mock-inbox">
+          <div class="mock-topbar">
+            <div class="mock-logo-text">Satu<span>Inbox</span></div>
+            <div class="mock-search">Search conversations...</div>
+            <div class="mock-icons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg></div>
+          </div>
+          <div class="mock-body">
+            <div class="mock-sidebar">
+              <div class="mock-nav-item active">All Conversations <span class="mock-badge">999+</span></div>
+              <div class="mock-nav-item">Mine <span class="mock-count">12</span></div>
+              <div class="mock-nav-item">Unassigned <span class="mock-count">28</span></div>
+              <div class="mock-nav-item">Mentions <span class="mock-count">5</span></div>
+              <div class="mock-nav-item">Resolved</div>
+              <div class="mock-nav-item">Spam</div>
+            </div>
+            <div class="mock-content">
+              <div class="mock-conv"><div class="mock-avatar" style="background:var(--icon-bg);"></div><div class="mock-lines"><div class="mock-line-a" style="width:80%"></div><div class="mock-line-b"></div></div></div>
+              <div class="mock-conv"><div class="mock-avatar" style="background:var(--priority-p1-bg);"></div><div class="mock-lines"><div class="mock-line-a" style="width:65%"></div><div class="mock-line-b" style="width:55%"></div></div></div>
+              <div class="mock-conv"><div class="mock-avatar" style="background:var(--priority-p3-bg);"></div><div class="mock-lines"><div class="mock-line-a" style="width:75%"></div><div class="mock-line-b" style="width:40%"></div></div></div>
+            </div>
+            <div class="mock-chat-area">
+              <div class="mock-bubble"></div>
+              <div class="mock-bubble right"></div>
+              <div class="mock-bubble" style="width:45%"></div>
+              <div class="mock-input-bar">
+                <div class="mock-input">Type a message...</div>
+                <div class="mock-send">Send</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-pillars">
+          <div class="pillar-item">
+            <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3z"/></svg></span>
+            <div class="pillar-title">Secure</div>
+            <div class="pillar-desc">Reliable &amp; compliant</div>
+          </div>
+          <div class="pillar-item">
+            <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></span>
+            <div class="pillar-title">Scalable</div>
+            <div class="pillar-desc">Built for growth</div>
+          </div>
+          <div class="pillar-item">
+            <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11V5a2 2 0 0 0-2-2h-6M4 13v6a2 2 0 0 0 2 2h6"/><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>
+            <div class="pillar-title">Customizable</div>
+            <div class="pillar-desc">Adapt to your needs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3: Product Modules -->
+      <div class="modules-panel">
+        <div class="flow-node" aria-hidden="true">→</div>
+        <div class="section-label">Product Modules</div>
+        <div class="section-sublabel">Turn conversations into value.</div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L3 21l2.4-6.4A8 8 0 1 1 21 11.5z"/></svg></div>
+            <div class="module-text"><div class="module-name">Omnichannel Chat <span class="st st-live"></span></div><div class="module-desc">Conversation V2</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5H4a2 2 0 0 0-2 2v3a2 2 0 0 1 0 4v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a2 2 0 0 1 0-4V7a2 2 0 0 0-2-2z"/></svg></div>
+            <div class="module-text"><div class="module-name">Ticket <span class="st st-live"></span></div><div class="module-desc">Ticket V2</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
+            <div class="module-text"><div class="module-name">Sales <span class="st st-build"></span></div><div class="module-desc">PRD + P0 fixes</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></div>
+            <div class="module-text"><div class="module-name">Broadcast <span class="st st-live"></span></div><div class="module-desc">+ invoice fraud*</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></div>
+            <div class="module-text"><div class="module-name">Analytics <span class="st st-live"></span></div><div class="module-desc">+ advance export</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18 9l-4.1 1.4L12 15l-1.9-4.6L6 9l4.1-1.4L12 3z"/><path d="M19 15l.8 2 .2.8.8.2 2 .8-2 .8-.8.2-.2.8-.8 2-.8-2-.2-.8-.8-.2-2-.8 2-.8.2-.8.8-.2.8-2z"/></svg></div>
+            <div class="module-text"><div class="module-name">AI <span class="st st-plan"></span></div><div class="module-desc">bot + summary</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11V5a2 2 0 0 0-2-2h-6M4 13v6a2 2 0 0 0 2 2h6"/><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></div>
+            <div class="module-text"><div class="module-name">Tools / Add-ons <span class="st st-build"></span></div><div class="module-desc">widget module · chat tools API</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+            <div class="module-text"><div class="module-name">Payment <span class="st st-plan"></span></div><div class="module-desc">scoping</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20 2 2 0 0 0 0-4 2 2 0 0 1 0-4h2a4 4 0 0 0 4-4 8 8 0 0 0-8-8z"/></svg></div>
+            <div class="module-text"><div class="module-name">Theme <span class="st st-plan"></span></div><div class="module-desc">scoping</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+            <div class="module-text"><div class="module-name">Affiliate <span class="st st-plan"></span></div><div class="module-desc">scoping</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+            <div class="module-text"><div class="module-name">Notification <span class="st st-live"></span></div><div class="module-desc">targeting fix</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+            <div class="module-text"><div class="module-name">Mobile App <span class="st st-plan"></span></div><div class="module-desc">widget app web / mobile</div></div>
+          </div>
+          <div class="module-item">
+            <div class="module-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg></div>
+            <div class="module-text"><div class="module-name">Open API <span class="st st-plan"></span></div><div class="module-desc">public contract</div></div>
+          </div>
+
+          <!-- §35/§37 — legend anchored under the module list, footnote on its own line -->
+          <div class="legend">
+            <span><span class="lg" style="background:var(--accent-success)"></span>Live</span>
+            <span><span class="lg" style="background:var(--accent-warning)"></span>In development / scoped</span>
+            <span><span class="lg" style="background:var(--text-4)"></span>Planned / backlog</span>
+            <span class="legend-note">* Fraud broadcast: blocked, menunggu requirement Lincah</span>
+          </div>
+      </div>
+
+      <!-- Col 4: Business Value -->
+      <div class="value-panel">
+        <div class="flow-node" aria-hidden="true">→</div>
+        <div class="section-label">Business Value</div>
+        <div class="section-sublabel">Create impact at every level.</div>
+
+          <div class="value-card">
+            <div class="value-header">
+              <div class="value-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+              <div class="value-name">Operational</div>
+            </div>
+            <div class="value-check"><div class="check-dot">✓</div> Faster response, tepat sasaran</div>
+            <div class="value-check"><div class="check-dot">✓</div> Satu contact lintas channel</div>
+          </div>
+
+          <div class="value-card">
+            <div class="value-header">
+              <div class="value-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 5 0M9.5 14.5a2.5 2.5 0 0 0 5 0"/></svg></div>
+              <div class="value-name">Cost &amp; Insight</div>
+            </div>
+            <div class="value-check"><div class="check-dot">✓</div> Cost visibility WhatsApp Official</div>
+            <div class="value-check"><div class="check-dot">✓</div> Insight lewat export dinamis</div>
+          </div>
+
+          <div class="value-card">
+            <div class="value-header">
+              <div class="value-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+              <div class="value-name">Platform</div>
+            </div>
+            <div class="value-check"><div class="check-dot">✓</div> Stabil dan scalable infra</div>
+          </div>
+      </div>
+    </div><!-- /main-grid -->
+
+    <!-- Strategic Areas -->
+    <div class="strategic-section">
+      <div class="strategic-header">
+        <div class="strategic-title-area">
+          <div class="strategic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+          <div>
+            <div class="strategic-title">Strategic Areas &amp; Recommendations</div>
+            <div class="strategic-desc">13 strategic areas, urutan sesuai dokumen — plus roadmap themes hasil grouping eksekusi task list.</div>
+          </div>
+        </div>
+        <div class="s-legend">
+          <div class="s-legend-item"><div class="s-dot" style="background:var(--priority-p1-fg);"></div> P1 — kerjakan dulu</div>
+          <div class="s-legend-item"><div class="s-dot" style="background:var(--priority-p2-fg);"></div> P2 — next</div>
+          <div class="s-legend-item"><div class="s-dot" style="background:var(--priority-p3-fg);"></div> P3 — later</div>
+        </div>
+      </div>
+      <hr class="strategic-divider">
+
+      <div class="strategic-grid">
+        <div class="strat-card">
+          <span class="strat-num">01</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-6M22 20H2"/></svg></div><div class="strat-name">Analytics</div></div>
+          <div class="strat-desc">Advance export dinamis, deeper insights.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">02</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg></div><div class="strat-name">Open API</div></div>
+          <div class="strat-desc">Chat tools API, public contract untuk integrasi.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">03</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l16-5v12L3 13v-2z"/></svg></div><div class="strat-name">Broadcast</div></div>
+          <div class="strat-desc">Fraud invoice + dashboard statistik (blocked Lincah).</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">04</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8 8 0 0 1-11.6 7.1L3 21l2.4-6.4A8 8 0 1 1 21 11.5z"/></svg></div><div class="strat-name">Omnichannel Chat</div></div>
+          <div class="strat-desc">UI redesign, informative utilities, grouping contact.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">05</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/></svg></div><div class="strat-name">Ticket</div></div>
+          <div class="strat-desc">KPI card &amp; dynamic status halaman utama.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">06</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div><div class="strat-name">Sales</div></div>
+          <div class="strat-desc">PRD + P0 fixes dulu, lalu revamp UX &amp; prospect flow.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">07</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/><path d="M13 7h8M17 3v8M3 17h8M7 13v8"/></svg></div><div class="strat-name">Tools / Add-ons</div></div>
+          <div class="strat-desc">Widget module, simplicity settings, FAQ in-app.</div>
+        </div>
+      </div>
+
+      <div class="strategic-grid-2">
+        <div class="strat-card">
+          <span class="strat-num">08</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18 9l-4.1 1.4L12 15l-1.9-4.6L6 9l4.1-1.4L12 3z"/></svg></div><div class="strat-name">AI</div></div>
+          <div class="strat-desc">Chatbot auto response, conversation summary.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">09</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20 2 2 0 0 0 0-4 2 2 0 0 1 0-4h2a4 4 0 0 0 4-4 8 8 0 0 0-8-8z"/></svg></div><div class="strat-name">Theme</div></div>
+          <div class="strat-desc">Customization &amp; branding (scoping).</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">10</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/></svg></div><div class="strat-name">Affiliate</div></div>
+          <div class="strat-desc">Program affiliate untuk grow ecosystem (scoping).</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">11</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><div class="strat-name">Payment</div></div>
+          <div class="strat-desc">Integrasi payment solutions (scoping).</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">12</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="strat-name">Notification</div></div>
+          <div class="strat-desc">Targeting &amp; delivery correctness.</div>
+        </div>
+        <div class="strat-card">
+          <span class="strat-num">13</span>
+          <div class="strat-icon-label"><div class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div><div class="strat-name">Mobile App</div></div>
+          <div class="strat-desc">Widget app web / mobile, Google login.</div>
+        </div>
+        <div class="bigger-together">
+          <div class="bt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
+          <div class="bt-text">
+            <div class="bt-title">Bigger Together</div>
+            <div class="bt-desc">More channels. More features.<br>More opportunities.<br>A stronger SatuInbox.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-bottom:2px;">Roadmap Themes</div>
+      <div class="section-sublabel">Grouping eksekusi dari task list:</div>
+      <div class="themes-grid">
+        <div class="scard">
+          <div class="head">Platform Stability <span class="prio prio-p1">P1</span></div>
+          <ul>
+            <li>Infra stability track (skor 50% → naik per slice)</li>
+            <li>Notification targeting correctness</li>
+            <li>DB topology hot / warm / cold (hold, butuh evidence)</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">Growth &amp; Internal Ops <span class="prio prio-p1">P1</span></div>
+          <ul>
+            <li>Superadmin internal: approval pendaftaran</li>
+            <li>GTM — statistik dan analisis Google Ads</li>
+            <li>Demo database dan dashboard kandidat</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">Monetization Guard <span class="prio prio-p2">P2</span></div>
+          <ul>
+            <li>WhatsApp Official pricing research (Meta per-message)</li>
+            <li>Cost simulation dan overbudget guarding</li>
+            <li>Fraud invoice via broadcast (blocked Lincah)</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">UX Simplification <span class="prio prio-p2">P2</span></div>
+          <ul>
+            <li>UI conversation redesign (audit lalu implementasi)</li>
+            <li>Simplicity settings dan wizard onboarding</li>
+            <li>Informative utilities dan FAQ in-app</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">Sales Expansion <span class="prio prio-p2">P2</span></div>
+          <ul>
+            <li>Sales module PRD dan P0 fixes dulu</li>
+            <li>Create prospect from conversation</li>
+            <li>Revamp UX dan workflow (fase 2)</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">Unified Contact <span class="prio prio-p2">P2</span></div>
+          <ul>
+            <li>Grouping contact lintas channel (satu identity)</li>
+            <li>Butuh PRD dan dedupe / migration plan</li>
+            <li>Blast radius: broadcast, visibility, merge race</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">AI &amp; Automation <span class="prio prio-p3">P3</span></div>
+          <ul>
+            <li>Chatbot auto response dan eskalasi human</li>
+            <li>Conversation AI summary</li>
+            <li>Foundation dulu, lalu PRD dan guard design</li>
+          </ul>
+        </div>
+        <div class="scard">
+          <div class="head">Channel &amp; Ecosystem <span class="prio prio-p3">P3</span></div>
+          <ul>
+            <li>Telegram (resume) · Shopee · TikTok</li>
+            <li>Chat tools API — communication layer</li>
+            <li>Widget app (web / mobile, Google login)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 2 — ROADMAP ================= -->
+  <div class="page" id="p1">
+
+    <div class="sticky-top">
+    <div class="header">
+      <div class="logo-block">
+        <div class="logo">Satu<span>Inbox</span></div>
+        <div class="logo-sub">One Conversation. More Possibilities.</div>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-center">
+        <h1>Task Prioritization &amp; Roadmap</h1>
+        <div class="subtitle">From current priorities to long-term growth</div>
+        <div class="desc">Focused execution to deliver the biggest impact for SatuInbox.</div>
+      </div>
+      <div class="header-right">
+        <div class="header-quote">
+          "Build today<br>for a bigger tomorrow."
+          <svg class="quote-swoosh" width="150" height="10" viewBox="0 0 150 10" fill="none">
+            <path d="M2 6.5 C 30 1.5, 60 9, 92 3.5 S 132 1.5, 148 5" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="roadmap-label">Roadmap Sep – Dec 2026 · Impact → Effort → Testing → Dependency</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-block">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v3h6V3M8 11h8M8 15h5"/></svg></div>
+        <div><div class="stat-num">30</div><div class="stat-label">Total Tasks</div></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <div><div class="stat-num">7</div><div class="stat-label">Current Tasks</div></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-icon" style="background:var(--priority-p1-bg);color:var(--priority-p1-fg);"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></div>
+        <div>
+          <div><span class="stat-badge" style="background:var(--priority-p1-bg);color:var(--priority-p1-fg);">● P1</span></div>
+          <div class="stat-num">7</div><div class="stat-label">(Kerjakan dulu)</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-icon" style="background:var(--priority-p2-bg);color:var(--priority-p2-fg);"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></div>
+        <div>
+          <div><span class="stat-badge" style="background:var(--priority-p2-bg);color:var(--priority-p2-fg);">● P2</span></div>
+          <div class="stat-num">9</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-icon" style="background:var(--priority-p3-bg);color:var(--priority-p3-fg);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6H21l-5 4 2 7-6-4-6 4 2-7-5-4h6.5z"/></svg></div>
+        <div>
+          <div><span class="stat-badge" style="background:var(--priority-p3-bg);color:var(--priority-p3-fg);">● P3</span></div>
+          <div class="stat-num">10</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-icon" style="background:var(--priority-backlog-bg);color:var(--priority-backlog-fg);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></div>
+        <div>
+          <div><span class="stat-badge" style="background:var(--priority-backlog-bg);color:var(--priority-backlog-fg);">● Backlog</span></div>
+          <div class="stat-num">4</div><div class="stat-label">(Belum ready)</div>
+        </div>
+      </div>
+
+      <div class="rules-area">
+        <div class="rule-box">
+          <div class="rule-title">Priority Rule</div>
+          <div class="rule-item">1. Impact (H &gt; M &gt; L)</div>
+          <div class="rule-item">2. Effort (L &gt; M &gt; H)</div>
+          <div class="rule-item">3. Testing (L &gt; M &gt; H)</div>
+          <div class="rule-item">4. Dependency (constraint timeline, bukan pengganti priority)</div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-title">Timeline Codes</div>
+          <div class="rule-item">S = September &nbsp;&nbsp; D = December</div>
+          <div class="rule-item">O = October &nbsp;&nbsp;&nbsp;&nbsp; B = Backlog</div>
+          <div class="rule-item">N = November</div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /sticky-top -->
+
+    <div class="table-panel">
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Task</th><th>Strategic Area</th><th>Description</th>
+            <th>Impact</th><th>Effort</th><th>Testing</th><th>Dependency</th><th>Priority</th>
+            <th class="mo">Sep</th><th class="mo">Oct</th><th class="mo">Nov</th><th class="mo">Dec</th><th class="mo">Backlog</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="grp"><td colspan="14">Current tasks — start now</td></tr>
+
+          <tr>
+            <td class="num">1</td><td class="tname">Super admin internal</td><td class="area">Growth &amp; Internal Ops</td>
+            <td class="tdesc">Halaman superadmin internal-only: approval pendaftaran SatuInbox dan internal administration</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">2</td><td class="tname">GTM</td><td class="area">Growth &amp; Internal Ops</td>
+            <td class="tdesc">Statistik dan analisis Google Ads pada internal dashboard — bagian dari superadmin internal</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">Task #1</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">3</td><td class="tname">Demo database and dashboard</td><td class="area">Growth &amp; Internal Ops</td>
+            <td class="tdesc">Data kandidat user yang request demo aplikasi + dashboard untuk mengelola request</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">Task #1</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">4</td><td class="tname">Notification service improvement</td><td class="area">Platform Stability</td>
+            <td class="tdesc">Notification tepat sasaran: targeting, delivery correctness, recipient correctness</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Regression matrix notification</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">5</td><td class="tname">Advance exporting</td><td class="area">Analytics</td>
+            <td class="tdesc">Export data statistik secara dinamis: user memilih data yang dibutuhkan lalu export</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Jangan paralel dengan #4</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">6</td><td class="tname">Email summary</td><td class="area">Notification</td>
+            <td class="tdesc">NEEDS DESCRIPTION — scope belum cukup didefinisikan. Penerima, frekuensi, isi summary, trigger, format, dan data source belum boleh diasumsikan</td>
+            <td><span class="metric metric-unknown">?</span></td><td><span class="metric metric-unknown">?</span></td><td><span class="metric metric-unknown">?</span></td>
+            <td class="dep">Requirement belum tersedia</td><td><span class="prio prio-backlog">NEEDS DESCRIPTION</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">7</td><td class="tname">Fraud dashboard</td><td class="area">Monetization Guard</td>
+            <td class="tdesc">Invoice fraud via broadcast, integrasi Lincah App, data customer dan penagihan, dashboard statistik broadcast</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Final requirement user fraud + Lincah ⛔</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+
+          <tr class="grp"><td colspan="14">Next priorities — September to October</td></tr>
+
+          <tr>
+            <td class="num">8</td><td class="tname">WA official adjustment research</td><td class="area">Monetization Guard</td>
+            <td class="tdesc">Research perubahan API Meta: apakah user membayar setiap message yang dikirim atau diterima</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-low">L</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">9</td><td class="tname">Infra redesign and stability — slice 1</td><td class="area">Platform Stability</td>
+            <td class="tdesc">Reliability dan stability foundation; stabilitas saat ini sekitar 50%. Track bulanan ber-slice, bukan big-bang</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">10</td><td class="tname">Sales module — PRD + P0 fixes</td><td class="area">Sales Expansion</td>
+            <td class="tdesc">Security scope, transition guard, team transfer (Gap-002 / 003 / 004) sebelum revamp UX</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p1">P1</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p1"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">11</td><td class="tname">Cost simulation WA official and guarding</td><td class="area">Monetization Guard</td>
+            <td class="tdesc">Used cost visibility per conversation WhatsApp Official, budget awareness, guarding overbudget</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Task #8 research</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">12</td><td class="tname">Informative utilities</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Deskripsi fitur penting dan message utility di conversation: channel disconnect, penggantian nomor</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">13</td><td class="tname">FAQ in-app</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Halaman FAQ di dalam aplikasi; saat ini FAQ hanya tersedia di landing page</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-low">L</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+
+          <tr class="grp"><td colspan="14">November</td></tr>
+
+          <tr>
+            <td class="num">14</td><td class="tname">Ticketing KPI card and dynamic status</td><td class="area">Ticket</td>
+            <td class="tdesc">KPI card halaman utama ticket; status dapat di-setup dinamis oleh user dan KPI mengikutinya</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Testing per-tenant config</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">15</td><td class="tname">Simplicity settings</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Settings lebih simple: information architecture, guidance, clarity, user journey</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Regression lintas settings</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">16</td><td class="tname">Grouping contact</td><td class="area">Unified Contact</td>
+            <td class="tdesc">Satu contact dapat digunakan lintas seluruh channel; saat ini contact terpisah per channel</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">PRD + migration / dedupe plan</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">17</td><td class="tname">Create prospect from conversation</td><td class="area">Sales Expansion</td>
+            <td class="tdesc">Interconnection conversation ke sales: user menilai conversation sebagai prospect lalu create prospect</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">Task #10 sales PRD / P0</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">18</td><td class="tname">UI conversation redesign — audit</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Audit ulang UX / UX conversation: placement button dan section, user workflow, responsive seluruh viewport</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-low">L</span></td><td><span class="metric metric-low">L</span></td>
+            <td class="dep">—</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+
+          <tr class="grp"><td colspan="14">December</td></tr>
+
+          <tr>
+            <td class="num">19</td><td class="tname">UI conversation redesign — implementation</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Eksekusi hasil audit #18; scope diambil dari pain-point list, bukan asumsi</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Task #18 audit</td><td><span class="prio prio-p2">P2</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p2"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">20</td><td class="tname">Wizard setting onboarding</td><td class="area">UX Simplification</td>
+            <td class="tdesc">Quick guide saat user pertama kali mengakses halaman; muncul satu kali, P1 dapat diulang on-demand</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Task #15 settings</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">21</td><td class="tname">Widget module</td><td class="area">Tools / Add-ons</td>
+            <td class="tdesc">Improvement UX / UX dan workflow, termasuk domain-specific configuration per widget</td>
+            <td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Settings selesai dulu</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+          <tr>
+            <td class="num">22</td><td class="tname">Sales module — revamp UX and workflow</td><td class="area">Sales Expansion</td>
+            <td class="tdesc">Improvement UX, workflow, dan user experience; fase 2 setelah PRD dan P0 stabil</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Task #10 stabil</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td><td class="mo"><div class="bar"></div></td>
+          </tr>
+
+          <tr class="grp"><td colspan="14">Later / backlog — butuh scope atau unblock dulu</td></tr>
+
+          <tr>
+            <td class="num">23</td><td class="tname">DB topology hot / warm / cold</td><td class="area">Platform Stability</td>
+            <td class="tdesc">Tiering umur data conversation-service dan ticket-service; exclude conversation group, collection vs DB belum diputuskan</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Rca / perf evidence, hold feature</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+          <tr>
+            <td class="num">24</td><td class="tname">Chat bot auto response</td><td class="area">AI &amp; Automation</td>
+            <td class="tdesc">AI agent merespons chat pelanggan tanpa human agent, dengan eskalasi ke human agent bila dibutuhkan</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">PRD + guard + SLA design</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+          <tr>
+            <td class="num">25</td><td class="tname">Conversation AI summary</td><td class="area">AI &amp; Automation</td>
+            <td class="tdesc">AI agent memberikan summary singkat isi conversation; dependency dinilai dari architecture</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Task #24 AI foundation</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+          <tr>
+            <td class="num">26</td><td class="tname">Chat tools API</td><td class="area">Channel &amp; Ecosystem</td>
+            <td class="tdesc">Communication layer untuk integrasi pihak ketiga; butuh assessment API contract dan integration requirement</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Design auth / tenant / versioning</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+          <tr>
+            <td class="num">27</td><td class="tname">Widget app</td><td class="area">Channel &amp; Ecosystem</td>
+            <td class="tdesc">Web dan mobile app dengan konsep authentication Google login; scope final butuh assessment</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-medium">M</span></td>
+            <td class="dep">Discovery / assessment</td><td><span class="prio prio-p3">P3</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-p3"></div></td>
+          </tr>
+          <tr>
+            <td class="num">28</td><td class="tname">Telegram</td><td class="area">Channel &amp; Ecosystem</td>
+            <td class="tdesc">Telegram sebagai channel baru; development sempat pending (sekitar 18 Fs-days)</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Kapasitas tim</td><td><span class="prio prio-backlog">Backlog</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-backlog"></div></td>
+          </tr>
+          <tr>
+            <td class="num">29</td><td class="tname">Shopee chat</td><td class="area">Channel &amp; Ecosystem</td>
+            <td class="tdesc">Shopee sebagai source channel chat baru; pending menunggu seller yang bersedia jadi akun testing</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Seller test account ⛔</td><td><span class="prio prio-backlog">Backlog</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-backlog"></div></td>
+          </tr>
+          <tr>
+            <td class="num">30</td><td class="tname">TikTok chat</td><td class="area">Channel &amp; Ecosystem</td>
+            <td class="tdesc">TikTok sebagai source channel chat baru; butuh assessment scope sebelum dijadwalkan</td>
+            <td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td><td><span class="metric metric-high">H</span></td>
+            <td class="dep">Task #29 marketplace foundation</td><td><span class="prio prio-backlog">Backlog</span></td>
+            <td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar"></div></td><td class="mo"><div class="bar on-backlog"></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="takeaways">
+      <div class="takeaway-label">
+        <div class="tk-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
+        Legend
+      </div>
+      <div class="takeaway-items">
+        <span><span class="lg" style="background:var(--priority-p1-fg)"></span>P1 — kerjakan dulu</span>
+        <span><span class="lg" style="background:var(--priority-p2-fg)"></span>P2 — next</span>
+        <span><span class="lg" style="background:var(--priority-p3-fg)"></span>P3 — later</span>
+        <span><span class="lg" style="background:var(--priority-backlog-fg)"></span>Backlog — belum ready dijadwalkan</span>
+        <span>Impact / Effort / Testing: <span class="metric metric-high">H</span> <span class="metric metric-medium">M</span> <span class="metric metric-low">L</span> <span class="metric metric-unknown">?</span></span>
+        <span>⛔ = blocked external</span>
+      </div>
+      <div class="exec-clarity">
+        <div class="ec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></div>
+        <div>
+          <div class="ec-title">Execute with Clarity</div>
+          <div class="ec-desc">Build a stronger SatuInbox.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.page').forEach((p,j)=>p.classList.toggle('active',j===i));
+  try{history.replaceState(null,'','#page='+i)}catch(e){}
+}
+try{if(window.self!==window.top){document.querySelector('.tabs').style.display='none'}}catch(e){}
+try{var _hp=parseInt(new URLSearchParams(location.hash.slice(1)).get('page'));if(!isNaN(_hp)&&_hp>=0&&_hp<=1)go(_hp)}catch(e){}
+/* ponytail: area-chip dot hue map — chip surface/text now theme-driven via CSS;
+   only the small per-area dot keeps a stable identity hue. Extend when a new area appears. */
+(function(){
+  var dot={
+    'Growth & Internal Ops':'#94a3b8','Platform Stability':'#38bdf8','Analytics':'#3b82f6',
+    'Notification':'#f87171','Monetization Guard':'#eab308','Sales Expansion':'#22c55e',
+    'UX Simplification':'#f59e0b','Ticket':'#fb923c','Unified Contact':'#ef4444',
+    'Tools / Add-ons':'#f59e0b','AI & Automation':'#4ade80','Channel & Ecosystem':'#ec4899'
+  };
+  document.querySelectorAll('td.area').forEach(function(td){
+    var name=td.textContent.trim(), c=dot[name]||'#94a3b8';
+    td.innerHTML='<span class="area-chip"><span class="area-dot" style="background:'+c+';"></span>'+name+'</span>';
+  });
+})();
+</script>
+</body>
+</html>

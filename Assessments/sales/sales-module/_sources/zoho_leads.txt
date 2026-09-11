@@ -1,0 +1,139 @@
+URL: https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module
+FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module
+
+Title: Zoho Community | Connect, network, and share on Zoho Forums
+
+URL Source: https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module
+
+Markdown Content:
+###### Welcome to Portal
+
+[Skip to Content](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module#layoutContainer)[Skip to Menu](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module#headerContainer)[Skip to Footer](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module#footer)
+
+[![Image 1](https://help.zoho.com/portal/api/publicImages/205219028040263104?portalId=edbsn3857479fd7bb83e29368ff05a1860319f4481b7f04184d0e9b6e93712995a590)](https://www.zoho.com/)[![Image 2](https://desk.zoho.in/portal/api/publicImages/205219035382520606?portalId=edbsn3857479fd7bb83e29368ff05a1860319f4481b7f04184d0e9b6e93712995a590)](https://www.zoho.com/)Zoho Corporation
+
+* [Home](https://help.zoho.com/portal/en/home "Home")
+* [My Area](https://help.zoho.com/portal/en/myarea "My Area")
+* [Knowledge Base](https://help.zoho.com/portal/en/kb "Knowledge Base")
+* [Community](https://help.zoho.com/portal/en/community "Community")
+* [オンラインフォーラム](https://help.zoho.com/portal/ja/community "オンラインフォーラム")
+* [ZUGs](https://zoho.to/zugs "Zugs")
+* * Sign In
+
+[As a customer To submit requests, browse through articles and participate in the community.](https://help.zoho.com/accounts/p/50026469102/clientidprequest?servicename=ZohoSupport&service_language=en&provider=ZOHO&serviceurl=https%3A%2F%2Fhelp.zoho.com%2Fportal%2Fen%2Fkb%2Fcrm%2Fmanage-leads%2Farticles%2Fleads-standard-module)[As an agent To access the agent interface where you can handle your tickets.](https://accounts.zoho.in/login?servicename=ZohoSupport&serviceurl=%2Fsupport%2Fzohocorp) 
+
+English
+
+## Welcome to Zoho Cares
+
+Search our knowledge base, ask the community or submit a request.
+
+* [Add Request](https://help.zoho.com/portal/en/newticket)
+* [Add Topic](https://help.zoho.com/portal/en/community/topics/new)
+
+Sorry, this page doesn't exist.
+
+Please check the URL for proper spelling and capitalization.
+
+By submitting this form, you agree to the processing of personal data according to our [Privacy Policy.](https://zoho.com/privacy.html)
+
+Follow us on:
+
+[](https://twitter.com/zoho)[](https://www.linkedin.com/company/zohocorp/)[](https://www.youtube.com/user/zoho)
+
+#### Apps
+
+* [Mobile Apps](https://www.zoho.com/mobile-apps.html)
+* [G Suite Integration](https://www.zoho.com/g-suite/)
+* [Microsoft Office 365 Integration](https://www.zoho.com/office365/)
+* [Apps for Apple Watch](https://www.zoho.com/apple-watch.html)
+
+#### Partners
+
+* [Hosting Providers](https://www.zoho.com/hosting/)
+* [Partners](https://www.zoho.com/partnerportal.html)
+* [Consulting Partners](https://www.zoho.com/consulting-partners.html)
+* [Platform Partners](https://www.zoho.com/platform-partners.html)
+* [Technology Partners](https://www.zoho.com/technology-partners.html)
+
+#### Resources
+
+* [Zia](https://www.zoho.com/zia/)
+* [Support](https://help.zoho.com/portal/en/home)
+* [Community](https://community.zoho.com/)
+* [Forums](https://help.zoho.com/portal/en/community)
+* [Blogs](https://www.zoho.com/blog)
+* [Academy](https://www.zoho.com/academy/)
+
+#### About
+
+* [About Zoho](https://www.zoho.com/aboutus.html)
+* [Perspectives](https://www.zoho.com/perspectives/)
+* [Events](https://www.zoho.com/events.html?src=zohofooter)
+* [Press](https://www.zoho.com/press.html)
+* [Zoho in the News](https://www.zoho.com/inthenews.html)
+* [Zoho Opinions](https://www.zoho.com/opinions.html)
+* [Contact Us](https://www.zoho.com/contactus.html)
+* [Zoho Schools](https://www.zohoschools.com/)
+
+#### Contact - India
+
+* [GST Helpline](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module)
+* [1800 123 7711](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module)
+* [gstindia@zohofinance.com](mailto:gstindia@zohofinance.com)
+
+* [Sales](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module)
+* [1800 103 1123](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module)
+* [+91 (44) 69656060](https://help.zoho.com/portal/en/kb/crm/manage-leads/articles/leads-standard-module)
+* [sales@zohocorp.com](mailto:sales@zohocorp.com)
+
+* [Zoho Home](https://www.zoho.com/)
+* [Contact](https://www.zoho.com/contactus.html)
+* [Security](https://www.zoho.com/security.html)
+* [IPR Complaints](https://www.zoho.com/ipr-complaints.html)
+* [Anti-spam Policy](https://www.zoho.com/policy.html)
+* [Terms of Service](https://www.zoho.com/terms.html)
+* [Privacy Policy](https://www.zoho.com/privacy.html)
+* [Cookie Policy](https://www.zoho.com/privacy/cookie-policy.html)
+* [GDPR Compliance](https://www.zoho.com/gdpr.html)
+* [Abuse Policy](https://www.zoho.com/abuse-policy/)
+* [Community Guidelines](https://community.zoho.com/terms.html)
+
+© 2026, Zoho Corporation Pvt. Ltd. All Rights Reserved.
+
+* [Zoho ホーム](https://www.zoho.com/jp/)
+* [プレスリリース](https://www.zoho.com/jp/press.html)
+* [Zohoについて](https://www.zoho.com/jp/aboutus.html)
+* [お問い合わせ](https://www.zoho.com/jp/contactus.html)
+* [セミナー・イベント開催予定](https://www.zoho.com/jp/webinar.html)
+* [Zoho コミュニティ](https://community.zoho.com/jp/)
+* [製品サポートガイドライン](https://www.zoho.com/jp/support-guideline.html)
+* [データセンターについて](https://www.zoho.com/know-your-datacenter.html)
+* [情報セキュリティについて](https://www.zoho.com/jp/security.html)
+* [コンプライアンス一覧](https://www.zoho.com/jp/compliance.html)
+* [知的財産権について](https://www.zoho.com/jp/ipr-complaints.html)
+* [迷惑メール防止規定](https://www.zoho.com/jp/policy.html)
+* [サービス規約](https://www.zoho.com/jp/terms.html)
+* [プライバシーポリシー](https://www.zoho.co.jp/privacy/)
+* [Cookieポリシー](https://www.zoho.com/jp/privacy/cookie-policy.html)
+* [GDPRコンプライアンス](https://www.zoho.com/jp/gdpr.html)
+* [悪用防止規定](https://www.zoho.com/jp/abuse-policy/)
+* [販売規約](https://www.zoho.com/jp/terms-of-sales-online-payment.html)
+* [サイトの利用条件](https://www.zoho.co.jp/termofuse/)
+
+© 2026, ZOHO Japan Corporation. All Rights Reserved.
+
+日本語
+
+* [English](https://www.zoho.com/?zredirect=f&zsrc=langdropdown&lb=jp)
+* [Español](https://www.zoho.com/es-xl/?zredirect=f&zsrc=langdropdown)
+* [Português (Brasil)](https://www.zoho.com/pt-br/?zredirect=f&zsrc=langdropdown)
+* [Deutsch](https://www.zoho.com/de/?zredirect=f&zsrc=langdropdown)
+* [Français](https://www.zoho.com/fr/?zredirect=f&zsrc=langdropdown)
+* [Nederlands](https://www.zoho.com/nl/?zredirect=f&zsrc=langdropdown)
+* [العربية](https://www.zoho.com/ar/?zredirect=f&zsrc=langdropdown)
+* [Bahasa Indonesia](https://www.zoho.com/id/?zredirect=f&zsrc=langdropdown)
+* [ภาษาไทย](https://www.zoho.com/th/?zredirect=f&zsrc=langdropdown)
+* [Tiếng Việt](https://www.zoho.com/vi/?zredirect=f&zsrc=langdropdown)
+* [Italiano](https://www.zoho.com/it/?zredirect=f&zsrc=langdropdown)
+* [简体中文](https://www.zoho.com.cn/?zredirect=f&zsrc=langdropdown)

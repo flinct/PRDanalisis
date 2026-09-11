@@ -1,0 +1,30 @@
+rank,task,source_column,score_effort_impact_testing,time,priority,note
+1,super admin internal (paket: approval pendaftaran),CURRENT TASK,MMM,S,P1,"Internal-only superadmin, in-flight; regression risk ke customer rendah."
+2,"GTM (statistik Google Ads, bagian superadmin internal)",CURRENT TASK,MML,S,P1,Satu paket dengan superadmin internal; brief GTM sudah ada.
+3,demo data base and dashboard (kandidat request demo),CURRENT TASK,MML,S,P1,"Satu paket superadmin internal; data internal, testing rendah."
+4,wa official adujstmen research (perubahan pricing Meta),FEATURE,LHL,S,P1,LHL murni. Output = decision memo pricing per-message; prasyarat cost simulation.
+5,infra stability — slice 1: SLO + top incident fixes,FEATURE,MHM,S,P1,"Stability 50% = impact tertinggi. Mulai sebagai track bulanan ber-slice, bukan redesign big-bang."
+6,notification service improvement (targeting tepat sasaran),CURRENT TASK,MHH,O,P1,"Correctness fix bernilai tinggi; testing tinggi (multi-role/tenant), butuh regression matrix notif."
+7,"sales module — PRD + P0 fixes (security scope, transition guard, team transfer)",FEATURE,MHM,O,P1,"P0 dari assessment existing (GAP-002/003/004, transition guard) dulu; revamp UI/workflow belakangan."
+8,cost simulation WA official + guarding,FEATURE,MHM,O,P2,Build setelah research #4. Guarding menyentuh send path → test hati-hati.
+9,advance exporting (export statistik dinamis),CURRENT TASK,HHM,O,P2,High effort; testing butuh window data incremental — jangan ditumpuk dengan #6 di sprint sama.
+10,informative utilities (deskripsi fitur + utility message conversation),UI/UX,MHM,O,P2,"Menurunkan kebingungan user; mostly FE + copy, testing sedang."
+11,faq (halaman FAQ in-app),UI/UX,LML,O,P3,Quick win filler; konten sudah ada di landing page.
+12,ticketing KPI card + dynamic status,UI/UX,MHM,N,P2,Improvement UI halaman ticket; dynamic status config butuh test per-tenant.
+13,simplicity settings (redesign + guidance),UI/UX,MHH,N,P2,UI redesign settings; regression lintas settings tinggi.
+14,grouping contact (unifikasi contact lintas channel),FEATURE,HHH,N,P2,"Identity merge = blast radius besar (broadcast, visibility, duplicate merge race). Wajib PRD + migration/dedupe plan dulu."
+15,create prospect from conversation,UI/UX,MHL,N,P2,Interconnection conversation→sales; jalan setelah sales PRD/P0 (#7).
+16,UI conversation redesign — audit UX,UI/UX,LHL,N,P2,"Audit dulu (reuse Track B uiux existing), implementasi di D."
+17,UI conversation redesign — implementasi,UI/UX,MHM,D,P2,"Eksekusi hasil audit #16; scope dari pain-point list, bukan full rewrite."
+18,wizard setting onboarding (quick guide sekali muncul),UI/UX,MMM,D,P3,FE-only; P1 requirement replay guide masuk fase ini juga.
+19,widget module (UI/UX + workflow + domain per widget),FEATURE,MMM,D,P3,Improvement widget existing; jalan setelah settings/onboarding beres.
+20,sales module — revamp UI/workflow,FEATURE,HHM,D,P3,Fase 2 setelah PRD+P0 (#7) stabil.
+21,DB topology HOT/WARM/COLD (+ exclude conversation group),FEATURE,HHH,B,P3,Assessment existing: HOLD_FEATURE (audit/database). Butuh RCA/perf evidence + keputusan exclude-group sebelum maju.
+22,fraud dashboard (invoice fraud via broadcast + integrasi Lincah),CURRENT TASK,HHM,B,P3,Blocked: menunggu final requirement user fraud & Lincah. Jangan masuk bulan delivery.
+23,chat bot auto response (AI agent + eskalasi human),BACKLOG,HHH,B,P3,"Feature besar; butuh PRD, guard, SLA/escalation design."
+24,converesation AI summary,BACKLOG,MHH,B,P3,Menyusul setelah AI agent foundation (#23).
+25,chat tools API (communication layer pihak ketiga),BACKLOG,HHM,B,P3,"Public API: auth, tenant isolation, versioning — butuh design dulu."
+26,"widget app (web/mobile app, Google login)",BACKLOG,HHM,B,P3,Produk baru; discovery dulu.
+27,telegram channel (resume pending dev),BACKLOG,HHH,B,P3,Resume saat kapasitas ada; estimasi lama ~18 FS-days (impact matrix #168).
+28,shopee chat,BACKLOG,HHH,B,P3,Blocked: menunggu seller test account.
+29,tiktok chat,BACKLOG,HHH,B,P3,Setelah shopee/foundation channel marketplace.

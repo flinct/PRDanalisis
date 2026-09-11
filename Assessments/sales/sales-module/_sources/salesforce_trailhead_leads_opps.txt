@@ -1,0 +1,151 @@
+URL: https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities
+FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities
+
+Title: 404 | Salesforce Trailhead
+
+URL Source: https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities
+
+Warning: Target URL returned error 404: Not Found
+
+Markdown Content:
+[Skip to main content](https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities#main)
+
+[Trailhead](https://trailhead.salesforce.com/)
+
+* [Home](https://trailhead.salesforce.com/)
+* Learn
+
+### Grow your Salesforce expertise
+
+* [Badges Gain new skills and hands-on experience through bite-sized units](https://trailhead.salesforce.com/badges)
+* [Trails Follow guided learning paths](https://trailhead.salesforce.com/trails)
+* [Trailhead Journeys Curated trails that build product expertise](https://trailhead.salesforce.com/trailhead-journeys)
+* [Superbadges Get hands-on applying your skills to solve real-world challenges](https://trailhead.salesforce.com/superbadges)
+* [Trailmixes Create and follow custom learning playlists](https://trailhead.salesforce.com/trailmixes)
+
+### Other learning tools
+
+* [Become an Agentblazer Learn in-demand AI skills to build the future](https://trailhead.salesforce.com/agentblazer)
+* [Trailblazer Quests Learn new skills and win fun prizes](https://trailhead.salesforce.com/quests)
+* [Trailhead Mobile App Skill up anytime, anywhere](https://trailhead.salesforce.com/mobile)
+* [Instructor-led Training Learn directly from experts](https://trailheadacademy.salesforce.com/)
+* [Academic Programs Explore resources for students and educators](https://www.salesforce.com/workforce-development/higher-education/)
+
+* Community
+
+### Connect with the Trailblazer Community
+
+* [Feed Ask and answer questions to build your skills](https://trailhead.salesforce.com/trailblazer-community/feed)
+* [Groups Meet and collaborate with Trailblazers to grow your network](https://trailhead.salesforce.com/trailblazer-community/groups)
+* [Topics Discover featured and trending topics](https://trailhead.salesforce.com/trailblazer-community/topics)
+* [Group Meetings Join local community group meetings](https://trailhead.salesforce.com/trailblazer-community/meetings)
+* [360 Blog Learn about new Salesforce innovations](https://www.salesforce.com/blog/category/trailblazer/)
+
+* Career Growth
+
+### Build your Salesforce career
+
+* [Role-Based Career Paths Explore which career is right for you and learn role-based skills](https://trailhead.salesforce.com/career-path)
+* [Trailblazer Workforce Partner Programs Find expert-led training programs to build Salesforce skills and launch your career.](https://www.salesforce.com/workforce-development/)
+
+* Certifications
+
+### Earn resume-worthy credentials
+
+* [Certifications Overview Discover how to prove your expertise with globally-recognized certifications.](https://trailheadacademy.salesforce.com/certification-overview)
+* [Certifications by Role Find certifications specific to your role.](https://trailhead.salesforce.com/credentials/administratoroverview/)
+* [Browse All Certifications Explore the catalog of certifications designed to prove your expertise.](https://trailheadacademy.salesforce.com/all-offerings#f-assetType=Certification)
+
+### Discover resources
+
+* [Maintain Certifications Learn about recent product updates and demonstrate your knowledge.](https://trailhead.salesforce.com/content/learn/trails/maintain-your-salesforce-certifications)
+* [Verify Certifications Validate certifications and view your maintenance requirements.](https://trailhead.salesforce.com/credentials/verification)
+
+* Help
+
+### All support
+
+* [Salesforce Help Get help with Trailhead, Instructor-led Training, Certifications, Salesforce products, and more](https://help.salesforce.com/services/auth/sso/trailheadlogincommunity?startURL=/s)
+* [My Cases Review and receive updates about submitted cases](https://help.salesforce.com/services/auth/sso/trailheadlogincommunity?startURL=/s/cases)
+* [Hands-On Challenge Help Get guidance from experts in the Trailblazer Community](https://trailhead.salesforce.com/trailblazer-community/topics/trailheadchallenges?sort=LAST_MODIFIED_DATE_DESC&ref=nav)
+
+### Trailblazer resources
+
+* [IdeaExchange Share and vote on ideas for improving Salesforce products](https://ideas.salesforce.com/)
+* [Be A Trailblazer Learn what it means to be a Trailblazer](https://www.salesforce.com/company/be-a-trailblazer/?sfdc-redirect=387)
+* [Trailhead MCP Support Connect your AI tools directly to Trailhead content and data](https://trailhead.salesforce.com/support/mcp)
+
+[Sign Up](https://trailhead.salesforce.com/sessions/users/new?type=tbidsignup)
+
+Bring your team and maximize your impact at Dreamforce. [Register](https://www.salesforce.com/dreamforce/register/?&utm_source=event&utm_medium=web-notification-bar&utm_campaign=Eyebrow_TrailheadBanner%20_DF26_EventExperiences_IP&d=701ed00001VBPiKAAX) three or more to unlock $999 passes. 
+
+Oops, the page you’re trying to view isn’t here. 
+
+Looks like we took a wrong turn. Sometimes content gets retired or URLs change.
+
+[Go Home](https://trailhead.salesforce.com/)[](https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities)[Get More Help](https://help.salesforce.com/services/auth/sso/trailheadlogincommunity?startURL=/s "Get More Help")
+
+![Image 1: Salesforce](https://a.sfdcstatic.com/digital/one-trust/core/stable/consent/8e783e8c-0ad0-475d-8fca-4a03afa0a02a/019e3ba8-766d-7090-bf0d-c2f7beefa22d/logos/ddb906c9-f57b-40fc-85a1-c8bcbc371b0d/6a33a761-886e-4860-8e17-abc0832f7a62/corporate_logo_big.png)
+
+## Cookie Consent Manager
+
+## Cookie Consent Manager
+
+* ### General Information 
+* ### Required Cookies 
+* ### Functional Cookies 
+* ### Advertising Cookies 
+
+#### General Information
+
+We use three kinds of cookies on our websites: required, functional, and advertising. You can choose whether functional and advertising cookies apply. Click on the different cookie categories to find out more about each category and to change the default settings. 
+
+[Privacy Statement](https://www.salesforce.com/company/privacy/full_privacy/)
+
+#### Required Cookies
+
+Always Active
+
+Required cookies are necessary for basic website functionality. Some examples include: session cookies needed to transmit the website, authentication cookies, and security cookies.
+
+Cookies Details
+
+#### Functional Cookies
+
+- [x] Functional Cookies 
+
+Functional cookies enhance functions, performance, and services on the website. Some examples include: cookies used to analyze site traffic, cookies used for market research, and cookies used to display advertising that is not directed to a particular individual.
+
+Cookies Details
+
+#### Advertising Cookies
+
+- [x] Advertising Cookies 
+
+Advertising cookies track activity across websites in order to understand a viewer’s interests, and direct them specific marketing. Some examples include: cookies used for remarketing, or interest-based advertising.
+
+Cookies Details
+
+### Cookie List
+
+Consent Leg.Interest
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+- [x] checkbox label label
+
+Clear
+
+* - [x] checkbox label label 
+
+Apply Cancel
+
+Save Settings
+
+Accept All Cookies
+
+[![Image 2: Powered by Onetrust](https://trailhead.salesforce.com/content/learn/modules/leads_opportunities_lightning_experience/manage-leads-and-opportunities)](https://onetrust.com/poweredbyonetrust)
+
+![Image 3](https://t.co/1/i/adsct?bci=4&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=3&event=%7B%7D&event_id=68fd5119-147a-4320-9d4d-60494e5c7910&integration=gtm&p_id=Twitter&p_user_id=0&pl_id=bee121c7-6c95-4582-b0d0-5d0ccf882f5c&pt=404%20%7C%20Salesforce%20Trailhead&tw_document_href=https%3A%2F%2Ftrailhead.salesforce.com%2Fcontent%2Flearn%2Fmodules%2Fleads_opportunities_lightning_experience%2Fmanage-leads-and-opportunities&tw_iframe_status=0&tw_pid_src=1&twpid=tw.1788869252806.747764229950237524&txn_id=nzh5s&type=javascript&version=2.4.4)![Image 4](https://analytics.twitter.com/1/i/adsct?bci=4&dv=UTC%26en-US%2Cen%26Google%20Inc.%26Linux%20x86_64%26255%261280%261280%2610%2624%261280%261280%260%26na&eci=3&event=%7B%7D&event_id=68fd5119-147a-4320-9d4d-60494e5c7910&integration=gtm&p_id=Twitter&p_user_id=0&pl_id=bee121c7-6c95-4582-b0d0-5d0ccf882f5c&pt=404%20%7C%20Salesforce%20Trailhead&tw_document_href=https%3A%2F%2Ftrailhead.salesforce.com%2Fcontent%2Flearn%2Fmodules%2Fleads_opportunities_lightning_experience%2Fmanage-leads-and-opportunities&tw_iframe_status=0&tw_pid_src=1&twpid=tw.1788869252806.747764229950237524&txn_id=nzh5s&type=javascript&version=2.4.4)

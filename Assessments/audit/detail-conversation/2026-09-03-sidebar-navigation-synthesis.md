@@ -1,156 +1,274 @@
-# Analisa: Conversation-Sidebar-Navigation
+# Audit Tunggal: Conversation-Sidebar-Navigation
 
-Konsolidasi 3 audit anak (counter divergence, default channel display, team-inbox rules).
-Semua temuan sudah diverifikasi terhadap source. File+line ada di tiap temuan.
+> **Status:** CANONICAL DETAIL / code-verified
+> **Version:** v2.0
+> **Baseline:** FE/BE memory menjadi patokan utama; branch operasional `prod-2.8.1`
+> **Owner:** Dany Christian (PM) / Naftal Yunior (Eng Lead)
+> **Changelog v2.0:** menggabungkan audit counter, default channel, team inbox, dan re-verifikasi 2026-09-04; mengoreksi C2/C3/C5; mend deduplikasi empat gap invalidation menjadi satu akar masalah; menyiapkan CSN-01..12 untuk master register.
 
-Repos:
-- BE: `Desktop/BE satuinbox/omnichannel-satuinbox-be`
-- FE: `Desktop/FE satuinbox/omnichannel-satuinbox-fe`
+File ini adalah satu-satunya laporan aktif untuk seluruh scope **Conversation-Sidebar-Navigation**. Isinya menyerap:
 
-Sub-laporan lengkap:
-- Counter: `2026-09-03-counter-divergence.md`
-- Channel: `2026-09-03-default-channel-display.md`
-- Team inbox: `2026-09-03-team-inbox-rules.md`
+- `_source/2026-09-03-counter-divergence.md`
+- `_source/2026-09-03-default-channel-display.md`
+- `_source/2026-09-03-team-inbox-rules.md`
+- `_source/2026-09-04-verify-team-inbox-rules.md`
 
----
-
-## Ringkasan Eksekutif
-
-| # | Pertanyaan | Verdict | Bug utama |
-|---|-----------|---------|-----------|
-| 1 | Counter tidak sinkron dgn list (26 vs 28), butuh hard refresh | Root cause ditemukan | Count query tanpa polling safety-net + criteria count≠list |
-| 2 | Channel default = channel aktif company? | Scoping BENAR, tapi bocor | Merge tanpa `has()` guard + cache counter tak pernah di-invalidate saat channel status berubah |
-| 3 | Kotak Masuk Tim: konflik rule per role x ownership | 6 konflik, 1 CRITICAL | FE gate pakai `role.name` bukan `role.code` → gate bocor utk role sales |
-
-Prioritas fix ada di bagian akhir. Satu bug CRITICAL (C1) + tiga HIGH (counter Fix1, channel F1+F2).
+Keempat source dipindahkan ke `_source/` untuk traceability, bukan untuk dibaca sebagai audit aktif.
 
 ---
 
-## Bagian 1 — Counter tidak sinkron dengan Conversation List
+## 1. Scope dan Verdict
 
-Symptom: sidebar "Kotak Pesan Anda" counter=26, list tampil 28. Hard refresh nge-clear cache → dua query fetch ulang → sinkron sementara.
+Scope:
 
-Root cause (dua issue saling memperkuat):
+1. Sinkronisasi counter sidebar dengan Conversation List.
+2. Channel default yang ditampilkan per company.
+3. Team Inbox: visibility, role gate, ownership, dan counter scope.
 
-1. PRIMARY — count query tanpa polling safety-net.
-   `apps/omnichannel/services/conversation/conversation.service.ts:348-366`
-   `useCountConversation` tidak punya `refetchInterval`. Global defaults `refetchOnWindowFocus:false`, `staleTime:2min` (`packages/react-query/src/helpers/makeQueryClientHelper.ts:9-12`).
-   Count hanya update lewat socket `conversation.counter` + invalidation eksplisit. Kalau socket delayed/dropped/userId mismatch → count stale tanpa fallback.
+| Area | Verdict | Risiko utama |
+|---|---|---|
+| Counter vs list | **BROKEN / PARTIAL** | Invalidation counter tidak lengkap; criteria count belum dibuktikan identik dengan list. |
+| Default channel | **PARTIAL** | Company scope benar, tetapi lifecycle cache dan active-channel filtering tidak konsisten. |
+| Team Inbox | **BROKEN / PARTIAL** | FE membandingkan `role.name` dengan enum code; counter scope non-ADMIN berbeda dari team visibility. |
 
-2. List di-update langsung via cache manipulation, count TIDAK.
-   `notification.new.message` utk conversation yang sudah ada di cache → `handleUpdateLatestMessage` update list cache (unread++, latest msg), count tidak disentuh (`use-invalidate-conversation.ts:163-173`).
-
-3. Criteria count ≠ list (backend).
-   List: `getConversations({ assign:true, hideEmpty:true })`. Count: `countConversation()` TANPA filter. Kalau logic count beda dari list (mis. count exclude empty berbeda), angka diverge secara struktural — bukan sekadar timing.
-
-4. Guard socket bisa fail silent.
-   `use-conversation-socket-event.ts:570-589`: `if (currentUserId === data.userId)`. Kalau backend kirim userId format beda/null → handler skip diam-diam.
-
-Fix (urut): Fix1 `refetchInterval: 30_000` pada `useCountConversation` (minimal, safe, hilangkan divergence timing). Fix2 invalidate count juga saat conversation sudah ada di cache. Fix3 (backend) samakan criteria count API dengan list API — ini fix struktural, wajib untuk hilangkan diverge permanen.
+**Blocking:** CSN-01.
+**Perlu validasi/keputusan sebelum ticket final:** CSN-03, CSN-05, CSN-10, CSN-11.
 
 ---
 
-## Bagian 2 — Default Channel Display per Company
+## 2. Alur Sistem Ringkas
 
-Pertanyaan: default nampilin channel mana? Harusnya hanya channel `status==ACTIVE` di company tsb; beda company beda set.
+```text
+Sidebar load
+  ├─ FE GET /conversation/count
+  │    └─ BE resolveTeams + aggregate count + cache per userId
+  │         └─ socket conversation.counter memperbarui FE cache
+  ├─ FE GET /conversation?...filters
+  │    └─ BE repository membangun team/participant filters
+  └─ FE render inbox rows + channel rows + team rows
 
-Verdict: company-scoping BENAR (tidak ada cross-company leak). `getActiveChannel(company)` pakai `companyContext` + filter `status==ACTIVE` (`conversation.service.ts:2857,2873`). TAPI channel non-aktif tetap bisa muncul karena 2 bug:
+Perubahan realtime
+  ├─ sebagian event memutasi list cache langsung
+  └─ sebagian event meng-invalidate counter
+       tetapi coverage event tidak lengkap
+```
 
-- F1 [HIGH] Merge tanpa `has()` guard.
-  `conversation.service.ts:1272-1281`. `channelMap` di-seed dari active channels, lalu merge agregasi `channelMap.set(channel.id, ...)` TANPA `if (channelMap.has(...))`. Channel non-aktif yang masih punya open conversation (platform whitelisted) ikut ditambahkan.
-  Fix: `if (!channelMap.has(channel.id)) continue;` (1 baris, root cause).
+Akar lintas-area:
 
-- F2 [HIGH] Counter tak pernah di-invalidate saat channel activate/deactivate.
-  `conversation.service.ts:1300-1302` return cached `existCounter` apa adanya. channel-service tidak emit event counter saat channel status berubah (hanya people-service emit, utk membership tim). Jadi walau F1 sudah fix, company yang counter-nya sudah ke-cache tetap pakai channel-set lama.
-  Fix: emit event invalidate/rebuild counter company saat channel status berubah (reuse path `CONVERSATION_INIT_COUNTER` + `reset`), atau kasih TTL counter.
-
-- F3 [MEDIUM] Hardcoded `limit:25` (`conversation.service.ts:2861`) — company >25 channel bisa kehilangan active channel di luar page 1 (false negative). Fix: filter `status==ACTIVE` server-side / paginate semua.
-- F4 [MEDIUM] Platform whitelist hardcoded (`conversation.repository.ts:1969`), bukan dari config company. Platform di luar list disenyapkan dari count. Fix: derive dari active channel company.
-- F5 [LOW] Agregasi hitung conversation di channel non-aktif (`conversation.repository.ts:1956`). Harmless setelah F1, tapi angka dihitung atas data channel non-aktif.
-
----
-
-## Bagian 3 — Kotak Masuk Tim: Rule x Role x Ownership
-
-Roles: AGENT, ADMIN, MANAGER, SUPER_ADMIN, SUPERVISOR, TEAM_LEAD, USER.
-
-6 rule dienumerasi:
-- R1 Visibility tim: ADMIN=semua tim company; lainnya=tim user (member ∪ tim dgn conversation assigned). BE `resolveTeams` (`conversation.service.ts:1332`). FE tidak filter, andalkan BE.
-- R2 Tombol create team: SUPERVISOR/ADMIN saja. FE `ConversationNavItemDefault.tsx:294-295`.
-- R3 Visibility inbox items: AGENT sembunyikan `unassigned`+`all`; lainnya semua. FE `:137-183`.
-- R4 Scope counter: AGENT/SUPERVISOR scoped by team; lainnya tidak. BE `handleInitCounter` (`:6477`).
-- R5 Ownership list: AGENT selalu `participants.userId=currentUser`; lainnya lihat semua di tim. BE `buildAssignFilter` (`conversation.repository.ts:2742-2767`).
-- R6 Cache counter: per-userId, return cached bila ada. BE `:1299-1302`.
-
-6 konflik:
-
-| # | Sev | Role | Issue | File:Line | Fix |
-|---|-----|------|-------|-----------|-----|
-| C1 | CRITICAL | AGENT(SALES), SUPERVISOR(SALES) | FE bandingin `userRole?.name` vs `RoleTypeEnum` (=code). Seed buktikan name≠code: `{name:'SALES',code:AGENT}`, `{name:'SUPERVISOR SALES',code:SUPERVISOR}`. Efek: SALES agent lolos check `name!=='AGENT'` → lihat Unassigned/All; SUPERVISOR SALES kehilangan tombol create. Semua gate lain pakai `.code`, hanya sidebar nav pakai `.name`. | FE `ConversationNavItemDefault.tsx:142,294-295`; BE `role.seed.ts` | Ganti kedua check ke `userRole?.code`. 1 baris each. |
-| C2 | MAJOR | MANAGER, SUPER_ADMIN, TEAM_LEAD, USER | Counter NOT team-scoped (`shouldScopeByTeam` cuma AGENT/SUPERVISOR) padahal tim DIFILTER (`getTeamsByUserId`). Badge count ≠ list count. | `conversation.service.ts:6477` | Extend `shouldScopeByTeam` ke semua non-ADMIN (samakan dgn `resolveTeams`). |
-| C3 | MAJOR | AGENT | Tidak ada role guard di controller `GET /conversation`. Ownership AGENT hanya di repo `buildAssignFilter`. AGENT bisa panggil endpoint dgn `assign=false` langsung. | `conversation.service.ts:995-1019`, `conversation.repository.ts:2742-2767` | Paksa `participants.userId` utk AGENT di server, apapun filter request. |
-| C4 | MINOR | ALL | Cache counter per-userId bukan per-role. Ganti role → counter stale sampai invalidation berikutnya. | `counter.repository.ts:90-93` | Invalidate saat role change / masukkan role ke cache key. |
-| C5 | MINOR | MANAGER, TEAM_LEAD | Tombol create hanya SUPERVISOR/ADMIN. Intent produk belum jelas. | `ConversationNavItemDefault.tsx:294-295` | Klarifikasi produk. |
-| C6 | INFO | Non-ADMIN | `getTeamsByUserId` union (member ∪ tim dgn conversation assigned). Intentional tapi undoc. | `conversation.service.ts:5555-5582` | Dokumentasikan. |
+- **Counter invalidation tidak punya satu kontrak lifecycle.** New message pada conversation existing, perubahan status channel, dan perubahan role tidak ditangani konsisten; polling/TTL juga tidak ada.
+- **Count dan list dibangun lewat criteria berbeda.** Gejala 26-vs-28 dan scope Team Inbox berasal dari kelas masalah yang sama.
+- **Role gate FE tidak konsisten.** Sidebar memakai `role.name`; jalur lain memakai `role.code`.
 
 ---
 
-## Tema Lintas-Audit
+## 3. Rule Inventory Team Inbox
 
-1. Cache counter fragile di 3 sumbu. Counter di-cache per userId dan diandalkan sebagai sumber kebenaran, tapi tidak di-invalidate saat: (a) channel status berubah (F2), (b) role berubah (C4), (c) new message pada conversation existing (Bagian 1). Semua bermuara ke path counter yang sama. Perbaikan strategis: standardisasi invalidation counter + kasih TTL/polling fallback, bukan tambal per-event.
+| Rule | Perilaku aktual | Evidence | Status |
+|---|---|---|---|
+| R1 — Team visibility | `ADMIN` melihat semua team company; non-ADMIN mendapat union membership team + team yang memiliki conversation assigned ke user. FE mengandalkan hasil BE. | BE `conversation.service.ts:1332-1341,5555-5582`; FE `ConversationNavItemDefault.tsx:293-297` | confirmed |
+| R2 — Create team | Tombol dimaksudkan untuk `SUPERVISOR`/`ADMIN`, tetapi implementasi membaca `role.name`. | FE `ConversationNavItemDefault.tsx:294-295` | broken; lihat CSN-01/11 |
+| R3 — Inbox visibility | AGENT seharusnya tidak melihat `unassigned` dan `all`; role lain melihat semua item. Implementasi membaca `role.name`. | FE `ConversationNavItemDefault.tsx:137-183` | broken; lihat CSN-01 |
+| R4 — Counter scope | Hanya AGENT/SUPERVISOR yang diberi team scope; non-ADMIN lain tidak. | BE `conversation.service.ts:6477` | partial; lihat CSN-09 |
+| R5 — List ownership | AGENT dipaksa ke `participants.userId=currentUser`; role lain dapat melihat semua conversation dalam team yang dipilih. | BE `conversation.repository.ts:2584,2746-2754,3663-3677` | confirmed |
+| R6 — Counter cache | Counter dicari per `userId`; role/scope tidak menjadi bagian lookup key. | BE `counter.repository.ts:90-93` | partial; lihat CSN-02 |
 
-2. Count ≠ List secara sistemik. Divergence 26-vs-28 (Bagian 1 issue #3) dan badge≠list team (C2) adalah gejala sama: query count dan query list dibangun dari criteria berbeda. Selama count API tidak dijamin memakai criteria yang sama dgn list API, angka akan terus diverge.
-
-3. Role gating tidak konsisten `name` vs `code` (C1). Sidebar nav satu-satunya yang pakai `role.name`; sisanya `role.code`. Ini bug diam yang lolos di company default (name==code) tapi bocor di company yang punya custom role sales.
-
----
-
-## Prioritas Fix (urut kerja)
-
-P0 — CRITICAL
-- C1: ganti `userRole?.name` → `userRole?.code` di `ConversationNavItemDefault.tsx:142,294-295`. 2 baris. Gate role sidebar bocor untuk role sales.
-
-P1 — HIGH
-- Counter Fix1: `refetchInterval: 30_000` pada `useCountConversation` (`conversation.service.ts:354`). Hilangkan divergence timing.
-- Channel F1: `if (!channelMap.has(channel.id)) continue;` di merge loop (`conversation.service.ts:1272`). Cegah channel non-aktif muncul.
-- Channel F2: emit event invalidate counter saat channel activate/deactivate. Supaya F1 berlaku utk company yang sudah ke-cache.
-
-P2 — MAJOR
-- C2: extend `shouldScopeByTeam` ke semua non-ADMIN (`conversation.service.ts:6477`).
-- C3: role guard server-side pada `GET /conversation` untuk AGENT.
-- Counter Fix3 / Count≠List: samakan criteria count API dgn list API. (fix struktural utk divergence permanen)
-
-P3 — MINOR / hardening
-- Channel F3 (limit:25), F4 (platform whitelist), F5 (count inactive).
-- C4 (cache per-role), C5 (create-team utk MANAGER/TEAM_LEAD — butuh keputusan produk), C6 (dokumentasi).
-
-Catatan: Counter Fix1 dan Channel F2 dan C4 semuanya menyentuh mekanisme invalidation counter yang sama — kalau invalidation/TTL counter distandardisasi sekali, ketiganya beres tanpa tambalan terpisah.
+`TeamInboxSection.tsx` adalah ekstraksi presentasional. Gate tetap dihitung di `ConversationNavItemDefault.tsx`; refactor tersebut tidak menutup CSN-01.
 
 ---
 
-## Verifikasi Cross-Check (2026-09-03)
+## 4. Register Temuan Tunggal
 
-3 klaim decision-bearing diverifikasi terhadap source code asli (BE + FE). Confidence: **TINGGI** — semua symbol & kutipan cocok, line number bergeser ≤20 baris dari current source.
+### CSN-01 — FE role gate memakai `name`, bukan `code`
 
-### C1 (CRITICAL) — `role.name` vs `role.code` → **CONFIRMED**
-- FE `ConversationNavItemDefault.tsx:142`: `const isAgent = userRole?.name === RoleTypeEnum.AGENT` — pakai `.name` ✓
-- FE `:294-295`: `const showCreateButton = userRole?.name === RoleTypeEnum.SUPERVISOR || userRole?.name === RoleTypeEnum.ADMIN` — pakai `.name` ✓
-- `RoleTypeEnum` (packages/constants/src/roles.ts:1-9) = CODE values: `AGENT='AGENT'`, `SUPERVISOR='SUPERVISOR'` ✓
-- BE `role.seed.ts`: line 65 `name: 'SALES'` + line 62 `code: RoleTypeEnum.AGENT`; line 58 `name: 'SUPERVISOR SALES'` + line 51 `code: RoleTypeEnum.SUPERVISOR` — name≠code confirmed ✓
-- Counter-proof: `ConversationChatLists.tsx:134` pakai `session?.user?.role?.code` — gate lain pakai `.code` ✓
-- **Kesimpulan:** static-certain bug. Sub-report caveat "verify by logging userRole" berlebihan — seed data + enum sudah membuktikan secara statis (asumsi: role SALES/SUPERVISOR SALES ter-provision via `defaultCompanyRole`, yang memang men-seed keduanya).
+- **Severity:** Major — blocking
+- **Status:** confirmed
+- **Area:** RBAC / navigation visibility
+- **Evidence:** FE `ConversationNavItemDefault.tsx:142,294-295`; BE `role.seed.ts:51-67`; pembanding benar di `ConversationChatLists.tsx:134`.
+- **Temuan:** `RoleTypeEnum` berisi code (`AGENT`, `SUPERVISOR`), tetapi sidebar membandingkannya dengan `userRole.name`. Seed membuktikan `SALES` memiliki code `AGENT`, dan `SUPERVISOR SALES` memiliki code `SUPERVISOR`.
+- **Dampak:** SALES agent salah melihat `Unassigned`/`All`; SUPERVISOR SALES kehilangan tombol create team.
+- **Remediation:** ganti kedua check ke `userRole?.code`.
+- **Acceptance:** role code AGENT dengan name SALES tidak melihat `Unassigned`/`All`; role code SUPERVISOR dengan name SUPERVISOR SALES melihat create-team sesuai policy.
+- **Effort:** S
 
-### F1 (HIGH) — channelMap key mismatch → **CONFIRMED, keys collide legitimately**
-- Seed key (conversation.service.ts:1260-1264): `channelMap.set(code, ...)` keyed by `channel.platform.code` ✓
-- Merge key (:1272-1273): `const channelKey = channel.id;` — comment di source: "In DB, 'id' usually contains 'widget','email', etc." ✓
-- Aggregation pipeline (repository.ts:2054-2060): `_id: '$channelType'` where `channelType` default = `$channel.platform.code`; project (:2066-2074) `id: '$_id'` = platform code ✓
-- **Kesimpulan:** seed key dan merge key = domain sama (platform code). Guard `has(channel.id)` valid, bukan no-op.
-- **Koreksi penting:** karena keys collide, merge sudah update seeded entries in-place. Guard `has()` efek nyata = **drop bucket channelType hasil `addFields` yang TIDAK ada di seed activeChannels** (WHATSAPP_WEB_GROUP, INSTAGRAM_COMMENT). Ini keputusan perilaku, perlu ditegaskan sebelum fix diterapkan — apakah WA group / IG comment counts memang harus disembunyikan?
+### CSN-02 — Lifecycle invalidation counter tidak lengkap
 
-### C2 (MAJOR) — `shouldScopeByTeam` scope mismatch → **CONFIRMED**
-- `conversation.service.ts:6477`: `const shouldScopeByTeam = role === RoleTypeEnum.AGENT || role === RoleTypeEnum.SUPERVISOR;` ✓
-- `resolveTeams` (:1332-1341): `if (role !== RoleTypeEnum.ADMIN) { return this.getTeamsByUserId(userContext); }` — ALL non-ADMIN dapat filtered teams ✓
-- **Kesimpulan:** mismatch nyata. Fix sebaiknya `role !== RoleTypeEnum.ADMIN` (samakan dengan `resolveTeams`), bukan tambah role satu-satu.
+- **Severity:** Major
+- **Status:** confirmed
+- **Area:** Counter / realtime consistency
+- **Evidence:** FE `conversation.service.ts:348-366`; `use-invalidate-conversation.ts:163-173`; BE `conversation.service.ts:1300-1302`; `counter.repository.ts:90-93`.
+- **Temuan:** counter tidak mempunyai polling/TTL safety net dan invalidation contract tidak mencakup setidaknya: new message pada conversation existing, activate/deactivate channel, dan perubahan role. Cache dapat tetap stale sampai event lain atau hard refresh.
+- **Dampak:** angka sidebar, daftar channel, dan scope role dapat berbeda dari list aktual.
+- **Remediation:** satu kontrak invalidation counter untuk semua mutation yang mengubah membership/count, ditambah TTL atau polling fallback terukur. Jangan membuat tiga tambalan event terpisah.
+- **Acceptance:** tiga skenario di atas memperbarui counter tanpa hard refresh; reconnect/drop satu socket event pulih lewat fallback.
+- **Effort:** M
 
-### Catatan tambahan: C3 (MAJOR) — server-side AGENT guard
-Report bilang "Tidak ada role guard di controller `GET /conversation`". Benar bahwa controller tidak punya role check. TAPI `buildAssignFilter` (repository.ts:2742-2767) dipanggil di repo layer (line 2608-2610) untuk SEMUA query — `isAgent` check di sana force `participants.userId` filter untuk AGENT. Jadi guard ADA, tapi di repo bukan controller. Risiko: kalau ada code path baru yang query conversation TANPA lewat `buildAssignFilter` (misal direct aggregation), AGENT bisa bypass. Severity turun dari MAJOR ke **MEDIUM** — guard ada tapi enforcement layer-nya fragile (repo-level, bukan controller-level).
+### CSN-03 — Criteria count belum dijamin identik dengan criteria list
+
+- **Severity:** Major
+- **Status:** needs-validation
+- **Area:** Counter / query parity
+- **Evidence:** FE list memanggil `getConversations({ assign:true, hideEmpty:true })`; count memanggil `countConversation()` tanpa filter eksplisit.
+- **Temuan:** jalur request berbeda; audit belum membuktikan hasil backend selalu memakai visibility, assignment, empty-conversation, team, dan channel criteria yang sama.
+- **Dampak:** divergence permanen tetap mungkin meski realtime invalidation diperbaiki.
+- **Validation:** bandingkan pipeline final count vs list untuk role/filter matrix dan dataset yang sama.
+- **Remediation:** ekstrak/shared criteria di BE atau contract-test parity count/list.
+- **Acceptance:** untuk setiap role dan active filter, count sama dengan total dataset list yang visible.
+- **Effort:** M
+
+### CSN-04 — Socket counter guard gagal diam-diam saat `userId` tidak cocok
+
+- **Severity:** Low
+- **Status:** confirmed
+- **Area:** Counter / observability
+- **Evidence:** FE `use-conversation-socket-event.ts:570-589`.
+- **Temuan:** event hanya diproses bila `currentUserId === data.userId`; mismatch/null dilewati tanpa telemetry atau recovery.
+- **Dampak:** counter stale sulit didiagnosis.
+- **Remediation:** normalisasi ID, log terstruktur tanpa PII pada mismatch, lalu invalidasi/refetch aman.
+- **Acceptance:** payload ID invalid tidak mengubah user lain dan memicu recovery terukur untuk user aktif.
+- **Effort:** S
+
+### CSN-05 — Active-channel merge membutuhkan keputusan untuk bucket sintetis
+
+- **Severity:** Medium
+- **Status:** needs-decision
+- **Area:** Channel navigation
+- **Evidence:** BE `conversation.service.ts:1260-1281`; `conversation.repository.ts:2054-2074`.
+- **Temuan:** map di-seed dari active channel, lalu hasil agregasi di-`set` tanpa membership guard. Guard `has()` akan membuang bucket yang tidak ada di seed, termasuk kemungkinan `WHATSAPP_WEB_GROUP`/`INSTAGRAM_COMMENT` hasil transformasi.
+- **Dampak:** tanpa guard, channel/bucket non-active bisa muncul; dengan guard buta, bucket turunan yang valid bisa hilang.
+- **Decision:** PM+Tech mengunci apakah bucket grup/comment mengikuti active parent channel atau berdiri sendiri.
+- **Remediation:** setelah policy dikunci, merge hanya key yang diizinkan oleh active parent/channel capability map.
+- **Acceptance:** inactive parent tidak tampil; bucket turunan active tampil sesuai matrix yang disetujui.
+- **Effort:** S-M
+
+### CSN-06 — Active channel dibatasi 25 item sebelum filtering
+
+- **Severity:** Medium
+- **Status:** confirmed
+- **Area:** Channel navigation
+- **Evidence:** BE `conversation.service.ts:2857,2861-2865,2873`.
+- **Temuan:** `getChannels` mengambil `limit:25`, baru kemudian memfilter `ACTIVE`. Active channel di luar page pertama dapat hilang.
+- **Dampak:** false negative pada company dengan lebih dari 25 channel atau campuran status besar.
+- **Remediation:** filter `ACTIVE` server-side dan paginate sampai selesai; jangan menaikkan angka hardcoded tanpa kontrak.
+- **Acceptance:** seluruh active channel company tampil meski total channel >25.
+- **Effort:** S-M
+
+### CSN-07 — Platform count memakai whitelist hardcoded
+
+- **Severity:** Medium
+- **Status:** confirmed
+- **Area:** Channel navigation
+- **Evidence:** BE `conversation.repository.ts:1969-1988`.
+- **Temuan:** platform `$in` tidak diturunkan dari active/configured channels company.
+- **Dampak:** platform valid di luar whitelist hilang dari counter/sidebar.
+- **Remediation:** derive platform set dari active channel/capability company.
+- **Acceptance:** channel aktif baru tidak membutuhkan edit whitelist repository untuk muncul.
+- **Effort:** M
+
+### CSN-08 — Aggregasi channel menghitung history channel non-active
+
+- **Severity:** Low
+- **Status:** confirmed
+- **Area:** Channel counter
+- **Evidence:** BE `conversation.repository.ts:1956`.
+- **Temuan:** pipeline count tidak join/filter status channel.
+- **Dampak:** data non-active tetap dihitung dan dapat bocor ke display melalui merge/cache gap lain.
+- **Remediation:** filter menggunakan active channel IDs bila kontrak counter hanya mencakup channel aktif.
+- **Acceptance:** menonaktifkan channel mengeluarkan bucket/count setelah invalidation.
+- **Effort:** M
+
+### CSN-09 — Scope counter non-ADMIN berbeda dari scope team visibility
+
+- **Severity:** Medium
+- **Status:** confirmed
+- **Area:** Team Inbox / counter parity
+- **Evidence:** BE `conversation.service.ts:1332-1341,6477`; `buildCountResponse:1233-1287`.
+- **Temuan:** `resolveTeams` memfilter semua non-ADMIN, tetapi `shouldScopeByTeam` hanya AGENT/SUPERVISOR. Re-verifikasi mengoreksi klaim lama: daftar dan badge tetap dibatasi map team hasil filter; ini bukan leak team di luar daftar, melainkan potensi per-team count memasukkan shared conversation dengan scope berbeda.
+- **Dampak:** badge dapat tidak sama dengan list untuk MANAGER/SUPER_ADMIN/TEAM_LEAD/USER.
+- **Remediation:** samakan scope dengan `resolveTeams` (`role !== ADMIN`) atau gunakan shared scope builder.
+- **Acceptance:** badge per team sama dengan jumlah list visible untuk seluruh role matrix.
+- **Effort:** S-M
+
+### CSN-10 — Coverage guard AGENT lintas entry point belum dibuktikan lengkap
+
+- **Severity:** Medium
+- **Status:** needs-validation
+- **Area:** Team Inbox / authorization
+- **Evidence:** guard ditemukan di `conversation.repository.ts:2584,2746-2754,3663-3677`; dipakai jalur list/count yang direview.
+- **Koreksi:** klaim lama “AGENT bisa bypass dengan `assign=false`” diretract. Repository memaksa participant filter untuk AGENT, termasuk role SALES karena cek memakai code.
+- **Sisa risiko:** audit belum membuktikan semua entry point/aggregation conversation melewati guard yang sama.
+- **Validation:** inventaris semua controller/gRPC/event read path yang mengembalikan conversation list dan trace ke scope builder.
+- **Remediation:** bila ada bypass path, pusatkan authorization scope pada satu shared BE boundary.
+- **Acceptance:** seluruh read path role AGENT selalu membatasi participant/team sesuai policy.
+- **Effort:** M
+
+### CSN-11 — Hak create-team untuk MANAGER/TEAM_LEAD belum dikunci
+
+- **Severity:** Low
+- **Status:** needs-decision
+- **Area:** Team Inbox / capability
+- **Evidence:** FE `ConversationNavItemDefault.tsx:294-295`.
+- **Koreksi:** ini bukan bug terkonfirmasi. Implementasi hanya mengizinkan SUPERVISOR/ADMIN; requirement MANAGER/TEAM_LEAD belum ditemukan.
+- **Decision:** PM+Tech mengunci capability matrix create-team.
+- **Remediation:** ubah gate hanya bila matrix memberi permission; tetap enforce di BE.
+- **Acceptance:** FE visibility dan BE authorization mengikuti matrix yang sama.
+- **Effort:** S
+
+### CSN-12 — Union team assignment belum terdokumentasi
+
+- **Severity:** Low
+- **Status:** confirmed
+- **Area:** Team Inbox / documentation
+- **Evidence:** BE `conversation.service.ts:5555-5582`.
+- **Temuan:** non-ADMIN dapat melihat team yang bukan membership langsung bila memiliki assigned conversation pada team itu. Perilaku tampak intentional, tetapi tidak terdokumentasi dekat contract counter/sidebar.
+- **Dampak:** engineer/QA dapat menganggapnya leak dan membangun test/fix yang salah.
+- **Remediation:** dokumentasikan union rule dan tambahkan satu contract test.
+- **Acceptance:** test membuktikan assigned conversation mempertahankan visibility team tanpa membuka conversation lain yang tidak berhak.
+- **Effort:** S
+
+---
+
+## 5. Koreksi dan Retraction
+
+| Klaim lama | Resolusi kanonik |
+|---|---|
+| C2: sidebar menampilkan badge team di luar team user | **Dikoreksi.** Map output tetap dibatasi team hasil `resolveTeams`; masalahnya parity scope/count, bukan exposure row asing. |
+| C3: AGENT dapat bypass dengan `assign=false` | **Diretract.** Guard AGENT ada di repository untuk jalur yang diverifikasi. Coverage semua entry point tetap needs-validation (CSN-10). |
+| C5: MANAGER/TEAM_LEAD tidak bisa create team adalah bug | **Dikoreksi.** Capability gap/decision, bukan defect tanpa requirement. |
+| F1: tambah `if (!channelMap.has(...)) continue` selalu aman | **Dikoreksi.** Guard dapat membuang bucket sintetis; policy parent-channel harus dikunci dulu (CSN-05). |
+| Counter Fix1, channel F2, role-cache C4 adalah tiga akar berbeda | **Dedup.** Semuanya trigger dari satu lifecycle invalidation counter yang tidak lengkap (CSN-02). |
+
+---
+
+## 6. Prioritas Eksekusi
+
+1. **P0 — CSN-01:** perbaiki dua role gate FE; regression test SALES dan SUPERVISOR SALES.
+2. **P1 — CSN-02:** pusatkan lifecycle invalidation counter; tambahkan fallback terukur.
+3. **P1 — CSN-03/09:** buktikan dan samakan query parity count/list serta team scope.
+4. **P2 — CSN-06/07:** hilangkan pagination/filter dan whitelist trap.
+5. **Decision — CSN-05/11:** PM+Tech lock bucket turunan channel dan capability create-team.
+6. **Hardening — CSN-04/08/10/12.**
+
+---
+
+## 7. Overlap dengan Track Lain
+
+- **SEC-03 register** adalah kontrol positif RBAC di BE gateway; **CSN-01** adalah gate visibility FE yang rusak. Keduanya benar pada layer berbeda.
+- Track B/D mencatat gap visibility/assignment secara UX; CSN-01 memberi root cause code untuk sidebar. Saat ticketing, link sebagai evidence, jangan buat bug duplikat.
+- CSN-03/09 beririsan dengan temuan count/list pada Track D/E; gunakan CSN sebagai owner untuk scope sidebar, dan link issue BE yang lebih luas bila ditemukan.
+
+---
+
+## 8. Acceptance Matrix Minimum
+
+| Skenario | Expected |
+|---|---|
+| SALES (`code=AGENT`) login | `Unassigned`/`All` hidden; list tetap participant-scoped. |
+| SUPERVISOR SALES login | Create-team mengikuti matrix capability final. |
+| Existing conversation menerima inbound | Counter dan list kembali parity tanpa hard refresh. |
+| Channel activate/deactivate | Row/count berubah setelah event/fallback; inactive tidak bocor. |
+| Company memiliki >25 channel | Semua active channel muncul. |
+| MANAGER/TEAM_LEAD/USER membuka team | Badge sama dengan visible list berdasarkan policy. |
+| Role user berubah | Counter lama tidak dipakai dengan scope baru. |
+| Socket counter membawa userId invalid | Tidak cross-user update; recovery/telemetry berjalan. |
+
+Hasil di atas adalah desain acceptance test, bukan klaim hasil eksekusi.

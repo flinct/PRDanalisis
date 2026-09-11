@@ -463,6 +463,58 @@ app.get("/api/tracker", async (_req, res) => {
   }
 });
 
+// ── Error Monitoring ─────────────────────────────────────────────────
+// Reads grafana-errors JSONL runs (one JSON object per line, appended per
+// collector run) and returns them newest-first. UI derives KPI/trend/alerts.
+const MONITORING_DIR = path.join(BASE, "monitoring", "grafana-errors");
+// eslint-disable-next-line no-control-regex
+const ANSI = /(?:\u001b|\\u001b|\\x1b)\[[0-9;]*[A-Za-z]?/g;
+function parseCategory(key) {
+  const clean = key.replace(ANSI, "");
+  const parts = clean.split(" | ");
+  const service = (parts[0] || "?").trim();
+  const ctx = (parts[1] || "-").trim();
+  const message = (parts.slice(2).join(" | ") || "").trim();
+  return { service, ctx: ctx === "-" ? "" : ctx, message };
+}
+app.get("/api/monitoring/errors", (_req, res) => {
+  try {
+    if (!fs.existsSync(MONITORING_DIR)) return res.json({ ok: true, runs: [] });
+    const days = fs
+      .readdirSync(MONITORING_DIR)
+      .filter((f) => /^\d{4}-\d{2}-\d{2}\.jsonl$/.test(f))
+      .sort(); // ascending by date
+    const runs = [];
+    // ponytail: one row per pull, so reading all day-files is still cheap enough.
+    for (const day of days) {
+      const raw = fs.readFileSync(path.join(MONITORING_DIR, day), "utf8");
+      for (const line of raw.split("\n")) {
+        if (!line.trim()) continue;
+        let rec;
+        try {
+          rec = JSON.parse(line);
+        } catch {
+          continue;
+        }
+        const categories = Object.entries(rec.categories || {}).map(
+          ([key, count]) => ({ ...parseCategory(key), count }),
+        );
+        runs.push({
+          ts: rec.ts,
+          windowMinutes: rec.window_min,
+          totalErrors: rec.total,
+          truncated: !!rec.truncated,
+          categories,
+        });
+      }
+    }
+    runs.sort((a, b) => (a.ts < b.ts ? 1 : -1)); // newest first
+    res.json({ ok: true, runs });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get("/api/tracker/source", async (_req, res) => {
   try {
     res.json(await trackerSheets.status(BASE));

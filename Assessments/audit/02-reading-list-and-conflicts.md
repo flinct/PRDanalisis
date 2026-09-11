@@ -1,30 +1,33 @@
 # SatuInbox — Audit Review + Prioritized Reading List
 
 > Task t_daf34b91. Reviewed all audit outputs in `Assessments/audit/`, deduped, produced source-file reading list.
-> Baseline: BE `prod-2.7.0`, FE `prod-2.7.0-11`. Owner: PM Dany Christian, Eng Lead Naftal Yunior.
+> Baseline: FE/BE memory = patokan utama; branch kerja saat ini `prod-2.8.1` (repo reality lama di dokumen dianggap outdated). Owner: PM Dany Christian, Eng Lead Naftal Yunior.
 > **Core files** (this file + register + code-verified evidence) now live at repo root `Assessments/audit/` dengan prefix nomor (00–03). Detail per-area di sub-folder `detail-*/`; arsip di `_source/`.
 
 ---
 
 ## 1 | What exists (deduped)
 
-Five independent audit tracks + one knowledge-base track. Do not merge them — different sources, scopes, methods.
+Seven independent audit tracks + one knowledge-base track. Do not merge them — different sources, scopes, methods.
 
 ### Track A — Code + PRD audit (canonical)
-- `01-audit-master-register.md` **v1.5** — SINGLE SOURCE OF TRUTH. 71 findings. Wins on any conflict.
+- `01-audit-master-register.md` **v1.9** — SINGLE SOURCE OF TRUTH. 101 findings. Wins on any conflict.
 - `2026-09-02-satuinbox-audit-3-synthesis.md` — evidence↔register cross-check. NO new findings; its patches (DI-06 add, V17 close) already applied to register (v1.2). Read only for traceability rationale.
 
-Register breakdown (61):
+Register breakdown (101):
 | Bucket | Count | State |
 |---|---|---|
-| Confirmed — priority (code-verified bugs) | 8 (DI-01, SEC-02, DI-04, SEC-04, INT-03, SEC-01, F-07, ENV-01) | ticket-ready, gated by ENV-01 |
+| Confirmed — priority (code-verified bugs) | 7 (DI-01, SEC-02, DI-04, SEC-04, INT-03, SEC-01, F-07) | ticket-ready |
 | Confirmed — positive controls | 10 | keep, don't touch |
 | Confirmed — non-priority | 16 (C1–C16) | backlog |
-| Needs-validation (PRD/memory inference) | 25 (V1–V26 minus closed V17) | verify code / decision meeting |
-| Corrected | 1 (FS-05 → DLQ exists) | do not backlog |
-| Closed dup | 1 (V17) | — |
+| Confirmed — Track F infra Critical | 10 (INFRA-01..10) | active infra backlog |
+| Confirmed — Track G sidebar-navigation | 8 (CSN-01/02/04/06/07/08/09/12) | backlog; CSN-01 blocking |
+| Confirmed — Track H conversation-list | 17 (CLH-01..17) | backlog; CLH-02/03 blocking |
+| Needs-validation | 29 (V1–V26 minus closed V17 + CSN-03/05/10/11) | verify code / decision meeting |
+| Corrected | 2 (FS-05 → DLQ exists, CLH-18 RBAC false alarm) | do not backlog |
+| Closed dup/operational | 2 (V17, ENV-01) | — |
 
-Gate: **ENV-01** — branch target not locked (repo `prod-2.7.0` vs memory `v2.8.0`). All `confirmed` valid ONLY for prod-2.7.0. No ticketing until branch locked.
+Gate: **ENV-01** — resolved operasional (PM: `prod-2.8.1`, memory FE/BE patokan utama). Ticket langsung boleh mulai; re-verify hanya jika area berubah di 2.8.1.
 Decision-only (not tickets): V1/V2 (Catastrophe SLA conflicts) + V3–V6 (SLA modes) → PM+Eng meeting.
 
 ### Track B — UI/UX heuristic audit (FE-only, separate)
@@ -58,24 +61,31 @@ Top P0 (from consolidated): P0-01 send endpoint no authz (`conversation.controll
 
 NOT yet folded into register (Track A). Overlaps Track A DB-index findings (V8/P-01) + Track D reminder/unread — dedup before ticketing.
 
-### Track F — Conversation sidebar navigation (FE+BE cross-verified)
-Dashboard kanban audit (2026-09-03), all 3 claims cross-checked against source (FE + `Desktop/BE satuinbox/omnichannel-satuinbox-be`). Confidence TINGGI (symbols match, line drift ≤20).
-- `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` — **synthesis, read first.** + Verifikasi Cross-Check section (verdicts + file:line).
-- `detail-conversation/2026-09-03-counter-divergence.md` — sub-report: counter divergence.
-- `detail-conversation/2026-09-03-default-channel-display.md` — sub-report: default channel display (F1 channelMap key).
-- `detail-conversation/2026-09-03-team-inbox-rules.md` — sub-report: team inbox rules (C2 shouldScopeByTeam).
-
-Verified findings: C1 (CRITICAL, CONFIRMED) FE `ConversationNavItemDefault.tsx:142,294-295` gate pakai `role.name` vs `RoleTypeEnum` code → SALES agent lolos, SUPERVISOR SALES kehilangan create-team. C2 (MAJOR, CONFIRMED) `shouldScopeByTeam` (conversation.service.ts:6477) hanya AGENT/SUPERVISOR tapi `resolveTeams` scope semua non-ADMIN. F1 (HIGH, CONFIRMED w/ nuance) channelMap guard valid tapi efek = drop WA_WEB_GROUP/IG_COMMENT bucket (butuh keputusan produk). C3 downgrade MAJOR→MEDIUM (guard ADA di repo `buildAssignFilter`, bukan controller).
-NOT yet folded into register (Track A). C1/C2 overlap Track D RBAC-visibility + Track B RBAC visibility gap — dedup before ticketing.
-
-### Track G — Infra/DevOps audit (folded partial, register v1.5)
+### Track F — Infra/DevOps audit (folded partial, register v1.5)
 - `detail-infra/satuinbox-infra-audit.md` — 69 temuan infra: secrets, CORS, SPOF, alerting, test coverage, docs. **10 Critical sudah folded ke register** sebagai `INFRA-01..10` (confirmed). Sisa 59 (High/Med/Low) **belum di-fold** — baca file ini langsung untuk backlog infra.
 - **INFRA-01** (committed secrets: DB password + API key di git) = **active risk**, kerjakan lebih dulu (rotate + `git rm --cached`, 30 menit).
 
-### Arsip source (2026-09-04)
-Source file 09-01/09-02 yang temuannya sudah terserap dipindah ke `_source/` (root) dan `detail-conversation/_source/` — history via `git mv`, baca hanya untuk file:line detail:
+### Track G — Conversation-Sidebar-Navigation (FE+BE cross-verified)
+Dashboard kanban audit 2026-09-03 kini dikonsolidasikan ke **satu file tunggal**: `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md`.
+- File tunggal aktif itu menyerap 4 source: counter divergence, default channel display, team inbox rules, dan re-verifikasi team inbox 2026-09-04.
+- Source lama diparkir di `detail-conversation/_source/` untuk traceability, bukan jalur baca utama.
+
+Fold status:
+- **CSN-01..12** sekarang menjadi ID register resmi dari file tunggal ini.
+- Blocking: **CSN-01**.
+- Needs decision/validation: **CSN-03, CSN-05, CSN-10, CSN-11**.
+
+Inti finding:
+- CSN-01 confirmed: FE `ConversationNavItemDefault.tsx:142,294-295` pakai `role.name` vs enum code.
+- CSN-02 confirmed: lifecycle invalidation counter tidak lengkap lintas new-message existing, channel status change, role change.
+- CSN-05 corrected: guard `channelMap.has()` tidak bisa dianggap aman tanpa policy bucket sintetis (WA group / IG comment).
+- CSN-09 confirmed: `shouldScopeByTeam` berbeda dengan `resolveTeams`; mismatch = parity, bukan leak row team asing.
+
+### Arsip source
+Source yang temuannya sudah terserap dipindah ke `_source/` (root) dan `detail-conversation/_source/`; baca hanya untuk file:line detail:
 - `_source/` (root): 09-01 system-audit, extension-performance-flow-ux, rule-adherence, orchestrator-compliance, qa-compliance, comprehensive-master, meta-audit, audit-3-synthesis, register-review.
-- `detail-conversation/_source/`: 6 source Track D/E + 2 synthesis lama. Gantinya: **`detail-conversation/2026-09-02-conversation-audit-merged.md`** (Track D+E digabung, 105 finding).
+- `detail-conversation/_source/` (2026-09-04): 6 source Track D/E + 2 synthesis lama. Gantinya: **`detail-conversation/2026-09-02-conversation-audit-merged.md`** (Track D+E digabung, 105 finding).
+- `detail-conversation/_source/` (2026-09-07): 4 source Track G (`counter-divergence`, `default-channel-display`, `team-inbox-rules`, `verify-team-inbox`) sudah diserap ke **`detail-conversation/2026-09-03-sidebar-navigation-synthesis.md`**.
 
 ---
 
@@ -86,7 +96,7 @@ Ordered by execution priority. Paths = SatuInbox repos (`backend-v2` / `omnichan
 ### GATE — read first, blocks everything
 | # | File | Why |
 |---|---|---|
-| 0 | `Memory/global-memory.md` §SLA/Chat List + repo branch state | Resolve ENV-01: confirm `prod-2.7.0` vs `v2.8.0` target. All confirmed findings hinge on this. |
+| 0 | `Memory/global-memory.md` §SLA/Chat List + repo branch state | ENV-01 resolved: target operasional `prod-2.8.1`; memory FE/BE patokan utama. |
 
 ### P1 — Confirmed priority bugs (verify + fix)
 | # | File | Finding | Why |
@@ -98,28 +108,36 @@ Ordered by execution priority. Paths = SatuInbox repos (`backend-v2` / `omnichan
 | 5 | `broadcast-dlq.processor.ts:120` | INT-03 | Non-TLS fallback when cert missing (violates mTLS mandatory). |
 | 6 | `whatsapp-api.controller.ts:144` | SEC-01 | `console.log(payload)` leaks tenant ID + WA number. Quick win. |
 | 7 | `throw-service-error.ts` + 278 call sites (FE `apps/omnichannel`) | F-07 | Raw BE error leak, 0 error mapper. Phased; start 5 core negative-path flows. Dedup with UI #11/#29. |
+| 8 | FE `ConversationNavItemDefault.tsx:142,294-295` + BE `role.seed.ts:51-67` | CSN-01 | Sidebar role gate pakai `role.name` vs enum code; SALES/ SUPERVISOR SALES impact. |
 
 ### P2 — Confirmed non-priority (backlog, cheap verify)
 | # | File | Finding |
 |---|---|---|
-| 8 | `makeQueryClientHelper.ts:11` | C1/PERF-01 — add `refetchOnReconnect:true` (1 line) |
-| 9 | `broadcast.processor.ts:209` + retryTracker Map | C7/INT-06 + C16/DI-06 — in-thread sleep + in-memory retry state |
-| 10 | `.env.example:77,91` | INT-01 — dup `GRPC_ANALYTICS_URL` config trap |
-| 11 | `packages/constants/src/socket.ts` | C15/UX-07 — `SOCKER_ERROR_MESSAGE` typo |
+| 9 | `makeQueryClientHelper.ts:11` | C1/PERF-01 — add `refetchOnReconnect:true` (1 line) |
+| 10 | FE/BE counter invalidation path (`conversation.service.ts`, `use-invalidate-conversation.ts`, `counter.repository.ts`) | CSN-02 — lifecycle invalidation counter tidak lengkap |
+| 11 | BE `conversation.service.ts:2857,2861-2865,2873` + `conversation.repository.ts:1969-1988` | CSN-06/07 — active-channel pagination + platform whitelist |
+| 12 | BE `conversation.service.ts:6477` | CSN-09 — team scope count/list parity |
+| 13 | `broadcast.processor.ts:209` + retryTracker Map | C7/INT-06 + C16/DI-06 — in-thread sleep + in-memory retry state |
+| 14 | `.env.example:77,91` | INT-01 — dup `GRPC_ANALYTICS_URL` config trap |
+| 15 | `packages/constants/src/socket.ts` | C15/UX-07 — `SOCKER_ERROR_MESSAGE` typo |
 
 ### P3 — Needs-validation, code-verifiable (grep/index check)
 | # | File | Finding |
 |---|---|---|
-| 12 | MongoDB `conversation` collection indexes | V8/P-01 — 4-dim filter, no compound index |
-| 13 | `base.constant.ts:216` + `conversation.repository.ts:283` | V9/P-02 — Atlas search `ENABLED` flag maybe dead code |
-| 14 | FE SLA color render path | V3/F-03 — absolute-time vs PRD percentage |
-| 15 | FE group FRT visibility | V7/F-06 — group FRT hidden |
+| 16 | count/list pipeline pair | CSN-03 — count criteria parity vs list criteria |
+| 17 | BE `conversation.service.ts:1260-1281` | CSN-05 — bucket sintetis channel needs policy sebelum guard |
+| 18 | all conversation read/list entry points | CSN-10 — prove every path uses AGENT scope guard |
+| 19 | MongoDB `conversation` collection indexes | V8/P-01 — 4-dim filter, no compound index |
+| 20 | `base.constant.ts:216` + `conversation.repository.ts:283` | V9/P-02 — Atlas search `ENABLED` flag maybe dead code |
+| 21 | FE SLA color render path | V3/F-03 — absolute-time vs PRD percentage |
+| 22 | FE group FRT visibility | V7/F-06 — group FRT hidden |
 
 ### P4 — Decision meeting (read PRDs, NOT code — no tickets yet)
 | # | File | Finding |
 |---|---|---|
-| 16 | `PRD/Conversationv2/` files 9, 12, 13, 16 | V1/F-01 (Hold vs Snooze vs SLA) + V2/F-02 (reopen 3 defs) — Catastrophe, REVISE_PRD |
-| 17 | `global-memory.md` §SLA (FRT start, SLA mode) | V5/F-05 + V6/SLA-mode — PM+Eng decision |
+| 23 | `PRD/Conversationv2/` files 9, 12, 13, 16 | V1/F-01 (Hold vs Snooze vs SLA) + V2/F-02 (reopen 3 defs) — Catastrophe, REVISE_PRD |
+| 24 | `global-memory.md` §SLA (FRT start, SLA mode) | V5/F-05 + V6/SLA-mode — PM+Eng decision |
+| 25 | capability matrix sidebar/team management | CSN-11 — MANAGER/TEAM_LEAD create-team intent belum locked |
 
 ### Track B — FE UI/UX (separate work, read after revision pass)
 | # | File | Finding |
@@ -136,7 +154,7 @@ Ordered by execution priority. Paths = SatuInbox repos (`backend-v2` / `omnichan
 
 ## 3 | Rules for the requester
 1. `audit-master-register.md` wins on every conflict. Track B/C do not override it.
-2. Nothing becomes an engineering ticket until ENV-01 (branch lock) resolved.
+2. ENV-01 resolved operationally: ticket may refer `prod-2.8.1`; re-verify only if the touched area changed in 2.8.1.
 3. V1–V6 = decision meeting, never code tickets.
 4. When ticketing F-07, fold in UI #11/#29 (same defect class) to avoid duplicate work.
 
@@ -144,21 +162,21 @@ Ordered by execution priority. Paths = SatuInbox repos (`backend-v2` / `omnichan
 
 ## 4 | Audit Conversation — Baca di Sini (index domain)
 
-> Semua audit domain **Conversation** ada di `detail-conversation/`. Tiga track terpisah (D/E/F), beda sumber/scope/metode — **belum di-fold ke master register**. Gate: dedup lintas-track + ENV-01 branch-lock sebelum jadi ticket.
+> Semua audit domain **Conversation** ada di `detail-conversation/`. Track **G** sudah dikonsolidasikan ke satu file dan folded ke register (CSN-01..12). Track **H** sudah folded ke register (CLH-01..18). Track D/E masih raw; gate: dedup antar-track sebelum ticketing final.
 
 **Urutan baca (dari luas ke sempit):**
 
 | # | Baca | Track | Scope | Temuan | Decision |
 |---|---|---|---|---|---|
-| 1 | `detail-conversation/2026-09-07-conversation-list-deep-audit.md` | H | Conversation-list deep audit (chat list panel saja; 10 aspek, CLX-01..23) | 23 (P1×3/P2×3/P3×11 + NV×2 + clean×4) | `PROCEED_WITH_CAUTION`, blocking: CLX-03/04/15 |
+| 1 | `detail-conversation/2026-09-07-conversation-list-deep-audit.md` | H | Conversation-list deep audit (chat list panel saja; 10 aspek, CLX-01..23) | 23 total; **17 confirmed + 1 corrected folded ke register (CLH-01..18)**; clean/retracted tetap di source | blocking: CLH-02/03; CLH-17 confirmed, CLH-18 corrected |
 | 2 | `detail-conversation/_source/2026-09-02-conversation-consolidated-shortcomings-report.md` | E | BE deep-dive (data model, security, perf, functional) | 64 (P0×7/P1×15/P2×24/P3×18) | code-verified, backlog |
 | 3 | `detail-conversation/_source/2026-09-02-conversation-phase2-synthesis-report.md` | D | FE UX flow (first-time + returning user) | 41 (2 CRIT/11 HIGH) | REVISE_PRD + PROCEED_WITH_CAUTION |
-| 4 | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | F | Sidebar nav RBAC + counter (FE+BE cross-verified) | 3 confirmed (1 CRIT/2 MAJOR→1 MED) | belum ticket, butuh keputusan produk (F1) |
+| 4 | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | G | Conversation-Sidebar-Navigation: counter, channel, team inbox | 12 folded (8 confirmed + 4 validation/decision) | CSN-01 blocking; register v1.7 |
 
 Sub-report per track (baca kalau butuh file:line detail):
 - **Track E:** `conversation-functional-business-logic.md` (22), `2026-09-02-conversation-data-model-api-contract-audit.md` (18, 3 CRIT), `2026-09-02-conversation-security-perf-audit.md` (13). UX/a11y (17) folded ke consolidated.
 - **Track D:** `2026-09-02-conversation-first-time-user-flow-audit.md`, `2026-09-02-satuinbox-audit-2-conversation-returning-user-flow.md`.
-- **Track F:** `2026-09-03-counter-divergence.md`, `2026-09-03-default-channel-display.md`, `2026-09-03-team-inbox-rules.md`.
+- **Track G:** source lama ada di `detail-conversation/_source/2026-09-03-counter-divergence.md`, `detail-conversation/_source/2026-09-03-default-channel-display.md`, `detail-conversation/_source/2026-09-03-team-inbox-rules.md`, `detail-conversation/_source/2026-09-04-verify-team-inbox-rules.md`; audit aktif tetap `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md`.
 
 **Coverage gap (jangan lupa):** `03-coverage-gap-check.md` — verdict PARTIAL, ~40% aspek Conversation belum di-audit. P0 gap: SLA engine vs contract, Hold/Snooze/SLA 3-way + reopen, multi-tenant READ-path isolation, migration/rollback runbook.
 
@@ -166,9 +184,9 @@ Sub-report per track (baca kalau butuh file:line detail):
 - Track E DB-index ↔ register **V8/P-01** (compound index).
 - Track E soft-delete/tenant-scope ↔ register **SEC-*** family (verifikasi bukan dobel).
 - Track D reminder/unread ↔ Track E functional (reminder stub).
-- Track F C1/C2 (RBAC visibility `role.name` vs `role.code`) ↔ Track B RBAC visibility gap ↔ Track D assignment-invisible.
+- Track G CSN-01 (`role.name` vs `role.code`) ↔ Track B RBAC visibility gap ↔ Track D assignment-invisible. Sudah folded sebagai CSN-01; saat ticketing, link Track B/D sebagai evidence tambahan, bukan bug baru.
 
-**Kenapa belum di register:** register = 61 finding code-verified dgn severity+decision+acceptance-test. Track D/E/F = ratusan finding mentah, banyak overlap antar-track + dgn register. Fold tanpa dedup = double-count + backlog kembar. Fold hanya setelah: (a) ENV-01 branch di-lock, (b) dedup decision per overlap di atas.
+**Kenapa D/E belum di register:** register = 101 finding ter-triase. Track D/E masih ratusan finding mentah dan banyak overlap antar-track + dgn register. Fold tanpa dedup = double-count + backlog kembar. Track G dan H sudah folded.
 
 ---
 
@@ -178,12 +196,14 @@ Hasil review seluruh corpus audit. Resolusi mengikuti precedence README (registe
 
 | # | Konflik | File | Resolusi |
 |---|---|---|---|
-| K1 | **RBAC dua layer**: register P1 SEC-03 = RBAC BE gateway POSITIF; Track F C1 = RBAC FE sidebar RUSAK (`role.name` vs code). Pembaca bisa salah simpul "RBAC aman". | register ↔ `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | Dua-duanya benar, layer beda. Warning ditambah di register §Cakupan. Saat fold, C1 = finding FE-RBAC baru, BUKAN kontradiksi SEC-03. |
+| K1 | **RBAC dua layer**: register P1 SEC-03 = RBAC BE gateway POSITIF; Track G CSN-01 = RBAC FE sidebar RUSAK (`role.name` vs code). Pembaca bisa salah simpul "RBAC aman". | register ↔ `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | **RESOLVED 2026-09-07 (register v1.7):** dua-duanya benar, layer beda. CSN-01 folded sebagai finding FE-RBAC baru, bukan kontradiksi SEC-03. |
 | K2 | **DB-index triple-report beda severity**: Track E P0-03 (Message zero index, code-verified P0) vs register V8/P-01 (needs-validation P3) vs extension P-01 (Major). Defect sama. | `detail-conversation/_source/…-consolidated-shortcomings…` ↔ register ↔ extension | Track E code-verified outranks inference. Saat fold: promote V8 → confirmed P0, tutup duplikat. Sampai fold, register tetap patokan backlog. |
 | K3 | **Reminder dua track**: Track D (FE `console.log` stub, HIGH) + Track E functional (BE state gap). Tema beda, defect sama. | `detail-conversation/_source/…-returning-user-flow…` ↔ `detail-conversation/_source/conversation-functional-business-logic.md` | Satu ticket gabungan saat fold (FE stub + BE state). |
 | K4 | **F-07 vs Track B**: register F-07 (Major, 278 call sites) = defect sama dgn UI #11/#29 (skala Nielsen). | register ↔ `detail-uiux/uiux-audit-report-sabrina.md` | Register menang. Ticketing F-07 fold UI #11/#29 (sudah dicatat §3 rule 4). |
 | K5 | **Register version drift**: reading-list dulu bilang v1.2; register-review bilang 60; meta-audit bilang 59. | 4 file | FIXED 2026-09-03: reading-list → v1.3/61; register-review dibanner HISTORICAL. Meta-audit 59 = snapshot, jangan update (point-in-time). |
-| K6 | **Track G fold**: `detail-infra/satuinbox-infra-audit.md` 69 temuan infra (secrets/CORS/SPOF) — orphan sebelumnya. | orphan → register | **RESOLVED 2026-09-04 (register v1.5):** 10 Critical folded jadi INFRA-01..10 (confirmed) di register. Sisa 59 (High/Med/Low) TETAP di source `detail-infra/satuinbox-infra-audit.md` — belum di-fold, baca source langsung. INFRA-01 (committed secrets) = active risk, prioritas. |
+| K6 | **Track F fold**: `detail-infra/satuinbox-infra-audit.md` 69 temuan infra (secrets/CORS/SPOF) — orphan sebelumnya. | orphan → register | **RESOLVED 2026-09-04 (register v1.5):** 10 Critical folded jadi INFRA-01..10 (confirmed) di register. Sisa 59 (High/Med/Low) TETAP di source `detail-infra/satuinbox-infra-audit.md` — belum di-fold, baca source langsung. INFRA-01 (committed secrets) = active risk, prioritas. |
+| K7 | **Track H fold**: conversation-list deep audit CLX-01..23 punya overlap CL-01..07 dan 5 clean/retracted. | Track H → register | **RESOLVED 2026-09-07 (register v1.9):** 17 confirmed + 1 corrected folded sebagai CLH-01..18. `CLH-17` kini confirmed Low (realtime invalidation churn, bukan thundering herd tanpa batas). `CLH-18` ditutup sebagai false alarm security setelah BE decorator terbukti enforce permission per bulk endpoint. Blocking tetap = CLH-02/03. |
+| K8 | **Track G consolidation + fold**: Conversation-Sidebar-Navigation tercecer di 4 source dan punya koreksi C2/C3/C5. | Track G source → single detail + register | **RESOLVED 2026-09-07 (register v1.7):** `2026-09-03-sidebar-navigation-synthesis.md` jadi file tunggal aktif; source lama diparkir di `_source/`; CSN-01..12 folded. |
 
 **Stale metadata (fix bila disentuh, bukan prioritas):**
 - `2026-09-02-satuinbox-audit-extension-performance-flow-ux.md` masih refer `Memory/CLAUDE-be.md`/`CLAUDE-fe.md` → sekarang `Codex-be.md`/`Codex-fe.md`.

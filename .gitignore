@@ -19,3 +19,5 @@ node_modules/
 qa.db
 qa.db-wal
 qa.db-shm
+
+.worktrees/

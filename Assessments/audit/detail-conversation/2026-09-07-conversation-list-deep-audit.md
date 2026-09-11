@@ -2,7 +2,7 @@
 
 Tanggal: 2026-09-07
 Author: Analyst (analyzer role, PRDanalisis multi-agent audit workflow)
-Version: 1.0
+Version: 1.1
 Scope: section **conversation-list** SatuInbox — panel chat list saja (`chat-lists/` + supporting hooks/stores/services + BE endpoint yang melayani list & bulk action). **Message thread / chat room di luar scope.**
 Artifact class: **detail-\* deep-dive**. Dokumen ini **TIDAK di-fold ke `01-audit-master-register.md`** kecuali user/orchestrator eksplisit minta fold. `01-register` tetap single source of truth untuk corpus-level register; file ini adalah raw evidence layer per `Rules/core/audit.md` §1.
 ID prefix baru: **CLX-**.
@@ -15,11 +15,11 @@ ID prefix baru: **CLX-**.
 |---|---|---|
 | CL-01 | FE re-sort lokal vs server pagination | KNOWN. Diperluas oleh **CLX-03** (mekanisme baru: index mismatch virtualizer, bukan hanya urutan) |
 | CL-02 | Filter count tidak scoped | KNOWN, tidak diulang |
-| CL-03 | Partial persist filter store | KNOWN. Disinggung oleh **CLX-13** (advanced-filter store tidak persist sama sekali → inkonsistensi kedua) |
+| CL-03 | Partial persist filter store | KNOWN. Disinggung oleh **CLX-13** (advanced-filter store sengaja `persist` kosong → inkonsistensi kedua) |
 | CL-04 | Team-view invalidation mismatch | KNOWN, tidak diulang |
 | CL-05 | Prefetch `hideEmpty` | KNOWN, tidak diulang |
 | CL-06 | flatMap scan per event | KNOWN, tidak diulang |
-| CL-07 | Error-state list | KNOWN. Diperluas oleh **CLX-23** (bukti konkret: container membuang `noDataError` di branch error dan hardcode string) |
+| CL-07 | Error-state list | KNOWN. Diperluas oleh **CLX-23** (bukti konkret: error branch tidak menerima `noDataError` / custom retry UI) |
 
 ---
 
@@ -92,30 +92,21 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 **Recommendation:** satu perbaikan di shared container (root cause, bukan per-caller): gunakan `processedRows.length` konsisten untuk `count`, `isLastItemVisible`, dan `isLoaderData`; atau larang `formatData` mengubah panjang dan pindahkan filter unread ke query param server (`read`/`unreadOnly`) sehingga server yang memangkas dan pagination tetap benar. Opsi kedua sekaligus menutup CL-01.
 **Suggested Test:** dataset 2 page × 20 item di mana hanya 3 item per page unread; aktifkan Unread-only; scroll ke dasar; assert `fetchNextPage` terpanggil dan total item unread yang tampil = 6, bukan 3.
 
-### CLX-04 — P2 Medium — DEFECT — Virtual row `key={virtualData.index}` → state per-row (hover, checkbox visibility, popover open) bocor antar conversation saat list bergeser
+### CLX-04 — P4 Info — Aspek 1 — Virtual row positional key: klaim target-swap **tidak terbukti** karena child `ChatCard` sudah ber-key `data.id` (retraksi)
 
-**Status:** Confirmed
-**Location:** FE `InfiniteVirtualContainer.tsx` row wrapper
-**Scenario:** agent hover row #3 (checkbox muncul, QuickAction popover terbuka). Datang pesan baru → item baru masuk di posisi 0 setelah refetch/re-sort (`handleFormatConversationLists` mengurut ulang). Index 3 sekarang menunjuk conversation yang berbeda.
-**Expected:** identitas row terikat ke conversation id, sehingga state lokal row (hover, popover open, checkbox terlihat) ikut pindah bersama datanya atau reset bersih.
-**Actual / Failure Mode:** wrapper row memakai `key={virtualData.index}` (`InfiniteVirtualContainer.tsx:264`) — **key positional**. React mempertahankan instance komponen di posisi itu dan hanya mengganti props. `ChatCard` memang `React.memo` dengan key `data.id` di dalam renderer (`ConversationChatLists.tsx:58-59`), tetapi key itu berada di dalam wrapper yang sudah ber-key positional, sehingga rekonsiliasi terjadi per-posisi: subtree tidak di-unmount. State di `useChatCardHandlers` (`useChatHandlers.ts:10` `const [isHovered, setIsHovered] = useState(false)`) dan `useState(false)` untuk popover di `QuickAction.tsx:272` **tetap** terbawa ke conversation yang baru menempati posisi tersebut.
-**Root Cause:** key positional pada list yang urutannya tidak stabil (diperparah oleh re-sort lokal CL-01).
-**Evidence:**
-- `InfiniteVirtualContainer.tsx:264` — `key={virtualData.index}`
-- `ConversationChatLists.tsx:58-64` — `<ChatCard key={data.id} ... />` (key di dalam, tidak menolong rekonsiliasi wrapper)
-- `useChatHandlers.ts:9-13` — state hover lokal + `showCheckbox = isHovered || hasSelection || isBulkSelected`
-- `QuickAction.tsx:271-272` — `const [open, setOpen] = useState(false)` popover per-row
-- `ConversationChatLists.tsx:87-109` — re-sort yang bisa memindahkan item antar posisi
-**Impact:** QuickAction popover yang sedang terbuka dapat "berpindah" ke conversation lain. Karena setiap action di popover terikat `chat` dari props terbaru (`useConversationActions` deps `[chat, ...]`, `QuickAction.tsx:265`), user bisa mengklik menu yang dilihatnya untuk conversation A tetapi eksekusi terjadi pada conversation B — **aksi destruktif** (Junk, Close, Spam) di objek yang salah.
-**Blast Radius:** semua user; probabilitas naik pada inbox realtime ramai. Risiko integritas data (junk/close salah target), bukan hanya visual.
-**Recommendation:** ganti ke key stabil berbasis identitas data pada wrapper container (`key={getRowKey?.(data) ?? virtualData.index}`, dengan conversation list mengirim `(d) => d.id`). Tambahan mitigasi langsung di list: tutup popover QuickAction saat `chat.id` berubah (`useEffect(() => setOpen(false), [chat.id])`).
-**Suggested Test:** buka QuickAction pada item posisi 3; simulasikan socket new-message pada item posisi 8 sehingga naik ke posisi 0; assert popover tertutup ATAU popover masih terikat pada conversation id yang sama seperti saat dibuka.
+**Status:** Retracted / clean-enough for current code
+**Location:** FE `InfiniteVirtualContainer.tsx` row wrapper × `ConversationChatLists.tsx` renderer
+**Klaim awal (retracted):** wrapper `key={virtualData.index}` membuat state hover/popover `ChatCard` bocor ke conversation lain saat list re-sort, sehingga QuickAction bisa kena target salah.
+**Verifikasi ulang:** wrapper memang positional (`InfiniteVirtualContainer.tsx:264`), tetapi renderer mengembalikan `<ChatCard key={data.id} ... />` (`ConversationChatLists.tsx:58-64`). Saat data pada index yang sama berubah dari conversation A → B, React melihat child key berubah A → B dan me-remount `ChatCard`, sehingga state lokal `useChatCardHandlers` dan `QuickAction` tidak otomatis terbawa. Jadi skenario destructive target-swap **tidak cukup terbukti** untuk masuk register sebagai defect.
+**Sisa risiko kecil:** wrapper DOM luar tetap positional; jika di masa depan `key={data.id}` di `ChatCard` dihapus atau state dipindahkan ke wrapper, bug ini bisa muncul.
+**Recommendation:** tidak perlu ticket sekarang. Kalau mau harden shared virtualizer, tambahkan optional `getRowKey` untuk wrapper identity; tapi ini bukan blocker.
+**Suggested Test:** re-order list saat QuickAction terbuka; assert `ChatCard` unmount/remount pada key berubah dan popover tidak pindah target.
 
-### CLX-05 — P3 Low — DESIGN FLAW — `getChannelIcon` fallback menyamarkan channel tak dikenal sebagai Live Chat; 3 platform code tidak punya ikon
+### CLX-05 — P3 Low — DESIGN FLAW — `getChannelIcon` fallback menyamarkan Facebook/Messenger prod sebagai Live Chat; Telegram = future-risk karena belum prod
 
 **Status:** Confirmed
 **Location:** FE `ConversationCard.tsx` `getChannelIcon`
-**Scenario:** conversation dari `facebook`, `facebook_messenger`, atau `telegram` (ketiganya ada di `PLATFORM_CODE`).
+**Scenario:** conversation dari `facebook` atau `facebook_messenger` (PM confirmed sudah release prod). `telegram` ada di `PLATFORM_CODE` tetapi PM confirmed belum prod, jadi bagian Telegram diperlakukan sebagai future-risk.
 **Expected:** ikon channel merepresentasikan channel sebenarnya, atau ikon "unknown" yang netral — tidak boleh mengklaim channel yang salah.
 **Actual / Failure Mode:** map `icons` hanya berisi EMAIL, WIDGET, WHATSAPP_API, WHATSAPP_WEB, INSTAGRAM (`ConversationCard.tsx:112-124`). Fallback `icons[code] ?? icons[PLATFORM_CODE.WIDGET]` (`:126`) membuat Facebook/Messenger/Telegram tampil sebagai **ikon Live Chat biru** — informasi salah, bukan informasi hilang. Tambahan inkonsistensi: default channel code di `TopRow` adalah `'live-chat'` (`:141`) yang **bukan** anggota `PLATFORM_CODE` (nilai widget = `'widget'`), sehingga lookup untuk conversation tanpa channel juga jatuh ke fallback lewat jalur string yang tidak pernah cocok.
 **Root Cause:** mapping partial + fallback optimistis, bukan fallback eksplisit "unknown".
@@ -215,37 +206,37 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 
 ### CLX-11 — P2 Medium — DATA INTEGRITY ISSUE — Select-All bersifat *sticky*: item baru dari socket refetch otomatis ikut terseleksi
 
-**Status:** Confirmed  
-**Location:** FE `conversationBulkAction.store.ts` `syncSelection` × `ConversationChatListBulkAction.tsx:657-660`  
-**Scenario:** (a) agent **Select All** (`selectAll(allIds)`), flag `isSelectAllActive = true`. (b) socket event memicu refetch `useConversations`; `allIds` berubah (2 item baru masuk). (c) `useEffect([allIds, syncSelection])` memanggil `syncSelection(allIds)`.  
-**Expected:** 2 item baru **tidak** otomatis terseleksi (Select-All = snapshot saat diklik), atau behavior didokumentasikan.  
-**Actual / Failure Mode:** `syncSelection` branch `isSelectAllActive ? dedupe(availableIds)` (`conversationBulkAction.store.ts:67-68`) → seluruh `allIds` terbaru jadi `selectedIds`, termasuk 2 item baru. Verified: `ConversationChatListBulkAction.tsx:658-660` `useEffect(() => { syncSelection(allIds) }, [allIds, syncSelection])`, `allIds` dari `useConversationData()` (`:500-508`, flatMap semua page).  
-**Root Cause:** `isSelectAllActive` bertahan sampai user toggle satu item (reset ke false, store `:40/:54/:77`) atau `clearSelection`. Refetch tidak reset flag; tidak ada snapshot ID saat select-all.  
-**Evidence:**  
-- `conversationBulkAction.store.ts:65-72` — `syncSelection`, branch `isSelectAllActive ? dedupe(availableIds)`  
-- `conversationBulkAction.store.ts:57-63` — `selectAll` set `isSelectAllActive: true`  
-- `ConversationChatListBulkAction.tsx:657-660` — `useEffect(() => { syncSelection(allIds) }, [allIds, syncSelection])` (CONFIRMED exact line pass ini)  
-- `ConversationChatListBulkAction.tsx:500-508` — `useConversationData` menghasilkan `allIds` dari flatMap semua page  
-**Impact:** setelah Select-All + bulk destructive (junk/close/spam), item yang masuk via socket sebelum submit ikut terkena — user tidak melihatnya masuk. Data-integrity risk, tapi butuh timing window (select-all → socket-insert → belum toggle → submit) sehingga P2, bukan P1.  
-**Blast Radius:** user bulk-action pada inbox aktif dengan traffic realtime.  
-**Recommendation:** (A) reset `isSelectAllActive=false` saat `allIds` berubah (di `useEffect` sebelum `syncSelection`), sehingga branch `filter` (`:69`) hanya pertahankan ID lama; atau (B) simpan snapshot `Set` saat select-all, `syncSelection` pertahankan intersection. Opsi A = 1 baris. Bila sticky memang intended, dokumentasikan + tambah visual \"+2 baru\" agar user sadar.  
+**Status:** Confirmed
+**Location:** FE `conversationBulkAction.store.ts` `syncSelection` × `ConversationChatListBulkAction.tsx:657-660`
+**Scenario:** (a) agent **Select All** (`selectAll(allIds)`), flag `isSelectAllActive = true`. (b) socket event memicu refetch `useConversations`; `allIds` berubah (2 item baru masuk). (c) `useEffect([allIds, syncSelection])` memanggil `syncSelection(allIds)`.
+**Expected:** 2 item baru **tidak** otomatis terseleksi (Select-All = snapshot saat diklik), atau behavior didokumentasikan.
+**Actual / Failure Mode:** `syncSelection` branch `isSelectAllActive ? dedupe(availableIds)` (`conversationBulkAction.store.ts:67-68`) → seluruh `allIds` terbaru jadi `selectedIds`, termasuk 2 item baru. Verified: `ConversationChatListBulkAction.tsx:658-660` `useEffect(() => { syncSelection(allIds) }, [allIds, syncSelection])`, `allIds` dari `useConversationData()` (`:500-508`, flatMap semua page).
+**Root Cause:** `isSelectAllActive` bertahan sampai user toggle satu item (reset ke false, store `:40/:54/:77`) atau `clearSelection`. Refetch tidak reset flag; tidak ada snapshot ID saat select-all.
+**Evidence:**
+- `conversationBulkAction.store.ts:65-72` — `syncSelection`, branch `isSelectAllActive ? dedupe(availableIds)`
+- `conversationBulkAction.store.ts:57-63` — `selectAll` set `isSelectAllActive: true`
+- `ConversationChatListBulkAction.tsx:657-660` — `useEffect(() => { syncSelection(allIds) }, [allIds, syncSelection])` (CONFIRMED exact line pass ini)
+- `ConversationChatListBulkAction.tsx:500-508` — `useConversationData` menghasilkan `allIds` dari flatMap semua page
+**Impact:** setelah Select-All + bulk destructive (junk/close/spam), item yang masuk via socket sebelum submit ikut terkena — user tidak melihatnya masuk. Data-integrity risk, tapi butuh timing window (select-all → socket-insert → belum toggle → submit) sehingga P2, bukan P1.
+**Blast Radius:** user bulk-action pada inbox aktif dengan traffic realtime.
+**Recommendation:** (A) reset `isSelectAllActive=false` saat `allIds` berubah (di `useEffect` sebelum `syncSelection`), sehingga branch `filter` (`:69`) hanya pertahankan ID lama; atau (B) simpan snapshot `Set` saat select-all, `syncSelection` pertahankan intersection. Opsi A = 1 baris. Bila sticky memang intended, dokumentasikan + tambah visual \"+2 baru\" agar user sadar.
 **Suggested Test:** Select All 100 item, socket menambah 2 item, assert `selectedIds.length` = 100 dan 2 item baru tidak included (opsi A).
 
 ### CLX-12 — P2 Medium — OPERABILITY ISSUE — Bulk close/star/pin/spam/junk/markRead tidak mendeteksi partial failure (`modifiedCount < selected`); hanya assign & reopen yang benar
 
-**Status:** Confirmed  
-**Location:** FE `ConversationChatListBulkAction.tsx` action success handlers  
-**Scenario:** bulk close 10 conversation, BE hanya close 7 (3 sudah closed / conflict). `modifiedCount = 7`.  
-**Expected:** toast informatif \"7/10 berhasil, 3 dilewati\" seperti pola assign, + selection hanya di-clear untuk yang berhasil.  
-**Actual / Failure Mode:** handler close/star/pin/spam/markRead/junk memanggil `clearSelection()` lalu `showSuccessToast(tToast('...success', { count: modifiedCount }))` **tanpa** membandingkan `modifiedCount` dengan `selectedIds.length`. Jadi 7/10 tampil sebagai \"7 berhasil\" (angka benar) tapi **tanpa** menyatakan 3 gagal — user mengira semua beres, dan selection sudah ke-clear (tidak bisa retry 3 sisa). Kontras: `useAssignHandler` (`:479-497`) **sudah benar** — hitung `skippedCount = payload.ids.length - modifiedCount` dan pakai `assign.successWithSkipped`; `createReopenSuccessHandler` (`:422-439`) juga benar — warning bila `modifiedCount === 0`. Jadi pola yang benar SUDAH ada di file, hanya tidak dipakai konsisten. Tidak ada `onError` sama sekali → hard failure (network/500) silent (mutation reject tanpa toast).  
-**Root Cause:** partial-failure handling di-implement per-action ad-hoc; hanya assign+reopen yang lengkap. Tidak ada helper bersama + tidak ada `onError`.  
-**Evidence:**  
-- `ConversationChatListBulkAction.tsx:144-151` (markRead), `:176-181` (star), `:206-211` (pin), `:232-239` (spam), `:268-274` (unjunk), `:623-631` (junk) — semua `clearSelection()` + success toast tanpa compare `modifiedCount` vs `selectedIds.length`, tanpa `onError`  
-- `ConversationChatListBulkAction.tsx:479-497` (`useAssignHandler`) — CONTOH BENAR: `skippedCount` + `successWithSkipped`  
-- `ConversationChatListBulkAction.tsx:422-439` (`createReopenSuccessHandler`) — CONTOH BENAR: warning bila 0  
-**Impact:** user tidak tahu sebagian bulk gagal; tidak bisa retry tertarget; hard error diam.  
-**Blast Radius:** semua bulk action selain assign/reopen.  
-**Recommendation:** ekstrak satu helper `bulkSuccessHandler(actionKey, selectedIds, clearSelection, tToast)` yang meniru pola assign (compare count → `successWithSkipped` bila ada skip) + tambah `onError` generic (toast error + jangan clearSelection). Terapkan ke 6 action.  
+**Status:** Confirmed
+**Location:** FE `ConversationChatListBulkAction.tsx` action success handlers
+**Scenario:** bulk close 10 conversation, BE hanya close 7 (3 sudah closed / conflict). `modifiedCount = 7`.
+**Expected:** toast informatif \"7/10 berhasil, 3 dilewati\" seperti pola assign, + selection hanya di-clear untuk yang berhasil.
+**Actual / Failure Mode:** handler close/star/pin/spam/markRead/junk memanggil `clearSelection()` lalu `showSuccessToast(tToast('...success', { count: modifiedCount }))` **tanpa** membandingkan `modifiedCount` dengan `selectedIds.length`. Jadi 7/10 tampil sebagai \"7 berhasil\" (angka benar) tapi **tanpa** menyatakan 3 gagal — user mengira semua beres, dan selection sudah ke-clear (tidak bisa retry 3 sisa). Kontras: `useAssignHandler` (`:479-497`) **sudah benar** — hitung `skippedCount = payload.ids.length - modifiedCount` dan pakai `assign.successWithSkipped`; `createReopenSuccessHandler` (`:422-439`) juga benar — warning bila `modifiedCount === 0`. Jadi pola yang benar SUDAH ada di file, hanya tidak dipakai konsisten. Tidak ada `onError` sama sekali → hard failure (network/500) silent (mutation reject tanpa toast).
+**Root Cause:** partial-failure handling di-implement per-action ad-hoc; hanya assign+reopen yang lengkap. Tidak ada helper bersama + tidak ada `onError`.
+**Evidence:**
+- `ConversationChatListBulkAction.tsx:144-151` (markRead), `:176-181` (star), `:206-211` (pin), `:232-239` (spam), `:268-274` (unjunk), `:623-631` (junk) — semua `clearSelection()` + success toast tanpa compare `modifiedCount` vs `selectedIds.length`, tanpa `onError`
+- `ConversationChatListBulkAction.tsx:479-497` (`useAssignHandler`) — CONTOH BENAR: `skippedCount` + `successWithSkipped`
+- `ConversationChatListBulkAction.tsx:422-439` (`createReopenSuccessHandler`) — CONTOH BENAR: warning bila 0
+**Impact:** user tidak tahu sebagian bulk gagal; tidak bisa retry tertarget; hard error diam.
+**Blast Radius:** semua bulk action selain assign/reopen.
+**Recommendation:** ekstrak satu helper `bulkSuccessHandler(actionKey, selectedIds, clearSelection, tToast)` yang meniru pola assign (compare count → `successWithSkipped` bila ada skip) + tambah `onError` generic (toast error + jangan clearSelection). Terapkan ke 6 action.
 **Suggested Test:** mock bulk-close return `modifiedCount=7` untuk 10 IDs; assert toast menyebut skip/partial dan behavior selection sesuai keputusan (retain-failed vs clear).
 
 ---
@@ -254,19 +245,19 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 
 **CLX-13 — P3 Low — INCONSISTENCY — Advanced filter store sengaja memakai `persist` kosong (`partialize: () => ({})`) sehingga agent/tag selalu hilang saat refresh; kontras dengan `conversationFilter.store.ts` yang persist `sort`**
 
-**Status:** Confirmed  
-**Location:** FE `conversationAdvancedFilter.store.ts` + `conversationFilter.store.ts`  
-**Scenario:** agent pilih 3 agent + 2 tag dari advanced-filter popover, apply, reload page.  
-**Expected:** policy persistence konsisten lintas filter (semua persist, atau semua volatile dengan alasan yang jelas).  
-**Actual / Failure Mode:** `conversationAdvancedFilter.store` memang **memakai** `persist`, tetapi `partialize: () => ({})` (`conversationAdvancedFilter.store.ts:86-91`) sengaja tidak menyimpan nilai apapun, sehingga `selectedAgents`/`selectedTags` selalu reset saat reload. Sebaliknya `conversationFilter.store` menyimpan `sort` (`conversationFilter.store.ts:45-48`). Hasil UX tetap sama seperti temuan awal: sort bertahan, advanced-filter hilang, tetapi mekanisme aslinya bukan "tanpa persist" melainkan "persist no-op".  
-**Root Cause:** tidak ada policy tunggal; dua store memakai strategi persist berbeda tanpa penjelasan user-facing.  
-**Evidence:**  
-- `conversationAdvancedFilter.store.ts:46-47` — dibungkus `persist(`  
-- `conversationAdvancedFilter.store.ts:86-91` — `partialize: () => ({})` + komentar `Don't persist filter values - reset on page reload`  
-- `conversationFilter.store.ts:33-49` — `persist(..., { partialize: (state) => ({ sort: state.sort }) })`  
-**Impact:** pengalaman tidak konsisten; agent re-setup filter tiap reload.  
-**Blast Radius:** user yang mengandalkan agent/tag filter lanjutan.  
-**Recommendation:** samakan policy: (A) persist nilai advanced filter juga, atau (B) reset semua saat reload dan hapus persist `sort` + dokumentasikan "filter bersifat session-only".  
+**Status:** Confirmed
+**Location:** FE `conversationAdvancedFilter.store.ts` + `conversationFilter.store.ts`
+**Scenario:** agent pilih 3 agent + 2 tag dari advanced-filter popover, apply, reload page.
+**Expected:** policy persistence konsisten lintas filter (semua persist, atau semua volatile dengan alasan yang jelas).
+**Actual / Failure Mode:** `conversationAdvancedFilter.store` memang **memakai** `persist`, tetapi `partialize: () => ({})` (`conversationAdvancedFilter.store.ts:86-91`) sengaja tidak menyimpan nilai apapun, sehingga `selectedAgents`/`selectedTags` selalu reset saat reload. Sebaliknya `conversationFilter.store` menyimpan `sort` (`conversationFilter.store.ts:45-48`). Hasil UX tetap sama seperti temuan awal: sort bertahan, advanced-filter hilang, tetapi mekanisme aslinya bukan "tanpa persist" melainkan "persist no-op".
+**Root Cause:** tidak ada policy tunggal; dua store memakai strategi persist berbeda tanpa penjelasan user-facing.
+**Evidence:**
+- `conversationAdvancedFilter.store.ts:46-47` — dibungkus `persist(`
+- `conversationAdvancedFilter.store.ts:86-91` — `partialize: () => ({})` + komentar `Don't persist filter values - reset on page reload`
+- `conversationFilter.store.ts:33-49` — `persist(..., { partialize: (state) => ({ sort: state.sort }) })`
+**Impact:** pengalaman tidak konsisten; agent re-setup filter tiap reload.
+**Blast Radius:** user yang mengandalkan agent/tag filter lanjutan.
+**Recommendation:** samakan policy: (A) persist nilai advanced filter juga, atau (B) reset semua saat reload dan hapus persist `sort` + dokumentasikan "filter bersifat session-only".
 **Suggested Test:** apply advanced-filter (pilih 2 agent), reload, assert behavior sesuai policy yang dipilih dan konsisten dengan sort filter.
 
 ---
@@ -275,16 +266,16 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 
 **CLX-14 — P4 Info — Aspek 4 — Modal assign validation: BENAR (retraksi klaim awal)**
 
-**Status:** Analyzed, clean  
-**Location:** FE `modals/AssignConversationModal.tsx`, `BulkAssignConversationModal.tsx`, `AssignModalFooter.tsx`  
-**Klaim awal (retracted):** "modal assign tidak validasi required field". **Salah** — verified pass ini:  
-- `AssignConversationModal` `validateForm` (`:253-261`): member → `selectedMembers.length > 0`, team → `!!selectedTeam?.id` (dan false bila team sudah disabled).  
-- `BulkAssignConversationModal` `validateForm` (`:180-185`): sama + guard `selectedIds.length === 0 → false`.  
-- `handleSubmit` (`:284-287` / `:208-211`): `if (!validateForm()) return` — tidak submit bila invalid.  
-- `AssignModalFooter` (`:33`): `<Button disabled={!isFormValid || isLoading}>` — tombol Confirm mati saat form invalid, `isLoading` mencegah double-submit.  
-- `LabelRequired` (`:90/:151`) menandai field wajib secara visual.  
-**Kesimpulan:** trust-boundary FE untuk assign SUDAH benar (validasi + disabled + double-submit guard). Modal junk (`JunkReasonModal`) belum diperiksa detail pass ini — apakah `reason` required sebelum confirm masih **NEEDS-VALIDATION** (satu-satunya sisa di aspek 4).  
-**Recommendation:** None untuk assign. Verifikasi `JunkReasonModal` reason-required sebagai follow-up kecil.  
+**Status:** Analyzed, clean
+**Location:** FE `modals/AssignConversationModal.tsx`, `BulkAssignConversationModal.tsx`, `AssignModalFooter.tsx`
+**Klaim awal (retracted):** "modal assign tidak validasi required field". **Salah** — verified pass ini:
+- `AssignConversationModal` `validateForm` (`:253-261`): member → `selectedMembers.length > 0`, team → `!!selectedTeam?.id` (dan false bila team sudah disabled).
+- `BulkAssignConversationModal` `validateForm` (`:180-185`): sama + guard `selectedIds.length === 0 → false`.
+- `handleSubmit` (`:284-287` / `:208-211`): `if (!validateForm()) return` — tidak submit bila invalid.
+- `AssignModalFooter` (`:33`): `<Button disabled={!isFormValid || isLoading}>` — tombol Confirm mati saat form invalid, `isLoading` mencegah double-submit.
+- `LabelRequired` (`:90/:151`) menandai field wajib secara visual.
+**Kesimpulan:** trust-boundary FE untuk assign SUDAH benar (validasi + disabled + double-submit guard). Modal junk (`JunkReasonModal`) belum diperiksa detail pass ini — apakah `reason` required sebelum confirm masih **NEEDS-VALIDATION** (satu-satunya sisa di aspek 4).
+**Recommendation:** None untuk assign. Verifikasi `JunkReasonModal` reason-required sebagai follow-up kecil.
 **Suggested Test:** (regression) buka assign modal tanpa pilih apa-apa → Confirm disabled (sudah expected-pass).
 
 ---
@@ -293,44 +284,44 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 
 **CLX-15 — P1 High — A11Y DEFECT — Virtualized list row tidak memakai semantic `role=\"listitem\"` dan parent tidak `role=\"list\"` → screen reader tidak announce jumlah item / posisi**
 
-**Status:** Confirmed  
-**Location:** FE `InfiniteVirtualContainer.tsx` + `ConversationChatLists.tsx`  
-**Scenario:** screen-reader user membuka conversation list.  
-**Expected:** announce \"List, 42 items\" saat masuk container, \"item 1 of 42\" per row.  
-**Actual / Failure Mode:** container `<div ref={parentRef} style={{...}}` (`InfiniteVirtualContainer.tsx:225`) tanpa `role=\"list\"`. Row wrapper `<div key={...} style={{...}}` (`:264-283`) tanpa `role=\"listitem\"`. Konten row (`ChatCard`) punya `data-cy` tetapi tidak `role`. SR membaca hanya teks flat tanpa struktur list.  
-**Root Cause:** shared virtualized container tidak inject semantic role (mungkin by design agar konsumen fleksibel), tetapi conversation-list tidak menambahkan wrapper semantic.  
-**Evidence:**  
-- `InfiniteVirtualContainer.tsx:225-290` — container + rows, tidak ada `role`  
-- `ConversationCard.tsx` — `<Card>` component yang render `<div>` (`packages/ui/src/components/atoms/card` perlu cek apakah support `role` prop).  
-**Impact:** SR user tidak dapat navigate by-item (jump ke item berikutnya), tidak tahu posisi dalam list, tidak tahu panjang list.  
-**Blast Radius:** semua pengguna SR.  
-**Recommendation:** tambahkan `role=\"list\"` pada `parentRef` container dan `role=\"listitem\"` pada row wrapper. Tambahkan `aria-setsize={count}` + `aria-posinset={virtualData.index+1}` per row bila virtualizer tidak otomatis (kebanyakan tidak). Alternatif: bungkus render card dengan `<li>` dan container dengan `<ul>` (ubah tag, bukan role), tetapi styling perlu disesuaikan.  
+**Status:** Confirmed
+**Location:** FE `InfiniteVirtualContainer.tsx` + `ConversationChatLists.tsx`
+**Scenario:** screen-reader user membuka conversation list.
+**Expected:** announce \"List, 42 items\" saat masuk container, \"item 1 of 42\" per row.
+**Actual / Failure Mode:** container `<div ref={parentRef} style={{...}}` (`InfiniteVirtualContainer.tsx:225`) tanpa `role=\"list\"`. Row wrapper `<div key={...} style={{...}}` (`:264-283`) tanpa `role=\"listitem\"`. Konten row (`ChatCard`) punya `data-cy` tetapi tidak `role`. SR membaca hanya teks flat tanpa struktur list.
+**Root Cause:** shared virtualized container tidak inject semantic role (mungkin by design agar konsumen fleksibel), tetapi conversation-list tidak menambahkan wrapper semantic.
+**Evidence:**
+- `InfiniteVirtualContainer.tsx:225-290` — container + rows, tidak ada `role`
+- `ConversationCard.tsx` — `<Card>` component yang render `<div>` (`packages/ui/src/components/atoms/card` perlu cek apakah support `role` prop).
+**Impact:** SR user tidak dapat navigate by-item (jump ke item berikutnya), tidak tahu posisi dalam list, tidak tahu panjang list.
+**Blast Radius:** semua pengguna SR.
+**Recommendation:** tambahkan `role=\"list\"` pada `parentRef` container dan `role=\"listitem\"` pada row wrapper. Tambahkan `aria-setsize={count}` + `aria-posinset={virtualData.index+1}` per row bila virtualizer tidak otomatis (kebanyakan tidak). Alternatif: bungkus render card dengan `<li>` dan container dengan `<ul>` (ubah tag, bukan role), tetapi styling perlu disesuaikan.
 **Suggested Test:** SR automation (axe-core atau manual VoiceOver/NVDA): assert container dikenali sebagai list dengan item-count, row pertama announce \"1 of N\".
 
 **CLX-16 — P4 Info — Aspek 5 — Checkbox select conversation SUDAH punya label aksesibel (retraksi klaim awal)**
 
-**Status:** Analyzed, clean  
-**Location:** FE `ChatCardCheckboxOrAvatar.tsx`  
-**Klaim awal (retracted):** "checkbox select conversation tidak punya label teks". **Salah** — verified: checkbox dibungkus `<label htmlFor={checkboxId} aria-label={`Select conversation with ${name}`}>` (`ChatCardCheckboxOrAvatar.tsx:55-59`) dan `<Checkbox id={checkboxId} ... />` (`:61-68`). Jadi SR tetap mendapat konteks conversation lewat label wrapper.  
-**Catatan:** label masih hardcoded English (`Select conversation with ...`) sehingga isu i18n tetap ada dan sudah tercakup di **CLX-18**.  
-**Recommendation:** tidak perlu fix a11y-label; cukup pindahkan string ini ke i18n catalog bersama aksesibilitas string lain.  
+**Status:** Analyzed, clean
+**Location:** FE `ChatCardCheckboxOrAvatar.tsx`
+**Klaim awal (retracted):** "checkbox select conversation tidak punya label teks". **Salah** — verified: checkbox dibungkus `<label htmlFor={checkboxId} aria-label={`Select conversation with ${name}`}>` (`ChatCardCheckboxOrAvatar.tsx:55-59`) dan `<Checkbox id={checkboxId} ... />` (`:61-68`). Jadi SR tetap mendapat konteks conversation lewat label wrapper.
+**Catatan:** label masih hardcoded English (`Select conversation with ...`) sehingga isu i18n tetap ada dan sudah tercakup di **CLX-18**.
+**Recommendation:** tidak perlu fix a11y-label; cukup pindahkan string ini ke i18n catalog bersama aksesibilitas string lain.
 **Suggested Test:** SR assert checkbox announce mencantumkan nama contact (expected-pass).
 
 **CLX-17 — P3 Low — A11Y / UX GAP — Row sudah bisa difokuskan + Enter/Space membuka conversation, tetapi belum ada roving ArrowUp/ArrowDown untuk list traversal cepat**
 
-**Status:** Confirmed  
-**Location:** FE `ConversationCard.tsx` + `useChatHandlers.ts` + `InfiniteVirtualContainer.tsx`  
-**Scenario:** keyboard-only user ingin membuka conversation ketiga dari list.  
-**Expected:** minimal row bisa difokuskan dan `Enter` membuka conversation; idealnya `ArrowDown`/`ArrowUp` memindahkan fokus antar row seperti inbox/list modern.  
-**Actual / Failure Mode:** dasar keyboard accessibility **sudah ada**: row `<Card>` punya `tabIndex={0}` (`ConversationCard.tsx:534`) dan `onKeyDown={handleKeyDown}` (`:538`), sementara `handleKeyDown` membuka conversation pada `Enter`/`Space` (`useChatHandlers.ts:16-20`). Jadi klaim awal "tidak bisa buka conversation via keyboard" **salah**. Gap yang masih nyata: tidak ada handler roving `ArrowDown`/`ArrowUp` di container/row untuk pindah antar item secara efisien; user tetap harus `Tab` satu per satu melewati banyak fokusable sub-element (checkbox, quick-action, dst.) bila ingin melompat beberapa row.  
-**Root Cause:** implementasi hanya memenuhi keyboard activation per-row, belum keyboard traversal pattern untuk list virtualized.  
-**Evidence:**  
-- `ConversationCard.tsx:533-538` — `<Card tabIndex={0} ... onKeyDown={handleKeyDown}>`  
-- `useChatHandlers.ts:16-20` — `Enter` / `Space` memanggil `handleClick()`  
-- `InfiniteVirtualContainer.tsx:218-280` — tidak ada roving-focus / arrow-key navigation pada wrapper list  
-**Impact:** keyboard user masih bisa memakai list, tetapi lambat pada inbox panjang. Ini gap efisiensi/usability, bukan broken accessibility total.  
-**Blast Radius:** keyboard-only user dan power-user yang mengandalkan keyboard.  
-**Recommendation:** jika UX keyboard menjadi prioritas, tambahkan roving tabindex / arrow-key navigation di wrapper list. Jika tidak, turunkan prioritas — baseline keyboard activation sudah lolos.  
+**Status:** Confirmed
+**Location:** FE `ConversationCard.tsx` + `useChatHandlers.ts` + `InfiniteVirtualContainer.tsx`
+**Scenario:** keyboard-only user ingin membuka conversation ketiga dari list.
+**Expected:** minimal row bisa difokuskan dan `Enter` membuka conversation; idealnya `ArrowDown`/`ArrowUp` memindahkan fokus antar row seperti inbox/list modern.
+**Actual / Failure Mode:** dasar keyboard accessibility **sudah ada**: row `<Card>` punya `tabIndex={0}` (`ConversationCard.tsx:534`) dan `onKeyDown={handleKeyDown}` (`:538`), sementara `handleKeyDown` membuka conversation pada `Enter`/`Space` (`useChatHandlers.ts:16-20`). Jadi klaim awal "tidak bisa buka conversation via keyboard" **salah**. Gap yang masih nyata: tidak ada handler roving `ArrowDown`/`ArrowUp` di container/row untuk pindah antar item secara efisien; user tetap harus `Tab` satu per satu melewati banyak fokusable sub-element (checkbox, quick-action, dst.) bila ingin melompat beberapa row.
+**Root Cause:** implementasi hanya memenuhi keyboard activation per-row, belum keyboard traversal pattern untuk list virtualized.
+**Evidence:**
+- `ConversationCard.tsx:533-538` — `<Card tabIndex={0} ... onKeyDown={handleKeyDown}>`
+- `useChatHandlers.ts:16-20` — `Enter` / `Space` memanggil `handleClick()`
+- `InfiniteVirtualContainer.tsx:218-280` — tidak ada roving-focus / arrow-key navigation pada wrapper list
+**Impact:** keyboard user masih bisa memakai list, tetapi lambat pada inbox panjang. Ini gap efisiensi/usability, bukan broken accessibility total.
+**Blast Radius:** keyboard-only user dan power-user yang mengandalkan keyboard.
+**Recommendation:** jika UX keyboard menjadi prioritas, tambahkan roving tabindex / arrow-key navigation di wrapper list. Jika tidak, turunkan prioritas — baseline keyboard activation sudah lolos.
 **Suggested Test:** fokus row pertama, tekan `Enter` → conversation terbuka (expected-pass). Lalu bila fitur arrow-nav ditambah, assert `ArrowDown` memindahkan fokus ke row berikutnya.
 
 ---
@@ -339,23 +330,23 @@ Ketika `processedRows.length < allRows.length` (unread filter membuang item):
 
 **CLX-18 — P3 Low — I18N DEFECT — 4+ hardcoded English strings di `BulkAction` / `PullButton` untuk `aria-label` / internal const tidak di-i18nkan**
 
-**Status:** Confirmed  
-**Location:** FE `bulk-action/*.tsx`, `PullButton.tsx`  
-**Scenario:** deployment non-English (Indonesia).  
-**Expected:** semua user-facing strings (termasuk SR announce) dalam bahasa lokal.  
-**Actual / Failure Mode:** grep hasil menunjukkan `aria-label` hardcoded di beberapa tempat:  
-- `BulkActionsMenu.tsx:6-7` — `const OPEN_BULK_ACTION_MENU = 'Open bulk actions menu'`, `const BULK_ACTION = 'Bulk actions'` (dipakai sebagai `aria-label`).  
-- `PullButton.tsx:59,71,81,279` — `aria-label={UI.ARIA.DECREMENT/COUNT_INPUT/INCREMENT/PULL_ACTION}` (konstanta `UI.ARIA` perlu cek apakah dari i18n atau hardcoded).  
-- `ConversationCard.tsx:464` — `aria-label=\"mentioned\"` (string literal).  
-String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.  
-**Root Cause:** sebagian accessibility string tidak masuk message catalog; mungkin dianggap \"developer-facing\" padahal SR user-facing.  
-**Evidence:**  
-- `BulkActionsMenu.tsx:6-7`  
-- `PullButton.tsx` (perlu cek definisi `UI.ARIA` — bila dari `@/constants`, likely hardcoded)  
-- `ConversationCard.tsx:464`  
-**Impact:** SR user non-English mendengar mixed-language announce.  
-**Blast Radius:** SR user pada deployment i18n-enabled.  
-**Recommendation:** ganti hardcoded string dengan `useTranslations('aria')` keys; tambahkan key `aria.openBulkActionMenu`, `aria.mentioned`, dst. Audit file accessibility-strings lain (empty-state, error) juga.  
+**Status:** Confirmed
+**Location:** FE `bulk-action/*.tsx`, `PullButton.tsx`
+**Scenario:** deployment non-English (Indonesia).
+**Expected:** semua user-facing strings (termasuk SR announce) dalam bahasa lokal.
+**Actual / Failure Mode:** grep hasil menunjukkan `aria-label` hardcoded di beberapa tempat:
+- `BulkActionsMenu.tsx:6-7` — `const OPEN_BULK_ACTION_MENU = 'Open bulk actions menu'`, `const BULK_ACTION = 'Bulk actions'` (dipakai sebagai `aria-label`).
+- `PullButton.tsx:59,71,81,279` — `aria-label={UI.ARIA.DECREMENT/COUNT_INPUT/INCREMENT/PULL_ACTION}` (konstanta `UI.ARIA` perlu cek apakah dari i18n atau hardcoded).
+- `ConversationCard.tsx:464` — `aria-label=\"mentioned\"` (string literal).
+String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
+**Root Cause:** sebagian accessibility string tidak masuk message catalog; mungkin dianggap \"developer-facing\" padahal SR user-facing.
+**Evidence:**
+- `BulkActionsMenu.tsx:6-7`
+- `PullButton.tsx` (perlu cek definisi `UI.ARIA` — bila dari `@/constants`, likely hardcoded)
+- `ConversationCard.tsx:464`
+**Impact:** SR user non-English mendengar mixed-language announce.
+**Blast Radius:** SR user pada deployment i18n-enabled.
+**Recommendation:** ganti hardcoded string dengan `useTranslations('aria')` keys; tambahkan key `aria.openBulkActionMenu`, `aria.mentioned`, dst. Audit file accessibility-strings lain (empty-state, error) juga.
 **Suggested Test:** set locale `id` (Indonesia), SR assert announce \"Buka menu aksi massal\" (translated), bukan \"Open bulk actions menu\".
 
 ---
@@ -364,18 +355,18 @@ String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
 
 **CLX-19 — P2 NEEDS-VALIDATION — DATA INTEGRITY / PERF — dugaan refetch storm dari socket-invalidation; sebagian handler yang terbaca justru sudah terguard**
 
-**Status:** NEEDS-VALIDATION (hanya sebagian `use-invalidate-conversation.ts` terbaca pass ini)  
-**Location:** FE `use-invalidate-conversation.ts` socket handlers  
-**Scenario:** 50 agent online, 200 conversation active; setiap incoming message broadcast socket event ke banyak agent.  
-**Expected:** invalidate hanya cache relevan, tidak refetch list penuh per event.  
-**Actual / Failure Mode:** handler yang terbaca (`use-invalidate-conversation.ts:130+`) **sudah terguard** — hanya invalidate saat `!isConversationExist && (isParticipant || role ADMIN)`, jadi tidak unconditional. Namun registry socket penuh (semua event → invalidate mapping) belum dibaca seluruhnya pass ini; potensi storm hanya terkonfirmasi bila ada event lain yang invalidate root list key tanpa guard. Klaim "storm unconditional" **belum terbukti** → jangan ticketkan sebelum trace penuh.  
-**Root Cause (dugaan):** granularitas invalidation mungkin belum optimal untuk beberapa event; perlu verifikasi apakah ada handler yang invalidate `[CONVERSATION_QUERY_KEY]` root (mengenai semua filter variant).  
-**Evidence:**  
-- `use-invalidate-conversation.ts:130+` — handler terbaca: guard `!isConversationExist && (participant||ADMIN)` sebelum invalidate  
-- Registry event→handler penuh: **belum dibaca** (butuh `use-conversation-socket-event.ts` + seluruh `use-invalidate-conversation.ts`)  
-**Impact (bila terbukti):** backend load tinggi, FE render churn pada tenant traffic tinggi.  
-**Blast Radius:** semua agent pada tenant traffic tinggi (bila ada handler tak terguard).  
-**Recommendation:** trace SELURUH mapping socket-event → invalidate; untuk event yang tak terhindarkan invalidate list, pertimbangkan optimistic cache update (update unread counter tanpa refetch penuh). Jangan ambil aksi sebelum trace lengkap.  
+**Status:** NEEDS-VALIDATION (hanya sebagian `use-invalidate-conversation.ts` terbaca pass ini)
+**Location:** FE `use-invalidate-conversation.ts` socket handlers
+**Scenario:** 50 agent online, 200 conversation active; setiap incoming message broadcast socket event ke banyak agent.
+**Expected:** invalidate hanya cache relevan, tidak refetch list penuh per event.
+**Actual / Failure Mode:** handler yang terbaca (`use-invalidate-conversation.ts:130+`) **sudah terguard** — hanya invalidate saat `!isConversationExist && (isParticipant || role ADMIN)`, jadi tidak unconditional. Namun registry socket penuh (semua event → invalidate mapping) belum dibaca seluruhnya pass ini; potensi storm hanya terkonfirmasi bila ada event lain yang invalidate root list key tanpa guard. Klaim "storm unconditional" **belum terbukti** → jangan ticketkan sebelum trace penuh.
+**Root Cause (dugaan):** granularitas invalidation mungkin belum optimal untuk beberapa event; perlu verifikasi apakah ada handler yang invalidate `[CONVERSATION_QUERY_KEY]` root (mengenai semua filter variant).
+**Evidence:**
+- `use-invalidate-conversation.ts:130+` — handler terbaca: guard `!isConversationExist && (participant||ADMIN)` sebelum invalidate
+- Registry event→handler penuh: **belum dibaca** (butuh `use-conversation-socket-event.ts` + seluruh `use-invalidate-conversation.ts`)
+**Impact (bila terbukti):** backend load tinggi, FE render churn pada tenant traffic tinggi.
+**Blast Radius:** semua agent pada tenant traffic tinggi (bila ada handler tak terguard).
+**Recommendation:** trace SELURUH mapping socket-event → invalidate; untuk event yang tak terhindarkan invalidate list, pertimbangkan optimistic cache update (update unread counter tanpa refetch penuh). Jangan ambil aksi sebelum trace lengkap.
 **Suggested Test:** mock 200 socket `new.message` (conversation berbeda) dalam 5 detik; assert GET `/conversations?...` ≤ 2× (bukan 200×) — jalankan setelah trace mengonfirmasi handler mana yang perlu difix.
 
 ---
@@ -384,19 +375,19 @@ String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
 
 **CLX-20 — P3 Low — UX ISSUE — `RefreshNotification` tidak punya auto-hide: banner "ada update, klik refresh" tampil sampai user interact/unmount**
 
-**Status:** Confirmed  
-**Location:** FE `refreshNotification.store.ts` + `ConversationRefreshNotification.tsx`  
-**Scenario:** banner refresh muncul, user ignore (sibuk baca row), banner tetap nongol; message baru lagi 2 menit kemudian → banner tetap sama, user bingung apakah update lama sudah ter-apply.  
-**Expected:** banner auto-dismiss setelah durasi tertentu, atau list ter-refresh via jalur lain.  
-**Actual / Failure Mode:** `refreshNotification.store.ts:2` `notifTimeout = 30000` **BUKAN** durasi auto-hide — perannya adalah *debounce sejak dismiss*: `showNotification` (`:27-35`) hanya menampilkan banner bila `Date.now() - lastDismissTime > 30000` (mencegah banner muncul lagi ≤30s setelah user dismiss). Tidak ada `setTimeout(hideNotification, …)` di manapun. Banner `show` bertahan sampai user klik refresh/dismiss (`ConversationRefreshNotification.tsx:35-50`) atau komponen unmount.  
-**Root Cause:** store hanya menyimpan `show: boolean` + debounce-since-dismiss; tidak ada TTL tampil.  
-**Evidence:**  
-- `refreshNotification.store.ts:2,27-35` — `notifTimeout` dipakai sebagai guard `timeSinceDismiss > notifTimeout` (debounce), bukan auto-hide  
-- `refreshNotification.store.ts:16-37` — hanya `showNotification`/`hideNotification`/`dismissNotification`, tidak ada timer auto-hide  
-- `ConversationRefreshNotification.tsx:26,35-50` — `if (!show) return null`; dismiss/refresh manual, tanpa auto-hide  
-**Impact:** banner lama nongol; user tidak yakin state list.  
-**Blast Radius:** semua user pada inbox realtime.  
-**Recommendation:** tambahkan auto-hide: `useEffect` di komponen yang `setTimeout(onDismiss, 60000)` saat `show` jadi true (clear on unmount/interact), atau field TTL di store. Semantik: banner = call-to-action sementara, bukan status permanen.  
+**Status:** Confirmed
+**Location:** FE `refreshNotification.store.ts` + `ConversationRefreshNotification.tsx`
+**Scenario:** banner refresh muncul, user ignore (sibuk baca row), banner tetap nongol; message baru lagi 2 menit kemudian → banner tetap sama, user bingung apakah update lama sudah ter-apply.
+**Expected:** banner auto-dismiss setelah durasi tertentu, atau list ter-refresh via jalur lain.
+**Actual / Failure Mode:** `refreshNotification.store.ts:2` `notifTimeout = 30000` **BUKAN** durasi auto-hide — perannya adalah *debounce sejak dismiss*: `showNotification` (`:27-35`) hanya menampilkan banner bila `Date.now() - lastDismissTime > 30000` (mencegah banner muncul lagi ≤30s setelah user dismiss). Tidak ada `setTimeout(hideNotification, …)` di manapun. Banner `show` bertahan sampai user klik refresh/dismiss (`ConversationRefreshNotification.tsx:35-50`) atau komponen unmount.
+**Root Cause:** store hanya menyimpan `show: boolean` + debounce-since-dismiss; tidak ada TTL tampil.
+**Evidence:**
+- `refreshNotification.store.ts:2,27-35` — `notifTimeout` dipakai sebagai guard `timeSinceDismiss > notifTimeout` (debounce), bukan auto-hide
+- `refreshNotification.store.ts:16-37` — hanya `showNotification`/`hideNotification`/`dismissNotification`, tidak ada timer auto-hide
+- `ConversationRefreshNotification.tsx:26,35-50` — `if (!show) return null`; dismiss/refresh manual, tanpa auto-hide
+**Impact:** banner lama nongol; user tidak yakin state list.
+**Blast Radius:** semua user pada inbox realtime.
+**Recommendation:** tambahkan auto-hide: `useEffect` di komponen yang `setTimeout(onDismiss, 60000)` saat `show` jadi true (clear on unmount/interact), atau field TTL di store. Semantik: banner = call-to-action sementara, bukan status permanen.
 **Suggested Test:** trigger notification, jangan klik apapun, tunggu > TTL, assert banner auto-dismiss.
 
 ---
@@ -405,30 +396,30 @@ String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
 
 **CLX-21 — P3 Low — SECURITY / RBAC — Bulk-action button RBAC gating tidak eksplisit terlihat di `ConversationChatListBulkAction` — perlu konfirmasi apakah setiap action di-gate di mutation hook atau BE endpoint**
 
-**Status:** NEEDS-VALIDATION  
-**Location:** FE `ConversationChatListBulkAction.tsx` + BE `conversation.controller.ts` bulk endpoints  
-**Scenario:** role AGENT coba bulk-junk conversation yang bukan miliknya.  
-**Expected:** FE hide button / disable, BE reject 403.  
-**Actual / Failure Mode:** pass ini belum membaca `:150-701` dari `BulkAction` file yang berisi render button; tidak terlihat guard `role.code === ...` di sample `:125-151`. Prior audit CL-04 mencatat `PullButton` sudah pakai `role.code` (positif). Perlu cek: (1) FE hide bulk-button per role, (2) BE controller decorator `@UseGuards(RoleGuard)` / `@Permissions([...])` pada setiap bulk endpoint. Pass ini tidak membaca BE controller.  
-**Root Cause:** visibility unclear (pass terbatas).  
-**Evidence:** TBD (see Open Questions).  
-**Impact:** bila tidak di-gate, authorization bypass; role rendah eksekusi bulk-close/junk tenant-wide.  
-**Blast Radius:** multi-tenant semua role.  
-**Recommendation:** (1) FE audit visibility button per role; (2) BE verify `conversation.controller.ts` setiap bulk method punya decorator permission (trace `@Permissions`, `@AllowedRoles`). Prioritas P3 karena likelihood rendah (biasanya BE guard — risk mitigasi).  
+**Status:** NEEDS-VALIDATION
+**Location:** FE `ConversationChatListBulkAction.tsx` + BE `conversation.controller.ts` bulk endpoints
+**Scenario:** role AGENT coba bulk-junk conversation yang bukan miliknya.
+**Expected:** FE hide button / disable, BE reject 403.
+**Actual / Failure Mode:** pass ini belum membaca `:150-701` dari `BulkAction` file yang berisi render button; tidak terlihat guard `role.code === ...` di sample `:125-151`. Prior audit CL-04 mencatat `PullButton` sudah pakai `role.code` (positif). Perlu cek: (1) FE hide bulk-button per role, (2) BE controller decorator `@UseGuards(RoleGuard)` / `@Permissions([...])` pada setiap bulk endpoint. Pass ini tidak membaca BE controller.
+**Root Cause:** visibility unclear (pass terbatas).
+**Evidence:** TBD (see Open Questions).
+**Impact:** bila tidak di-gate, authorization bypass; role rendah eksekusi bulk-close/junk tenant-wide.
+**Blast Radius:** multi-tenant semua role.
+**Recommendation:** (1) FE audit visibility button per role; (2) BE verify `conversation.controller.ts` setiap bulk method punya decorator permission (trace `@Permissions`, `@AllowedRoles`). Prioritas P3 karena likelihood rendah (biasanya BE guard — risk mitigasi).
 **Suggested Test:** login role AGENT, intercept network, manual POST `/api/bulk-close` conversation di luar scope → assert 403.
 
 **CLX-22 — P4 Info — Aspek 9 — XSS / HTML injection via preview: TIDAK TERKONFIRMASI**
 
-**Status:** Analyzed, clean  
-**Location:** FE `LatestMessage.tsx` + `ConversationCard.tsx`  
-**Scenario:** conversation dengan `latestMessage.content` berisi script tag `<script>alert(1)</script>` (attacker-controlled email subject/body).  
-**Expected:** text di-escape, tag tidak di-eksekusi.  
-**Actual:** React render `{content}` sebagai text node (`:LatestMessage.tsx:26-28`) — otomatis di-escape. Tidak ada `dangerouslySetInnerHTML`. **Clean untuk XSS**. Yang nyata hanya masalah render quality (tag tampil literal, lihat CLX-06), bukan eksekusi.  
-**Evidence:**  
-- `LatestMessage.tsx:26-28` — `{content}` text node, `title={content}` attribute (keduanya safe)  
-- Tidak ada `dangerouslySetInnerHTML` di `ConversationCard`, `LatestMessage`, `ChatItem` components (grep dilakukan pass analyzer sebelumnya)  
-**Impact:** None (clean).  
-**Blast Radius:** N/A.  
+**Status:** Analyzed, clean
+**Location:** FE `LatestMessage.tsx` + `ConversationCard.tsx`
+**Scenario:** conversation dengan `latestMessage.content` berisi script tag `<script>alert(1)</script>` (attacker-controlled email subject/body).
+**Expected:** text di-escape, tag tidak di-eksekusi.
+**Actual:** React render `{content}` sebagai text node (`:LatestMessage.tsx:26-28`) — otomatis di-escape. Tidak ada `dangerouslySetInnerHTML`. **Clean untuk XSS**. Yang nyata hanya masalah render quality (tag tampil literal, lihat CLX-06), bukan eksekusi.
+**Evidence:**
+- `LatestMessage.tsx:26-28` — `{content}` text node, `title={content}` attribute (keduanya safe)
+- Tidak ada `dangerouslySetInnerHTML` di `ConversationCard`, `LatestMessage`, `ChatItem` components (grep dilakukan pass analyzer sebelumnya)
+**Impact:** None (clean).
+**Blast Radius:** N/A.
 **Recommendation:** None (keep clean; monitor jika ada perubahan rendering ke `dangerouslySetInnerHTML` di masa depan).
 
 ---
@@ -437,33 +428,35 @@ String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
 
 **CLX-23 — P3 Low — OPERABILITY ISSUE — `InfiniteVirtualContainer` error branch tidak memakai `noDataError`, sehingga caller tidak bisa inject error-state khusus / retry UX; tetapi teks error BUKAN hardcoded `Failed to load data`**
 
-**Status:** Confirmed (memperluas CL-07, dengan koreksi evidence)  
-**Location:** FE `InfiniteVirtualContainer.tsx` error branch  
-**Scenario:** conversation list query gagal (API 500 / network timeout); `useConversations` mengembalikan `status === 'error'`.  
-**Expected:** caller bisa memberi error-state spesifik (message terjemahan, retry button) seperti saat empty-state.  
-**Actual / Failure Mode:** container punya helper `HandleError({ text, noDataError })` (`InfiniteVirtualContainer.tsx:67-76`). Pada branch error, container memang mengambil `error?.message || 'Something went wrong...'` (`:208-210`) lalu merender `<HandleError text={errorMessage} />` **tanpa** meneruskan `noDataError`. Akibatnya error branch jatuh ke fallback generik `HandleError`, bukan `noDataError` khusus caller. Jadi inti masalah tetap: error-state tidak bisa dikustom per consumer. Koreksi penting: klaim awal saya bahwa branch ini hardcode string `Failed to load data` itu salah.  
-**Root Cause:** `noDataError` dipakai ganda untuk empty-state, tetapi tidak diteruskan ke branch error; API komponen tidak punya prop error-specific semacam `errorElement`.  
-**Evidence:**  
-- `InfiniteVirtualContainer.tsx:67-76` — `HandleError` memilih `noDataError ?? <div>...{text}</div>`  
-- `InfiniteVirtualContainer.tsx:208-210` — error branch: `return <HandleError text={errorMessage} />` (tanpa `noDataError`)  
-- `InfiniteVirtualContainer.tsx:213-214` — empty branch: `return <HandleError text="Data not found!" noDataError={noDataError} />`  
-- `ConversationChatLists.tsx:194-210` — caller hanya bisa kirim `noDataError`, tidak ada `errorElement`  
-**Impact:** error UX generik; retry/action per-caller tidak tersedia kecuali user reload manual. Namun severity turun karena actual error text tetap berasal dari `error.message`, bukan string statis total.  
-**Blast Radius:** semua consumer `InfiniteVirtualContainer` yang butuh error-state kustom.  
-**Recommendation:** tambahkan prop terpisah `errorElement?: ReactNode` atau teruskan `noDataError` juga ke branch error bila memang ingin satu placeholder untuk both empty+error.  
+**Status:** Confirmed (memperluas CL-07, dengan koreksi evidence)
+**Location:** FE `InfiniteVirtualContainer.tsx` error branch
+**Scenario:** conversation list query gagal (API 500 / network timeout); `useConversations` mengembalikan `status === 'error'`.
+**Expected:** caller bisa memberi error-state spesifik (message terjemahan, retry button) seperti saat empty-state.
+**Actual / Failure Mode:** container punya helper `HandleError({ text, noDataError })` (`InfiniteVirtualContainer.tsx:67-76`). Pada branch error, container memang mengambil `error?.message || 'Something went wrong...'` (`:208-210`) lalu merender `<HandleError text={errorMessage} />` **tanpa** meneruskan `noDataError`. Akibatnya error branch jatuh ke fallback generik `HandleError`, bukan `noDataError` khusus caller. Jadi inti masalah tetap: error-state tidak bisa dikustom per consumer. Koreksi penting: klaim awal saya bahwa branch ini hardcode string `Failed to load data` itu salah.
+**Root Cause:** `noDataError` dipakai ganda untuk empty-state, tetapi tidak diteruskan ke branch error; API komponen tidak punya prop error-specific semacam `errorElement`.
+**Evidence:**
+- `InfiniteVirtualContainer.tsx:67-76` — `HandleError` memilih `noDataError ?? <div>...{text}</div>`
+- `InfiniteVirtualContainer.tsx:208-210` — error branch: `return <HandleError text={errorMessage} />` (tanpa `noDataError`)
+- `InfiniteVirtualContainer.tsx:213-214` — empty branch: `return <HandleError text="Data not found!" noDataError={noDataError} />`
+- `ConversationChatLists.tsx:194-210` — caller hanya bisa kirim `noDataError`, tidak ada `errorElement`
+**Impact:** error UX generik; retry/action per-caller tidak tersedia kecuali user reload manual. Namun severity turun karena actual error text tetap berasal dari `error.message`, bukan string statis total.
+**Blast Radius:** semua consumer `InfiniteVirtualContainer` yang butuh error-state kustom.
+**Recommendation:** tambahkan prop terpisah `errorElement?: ReactNode` atau teruskan `noDataError` juga ke branch error bila memang ingin satu placeholder untuk both empty+error.
 **Suggested Test:** mock API failure, assert error branch bisa menerima element custom dengan tombol Retry; fallback tetap menampilkan `error.message` bila `errorElement` tidak diberikan.
 
 ---
 
-## Open Questions
+## PM Answered / Open Questions
 
-1. **TypeScript build check**: kenapa `CLS.MESSAGE_MENTION_BADGE` tidak ditangkap type-check (CLX-01)? Cek `next.config`, `skipLibCheck`, CI pipeline.  
-2. **Select-all sticky behavior** (CLX-11): apakah intended? Document jika ya, fix jika tidak.  
-3. **BE bulk-action response shape**: apakah BE mengembalikan `{ succeeded: string[], failed: {...}[] }` atau hanya scalar `{ modifiedCount }`? (CLX-12)  
-4. **Channel FB/Messenger/Telegram**: apakah sudah GA atau beta-only? Severity CLX-05 tergantung jawaban.  
-5. **Email `content` quality**: apakah BE pipeline ingest email selalu menghasilkan plain-text di field `content`, atau kadang markup leak? (CLX-06)  
-6. **Bulk-action RBAC**: apakah setiap bulk method di BE controller punya decorator permission? (CLX-21 — BE audit required)  
-7. **Query client `staleTime`**: apakah ada override default di `makeQueryClientHelper` atau per-query? (CLX-19 impact)
+**Answered by PM (2026-09-07):** GA = **General Availability / sudah release production**. Facebook dan Messenger sudah release prod; Telegram belum. Dampak ke **CLX-05**: severity tetap **P3 Low** karena bug ikon sudah mengenai channel prod Facebook/Messenger; Telegram diperlakukan sebagai future-risk, bukan scope prod aktif.
+
+**Remaining Open Questions (Tech):**
+1. **TypeScript build check**: kenapa `CLS.MESSAGE_MENTION_BADGE` tidak ditangkap type-check (CLX-01)? Cek `next.config`, `skipLibCheck`, CI pipeline.
+2. **Select-all sticky behavior** (CLX-11): apakah intended? Document jika ya, fix jika tidak.
+3. **BE bulk-action response shape**: apakah BE mengembalikan `{ succeeded: string[], failed: {...}[] }` atau hanya scalar `{ modifiedCount }`? (CLX-12)
+4. **Email `content` quality**: apakah BE pipeline ingest email selalu menghasilkan plain-text di field `content`, atau kadang markup leak? (CLX-06)
+5. **Bulk-action RBAC**: apakah setiap bulk method di BE controller punya decorator permission? (CLX-21 — BE audit required)
+6. **Query client `staleTime`**: apakah ada override default di `makeQueryClientHelper` atau per-query? (CLX-19 impact)
 
 ---
 
@@ -471,43 +464,44 @@ String ini hanya didengar SR, tapi tetap non-compliant jika produk multi-bahasa.
 
 Conversation-list memiliki 10 aspek yang di-audit multi-layer (item rendering, bulk action, filter, modal, a11y, i18n, realtime, perf, security, error). Pass analyzer (timeout) menulis aspek 1 penuh (10 finding); orchestrator melanjutkan aspek 2-10 (13 finding tambahan). Total **23 finding baru** (CLX-01..23) + 7 KNOWN dari prior audit (CL-01..07).
 
-**Breakdown severity baru** (setelah verifikasi orchestrator + reviewer-trace):  
-- **P1 High: 3** — CLX-01 mention badge rusak, CLX-03 virtual array mismatch menghentikan infinite-scroll, CLX-15 semantic list role hilang untuk SR  
-- **P2 Medium: 3** — CLX-04 key positional QuickAction bisa pindah target, CLX-11 select-all sticky (turun dari P1), CLX-12 bulk partial-failure silent  
-- **P3 Low: 11** — CLX-02 unread overflow, CLX-05 channel fallback, CLX-06 preview HTML, CLX-07 avatar inisial, CLX-08 TagList doc-drift, CLX-09 SLA tick closed, CLX-13 filter persist-policy inconsistent, CLX-17 belum ada arrow-key row traversal, CLX-18 i18n hardcoded aria, CLX-20 refresh banner tanpa auto-hide, CLX-23 error-state customization gap  
-- **P2 NEEDS-VALIDATION: 1** — CLX-19 invalidation storm  
-- **P3 NEEDS-VALIDATION: 1** — CLX-21 RBAC bulk-action gating  
-- **P4 Info / clean: 4** — CLX-10 clean aspek 1, CLX-14 assign validation BENAR, CLX-16 checkbox label BENAR, CLX-22 XSS clean
+**Breakdown severity baru** (setelah verifikasi orchestrator + reviewer-trace):
+- **P1 High: 3** — CLX-01 mention badge rusak, CLX-03 virtual array mismatch menghentikan infinite-scroll, CLX-15 semantic list role hilang untuk SR
+- **P2 Medium: 3** — CLX-02 unread overflow, CLX-11 select-all sticky, CLX-12 bulk partial-failure silent
+- **P3 Low: 10** — CLX-05 channel fallback (Facebook/Messenger prod; Telegram future-risk), CLX-06 preview HTML, CLX-07 avatar inisial, CLX-08 TagList doc-drift, CLX-09 SLA tick closed, CLX-13 filter persist-policy inconsistent, CLX-17 belum ada arrow-key row traversal, CLX-18 i18n hardcoded aria, CLX-20 refresh banner tanpa auto-hide, CLX-23 error-state customization gap
+- **P2 NEEDS-VALIDATION: 1** — CLX-19 invalidation storm
+- **P3 NEEDS-VALIDATION: 1** — CLX-21 RBAC bulk-action gating
+- **P4 Info / clean/retracted: 5** — CLX-04 target-swap tidak terbukti, CLX-10 clean aspek 1, CLX-14 assign validation BENAR, CLX-16 checkbox label BENAR, CLX-22 XSS clean
 
-**Retraksi & koreksi pass-2/pass-3** (audit integrity):  
-- **CLX-14** semula P2 "assign modal tak validasi" → **RETRACTED ke P4 clean**.  
-- **CLX-16** semula P2 "checkbox tanpa label" → **RETRACTED ke P4 clean**: label wrapper + `htmlFor` sudah ada.  
-- **CLX-17** semula P2 "keyboard tidak bisa buka conversation" → **dikoreksi ke P3 gap**: row sudah `tabIndex={0}` dan `Enter`/`Space` berfungsi; yang belum ada hanya ArrowUp/ArrowDown traversal cepat.  
-- **CLX-13** dikoreksi: advanced-filter **memakai** `persist`, tetapi `partialize: () => ({})` membuat persist-nya no-op.  
-- **CLX-23** dikoreksi: error text berasal dari `error.message` / `'Something went wrong...'`, bukan hardcoded `'Failed to load data'`; isu nyatanya adalah error branch tidak menerima `noDataError`.  
+**Retraksi & koreksi pass-2/pass-3** (audit integrity):
+- **CLX-04** semula P2 target-swap → **RETRACTED ke P4 clean-enough**: wrapper positional key ada, tetapi child `ChatCard key={data.id}` membuat state row ter-remount saat id berubah.
+- **CLX-14** semula P2 "assign modal tak validasi" → **RETRACTED ke P4 clean**.
+- **CLX-16** semula P2 "checkbox tanpa label" → **RETRACTED ke P4 clean**: label wrapper + `htmlFor` sudah ada.
+- **CLX-17** semula P2 "keyboard tidak bisa buka conversation" → **dikoreksi ke P3 gap**: row sudah `tabIndex={0}` dan `Enter`/`Space` berfungsi; yang belum ada hanya ArrowUp/ArrowDown traversal cepat.
+- **CLX-13** dikoreksi: advanced-filter **memakai** `persist`, tetapi `partialize: () => ({})` membuat persist-nya no-op.
+- **CLX-23** dikoreksi: error text berasal dari `error.message` / `'Something went wrong...'`, bukan hardcoded `'Failed to load data'`; isu nyatanya adalah error branch tidak menerima `noDataError`.
 - **CLX-11** turun **P1→P2**; **CLX-12** dipersempit ke 6 action; **CLX-19** diturunkan ke NEEDS-VALIDATION.
 
-**Risiko terbesar** (setelah koreksi):  
-1. **CLX-03** virtual array mismatch → infinite-scroll mati saat unread-filter → block triage.  
-2. **CLX-04** QuickAction target-swap → data-integrity, aksi destruktif bisa salah objek.  
-3. **CLX-15** semantic list role hilang → SR kehilangan struktur list/posisi item.  
-4. **CLX-11** select-all sticky → bulk destructive bisa kena item tak dimaksud (timing-dependent).
+**Risiko terbesar** (setelah koreksi):
+1. **CLX-03** virtual array mismatch → infinite-scroll mati saat unread-filter → block triage.
+2. **CLX-15** semantic list role hilang → SR kehilangan struktur list/posisi item.
+3. **CLX-11** select-all sticky → bulk destructive bisa kena item tak dimaksud (timing-dependent).
+4. **CLX-12** bulk partial-failure silent → user tidak tahu sebagian aksi gagal.
 
-**Hal yang sudah benar** (tidak perlu diperbaiki):  
-- Virtualized container performance baseline clean (sebelum bug CLX-03/04)  
-- Timezone timestamp konsisten (CLX-10)  
-- XSS escape benar (CLX-22)  
-- Assign/BulkAssign modal validation + double-submit guard benar (CLX-14)  
-- Checkbox bulk-select sudah berlabel aksesibel; tinggal i18n-kan string-nya (CLX-16 clean, CLX-18 open)  
-- Row keyboard activation (`tabIndex`, `Enter`, `Space`) sudah berfungsi; gap tinggal arrow traversal (CLX-17)  
-- Bulk assign & reopen partial-failure handling benar (kontras dgn 6 action lain, CLX-12)  
-- `syncSelection` untuk kasus non-select-all benar (hanya branch select-all sticky yang jadi isu, CLX-11)  
+**Hal yang sudah benar** (tidak perlu diperbaiki):
+- Virtualized container performance baseline clean kecuali CLX-03; CLX-04 diretract
+- Timezone timestamp konsisten (CLX-10)
+- XSS escape benar (CLX-22)
+- Assign/BulkAssign modal validation + double-submit guard benar (CLX-14)
+- Checkbox bulk-select sudah berlabel aksesibel; tinggal i18n-kan string-nya (CLX-16 clean, CLX-18 open)
+- Row keyboard activation (`tabIndex`, `Enter`, `Space`) sudah berfungsi; gap tinggal arrow traversal (CLX-17)
+- Bulk assign & reopen partial-failure handling benar (kontras dgn 6 action lain, CLX-12)
+- `syncSelection` untuk kasus non-select-all benar (hanya branch select-all sticky yang jadi isu, CLX-11)
 - RBAC visibility `PullButton` pakai `role.code` (positif; extend ke bulk-button = CLX-21)
 
-**Coverage note**: audit ini **detail pada 10 aspek** yang diminta user; **TIDAK mencakup** (out-of-scope atau sudah tercakup audit lain):  
-- Message thread / chat room (bukan list)  
-- Conversation detail page (hanya list panel)  
-- BE repository query optimization (sudah di Track E prior audit)  
+**Coverage note**: audit ini **detail pada 10 aspek** yang diminta user; **TIDAK mencakup** (out-of-scope atau sudah tercakup audit lain):
+- Message thread / chat room (bukan list)
+- Conversation detail page (hanya list panel)
+- BE repository query optimization (sudah di Track E prior audit)
 - BE authorization controller decorator (mentioned CLX-21 Open Q, perlu audit BE terpisah)
 
 ---
@@ -515,75 +509,88 @@ Conversation-list memiliki 10 aspek yang di-audit multi-layer (item rendering, b
 ## System Model
 
 ### Actors
-- Agent (role AGENT)  
-- Supervisor (role SUPERVISOR)  
-- Admin (role ADMIN)  
+- Agent (role AGENT)
+- Supervisor (role SUPERVISOR)
+- Admin (role ADMIN)
 - Non-admin role lain (dapat view conversation list sesuai scope RBAC)
 
 ### Components FE
-- `ConversationChatLists.tsx` — shell list + infinite-container integration  
-- `ConversationCard.tsx` — item row render (730 LOC: timestamp, badge, indicator, avatar, preview, SLA, quick-action)  
-- `chat-item/` — Avatar, Checkbox, TagList, QuickAction, CreatedTicket sub-komponen  
-- `ConversationChatListBulkAction.tsx` — bulk toolbar + modal triggers (701 LOC)  
-- `bulk-action/` — BulkActionButtons, BulkActionHeader, BulkActionsMenu  
-- `filters/` — AdvanceFilterModal, FilterPopover, advance-filter/* (agent/tag popover search)  
-- `modals/` — AssignConversationModal, BulkAssignConversationModal, JunkReasonModal, ValidationBulkConversationModal  
-- `ConversationChatListFilter.tsx` — filter chips (status/read toggle)  
-- `ConversationChatListHeader.tsx` — search bar + filter trigger  
-- `ConversationRefreshNotification.tsx` — banner \"ada update, klik refresh\"  
-- `PullButton.tsx` — pull-conversation widget (AGENT role)  
-- Stores: `conversationFilter.store.ts` (persist sort only), `conversationAdvancedFilter.store.ts` (agent/tag, volatile), `conversationBulkAction.store.ts` (selection + syncSelection logic)  
-- Hooks: `use-invalidate-conversation.ts` (socket → cache invalidation), `use-conversation-socket-event.ts` (socket event registry), `useConversationFilters.ts` (build filter object), `useChatHandlers.ts` (row click/hover), `conversation.service.ts` (useConversations infinite-query + bulk mutation hooks)  
+- `ConversationChatLists.tsx` — shell list + infinite-container integration
+- `ConversationCard.tsx` — item row render (730 LOC: timestamp, badge, indicator, avatar, preview, SLA, quick-action)
+- `chat-item/` — Avatar, Checkbox, TagList, QuickAction, CreatedTicket sub-komponen
+- `ConversationChatListBulkAction.tsx` — bulk toolbar + modal triggers (701 LOC)
+- `bulk-action/` — BulkActionButtons, BulkActionHeader, BulkActionsMenu
+- `filters/` — AdvanceFilterModal, FilterPopover, advance-filter/* (agent/tag popover search)
+- `modals/` — AssignConversationModal, BulkAssignConversationModal, JunkReasonModal, ValidationBulkConversationModal
+- `ConversationChatListFilter.tsx` — filter chips (status/read toggle)
+- `ConversationChatListHeader.tsx` — search bar + filter trigger
+- `ConversationRefreshNotification.tsx` — banner \"ada update, klik refresh\"
+- `PullButton.tsx` — pull-conversation widget (AGENT role)
+- Stores: `conversationFilter.store.ts` (persist sort only), `conversationAdvancedFilter.store.ts` (agent/tag, volatile), `conversationBulkAction.store.ts` (selection + syncSelection logic)
+- Hooks: `use-invalidate-conversation.ts` (socket → cache invalidation), `use-conversation-socket-event.ts` (socket event registry), `useConversationFilters.ts` (build filter object), `useChatHandlers.ts` (row click/hover), `conversation.service.ts` (useConversations infinite-query + bulk mutation hooks)
 - Shared: `InfiniteVirtualContainer.tsx` (`packages/ui`, konsumen multi-modul)
 
 ### Components BE
-- `apps/conversation-service/src/app/repositories/conversation.repository.ts` — `getPaginatedConversation` (filter, sort, search pipeline + $skip/$limit)  
-- `apps/conversation-service/src/app/services/conversation.service.ts` — `getConversations`, `assignConversation`, `bulkClose`, `bulkJunk`, `shouldScopeByTeam`, `buildAssignFilter`  
+- `apps/conversation-service/src/app/repositories/conversation.repository.ts` — `getPaginatedConversation` (filter, sort, search pipeline + $skip/$limit)
+- `apps/conversation-service/src/app/services/conversation.service.ts` — `getConversations`, `assignConversation`, `bulkClose`, `bulkJunk`, `shouldScopeByTeam`, `buildAssignFilter`
 - `apps/conversation-service/src/app/controllers/conversation.controller.ts` — HTTP endpoints `/conversations`, `/bulk-*`, RBAC decorator (perlu verify CLX-21)
 
 ### Main flow (simplified)
-1. User membuka route conversation-list → `ConversationChatLists` mount  
-2. Build `filters` via `useConversationFilters()` (merge nav state + filter store + advanced-filter store)  
-3. Call `useConversations(filters)` → infinite-query hit `GET /api/conversations?page=1&status=...&hideEmpty=true`  
-4. BE `getConversations` → `conversationRepository.getPaginatedConversation` → filter+sort+lookup latestMessage → pagination  
-5. FE receive pages → `formatData` (re-filter unread LOCAL + re-sort LOCAL, masalah CL-01/CLX-03) → `InfiniteVirtualContainer` render rows virtualized  
-6. Socket event (`notification.new.message` dll) → `use-conversation-socket-event` → selective `invalidateQueries` (masalah CLX-19) atau optimistic update (CLX-04 key positional risk)  
+1. User membuka route conversation-list → `ConversationChatLists` mount
+2. Build `filters` via `useConversationFilters()` (merge nav state + filter store + advanced-filter store)
+3. Call `useConversations(filters)` → infinite-query hit `GET /api/conversations?page=1&status=...&hideEmpty=true`
+4. BE `getConversations` → `conversationRepository.getPaginatedConversation` → filter+sort+lookup latestMessage → pagination
+5. FE receive pages → `formatData` (re-filter unread LOCAL + re-sort LOCAL, masalah CL-01/CLX-03) → `InfiniteVirtualContainer` render rows virtualized
+6. Socket event (`notification.new.message` dll) → `use-conversation-socket-event` → selective `invalidateQueries` (masalah CLX-19)
 7. User select row → checkbox toggle → `conversationBulkAction.store` track IDs → BulkAction toolbar visible → user pilih action → mutation hook → BE bulk endpoint → `onSuccess` toast + `clearSelection` (masalah CLX-11/12)
 
 ---
 
 ## Recommendation / Next Action
 
+### Re-verification addendum — 2026-09-07 (v1.1, post-fold review)
+
+**Scope re-check:** conversation-list open questions yang sebelumnya masih `NEEDS-VALIDATION`, difokuskan ke invalidation path realtime dan RBAC bulk action end-to-end.
+
+**Resolved open questions:**
+- **CLX-19 / CLH-17 — realtime invalidation storm:** **confirmed, severity diturunkan ke P3 Low.** `use-invalidate-conversation.ts` memanggil invalidation/refetch pada banyak socket path tanpa debounce, sehingga inbox aktif bisa memicu refetch berulang untuk query list yang sama. Ini bukan bukti thundering herd tak terbatas karena TanStack Query tetap dedupe fetch in-flight per `queryKey`, tetapi tetap menyebabkan freshness churn dan network noise yang tidak perlu pada traffic tinggi. Rekomendasi minimum: debounce invalidation list/counter pada window pendek (mis. 250–500ms) atau gabungkan beberapa event ke satu invalidate.
+- **CLX-21 / CLH-18 — RBAC bulk-action gating:** **resolved / corrected.** FE visibility memang belum dibatasi per-permission, tetapi **BE enforcement terbukti ada** sehingga ini **bukan** authz bypass. Evidence BE: class-level `@UseGuards(JwtAuthGuard, PermissionsGuard)` di `apps/api-gateway/src/app/conversation/conversation.controller.ts:147`, lalu tiap bulk endpoint punya `@RequirePermissions(...)`: PIN (`:714`), MARK_SPAM (`:741`), MARK_READ (`:768`), MARK_STAR (`:795`), CHANGE_STATUS (`:822`, `:879`), MANAGE_ASSIGNEE (`:851`), REOPEN (`:905`). Implikasi: gap yang tersisa hanya UX/cosmetic — tombol bulk bisa terlihat di FE walau action akan ditolak server bila permission tidak ada. Jangan catat ini sebagai security finding.
+
+**Version delta v1.0 → v1.1:**
+- `CLH-17` siap dipromosikan dari needs-validation menjadi confirmed low-priority backlog di register.
+- `CLH-18` harus ditutup/dikoreksi di register sebagai false alarm security; jika ingin dilacak, pindahkan menjadi UX visibility consistency note, bukan RBAC gap.
+
+## Recommendation / Next Action
+
 **Decision:** `PROCEED_WITH_CAUTION`
 
-**Blocking issues** (harus diperbaiki sebelum release apapun yang menyentuh list):  
-1. **CLX-03** — fix virtual array length mismatch (gunakan `processedRows.length` konsisten, atau hapus re-filter FE dan pindah ke BE param; 2 hari, fungsional block)  
-2. **CLX-04** — ganti key row ke ID-based, tutup popover saat `chat.id` berubah (1 hari, data-integrity)  
-3. **CLX-15** — tambah `role="list"`/`"listitem"` untuk SR (4 jam, a11y high)
+**Blocking issues** (harus diperbaiki sebelum release apapun yang menyentuh list):
+1. **CLX-03** — fix virtual array length mismatch (gunakan `processedRows.length` konsisten, atau hapus re-filter FE dan pindah ke BE param; 2 hari, fungsional block)
+2. **CLX-15** — tambah `role="list"`/`"listitem"` untuk SR (4 jam, a11y high)
 
-**High-priority non-blocking** (dapat masuk backlog sprint berikutnya):  
-4. **CLX-01** — tambah `MESSAGE_MENTION_BADGE` ke CLS + audit type-check CI (2 jam)  
-5. **CLX-11** — reset `isSelectAllActive` saat refetch atau simpan snapshot (4 jam)  
-6. **CLX-12** — detect partial bulk-failure + retry UX (1 hari, perlu BE enhancement jika response shape kurang)  
-7. **CLX-17 / CLX-18 / CLX-20 / CLX-23** — keyboard traversal cepat, i18n accessibility strings, banner auto-hide, error-state customization (backlog UX hardening)
+**High-priority non-blocking** (dapat masuk backlog sprint berikutnya):
+3. **CLX-01** — tambah `MESSAGE_MENTION_BADGE` ke CLS + audit type-check CI (2 jam)
+4. **CLX-11** — reset `isSelectAllActive` saat refetch atau simpan snapshot (4 jam)
+5. **CLX-12** — detect partial bulk-failure + retry UX (1 hari, perlu BE enhancement jika response shape kurang)
+6. **CLX-17 / CLX-18 / CLX-20 / CLX-23** — keyboard traversal cepat, i18n accessibility strings, banner auto-hide, error-state customization (backlog UX hardening)
 
-**Medium/low backlog**:  
+**Medium/low backlog**:
 8. Sisanya (CLX-02/05/06/07/08/09/13/14/16/19/21/22/23) — prioritaskan berdasar deployment config dan hasil open-question verification.
 
-**Open-question resolution lane** (analyst + PM meeting):  
-9. Jawab 7 Open Questions di atas → adjust severity / add tickets sesuai jawaban.
+**Open-question resolution lane** (tech follow-up):
+9. Resolve CLH-17/18 dan open question teknis yang tersisa.
 
-**Cross-team sync**:  
-10. Share CLX-03/04/15/23 ke Tim Ticket/Broadcast/Contact — `InfiniteVirtualContainer` shared component, bug berlaku ke semua konsumen (blast-radius repo-wide)
+**Cross-team sync**:
+10. Share CLH-02/03/16 ke Tim Ticket/Broadcast/Contact — `InfiniteVirtualContainer` shared component, bug berlaku ke semua konsumen (blast-radius repo-wide)
 
 ---
 
-**STATUS:** COMPLETED WITH REVIEWER-TIMEOUT RECOVERY  
-**SUMMARY:** Deep 10-aspect audit conversation-list selesai dan sudah dikoreksi dari reviewer-trace timeout. Total 23 finding CLX-01..23: P1 confirmed×3 (CLX-01/03/15), P2 confirmed×3 (CLX-04/11/12), P3 confirmed×11, NEEDS-VALIDATION×2 (CLX-19/21), clean/retracted×4 (CLX-10/14/16/22). Blocking: CLX-03/04/15. Decision `PROCEED_WITH_CAUTION`.  
-**FINDINGS:** Confirmed {P1=3, P2=3, P3=11}; Needs-validation {P2=1, P3=1}; Clean/retracted {P4=4}. IDs = CLX-01..23.  
-**ASSUMPTIONS:** BE bulk response shape masih perlu verify (CLX-12); FB/Telegram channel mungkin belum GA (CLX-05); default query `staleTime` belum ditrace penuh (CLX-19).  
-**RISKS:** CLX-03 infinite-scroll mati saat unread-filter, CLX-04 key positional bisa salah target destructive action, CLX-15 SR kehilangan struktur list, CLX-11 select-all sticky bisa mengenai item tak dimaksud.  
-**OUTPUT:** C:/Users/MyBook SAGA 12/Desktop/PRDanalisis/Assessments/audit/detail-conversation/2026-09-07-conversation-list-deep-audit.md  
-**FOLLOW-UP TASKS:** (1) Wire report ke `Assessments/audit/README.md` + `02-reading-list-and-conflicts.md`; (2) Resolve 7 Open Questions; (3) Ticket/fix blocking CLX-03/04/15; (4) Audit BE controller untuk CLX-21.
+**STATUS:** COMPLETED + FOLDED TO MASTER REGISTER v1.6
+**SUMMARY:** Deep 10-aspect audit conversation-list selesai dan sudah dikoreksi dari reviewer-trace timeout. Total 23 finding CLX-01..23: P1 confirmed×3 (CLX-01/03/15), P2 confirmed×3 (CLX-02/11/12), P3 confirmed×10, NEEDS-VALIDATION×2 (CLX-19/21), clean/retracted×5 (CLX-04/10/14/16/22). Blocking: CLX-03/15. Folded ke register sebagai CLH-01..18; clean/retracted tetap di source. Decision `PROCEED_WITH_CAUTION`.
+**FINDINGS:** Confirmed {P1=3, P2=3, P3=10}; Needs-validation {P2=1, P3=1}; Clean/retracted {P4=5}. IDs = CLX-01..23.
+**ASSUMPTIONS:** BE bulk response shape masih perlu verify (CLX-12); default query `staleTime` belum ditrace penuh (CLX-19). PM answered: Facebook/Messenger GA, Telegram belum.
+**RISKS:** CLX-03 infinite-scroll mati saat unread-filter, CLX-15 SR kehilangan struktur list, CLX-11 select-all sticky bisa mengenai item tak dimaksud, CLX-12 partial failure silent.
+**OUTPUT:** C:/Users/MyBook SAGA 12/Desktop/PRDanalisis/Assessments/audit/detail-conversation/2026-09-07-conversation-list-deep-audit.md
+**FOLLOW-UP TASKS:** (1) Ticket/fix blocking CLH-02/03; (2) Resolve tech open questions CLH-17/18; (3) audit BE controller untuk CLH-18 bila bulk RBAC masuk sprint.
 
-[iter 1] analyzer → timeout setelah aspect-1 (10 finding). [iter 2] orchestrator → selesaikan aspect 2-10 langsung (13 finding) + koreksi reviewer-trace timeout. Total 23 CLX; confirmed high-priority utama: CLX-01/03/04/15.
+[iter 1] analyzer → timeout setelah aspect-1 (10 finding). [iter 2] orchestrator → selesaikan aspect 2-10 langsung (13 finding) + koreksi reviewer-trace timeout. Total 23 CLX; folded ke register v1.6 sebagai CLH-01..18; clean/retracted tidak di-fold.

@@ -269,6 +269,8 @@
     <script type="text/babel" src="./modules/ui-dashboard.js"></script>
     <script type="text/babel" src="./modules/ui-workspace.js"></script>
     <script type="text/babel" src="./modules/ui-tracker.js"></script>
+    <script src="./modules/error-analyzer.js"></script>
+    <script type="text/babel" src="./modules/ui-monitoring.js"></script>
     <script type="text/babel" src="./modules/ui-memory.js"></script>
     <script type="text/babel" src="./modules/ui-new-request.js"></script>
     <script type="text/babel">
@@ -1550,6 +1552,30 @@
               .transaction("handles", "readonly")
               .objectStore("handles")
               .get("theme");
+            r.onsuccess = () => res(r.result || null);
+            r.onerror = () => res(null);
+          });
+        } catch {
+          return null;
+        }
+      }
+
+      async function saveRoadmapIDB(tasks) {
+        try {
+          const db = await openIDB();
+          db.transaction("handles", "readwrite")
+            .objectStore("handles")
+            .put(tasks, "roadmap_v1");
+        } catch {}
+      }
+      async function loadRoadmapIDB() {
+        try {
+          const db = await openIDB();
+          return new Promise((res) => {
+            const r = db
+              .transaction("handles", "readonly")
+              .objectStore("handles")
+              .get("roadmap_v1");
             r.onsuccess = () => res(r.result || null);
             r.onerror = () => res(null);
           });
@@ -5286,6 +5312,1038 @@
       const { OpenProjectDashboard, TestcaseStatsDashboard } =
         window.DashboardModule;
 
+      /* ── BigPictureView: native render from prototype HTML ────────────── */
+      function BigPictureView({ page, themeId }) {
+        const [html, setHtml] = React.useState("");
+        const [css, setCss] = React.useState("");
+        const [err, setErr] = React.useState("");
+        const styleId = React.useRef("_bp_css_injected");
+        const protoPath = "Assessments/audit/00-Timeline/satuinbox-big-picture.html";
+
+        React.useEffect(() => {
+          let alive = true;
+          fetch(`/api/files/content?path=${encodeURIComponent(protoPath)}`)
+            .then((r) => { if (!r.ok) throw new Error(r.statusText); return r.text(); })
+            .then((src) => {
+              if (!alive) return;
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(src, "text/html");
+              /* extract <style> content once */
+              if (!document.getElementById(styleId.current)) {
+                const styleEl = doc.querySelector("style");
+                if (styleEl) {
+                  const s = document.createElement("style");
+                  s.id = styleId.current;
+                  s.textContent = styleEl.textContent;
+                  document.head.appendChild(s);
+                  if (alive) setCss("ok");
+                }
+              }
+              /* extract page div */
+              const pages = doc.querySelectorAll(".page");
+              const target = pages[page] || pages[0];
+              if (target) {
+                if (alive) setHtml(target.innerHTML);
+              } else {
+                if (alive) setErr("Page not found in prototype");
+              }
+              /* area-chip: prototype's inline script doesn't run when injected via
+                 dangerouslySetInnerHTML — rebuild chips React-side (theme-driven, dot hue only) */
+              if (page === 1) {
+                requestAnimationFrame(() => {
+                  const dot = {
+                    "Growth & Internal Ops":"#94a3b8","Platform Stability":"#38bdf8","Analytics":"#3b82f6",
+                    "Notification":"#f87171","Monetization Guard":"#eab308","Sales Expansion":"#22c55e",
+                    "UX Simplification":"#f59e0b","Ticket":"#fb923c","Unified Contact":"#ef4444",
+                    "Tools / Add-ons":"#f59e0b","AI & Automation":"#4ade80","Channel & Ecosystem":"#ec4899",
+                  };
+                  document.querySelectorAll(".bp-root td.area").forEach((td) => {
+                    if (td.querySelector(".area-chip")) return;
+                    const name = td.textContent.trim();
+                    const c = dot[name] || "#94a3b8";
+                    td.innerHTML =
+                      '<span class="area-chip"><span class="area-dot" style="background:' + c + ';"></span>' + name + "</span>";
+                  });
+                });
+              }
+            })
+            .catch((e) => { if (alive) setErr(e.message); });
+          return () => { alive = false; };
+        }, [page]);
+
+        if (err)
+          return (
+            <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-5)", fontSize:12 }}>
+              Error loading prototype: {err}
+            </div>
+          );
+        if (!html)
+          return (
+            <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-5)", fontSize:12 }}>
+              Loading…
+            </div>
+          );
+
+        return (
+          <div style={{ flex:1, overflow:"auto", background:"var(--app-bg)" }}>
+            <div className="bp-root" data-theme={themeId || "navy"}>
+              <div className="page active" dangerouslySetInnerHTML={{ __html: html }} />
+            </div>
+          </div>
+        );
+      }
+
+      /* ── RoadmapView (M1): interactive roadmap table ───────────────────── */
+      const RM_SEED_PATH = "Assessments/audit/00-Timeline/.roadmap-seed.json";
+      const RM_PROTO_PATH =
+        "Assessments/audit/00-Timeline/satuinbox-big-picture.html";
+      /* §70 strategic areas — data-driven option list */
+      const RM_AREAS = [
+        "Analytics",
+        "Open API",
+        "Broadcast",
+        "Omnichannel Chat",
+        "Ticket",
+        "Sales",
+        "Tools / Add-ons",
+        "AI",
+        "Theme",
+        "Affiliate",
+        "Payment",
+        "Notification",
+        "Mobile App",
+        "Growth & Internal Ops",
+      ];
+      /* §71-§73 impact / effort / testing — stored as L|M|H, labelled Low/Medium/High */
+      const RM_LEVELS = [
+        { v: "L", label: "Low" },
+        { v: "M", label: "Medium" },
+        { v: "H", label: "High" },
+      ];
+      /* §74 priority */
+      const RM_PRIOS = ["P1", "P2", "P3", "Backlog"];
+
+      /* §133 dark-theme combobox — reuses the prototype's token vars, declares none */
+      const RM_CSS = `
+.rm-wrap{padding:14px 16px}
+.rm-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rm-title{font-size:14px;font-weight:700;color:var(--text-1)}
+.rm-sub{font-size:11px;color:var(--text-4)}
+.rm-saved{margin-left:auto;font-size:10px;font-weight:700;color:var(--priority-p1-fg);background:var(--priority-p1-bg);border-radius:4px;padding:2px 8px;opacity:0;transition:opacity .18s}
+.rm-saved.on{opacity:1}
+.rm-wrap .table-panel{margin-bottom:0}
+.rm-combo{position:relative;display:inline-block;max-width:100%}
+.rm-trigger{display:flex;align-items:center;gap:4px;width:100%;box-sizing:border-box;background:transparent;border:1px solid transparent;border-radius:5px;padding:2px 5px;cursor:pointer;color:var(--text-2);font-size:11px}
+.rm-trigger:hover,.rm-trigger:focus-visible{background:var(--elevated-bg);border-color:var(--border-2);outline:none}
+.rm-combo.open .rm-trigger{background:var(--elevated-bg);border-color:var(--accent-primary)}
+.rm-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm-caret{margin-left:auto;font-size:9px;color:var(--text-4);opacity:0;flex-shrink:0}
+.rm-trigger:hover .rm-caret,.rm-trigger:focus-visible .rm-caret,.rm-combo.open .rm-caret{opacity:1}
+.rm-menu{position:absolute;top:calc(100% + 2px);left:0;z-index:60;min-width:100%;max-height:240px;overflow:auto;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.5);padding:4px}
+.rm-search{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:5px;padding:4px 6px;font-size:11px;margin-bottom:4px;outline:none}
+.rm-search:focus{border-color:var(--accent-primary)}
+.rm-opt{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.rm-opt.hl{background:var(--hover-bg)}
+.rm-opt.sel{color:var(--accent-secondary);font-weight:700}
+.rm-opt.sel:after{content:"\\2713";margin-left:auto;font-size:10px}
+.rm-empty{padding:6px 7px;font-size:11px;color:var(--text-4)}
+/* embedded pane is narrower than the print prototype — let KPI + rules wrap */
+.rm-wrap .stats-row{flex-wrap:wrap;gap:12px 0}
+.rm-wrap .stat-block:last-of-type{border-right:none}
+.rm-wrap .rules-area{flex-wrap:wrap}
+/* §80-116 timeline cells: drag affordance + empty-cell hint on hover */
+.rm-cell{cursor:pointer;user-select:none}
+.rm-cell:hover .bar{outline:1px dashed var(--border-2);outline-offset:1px;min-height:8px}
+.task-table th.wk{width:28px;min-width:28px;text-align:center;padding:5px 2px;font-size:9px;font-weight:500;color:var(--text-5);border-left:1px solid var(--border-3)}
+.task-table td.wk{width:28px;min-width:28px;padding:7px 2px;text-align:center;border-left:1px solid var(--border-3)}
+.task-table th.mo{text-align:center;padding:7px 3px;border-left:1px solid var(--border-1)}
+.task-table td.mo-start,.task-table th.wk.mo-start{border-left:1px solid var(--border-1)}
+/* frozen identity/metadata columns: horizontal scroll only moves the timeline.
+   left set per-cell in JS from offsetLeft; z-index keeps them above week cells. */
+.task-table .sl{position:sticky;z-index:15;background:var(--app-bg)}
+.task-table tbody tr:nth-child(even) .sl{background:var(--elevated-2)}
+.task-table thead .sl{z-index:35}
+.task-table tbody tr.grp td{background:var(--elevated-2)}
+.grp-label{position:sticky;left:0;display:inline-block}
+/* right edge of the frozen block */
+.task-table .sl-edge{box-shadow:2px 0 0 var(--border-1)}
+.status-pill{display:inline-block;border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap}
+.st-now{background:var(--priority-p1-bg);color:var(--priority-p1-fg);border:1px solid var(--priority-p1-fg)}
+.st-next{background:var(--elevated-2);color:var(--text-4);border:1px solid var(--border-2)}
+.dep-cell{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.dep-chip{display:inline-flex;align-items:center;gap:2px;font-size:10px;color:var(--accent-secondary);background:var(--elevated-2);border:1px solid var(--border-2);border-radius:5px;padding:1px 4px;max-width:100%}
+.dep-x{background:none;border:none;color:var(--text-4);cursor:pointer;font-size:12px;line-height:1;padding:0 1px}
+.dep-x:hover{color:var(--priority-p1-fg)}
+.dep-add{font-size:10px;color:var(--text-4)}
+.src-badge{display:inline-block;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;white-space:nowrap;background:var(--elevated-2);border:1px solid var(--border-2)}
+.src-cur{color:var(--priority-p1-fg)}
+.src-feat{color:var(--accent-secondary)}
+.src-ui{color:var(--priority-p2-fg)}
+.src-bl{color:var(--text-4)}
+/* sticky header + KPI while table body scrolls under */
+.rm-sticky{z-index:40;background:var(--app-bg);padding-bottom:2px}
+.rm-addbtn{margin-left:8px;background:var(--accent-primary);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer}
+.rm-search{margin-left:auto;background:var(--elevated-bg);border:1px solid var(--border-2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text-2);width:180px}
+.rm-search:focus{outline:none;border-color:var(--accent-primary)}
+.rm-addbtn:hover{filter:brightness(1.1)}
+.rm-addnext{background:var(--elevated-bg);color:var(--text-2);border:1px solid var(--border-2)}
+.rm-head .rm-saved{margin-left:8px}
+.rm-editable{display:inline-block;min-width:40px;min-height:16px;cursor:text;border-radius:4px;padding:1px 3px}
+.rm-editable:hover{background:var(--elevated-bg);outline:1px dashed var(--border-2)}
+.rm-ph{color:var(--text-4);font-style:italic}
+.rm-input{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-1);border:1px solid var(--accent-primary);border-radius:5px;padding:3px 6px;font-size:11px;font-family:inherit;outline:none;resize:vertical}
+.task-table td.num{white-space:nowrap}
+.rm-del{visibility:hidden;margin-left:4px;background:none;border:none;color:var(--accent-danger);font-size:14px;line-height:1;cursor:pointer;padding:0 2px}
+.task-table tbody tr:hover .rm-del{visibility:visible}
+/* flex column: KPI fixed at top, table-panel scrolls, footer fixed at bottom */
+.rm-flexroot{display:flex;flex-direction:column;min-height:0;flex:1}
+.rm-flexcol{display:flex;flex-direction:column;min-height:0;flex:1}
+.rm-flexcol .rm-sticky{flex:none}
+.rm-flexcol .table-panel{flex:1;min-height:0;overflow:auto}
+.rm-flexcol .rm-footer{flex:none}
+/* header + group rows pin to top of the SCROLLING table-panel */
+.task-table thead th{position:sticky;top:0;z-index:30;background:var(--elevated-bg)}
+.task-table thead tr:nth-child(2) th{top:28px;z-index:29}
+.task-table tbody tr.grp td{position:sticky;top:50px;z-index:20;background:var(--elevated-2)}
+`;
+
+      function rmMetricClass(v) {
+        if (v === "L") return "metric metric-low";
+        if (v === "M") return "metric metric-medium";
+        if (v === "H") return "metric metric-high";
+        return "metric metric-unknown";
+      }
+      function rmPrioClass(v) {
+        return "prio prio-" + String(v || "unknown").toLowerCase();
+      }
+      function rmBarClass(v) {
+        return "on-" + String(v || "backlog").toLowerCase();
+      }
+      function rmSrcClass(v) {
+        const k = { "CURRENT TASK": "cur", FEATURE: "feat", "UI/UX": "ui", BACKLOG: "bl" }[v] || "bl";
+        return "src-badge src-" + k;
+      }
+      /* the theme tokens live in the prototype <style>; Roadmap may render before
+         Big Picture was ever opened, so inject the same sheet under the same id */
+      async function ensureBpTokenCss() {
+        if (document.getElementById("_bp_css_injected")) return;
+        try {
+          const r = await fetch(
+            `/api/files/content?path=${encodeURIComponent(RM_PROTO_PATH)}`
+          );
+          if (!r.ok) return;
+          const doc = new DOMParser().parseFromString(
+            await r.text(),
+            "text/html"
+          );
+          const styleEl = doc.querySelector("style");
+          if (!styleEl || document.getElementById("_bp_css_injected")) return;
+          const s = document.createElement("style");
+          s.id = "_bp_css_injected";
+          s.textContent = styleEl.textContent;
+          document.head.appendChild(s);
+        } catch {}
+      }
+      function ensureRoadmapCss() {
+        if (document.getElementById("_roadmap_css")) return;
+        const s = document.createElement("style");
+        s.id = "_roadmap_css";
+        s.textContent = RM_CSS;
+        document.head.appendChild(s);
+      }
+
+      /* inline text editor: click to edit, commit on blur/Enter, cancel on Esc.
+         multiline=true → textarea for description. ponytail: uncontrolled defaultValue
+         + commit-on-blur, no per-keystroke state; add controlled value if live
+         validation is ever needed. */
+      function RmEdit({ value, onCommit, multiline, placeholder }) {
+        const [editing, setEditing] = React.useState(false);
+        const ref = React.useRef(null);
+        React.useEffect(() => {
+          if (editing && ref.current) {
+            ref.current.focus();
+            ref.current.select && ref.current.select();
+          }
+        }, [editing]);
+        const commit = () => {
+          const v = ref.current ? ref.current.value.trim() : value;
+          setEditing(false);
+          if (v !== (value || "")) onCommit(v);
+        };
+        if (!editing)
+          return (
+            <span
+              className="rm-editable"
+              tabIndex={0}
+              title="Click to edit"
+              onClick={() => setEditing(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "F2") setEditing(true);
+              }}
+            >
+              {value || <span className="rm-ph">{placeholder || "—"}</span>}
+            </span>
+          );
+        const common = {
+          ref,
+          className: "rm-input",
+          defaultValue: value || "",
+          onBlur: commit,
+          onKeyDown: (e) => {
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              setEditing(false);
+            } else if (e.key === "Enter" && !multiline) {
+              e.preventDefault();
+              commit();
+            } else if (e.key === "Enter" && multiline && (e.metaKey || e.ctrlKey)) {
+              e.preventDefault();
+              commit();
+            }
+          },
+        };
+        return multiline ? (
+          <textarea rows={2} {...common} />
+        ) : (
+          <input type="text" {...common} />
+        );
+      }
+
+      /* §78/§79/§133 combobox: badge at rest, menu on interaction, no layout shift */
+      function RmCombo({
+        value,
+        options,
+        onChange,
+        width,
+        searchable,
+        renderValue,
+        label,
+      }) {
+        const [open, setOpen] = React.useState(false);
+        const [q, setQ] = React.useState("");
+        const [hl, setHl] = React.useState(0);
+        const rootRef = React.useRef(null);
+        const inputRef = React.useRef(null);
+
+        const all = React.useMemo(
+          () =>
+            options.map((o) => (typeof o === "string" ? { v: o, label: o } : o)),
+          [options]
+        );
+        const opts = React.useMemo(() => {
+          if (!searchable || !q.trim()) return all;
+          const needle = q.trim().toLowerCase();
+          return all.filter((o) => o.label.toLowerCase().includes(needle));
+        }, [all, q, searchable]);
+
+        React.useEffect(() => {
+          if (!open) return;
+          const onDown = (e) => {
+            if (rootRef.current && !rootRef.current.contains(e.target))
+              setOpen(false);
+          };
+          document.addEventListener("mousedown", onDown);
+          return () => document.removeEventListener("mousedown", onDown);
+        }, [open]);
+
+        React.useEffect(() => {
+          if (open && searchable && inputRef.current) inputRef.current.focus();
+        }, [open, searchable]);
+
+        function openMenu() {
+          const i = all.findIndex((o) => o.v === value);
+          setQ("");
+          setHl(i < 0 ? 0 : i);
+          setOpen(true);
+        }
+        function pick(o) {
+          if (o && o.v !== value) onChange(o.v);
+          setOpen(false);
+        }
+        function onKeyDown(e) {
+          if (e.key === "Escape") {
+            if (!open) return;
+            e.stopPropagation();
+            e.preventDefault();
+            setOpen(false);
+            return;
+          }
+          if (!open) {
+            if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+              e.preventDefault();
+              openMenu();
+            }
+            return;
+          }
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHl((h) => (opts.length ? (h + 1) % opts.length : 0));
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHl((h) => (opts.length ? (h - 1 + opts.length) % opts.length : 0));
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            pick(opts[hl]);
+          } else if (e.key === "Tab") {
+            setOpen(false);
+          }
+        }
+
+        return (
+          <div
+            className={"rm-combo" + (open ? " open" : "")}
+            style={{ width }}
+            ref={rootRef}
+            onKeyDown={onKeyDown}
+          >
+            <div
+              className="rm-trigger"
+              role="combobox"
+              tabIndex={0}
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              aria-label={label}
+              onClick={() => (open ? setOpen(false) : openMenu())}
+            >
+              {renderValue ? (
+                renderValue(value)
+              ) : (
+                <span className="rm-txt">{value || "—"}</span>
+              )}
+              <span className="rm-caret">▾</span>
+            </div>
+            {open && (
+              <div className="rm-menu" role="listbox" aria-label={label}>
+                {searchable && (
+                  <input
+                    ref={inputRef}
+                    className="rm-search"
+                    placeholder="Search…"
+                    value={q}
+                    onChange={(e) => {
+                      setQ(e.target.value);
+                      setHl(0);
+                    }}
+                  />
+                )}
+                {opts.length === 0 && <div className="rm-empty">No match</div>}
+                {opts.map((o, i) => (
+                  <div
+                    key={o.v}
+                    role="option"
+                    aria-selected={o.v === value}
+                    className={
+                      "rm-opt" +
+                      (i === hl ? " hl" : "") +
+                      (o.v === value ? " sel" : "")
+                    }
+                    onMouseEnter={() => setHl(i)}
+                    onClick={() => pick(o)}
+                  >
+                    {o.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      function RoadmapView({ themeId }) {
+        const [tasks, setTasks] = React.useState(null);
+        const [err, setErr] = React.useState("");
+        const [saved, setSaved] = React.useState(false);
+        const [q, setQ] = React.useState("");
+        const savedTimer = React.useRef(null);
+        const wrapRef = React.useRef(null);
+        const stickyRef = React.useRef(null);
+
+        React.useEffect(() => {
+          let alive = true;
+          ensureRoadmapCss();
+          ensureBpTokenCss();
+          (async () => {
+            try {
+              const stored = await loadRoadmapIDB();
+              if (!alive) return;
+              if (Array.isArray(stored) && stored.length) {
+                setTasks(stored);
+                return;
+              }
+              const r = await fetch(
+                `/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`
+              );
+              if (!r.ok) throw new Error(r.statusText || "seed fetch failed");
+              const seed = JSON.parse(await r.text());
+              if (!alive) return;
+              setTasks(seed);
+              saveRoadmapIDB(seed);
+            } catch (e) {
+              if (alive) setErr(e.message || String(e));
+            }
+          })();
+          return () => {
+            alive = false;
+            clearTimeout(savedTimer.current);
+          };
+        }, []);
+
+        /* §123-§124 seam for M2 (timeline) and M3 (drag/resize/undo):
+           patch any field of a task — including `schedule` — and autosave. */
+        const updateTask = React.useCallback((id, patch) => {
+          setTasks((prev) => {
+            if (!prev) return prev;
+            const next = prev.map((t) => (t.id === id ? { ...t, ...patch } : t));
+            saveRoadmapIDB(next);
+            return next;
+          });
+          setSaved(true);
+          clearTimeout(savedTimer.current);
+          savedTimer.current = setTimeout(() => setSaved(false), 1200);
+        }, []);
+
+        const [focusId, setFocusId] = React.useState(null);
+        const addTask = React.useCallback((cur) => {
+          const id = "t" + Date.now().toString(36);
+          setTasks((prev) => {
+            const list = prev || [];
+            const maxRank = list.reduce((m, t) => Math.max(m, t.rank || 0), 0);
+            const next = [
+              ...list,
+              {
+                id,
+                rank: maxRank + 1,
+                task: "New task",
+                strategicArea: "",
+                sourceColumn: "FEATURE",
+                desc: "",
+                effort: "",
+                impact: "",
+                testing: "",
+                priority: "P3",
+                current: !!cur,
+                schedule: null,
+              },
+            ];
+            saveRoadmapIDB(next);
+            return next;
+          });
+          setQ("");
+          setFocusId(id);
+        }, []);
+        const removeTask = React.useCallback((id) => {
+          setTasks((prev) => {
+            const next = (prev || []).filter((t) => t.id !== id);
+            saveRoadmapIDB(next);
+            return next;
+          });
+        }, []);
+
+        /* §80-116 timeline: per-month split into 4 weeks; drag-select any week
+           span. Backlog stays a single cell (clear schedule). Schedule stores
+           {month,week} at both ends; internally we use a linear week-slot index
+           0..15 (Sep w1 = 0 … Dec w4 = 15). */
+        const RM_MONTHS = ["Sep", "Oct", "Nov", "Dec"];
+        const RM_SLOTS = RM_MONTHS.length * 4; // 16
+        const slotOf = (month, week) => {
+          const mi = RM_MONTHS.indexOf(month);
+          return mi < 0 ? -1 : mi * 4 + (week - 1);
+        };
+        const slotMonth = (i) => RM_MONTHS[Math.floor(i / 4)];
+        const slotWeek = (i) => (i % 4) + 1;
+        const [drag, setDrag] = React.useState(null); // {id, a, b} week-slot indices
+        React.useEffect(() => {
+          if (!drag) return;
+          const commit = () => {
+            const lo = Math.min(drag.a, drag.b),
+              hi = Math.max(drag.a, drag.b);
+            updateTask(drag.id, {
+              schedule: {
+                start: { month: slotMonth(lo), week: slotWeek(lo) },
+                end: { month: slotMonth(hi), week: slotWeek(hi) },
+              },
+            });
+            setDrag(null);
+          };
+          window.addEventListener("mouseup", commit);
+          return () => window.removeEventListener("mouseup", commit);
+        }, [drag, updateTask]);
+        // week-slot span [lo,hi] a task's bar covers, or null for backlog/unscheduled
+        const schedSpan = (t) => {
+          if (drag && drag.id === t.id)
+            return [Math.min(drag.a, drag.b), Math.max(drag.a, drag.b)];
+          if (!t.schedule) return null;
+          const lo = slotOf(t.schedule.start.month, t.schedule.start.week);
+          const hi = slotOf(t.schedule.end.month, t.schedule.end.week);
+          return lo < 0 || hi < 0 ? null : [lo, hi];
+        };
+
+        /* KPI derived live from tasks — never hardcoded (§ prototype used static 30) */
+        const kpi = React.useMemo(() => {
+          const list = tasks || [];
+          const by = (p) => list.filter((t) => t.priority === p).length;
+          return {
+            total: list.length,
+            current: list.filter((t) => t.current).length,
+            p1: by("P1"),
+            p2: by("P2"),
+            p3: by("P3"),
+            backlog: by("Backlog"),
+          };
+        }, [tasks]);
+
+        /* §121 revised (user 2026-09-11): sort by Priority Rule, not manual rank.
+           Priority (P1>P2>P3>Backlog) → Impact (H>M>L) → Effort (L>M>H) →
+           Testing (L>M>H). Unknown metric sorts last. rank kept only as final
+           tiebreak so order is deterministic. */
+        const groups = React.useMemo(() => {
+          const PRIO = { P1: 0, P2: 1, P3: 2, Backlog: 3 };
+          const HIGH = { H: 0, M: 1, L: 2 }; // impact: high first
+          const LOW = { L: 0, M: 1, H: 2 }; // effort/testing: low first
+          const g = (map, v) => (v in map ? map[v] : 9);
+          const cmp = (a, b) =>
+            g(PRIO, a.priority) - g(PRIO, b.priority) ||
+            g(HIGH, a.impact) - g(HIGH, b.impact) ||
+            g(LOW, a.effort) - g(LOW, b.effort) ||
+            g(LOW, a.testing) - g(LOW, b.testing) ||
+            (a.rank || 0) - (b.rank || 0);
+          const needle = q.trim().toLowerCase();
+          const hit = (t) =>
+            !needle ||
+            [t.task, t.desc, t.strategicArea, t.sourceColumn, t.priority]
+              .filter(Boolean)
+              .some((s) => s.toLowerCase().includes(needle));
+          const list = (tasks || []).filter(hit).sort(cmp);
+          return [
+            {
+              key: "current",
+              label: "Current tasks — start now",
+              rows: list.filter((t) => t.current),
+            },
+            {
+              key: "rest",
+              label: "Next & backlog",
+              rows: list.filter((t) => !t.current),
+            },
+          ].filter((g) => g.rows.length);
+        }, [tasks, q]);
+
+        // after adding a task, scroll it into view and focus its name cell
+        React.useEffect(() => {
+          if (!focusId) return;
+          const row = document.querySelector('[data-tid="' + focusId + '"]');
+          if (!row) return;
+          row.scrollIntoView({ behavior: "smooth", block: "center" });
+          const edit = row.querySelector(".rm-editable");
+          if (edit) edit.click();
+          setFocusId(null);
+        }, [focusId, groups]);
+
+        /* dependency picker: a task can depend on many others, and any task can
+           be a dependency of many rows. Store t.dependency as an id array
+           (back-compat: coerce legacy string / null). Render names via lookup. */
+        const nameById = React.useMemo(() => {
+          const m = {};
+          (tasks || []).forEach((t) => (m[t.id] = t.task));
+          return m;
+        }, [tasks]);
+        // legacy string / null → array of dep ids
+        const depList = (t) =>
+          Array.isArray(t.dependency)
+            ? t.dependency
+            : t.dependency
+            ? [t.dependency]
+            : [];
+
+        // freeze the identity/metadata columns horizontally: only the timeline
+        // scrolls sideways. Compute cumulative left from the header's sticky-cell
+        // widths (running sum), then apply by column index to every row — avoids
+        // offsetLeft positioned-ancestor quirks that leave a phantom left gutter.
+        React.useEffect(() => {
+          const panel = wrapRef.current
+            ? wrapRef.current.querySelector(".table-panel")
+            : null;
+          if (!panel) return;
+          const sync = () => {
+            const head = panel.querySelector("thead tr");
+            if (!head) return;
+            const headSl = head.querySelectorAll(".sl");
+            const lefts = [];
+            let acc = 0;
+            headSl.forEach((c) => {
+              lefts.push(acc);
+              acc += c.offsetWidth;
+            });
+            panel.querySelectorAll("tr").forEach((tr) => {
+              tr.querySelectorAll(".sl").forEach((cell, i) => {
+                if (lefts[i] != null) cell.style.left = lefts[i] + "px";
+              });
+            });
+          };
+          sync();
+          const ro = new ResizeObserver(sync);
+          ro.observe(panel);
+          return () => ro.disconnect();
+        }, [tasks, groups]);
+
+        if (err)
+          return (
+            <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-5)", fontSize:12 }}>
+              Error loading roadmap: {err}
+            </div>
+          );
+        if (!tasks)
+          return (
+            <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-5)", fontSize:12 }}>
+              Loading…
+            </div>
+          );
+
+        const level = (t, field) => (
+          <RmCombo
+            width={78}
+            value={t[field]}
+            options={RM_LEVELS}
+            onChange={(v) => updateTask(t.id, { [field]: v })}
+            label={`${field} for ${t.task}`}
+            renderValue={(v) => (
+              <span className={rmMetricClass(v)}>{v || "—"}</span>
+            )}
+          />
+        );
+
+        return (
+          <div style={{ flex:1, minHeight:0, display:"flex", flexDirection:"column", overflow:"hidden", background:"var(--app-bg)" }}>
+            <div className="bp-root rm-flexroot" data-theme={themeId || "navy"}>
+              <div className="rm-wrap rm-flexcol" ref={wrapRef}>
+                <div className="rm-sticky" ref={stickyRef}>
+                <div className="rm-head">
+                  <span className="rm-title">Roadmap</span>
+                  <span className="rm-sub">
+                    {(() => {
+                      const shown = groups.reduce((n, g) => n + g.rows.length, 0);
+                      return q.trim()
+                        ? `${shown} / ${tasks.length} tasks`
+                        : `${tasks.length} tasks · manual priority · autosaved`;
+                    })()}
+                  </span>
+                  <input
+                    type="search"
+                    className="rm-search"
+                    placeholder="Search tasks…"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                  />
+                  <button type="button" className="rm-addbtn" onClick={() => addTask(true)}>
+                    + Current
+                  </button>
+                  <button type="button" className="rm-addbtn rm-addnext" onClick={() => addTask(false)}>
+                    + Next
+                  </button>
+                  <span className={"rm-saved" + (saved ? " on" : "")}>Saved</span>
+                </div>
+
+                <div className="stats-row">
+                  <div className="stat-block">
+                    <div className="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v3h6V3M8 11h8M8 15h5"/></svg></div>
+                    <div><div className="stat-num">{kpi.total}</div><div className="stat-label">Total Tasks</div></div>
+                  </div>
+                  <div className="stat-block">
+                    <div className="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+                    <div><div className="stat-num">{kpi.current}</div><div className="stat-label">Current Tasks</div></div>
+                  </div>
+                  <div className="stat-block">
+                    <div className="stat-icon" style={{background:"var(--priority-p1-bg)",color:"var(--priority-p1-fg)"}}><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></div>
+                    <div>
+                      <div><span className="stat-badge" style={{background:"var(--priority-p1-bg)",color:"var(--priority-p1-fg)"}}>● P1</span></div>
+                      <div className="stat-num">{kpi.p1}</div><div className="stat-label">(Kerjakan dulu)</div>
+                    </div>
+                  </div>
+                  <div className="stat-block">
+                    <div className="stat-icon" style={{background:"var(--priority-p2-bg)",color:"var(--priority-p2-fg)"}}><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></div>
+                    <div>
+                      <div><span className="stat-badge" style={{background:"var(--priority-p2-bg)",color:"var(--priority-p2-fg)"}}>● P2</span></div>
+                      <div className="stat-num">{kpi.p2}</div>
+                    </div>
+                  </div>
+                  <div className="stat-block">
+                    <div className="stat-icon" style={{background:"var(--priority-p3-bg)",color:"var(--priority-p3-fg)"}}><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6H21l-5 4 2 7-6-4-6 4 2-7-5-4h6.5z"/></svg></div>
+                    <div>
+                      <div><span className="stat-badge" style={{background:"var(--priority-p3-bg)",color:"var(--priority-p3-fg)"}}>● P3</span></div>
+                      <div className="stat-num">{kpi.p3}</div>
+                    </div>
+                  </div>
+                  {kpi.backlog > 0 && (
+                    <div className="stat-block">
+                      <div className="stat-icon" style={{background:"var(--priority-backlog-bg)",color:"var(--priority-backlog-fg)"}}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></div>
+                      <div>
+                        <div><span className="stat-badge" style={{background:"var(--priority-backlog-bg)",color:"var(--priority-backlog-fg)"}}>● Backlog</span></div>
+                        <div className="stat-num">{kpi.backlog}</div><div className="stat-label">(Belum ready)</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="rules-area">
+                    <div className="rule-box">
+                      <div className="rule-title">Priority Rule</div>
+                      <div className="rule-item">1. Impact (H &gt; M &gt; L)</div>
+                      <div className="rule-item">2. Effort (L &gt; M &gt; H)</div>
+                      <div className="rule-item">3. Testing (L &gt; M &gt; H)</div>
+                      <div className="rule-item">4. Dependency (constraint timeline, bukan pengganti priority)</div>
+                    </div>
+                    <div className="rule-box">
+                      <div className="rule-title">Timeline Codes</div>
+                      <div className="rule-item">S = September &nbsp;&nbsp; D = December</div>
+                      <div className="rule-item">O = October &nbsp;&nbsp;&nbsp;&nbsp; B = Backlog</div>
+                      <div className="rule-item">N = November</div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+
+                <div className="table-panel">
+                  <table className="task-table">
+                    <thead>
+                      <tr>
+                        <th rowSpan={2} className="sl">#</th>
+                        <th rowSpan={2} className="sl">Task</th>
+                        <th rowSpan={2} className="sl">Strategic Area</th>
+                        <th rowSpan={2} className="sl">Description</th>
+                        <th rowSpan={2} className="sl">Source</th>
+                        <th rowSpan={2} className="sl">Impact</th>
+                        <th rowSpan={2} className="sl">Effort</th>
+                        <th rowSpan={2} className="sl">Testing</th>
+                        <th rowSpan={2} className="sl">Dependency</th>
+                        <th rowSpan={2} className="sl">Priority</th>
+                        <th rowSpan={2} className="sl sl-edge">Status</th>
+                        {RM_MONTHS.map((m) => (
+                          <th key={m} className="mo" colSpan={4}>{m}</th>
+                        ))}
+                        <th rowSpan={2} className="mo">Backlog</th>
+                      </tr>
+                      <tr>
+                        {RM_MONTHS.map((m) =>
+                          [1, 2, 3, 4].map((w) => (
+                            <th key={m + w} className={"wk" + (w === 1 ? " mo-start" : "")}>W{w}</th>
+                          ))
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groups.map((g) => (
+                        <React.Fragment key={g.key}>
+                          <tr className="grp">
+                            <td colSpan={28}><span className="grp-label">{g.label}</span></td>
+                          </tr>
+                          {g.rows.map((t) => (
+                            <tr key={t.id} data-tid={t.id}>
+                              <td className="num sl">
+                                <span className="rm-rank">{t.rank}</span>
+                                <button
+                                  type="button"
+                                  className="rm-del"
+                                  title="Delete task"
+                                  onClick={() => removeTask(t.id)}
+                                >
+                                  ×
+                                </button>
+                              </td>
+                              <td className="tname sl">
+                                <RmEdit
+                                  value={t.task}
+                                  placeholder="Task name"
+                                  onCommit={(v) => updateTask(t.id, { task: v })}
+                                />
+                              </td>
+                              <td className="area sl">
+                                <RmCombo
+                                  width={196}
+                                  searchable
+                                  value={t.strategicArea}
+                                  options={RM_AREAS}
+                                  onChange={(v) =>
+                                    updateTask(t.id, { strategicArea: v })
+                                  }
+                                  label={`Strategic area for ${t.task}`}
+                                />
+                              </td>
+                              <td className="tdesc sl">
+                                <RmEdit
+                                  value={t.desc}
+                                  multiline
+                                  placeholder="Description"
+                                  onCommit={(v) => updateTask(t.id, { desc: v })}
+                                />
+                              </td>
+                              <td className="sl"><span className={rmSrcClass(t.sourceColumn)}>{t.sourceColumn || "—"}</span></td>
+                              <td className="sl">{level(t, "impact")}</td>
+                              <td className="sl">{level(t, "effort")}</td>
+                              <td className="sl">{level(t, "testing")}</td>
+                              <td className="dep sl">
+                                {(() => {
+                                  const deps = depList(t);
+                                  const picked = new Set(deps);
+                                  return (
+                                    <div className="dep-cell">
+                                      {deps.map((d) => (
+                                        <span key={d} className="dep-chip">
+                                          {nameById[d] || d}
+                                          <button
+                                            type="button"
+                                            className="dep-x"
+                                            title="Remove dependency"
+                                            onClick={() =>
+                                              updateTask(t.id, {
+                                                dependency: deps.filter((x) => x !== d),
+                                              })
+                                            }
+                                          >
+                                            ×
+                                          </button>
+                                        </span>
+                                      ))}
+                                      <RmCombo
+                                        width={140}
+                                        searchable
+                                        value=""
+                                        options={[
+                                          { v: "", label: "+ add dependency" },
+                                          ...(tasks || [])
+                                            .filter(
+                                              (o) => o.id !== t.id && !picked.has(o.id)
+                                            )
+                                            .map((o) => ({ v: o.id, label: o.task })),
+                                        ]}
+                                        onChange={(v) =>
+                                          v &&
+                                          updateTask(t.id, {
+                                            dependency: [...deps, v],
+                                          })
+                                        }
+                                        label={`Add dependency for ${t.task}`}
+                                        renderValue={() => (
+                                          <span className="dep-add">+ dep</span>
+                                        )}
+                                      />
+                                    </div>
+                                  );
+                                })()}
+                              </td>
+                              <td className="sl">
+                                <RmCombo
+                                  width={94}
+                                  value={t.priority}
+                                  options={RM_PRIOS}
+                                  onChange={(v) =>
+                                    updateTask(t.id, { priority: v })
+                                  }
+                                  label={`Priority for ${t.task}`}
+                                  renderValue={(v) => (
+                                    <span className={rmPrioClass(v)}>
+                                      {v || "—"}
+                                    </span>
+                                  )}
+                                />
+                              </td>
+                              <td className="sl sl-edge">
+                                <RmCombo
+                                  width={78}
+                                  value={t.current ? "Now" : "Next"}
+                                  options={["Now", "Next"]}
+                                  onChange={(v) =>
+                                    updateTask(t.id, { current: v === "Now" })
+                                  }
+                                  label={`Status for ${t.task}`}
+                                  renderValue={(v) => (
+                                    <span
+                                      className={
+                                        "status-pill " +
+                                        (v === "Now" ? "st-now" : "st-next")
+                                      }
+                                    >
+                                      {v}
+                                    </span>
+                                  )}
+                                />
+                              </td>
+                              {Array.from({ length: RM_SLOTS }, (_, si) => {
+                                const span = schedSpan(t);
+                                const on = span && si >= span[0] && si <= span[1];
+                                const weekStart = si % 4 === 0;
+                                return (
+                                  <td
+                                    key={si}
+                                    className={"wk rm-cell" + (weekStart ? " mo-start" : "")}
+                                    title={slotMonth(si) + " w" + slotWeek(si)}
+                                    onMouseDown={() =>
+                                      setDrag({ id: t.id, a: si, b: si })
+                                    }
+                                    onMouseEnter={() =>
+                                      setDrag((d) =>
+                                        d && d.id === t.id ? { ...d, b: si } : d
+                                      )
+                                    }
+                                  >
+                                    <div
+                                      className={
+                                        "bar" +
+                                        (on
+                                          ? " " + rmBarClass(t.priority)
+                                          : "")
+                                      }
+                                    ></div>
+                                  </td>
+                                );
+                              })}
+                              <td
+                                className="mo rm-cell"
+                                title="Clear schedule (unscheduled)"
+                                onMouseDown={() =>
+                                  updateTask(t.id, { schedule: null })
+                                }
+                              >
+                                <div
+                                  className={
+                                    "bar" +
+                                    (!t.schedule ? " on-backlog" : "")
+                                  }
+                                ></div>
+                              </td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="takeaways rm-footer">
+                  <div className="takeaway-label">
+                    <div className="tk-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
+                    Legend
+                  </div>
+                  <div className="takeaway-items">
+                    <span><span className="lg" style={{background:"var(--priority-p1-fg)"}}></span>P1 — kerjakan dulu</span>
+                    <span><span className="lg" style={{background:"var(--priority-p2-fg)"}}></span>P2 — next</span>
+                    <span><span className="lg" style={{background:"var(--priority-p3-fg)"}}></span>P3 — later</span>
+                    <span><span className="lg" style={{background:"var(--priority-backlog-fg)"}}></span>Backlog — belum ready dijadwalkan</span>
+                    <span>Impact / Effort / Testing: <span className="metric metric-high">H</span> <span className="metric metric-medium">M</span> <span className="metric metric-low">L</span> <span className="metric metric-unknown">?</span></span>
+                    <span>⛔ = blocked external</span>
+                  </div>
+                  <div className="exec-clarity">
+                    <div className="ec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></div>
+                    <div>
+                      <div className="ec-title">Execute with Clarity</div>
+                      <div className="ec-desc">Build a stronger SatuInbox.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       function App() {
         const APP_NAV_STATE_KEY = "qa_browser_nav_state_v1";
         function readAppNavState() {
@@ -5300,8 +6358,11 @@
         function normalizeMainNav(value) {
           return [
             "dashboard",
+            "bigpic",
+            "roadmap",
             "workspace",
             "tracker",
+            "monitoring",
             "new-request",
             "memory",
             "settings",
@@ -6346,8 +7407,11 @@
         // ── Nav items ───────────────────────────────────────────────────────────
         const NAV_ITEMS = [
           { id: "dashboard", label: "Dashboard", icon: "◈" },
+          { id: "bigpic", label: "Big Picture", icon: "◉" },
+          { id: "roadmap", label: "Roadmap", icon: "◉" },
           { id: "workspace", label: "Workspace", icon: "⊞" },
           { id: "tracker", label: "Tracker", icon: "◷" },
+          { id: "monitoring", label: "Monitoring", icon: "◉" },
           { id: "new-request", label: "New Request", icon: "✎" },
           { id: "memory", label: "Memory", icon: "⚡" },
         ];
@@ -7647,6 +8711,15 @@
                   );
                 }
 
+                // ── Big Picture (native render from prototype) ─────────────
+                if (mainNav === "bigpic") {
+                  return <BigPictureView page={0} themeId={themeId} />;
+                }
+                // ── Roadmap (interactive, M1) ──────────────────────────────
+                if (mainNav === "roadmap") {
+                  return <RoadmapView themeId={themeId} />;
+                }
+
                 // ── Memory ─────────────────────────────────────────────────
                 if (mainNav === "tracker")
                   return (
@@ -7667,6 +8740,19 @@
                         onSelectedSheetChange={setTrackerSheet}
                         onSheetTabsChange={setTrackerSheetTabs}
                       />
+                    </div>
+                  );
+                if (mainNav === "monitoring")
+                  return (
+                    <div
+                      style={{
+                        flex: 1,
+                        minHeight: 0,
+                        overflow: "auto",
+                        background: "var(--app-bg)",
+                      }}
+                    >
+                      <window.MonitoringModule.MonitoringView />
                     </div>
                   );
                 if (mainNav === "new-request") return renderNewRequestView();

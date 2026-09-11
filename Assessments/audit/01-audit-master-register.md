@@ -2,7 +2,7 @@
 
 # SatuInbox — Audit Master Register
 
-> **Version:** v1.5 | **Changelog:** v1.5 — fold Track G 10 Critical jadi ID resmi INFRA-01..10 (committed secrets, no alerting, 2× SPOF, CORS wildcard, FE/BE test coverage, docs, EKS public). Track G status di Cakupan: orphan → folded (Critical only; High/Medium/Low tetap di source `detail-infra/satuinbox-infra-audit.md`). Arsip 9 file source 09-01/09-02 → `_source/`; conversation source → `conversation/_source/` + merged file. Statistik 61 → 71. v1.4 — review corpus 2026-09-03: tambah Track G? (orphan infra `detail-infra/satuinbox-infra-audit.md`, 69 temuan) + Track B ke peta Cakupan; warning konflik layer RBAC (SEC-03 BE vs Track F C1 FE); konflik antar-file terdokumentasi di reading-list §5 (K1–K6). NO finding baru di-fold. v1.3 — tambah section "Cakupan Audit" (peta track A–F). Register kini eksplisit sebagai master peta seluruh audit, bukan hanya Track A. v1.2 — synthesis audit-3 (t_ba1b1ec2): tambah DI-06 (RetryTracker in-memory), promote V17 config-trap ke confirmed (dup INT-01, close needs-validation part). v1.1 — tambah ENV-01 (branch conflict jadi finding, D3), tabel decision-taxonomy mapping (D2), blok versi (D4), per re-audit t_f4c645c2. v1.0 — baseline 59 temuan.
+> **Version:** v2.0 | **Changelog:** v2.0 — fold Track I (Conversation-Room PRD, 15 CRM: inference/Major) + Track J (Conversation-Room product-reality, 16 CRX: 3 Catastrophe/8 Major/4 Medium/1 Low, 9 confirmed/6 needs-validation/1 inference). Dedup 23 ROOM linked-only (evidence ke existing, bukan ID baru). Total 101→132. Cross-ref objek bersama (16 pasang) di kepala kedua file audit. v1.9 — jelaskan formula 303 bruto → 101 register kanonik: 101 = A61 + F Critical10 + G12 + H folded18; 202 sisanya = B33 + D41 + E64 + F non-Critical59 + H clean/retracted5, belum/tidak di-fold karena overlap, raw backlog, atau bukan bug. Koreksi statistik Track H pasca v1.8: confirmed 17, needs-validation 29, corrected 2; total tetap 101. v1.8 — re-review Track H conversation-list open questions. `CLH-17` dipromosikan jadi **confirmed Low**: invalidation realtime memicu refetch berulang tanpa debounce, tetapi bukan thundering herd tak terbatas karena TanStack Query dedupe in-flight fetch. `CLH-18` **closed/corrected**: bulk-action RBAC terbukti enforced di BE `conversation.controller.ts` lewat `JwtAuthGuard` + `PermissionsGuard` + `@RequirePermissions(...)` per bulk endpoint; gap FE tinggal cosmetic visibility, bukan authz bypass. Statistik tetap **101** (1 item pindah bucket ke confirmed, 1 item keluar dari needs-validation). v1.7 — konsolidasi penuh Conversation-Sidebar-Navigation ke 1 file tunggal dan fold ke ID resmi CSN-01..12 (8 confirmed + 2 needs-validation + 2 needs-decision). Koreksi: C2 parity scope, C3 bypass claim diretract jadi coverage-risk, C5 capability gap bukan bug. Statistik 89 → 101. **Re-letter track:** F = Infra/DevOps, G = Conversation-Sidebar-Navigation — supaya urutan baca G (sidebar) → H (list) searah; entri changelog lama di bawah memakai huruf lama sebelum swap. v1.6 — fold penuh conversation-list deep audit (Track H) ke ID resmi CLH-01..18. Dedup: CLX-03 memperluas CL-01 tapi mekanisme baru tetap dipertahankan sebagai finding baru; CLX-04 diretract dan tidak di-fold; clean/retracted tidak masuk register. Branch baseline diselaraskan ke `prod-2.8.1` dengan memory FE/BE tetap patokan utama. Statistik 71 → 89. v1.5 — fold infra 10 Critical jadi ID resmi INFRA-01..10 (committed secrets, no alerting, 2× SPOF, CORS wildcard, FE/BE test coverage, docs, EKS public); status di Cakupan: orphan → folded (Critical only; High/Medium/Low tetap di source `detail-infra/satuinbox-infra-audit.md`). Arsip 9 file source 09-01/09-02 → `_source/`; conversation source → `conversation/_source/` + merged file. Statistik 61 → 71. v1.4 — review corpus 2026-09-03: tambah track infra orphan (`detail-infra/satuinbox-infra-audit.md`, 69 temuan) + Track B ke peta Cakupan; warning konflik layer RBAC (SEC-03 BE vs sidebar-nav C1 FE); konflik antar-file terdokumentasi di reading-list §5 (K1–K6). NO finding baru di-fold. v1.3 — tambah section "Cakupan Audit" (peta track). Register kini eksplisit sebagai master peta seluruh audit, bukan hanya Track A. v1.2 — synthesis audit-3 (t_ba1b1ec2): tambah DI-06 (RetryTracker in-memory), promote V17 config-trap ke confirmed (dup INT-01, close needs-validation part). v1.1 — tambah ENV-01 (branch conflict jadi finding, D3), tabel decision-taxonomy mapping (D2), blok versi (D4), per re-audit t_f4c645c2. v1.0 — baseline 59... [truncated]
 >
 > **Single source of truth** untuk semua temuan audit. Laporan detail tetap di file asli — register ini untuk prioritisasi & tracking eksekusi.
 >
@@ -10,7 +10,7 @@
 >
 > **Severity:** Catastrophe (blocker release) | Major (fix before scale) | Medium (backlog) | Low (nice-to-have) | Positive (kontrol benar)
 >
-> **Repo baseline:** BE `prod-2.7.0`, FE `prod-2.7.0-11` (bukan v2.8.0)
+> **Repo baseline:** FE/BE memory = patokan utama; branch kerja saat ini `prod-2.8.1` (repo reality lama di dokumen dianggap outdated dan digantikan catatan ini)
 >
 > **Owner default:** PM = Dany Christian, Eng Lead = Naftal Yunior
 
@@ -18,7 +18,7 @@
 
 ## Cakupan Audit (peta semua track)
 
-> Register ini = **backlog eksekusi ter-triase**, bukan dump semua finding. Track A sudah di-fold jadi ID resmi di bawah. Track B/D/E/F **belum di-fold** (raw, banyak overlap antar-track + dgn register) — di-index di `02-reading-list-and-conflicts.md` (§1 peta, §4 khusus Conversation). Fold ke register hanya setelah dedup + ENV-01 branch-lock.
+> Register ini = **backlog eksekusi ter-triase**, bukan dump semua finding. Track A sudah di-fold jadi ID resmi di bawah. Track **G** dan **H** sudah folded ke ID resmi (CSN / CLH) di bawah. Track B/D/E/F non-critical masih banyak overlap/raw dan tetap dibaca via `02-reading-list-and-conflicts.md` (§1 peta, §4 khusus Conversation).
 
 | Track | Scope | Finding | Di register? | Baca |
 |---|---|---|---|---|
@@ -26,14 +26,19 @@
 | **B** | UI/UX heuristic (Nielsen, FE-only) | 33 | ❌ belum | `detail-uiux/uiux-audit-report-sabrina.md`, `detail-uiux/uiux-impact-assessment.md` |
 | **D** | Conversation FE UX flow (first-time + returning user) | 41 | ❌ belum | `detail-conversation/2026-09-02-conversation-audit-merged.md` (Track D) |
 | **E** | Conversation BE deep-dive (data model, security, perf, functional) | 64 | ❌ belum | `detail-conversation/2026-09-02-conversation-audit-merged.md` (Track E) |
-| **F** | Conversation sidebar nav RBAC + counter (FE+BE cross-verified) | 3 | ❌ belum | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` |
-| **G** | Infra/DevOps (secrets, CORS, SPOF, alerting, test coverage) | 69 (10 Critical/22 High/25 Med/12 Low) | ⚠️ **partial**: 10 Critical folded (INFRA-01..10); High/Med/Low belum | `detail-infra/satuinbox-infra-audit.md` (source lengkap 59 non-Critical) |
-| — | Conversation coverage gap-check (meta) | verdict PARTIAL, ~40% belum di-audit | n/a | `03-coverage-gap-check.md` |
+| **F** | Infra/DevOps (secrets, CORS, SPOF, alerting, test coverage) | 69 (10 Critical/22 High/25 Med/12 Low) | ⚠️ **partial**: 10 Critical folded (INFRA-01..10); High/Med/Low belum | `detail-infra/satuinbox-infra-audit.md` (source lengkap 59 non-Critical) |
+| **G** | Conversation-Sidebar-Navigation (counter, channel, team inbox) | 12 | ✅ **folded**: CSN-01..12; 4 butuh validation/decision | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` |
+| **H** | Conversation-list deep audit (chat-list panel, 10 aspek) | 23 (17 confirmed/1 corrected/5 clean+retracted + known overlap) | ✅ **folded**: CLH-01..18; clean/retracted tetap di source | `detail-conversation/2026-09-07-conversation-list-deep-audit.md` |
+| **I** | Conversation-Room PRD-conformance | 23 triaged / **15 folded** + 8 linked-only | ✅ **partial folded**: CRM-01..15; ROOM-01/02/03/05/06/07/13/22 linked ke existing IDs | `detail-conversation/2026-09-07-conversation-room-deep-audit.md` |
+| **J** | Conversation-Room product-reality (kode + heuristik) | 25 triaged / **16 folded** + 4 linked-only + 2 positive + 3 unique infra-quality | ✅ **partial folded**: CRX-01..16; linked evidence ke F-07/ROOM-21/CRM | `detail-conversation/2026-09-07-conversation-room-product-reality-audit.md` |
+| **TOTAL** | Corpus bruto seluruh track (A+B+D+E+F+G+H+I+J) | **351** | Register kanonik ter-triase & dedup = **132 finding** (statistik di bawah) | — |
 
-**Gate fold Track B/D/E/F/G:** (a) ENV-01 branch-lock resolve, (b) dedup per overlap yang dicatat di `02-reading-list-and-conflicts.md` §4 (mis. Track E DB-index ↔ register V8/P-01; Track F RBAC ↔ Track B/D visibility). Fold tanpa dedup = double-count backlog.
+> **Baca Total dengan benar:** 351 = corpus bruto sebelum triase/dedup. Register 132 = item yang sudah masuk canonical tracking: **A61 + F Critical10 + G12 + H folded18 + I CRM15 + J CRX16 = 132**. Selisih **219** = **B33 + D41 + E64 + F non-Critical59 + H clean/retracted5 + I linked-only8 + J linked-only4 + J positive2 + J unique-infra-quality3** yang belum/tidak di-fold karena overlap, raw backlog, kontrol positif, atau bukan bug. Kalau butuh satu angka eksekusi, pakai **132**.
 
-> **⚠️ Konflik layer RBAC (jangan salah baca):** P1 **SEC-03** di bawah = kontrol positif RBAC di **BE gateway** (benar, enforced). Track F **C1** = gate visibility RBAC di **FE sidebar** (RUSAK — `role.name` vs `role.code`). Dua-duanya benar di layer berbeda. SEC-03 positif TIDAK berarti FE gate aman.
-> **⚠️ Track G infra (INFRA-01..10 folded):** 10 Critical dari `detail-infra/satuinbox-infra-audit.md` kini jadi ID resmi di section **CONFIRMED — Track G Infra/DevOps** di bawah. Severity Track G = `Critical` (skala infra), setara **Major/Catastrophe** di skala produk register. Sisa 59 (High/Med/Low) TETAP di source, belum di-fold. INFRA-01 (committed secrets) time-sensitive — active risk, rotate segera.
+**Gate fold Track B/D/E/F:** dedup per overlap yang dicatat di `02-reading-list-and-conflicts.md` §4 masih wajib untuk track-track itu. **Track G** kini sudah dikonsolidasikan ke satu file tunggal dan di-fold ke `CSN-01..12`; item decision/validation tetap dipisah di section khusus. **Track H** dikecualikan sesuai keputusan user dan sudah di-fold penuh untuk non-clean findings; clean/retracted tetap tinggal di source supaya register tidak double-count non-bug.
+
+> **⚠️ Konflik layer RBAC (jangan salah baca):** P1 **SEC-03** di bawah = kontrol positif RBAC di **BE gateway** (benar, enforced). Track G / **CSN-01** = gate visibility RBAC di **FE sidebar** (RUSAK — `role.name` vs `role.code`). Dua-duanya benar di layer berbeda. SEC-03 positif TIDAK berarti FE gate aman.
+> **⚠️ Track F infra (INFRA-01..10 folded):** 10 Critical dari `detail-infra/satuinbox-infra-audit.md` kini jadi ID resmi di section **CONFIRMED — Track F Infra/DevOps** di bawah. Severity Track F = `Critical` (skala infra), setara **Major/Catastrophe** di skala produk register. Sisa 59 (High/Med/Low) TETAP di source, belum di-fold. INFRA-01 (committed secrets) time-sensitive — active risk, rotate segera.
 
 ---
 
@@ -48,7 +53,7 @@
 | 5 | INT-03 | Integrasi / Security | DLQ consumer **fallback non-TLS** saat cert hilang — melanggar "mTLS mandatory". | Major | `broadcast-dlq.processor.ts:120` verified (`logger.warn('TLS certs not available...connecting without TLS')`) | BE prod-2.7.0, broadcast-service | **confirmed** | Naftal | Hard-fail (throw) bila cert tidak ada, bukan fallback non-TLS. Samakan dengan service lain. | DLQ consumer gagal start saat cert hilang (bukan downgrade) | - |
 | 6 | SEC-01 | Security / PII | `console.log(payload)` bocorkan tenant ID + nomor WA bisnis ke stdout produksi. | Major | `whatsapp-api.controller.ts:144` verified | BE prod-2.7.0, api-gateway | **confirmed** | Naftal | Hapus `console.log`. Ganti logger level debug terstruktur dengan redaction. Sweep `console.log` lain di path controller. | `grep console.log apps/api-gateway/src` bersih | - |
 | 7 | F-07 | UX / Error Handling | Raw backend error leakage — `throw-service-error.ts` pakai `error.response.data.message` apa adanya. 278 call sites, 132 files, 0 error mapper. UI campuran ID-Inggris, detail internal bocor. | Major | grep verified (278 non-import calls, FE prod-2.7.0-11) | FE prod-2.7.0-11, apps/omnichannel | **confirmed** | Dany + Naftal | Shared error mapper: BE kirim `{code, messageKey, fieldErrors, retryable, correlationId}`. FE i18n by code. Raw hanya ke log. Phased rollout dari 278 sites. | Negative-path test (5 flow): teks UI human-readable, bukan err.message | - |
-| 8 | ENV-01 | Environment / Governance | **Branch target belum di-lock** — repo lokal `prod-2.7.0`, memory `v2.8.0`. Semua status `confirmed` valid HANYA untuk `prod-2.7.0`. `memory_conflict_flag` (non-bypassable) berlaku. (D3 meta-audit t_f4c645c2) | Major | repo baseline vs `global-memory` verified conflict | prod-2.7.0 vs v2.8.0 | **confirmed** | Naftal | Konfirmasi target branch final sebelum temuan `confirmed` dijadikan ticket. Jika target = v2.8.0, re-verify 7 confirmed prioritas di branch itu. | Branch target tertulis eksplisit di register + semua ticket refer branch yang sama | - |
+| 8 | ENV-01 | Environment / Governance | **Branch baseline lama outdated** — target operasional sekarang `prod-2.8.1`; memory FE/BE menjadi patokan utama bila audit lama menyebut `prod-2.7.0` / `v2.8.0`. | Major | PM clarification 2026-09-07 | prod-2.8.1 | **closed** | Naftal | Saat ticketing, refer branch `prod-2.8.1` dan re-verify hanya jika finding menyentuh area yang berubah di 2.8.1. | Ticket mencantumkan branch baseline `prod-2.8.1` + source memory FE/BE | - |
 
 ---
 
@@ -92,22 +97,84 @@
 
 ---
 
-## CONFIRMED — Track G Infra/DevOps (10 Critical folded dari `detail-infra/satuinbox-infra-audit.md`)
+## CONFIRMED — Track F Infra/DevOps (10 Critical folded dari `detail-infra/satuinbox-infra-audit.md`)
 
-> Severity `Critical` = skala infra (setara Major/Catastrophe skala produk). Owner default **Naftal**. Sisa 59 Track G (High/Med/Low) belum di-fold — baca source. **INFRA-01 = active risk, kerjakan lebih dulu.**
+> Severity `Critical` = skala infra (setara Major/Catastrophe skala produk). Owner default **Naftal**. Sisa 59 Track F (High/Med/Low) belum di-fold — baca source. **INFRA-01 = active risk, kerjakan lebih dulu.**
 
 | # | ID | Domain | Finding | Severity | Evidence | Status | Remediation | Effort |
 |---|---|---|---|---|---|---|---|---|
-| G1 | INFRA-01 | Security / Secrets | **Committed secrets di git** — `docker/local/.env` (tracked), `atlas-search/conversation-indexes.sh` (Mongo password hardcoded), `docker/dev/docker-compose.yml` (Redash+Mongo password). Siapapun dengan akses repo punya DB password + API key. | Critical | source-verified (t_4544c1c3 C-1/2/3) | **confirmed** | `git rm --cached`, **rotate SEMUA** credential terekspos, `.gitignore`. | 30 min |
-| G2 | INFRA-02 | Observability | **Zero alerting** — Prometheus collect metric tapi 0 PrometheusRule CRD. Tidak ada yang di-page. Failure baru ketahuan saat customer lapor. | Critical | t_f652d37d IV-1 | **confirmed** | Alertmanager: pod-not-ready >5min, MongoDB RS unhealthy, gRPC error >5%, mem >85%. | 1 day |
-| G3 | INFRA-03 | Architecture / SPOF | **API Gateway single-replica** — satu-satunya entry HTTP/WS, no HPA (VPA only). Crash = outage total semua traffic. | Critical | t_f652d37d I-1 | **confirmed** | HPA min 2 replica. | 1 hr |
-| G4 | INFRA-04 | Architecture / SPOF | **WhatsApp Service single-replica** — Baileys session stateful, tak bisa scale horizontal. Crash = semua sesi WA hilang, butuh re-auth. | Critical | t_f652d37d I-2 | **confirmed** | Session persistence untuk fast recovery; long-term migrasi WA Business API akun non-kritikal. | M |
-| G5 | INFRA-05 | Security / CORS | **CORS wildcard** — `CORS_ORIGINS` unset → `'*'`. Plus env var name mismatch (plural/singular di `.env.example`). Domain manapun bisa authenticated cross-origin. | Critical | `api-gateway/src/main.ts:70-77` + WS gateway | **confirmed** | Default ke domain produksi, fix nama env var. | 30 min |
-| G6 | INFRA-06 | Code Quality / Test | **FE zero test coverage** — 1 test file / 1.777 source, no test runner. Regresi ship diam-diam. | Critical | t_865726e9 | **confirmed** | Vitest + critical-path test (auth, conversation list). Tie C12/QA-01. | 1-2 days |
-| G7 | INFRA-07 | Quality / Test | **BE e2e semua stub** — 18 e2e app test endpoint `/api` yang tak ada. 0% real e2e. False confidence. | Critical | t_1e8f8b8c | **confirmed** | Ganti dgn integration test nyata, mulai auth-service. Tie C12. | 2-3 days |
-| G8 | INFRA-08 | Documentation | **Zero per-service docs** — 0/38 service punya README di arsitektur 19-microservice. Onboarding blocker. | Critical | t_1e8f8b8c | **confirmed** | Template README, mulai conversation-service. | 2-3 days |
-| G9 | INFRA-09 | Documentation | **No CHANGELOG / release process** — tak ada CHANGELOG.md, semver, release notes. | Critical | t_1e8f8b8c | **confirmed** | keepachangelog format, backfill dari git history. | 0.5 day |
-| G10 | INFRA-10 | Security / Infra | **EKS public endpoint** — cluster API internet-accessible, private access disabled. | Critical | t_f652d37d III-4 | **confirmed** | Enable private access, VPN/bastion untuk kubectl. | 1 day |
+| F1 | INFRA-01 | Security / Secrets | **Committed secrets di git** — `docker/local/.env` (tracked), `atlas-search/conversation-indexes.sh` (Mongo password hardcoded), `docker/dev/docker-compose.yml` (Redash+Mongo password). Siapapun dengan akses repo punya DB password + API key. | Critical | source-verified (t_4544c1c3 C-1/2/3) | **confirmed** | `git rm --cached`, **rotate SEMUA** credential terekspos, `.gitignore`. | 30 min |
+| F2 | INFRA-02 | Observability | **Zero alerting** — Prometheus collect metric tapi 0 PrometheusRule CRD. Tidak ada yang di-page. Failure baru ketahuan saat customer lapor. | Critical | t_f652d37d IV-1 | **confirmed** | Alertmanager: pod-not-ready >5min, MongoDB RS unhealthy, gRPC error >5%, mem >85%. | 1 day |
+| F3 | INFRA-03 | Architecture / SPOF | **API Gateway single-replica** — satu-satunya entry HTTP/WS, no HPA (VPA only). Crash = outage total semua traffic. | Critical | t_f652d37d I-1 | **confirmed** | HPA min 2 replica. | 1 hr |
+| F4 | INFRA-04 | Architecture / SPOF | **WhatsApp Service single-replica** — Baileys session stateful, tak bisa scale horizontal. Crash = semua sesi WA hilang, butuh re-auth. | Critical | t_f652d37d I-2 | **confirmed** | Session persistence untuk fast recovery; long-term migrasi WA Business API akun non-kritikal. | M |
+| F5 | INFRA-05 | Security / CORS | **CORS wildcard** — `CORS_ORIGINS` unset → `'*'`. Plus env var name mismatch (plural/singular di `.env.example`). Domain manapun bisa authenticated cross-origin. | Critical | `api-gateway/src/main.ts:70-77` + WS gateway | **confirmed** | Default ke domain produksi, fix nama env var. | 30 min |
+| F6 | INFRA-06 | Code Quality / Test | **FE zero test coverage** — 1 test file / 1.777 source, no test runner. Regresi ship diam-diam. | Critical | t_865726e9 | **confirmed** | Vitest + critical-path test (auth, conversation list). Tie C12/QA-01. | 1-2 days |
+| F7 | INFRA-07 | Quality / Test | **BE e2e semua stub** — 18 e2e app test endpoint `/api` yang tak ada. 0% real e2e. False confidence. | Critical | t_1e8f8b8c | **confirmed** | Ganti dgn integration test nyata, mulai auth-service. Tie C12. | 2-3 days |
+| F8 | INFRA-08 | Documentation | **Zero per-service docs** — 0/38 service punya README di arsitektur 19-microservice. Onboarding blocker. | Critical | t_1e8f8b8c | **confirmed** | Template README, mulai conversation-service. | 2-3 days |
+| F9 | INFRA-09 | Documentation | **No CHANGELOG / release process** — tak ada CHANGELOG.md, semver, release notes. | Critical | t_1e8f8b8c | **confirmed** | keepachangelog format, backfill dari git history. | 0.5 day |
+| F10 | INFRA-10 | Security / Infra | **EKS public endpoint** — cluster API internet-accessible, private access disabled. | Critical | t_f652d37d III-4 | **confirmed** | Enable private access, VPN/bastion untuk kubectl. | 1 day |
+
+---
+
+## CONFIRMED — Track G Conversation-Sidebar-Navigation (8 folded dari `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md`)
+
+> Track G sekarang punya satu file tunggal. Fold dilakukan untuk 8 temuan confirmed. Blocking: **CSN-01**. Decision/validation tetap di section bawah agar register tidak memalsukan status.
+
+| # | ID | Domain | Finding | Severity | Evidence | Status | Remediation | Effort |
+|---|---|---|---|---|---|---|---|---|
+| G1 | CSN-01 | Sidebar Navigation / RBAC | FE sidebar memakai `userRole?.name` untuk gate AGENT/SUPERVISOR/ADMIN, padahal enum membandingkan code. SALES agent salah melihat `Unassigned/All`; SUPERVISOR SALES kehilangan tombol create team. | Major | FE `ConversationNavItemDefault.tsx:142,294-295`; BE `role.seed.ts:51-67` | **confirmed** | Ganti check ke `userRole?.code` di dua titik. | S |
+| G2 | CSN-02 | Sidebar Navigation / Counter | Lifecycle invalidation counter tidak lengkap: new message pada conversation existing, perubahan status channel, dan perubahan role tidak dijamin refresh. Tidak ada TTL/polling safety-net. | Major | FE `conversation.service.ts:348-366`; `use-invalidate-conversation.ts:163-173`; BE `conversation.service.ts:1300-1302`; `counter.repository.ts:90-93` | **confirmed** | Pusatkan kontrak invalidation counter + fallback TTL/polling terukur. | M |
+| G3 | CSN-04 | Sidebar Navigation / Counter | Socket handler `conversation.counter` skip diam-diam saat `userId` mismatch/null, tanpa telemetry atau recovery eksplisit. | Low | FE `use-conversation-socket-event.ts:570-589` | **confirmed** | Normalisasi ID, log mismatch aman, lalu refetch/invalidate. | S |
+| G4 | CSN-06 | Sidebar Navigation / Channel | `getActiveChannel` membatasi fetch ke 25 channel sebelum filter ACTIVE, sehingga active channel di luar page pertama bisa hilang. | Medium | BE `conversation.service.ts:2857,2861-2865,2873` | **confirmed** | Filter ACTIVE server-side dan paginate sampai selesai. | S-M |
+| G5 | CSN-07 | Sidebar Navigation / Channel | Pipeline count memakai whitelist platform hardcoded, bukan capability/active-channel company. Platform valid di luar list hilang dari sidebar/count. | Medium | BE `conversation.repository.ts:1969-1988` | **confirmed** | Derive platform set dari active channel/capability company. | M |
+| G6 | CSN-08 | Sidebar Navigation / Channel | Aggregasi channel masih menghitung history dari channel non-active. | Low | BE `conversation.repository.ts:1956` | **confirmed** | Filter dengan active channel IDs bila kontrak hanya channel aktif. | M |
+| G7 | CSN-09 | Team Inbox / Counter Parity | `resolveTeams` memfilter semua non-ADMIN, tetapi `shouldScopeByTeam` hanya AGENT/SUPERVISOR. Re-verifikasi membuktikan ini parity issue, bukan leak row team asing. | Medium | BE `conversation.service.ts:1332-1341,6477`; `buildCountResponse:1233-1287` | **confirmed** | Samakan scope builder dengan `role !== ADMIN` atau shared helper. | S-M |
+| G8 | CSN-12 | Team Inbox / Documentation | Union visibility team (membership ∪ assigned conversation) intentional tetapi belum terdokumentasi dekat contract sidebar/counter. | Low | BE `conversation.service.ts:5555-5582` | **confirmed** | Dokumentasikan rule + tambah satu contract test. | S |
+
+---
+
+## NEEDS-VALIDATION / DECISION — Track G Conversation-Sidebar-Navigation
+
+| # | ID | Domain | Finding | Severity | Source | Status | Validation needed |
+|---|---|---|---|---|---|---|---|
+| G9 | CSN-03 | Sidebar Navigation / Query Parity | Criteria count belum dibuktikan identik dengan criteria list (`assign`, `hideEmpty`, team/channel visibility). | Major | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | **needs-validation** | Trace pipeline final count vs list per role/filter matrix. |
+| G10 | CSN-05 | Sidebar Navigation / Channel Policy | Guard active-channel merge membutuhkan keputusan policy untuk bucket sintetis (`WHATSAPP_WEB_GROUP`, `INSTAGRAM_COMMENT`). | Medium | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | **needs-validation** | Lock policy parent/bucket dengan PM+Tech sebelum patch `has()` guard. |
+| G11 | CSN-10 | Team Inbox / Authorization Coverage | Klaim bypass AGENT via `assign=false` diretract; guard repo ada. Yang belum terbukti: semua entry point list/read memakai guard yang sama. | Medium | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | **needs-validation** | Inventaris semua read path conversation dan trace ke scope builder. |
+| G12 | CSN-11 | Team Inbox / Capability | Hak create-team untuk MANAGER/TEAM_LEAD belum punya requirement kanonik. | Low | `detail-conversation/2026-09-03-sidebar-navigation-synthesis.md` | **needs-validation** | Lock capability matrix FE+BE dengan PM+Tech. |
+
+---
+
+## CONFIRMED — Track H Conversation-List (17 confirmed folded dari `detail-conversation/2026-09-07-conversation-list-deep-audit.md`)
+
+> Track H folded penuh untuk non-clean findings: 17 confirmed di section ini + 1 corrected/closed di section bawah. Blocking: **CLH-02/CLH-03**. Dedup: CLX-03 memperluas CL-01, tetapi mekanisme virtualizer mismatch berbeda; CLX-04 diretract dan tidak di-fold.
+
+| # | ID | Domain | Finding | Severity | Evidence | Status | Remediation | Effort |
+|---|---|---|---|---|---|---|---|---|
+| H1 | CLH-01 | Conversation List / A11y | Mention badge memakai `CLS.MESSAGE_MENTION_BADGE` yang tidak didefinisikan, sehingga styling indikator `@mention` hilang. | Major | `ConversationCard.tsx:464`; Track H CLX-01 | **confirmed** | Tambah konstanta CSS `MESSAGE_MENTION_BADGE`; pastikan type-check menangkap missing token. | S |
+| H2 | CLH-02 | Conversation List / Pagination | `formatData` mengubah panjang array sementara virtualizer memakai `allRows.length`; unread-only bisa blank row / infinite-scroll tidak fetch page berikutnya. | Major | `ConversationChatLists.tsx:87-109`, `InfiniteVirtualContainer.tsx:246-268`; Track H CLX-03 | **confirmed** | Pakai `processedRows.length` konsisten atau pindahkan unread filter ke BE query. | S-M |
+| H3 | CLH-03 | Conversation List / A11y | Virtualized list tidak punya parent `role="list"` dan row `role="listitem"`; screen reader kehilangan struktur/jumlah item. | Major | `ConversationChatLists.tsx:194-210`, `InfiniteVirtualContainer.tsx:246-268`; Track H CLX-15 | **confirmed** | Tambah semantic role di container + row, jaga virtualizer tetap jalan. | S |
+| H4 | CLH-04 | Conversation List / Visual | Unread badge tidak clamp angka/label; angka besar bisa overflow dan SR tidak mendapat angka penuh yang aman. | Medium | Track H CLX-02 | **confirmed** | Clamp visual ke `99+`, simpan angka penuh di `aria-label`. | S |
+| H5 | CLH-05 | Conversation List / Bulk Action | Select-all state sticky setelah refetch/filter berubah; aksi bulk destruktif bisa mengenai item yang tidak sedang dimaksud. | Medium | `conversationBulkAction.store.ts`; Track H CLX-11 | **confirmed** | Reset `isSelectAllActive` saat dataset/filter berubah atau simpan snapshot selection eksplisit. | S |
+| H6 | CLH-06 | Conversation List / Bulk Action | Sebagian bulk action menganggap partial failure sebagai sukses penuh; user tidak tahu item mana gagal. | Medium | `ConversationChatListBulkAction.tsx`; Track H CLX-12 | **confirmed** | Standarkan response partial-success + UI retry/summary. | M |
+| H7 | CLH-07 | Conversation List / Channel | Facebook/Messenger prod fallback ke ikon Live Chat; Telegram belum prod jadi future-risk saja. | Low | `ConversationCard.tsx:112-126`; PM answer 2026-09-07; Track H CLX-05 | **confirmed** | Tambah icon mapping Facebook/Messenger; fallback unknown netral. | S |
+| H8 | CLH-08 | Conversation List / Content Preview | Email/content preview bisa menampilkan markup mentah bila ingestion tidak selalu plain-text. | Low | Track H CLX-06 | **confirmed** | Pastikan preview memakai plain-text sanitized field atau stripper sebelum render. | S |
+| H9 | CLH-09 | Conversation List / Avatar | Avatar initial fallback kurang stabil/kurang jelas untuk nama kosong/duplikat. | Low | Track H CLX-07 | **confirmed** | Fallback ke channel/contact identifier yang deterministic. | S |
+| H10 | CLH-10 | Conversation List / Component Drift | `TagList` dan dokumentasi/usage drift; risiko behavior beda antar consumer. | Low | Track H CLX-08 | **confirmed** | Rapikan contract `TagList` dan usage list. | S |
+| H11 | CLH-11 | Conversation List / SLA | SLA ticker tetap berjalan untuk closed conversation; re-render tidak perlu di list. | Low | Track H CLX-09 | **confirmed** | Stop/turunkan ticker untuk status closed/non-active. | S |
+| H12 | CLH-12 | Conversation List / Filter State | Advanced-filter store memakai `persist` kosong (`partialize: () => ({})`), membuat kebijakan persist filter tidak konsisten dengan filter store lain. | Low | `conversationAdvancedFilter.store.ts`; Track H CLX-13 | **confirmed** | Dokumentasikan no-op persist atau hapus persist wrapper; pilih satu policy filter state. | S |
+| H13 | CLH-13 | Conversation List / Keyboard | Row bisa Enter/Space, tapi belum ada ArrowUp/ArrowDown traversal cepat untuk list padat. | Low | `ConversationCard.tsx`; Track H CLX-17 | **confirmed** | Tambah roving focus/arrow navigation di list. | M |
+| H14 | CLH-14 | Conversation List / i18n | String aksesibilitas/aria masih hardcoded, tidak lewat `next-intl`. | Low | Track H CLX-18 | **confirmed** | Pindahkan aria/user-visible helper string ke translation key. | S |
+| H15 | CLH-15 | Conversation List / Realtime UX | Refresh banner tidak auto-hide / tidak punya expiry; bisa menetap dan mengganggu alur. | Low | `ConversationRefreshNotification.tsx`; Track H CLX-20 | **confirmed** | Auto-hide setelah refresh/success atau TTL singkat. | S |
+| H16 | CLH-16 | Shared UI / Error State | `InfiniteVirtualContainer` error branch tidak menerima `noDataError`/custom retry UI; empty-state bisa custom, error-state tidak. | Low | `InfiniteVirtualContainer.tsx:67-76,208-214`; Track H CLX-23 | **confirmed** | Tambah `errorElement` atau teruskan placeholder custom ke error branch. | S |
+| H17 | CLH-17 | Conversation List / Realtime | Invalidation socket pada chat-list memicu refetch berulang tanpa debounce; TanStack Query dedupe fetch in-flight, jadi risikonya network churn/noise, bukan thundering herd tak terbatas. | Low | `use-invalidate-conversation.ts`; Track H CLX-19 re-verified 2026-09-07 | **confirmed** | Debounce/gabung invalidation list+counter pada burst event pendek (±250–500ms). | S |
+
+---
+
+## NEEDS-VALIDATION — Track H Conversation-List
+
+| # | ID | Domain | Finding | Severity | Source | Status | Validation needed |
+|---|---|---|---|---|---|---|---|
+| H18 | CLH-18 | Conversation List / RBAC | Bulk-action visibility/permission gating di FE tidak konsisten dengan permission matrix, tetapi enforcement server-side sudah terbukti sehingga ini bukan authz bypass. | Low | Track H CLX-21 + BE `conversation.controller.ts:147,714,741,768,795,822,851,879,905` | **closed/corrected** | Tidak perlu validasi RBAC lagi; bila mau ditindaklanjuti, pindahkan sebagai UX visibility consistency backlog FE. |
 
 ---
 
@@ -144,6 +211,57 @@
 
 ---
 
+## INFERENCE — Track I Conversation-Room PRD-conformance (folded dari `detail-conversation/2026-09-07-conversation-room-deep-audit.md`)
+
+> PRD-conformance audit Room V2 (Rev 2, reviewer gate `ok`). Status `inference` = temuan dokumen/PRD, belum verifikasi kode. Cluster Catastrophe **ROOM-01/02/03 TIDAK jadi ID baru** — dedup sebagai evidence room-specific ke existing **F-01/F-02/V2** (anti double-count). Owner: Dany (PRD) + Naftal (impl).
+> **Linked-only (bukan ID baru):** ROOM-01→F-01/V2 (status/reopen cluster), ROOM-02→F-02 (reopen 3 def), ROOM-03→F-01 (SLA 3-way), ROOM-05/06→V8/P-01/P-02 (perf), ROOM-07/22→FS-02/P-05 (socket/event), ROOM-13→cluster reminder Track D. Dicatat sebagai evidence room-specific, BUKAN ID baru (anti double-count).
+
+| # | ID | Domain | Finding | Severity | Evidence | Status | Decision | Remediation/Note |
+|---|---|---|---|---|---|---|---|---|
+| 1 | CRM-01 | Attachment | Room PRD kontradiktif: attachment max 100MB vs 15MB di file yang sama. | Major | `ROOM-04` (room audit 2026-09-07) | inference | Revise | Room-specific contradiction, bukan overlap. |
+| 2 | CRM-02 | Status indicator | Delivery/read status bisa difabrikasi di channel yang tak dukung status. | Major | `ROOM-09` (room audit 2026-09-07) | inference | Proceed w/ cond | Butuh channel capability matrix. |
+| 3 | CRM-03 | Composer | Auto-retry butuh idempotency key stabil agar tak dobel-send. | Major | `ROOM-10` (room audit 2026-09-07) | inference | Proceed w/ cond | Link tempMessageId existing. |
+| 4 | CRM-04 | RBAC/composer | Collaborator/reassignment race butuh submit-time permission check. | Major | `ROOM-11` (room audit 2026-09-07) | inference | Hold validation | Room-specific authz gap. |
+| 5 | CRM-05 | Collaborator | Collaborator role dijanjikan PRD tapi belum dibangun. | Major | `ROOM-12` (room audit 2026-09-07) | inference | Split | Undeveloped feature. |
+| 6 | CRM-06 | Hold/Resume | Hold/Resume header/list state belum dibangun. | Major | `ROOM-14` (room audit 2026-09-07) | inference | Split | Depends F-01 (ROOM-03). |
+| 7 | CRM-07 | WA group | Group room butuh send-as/quoted/system-message rules. | Major | `ROOM-17` (room audit 2026-09-07) | inference | Split | Cross-channel journey. |
+| 8 | CRM-08 | Security/notes | Boundary leakage private-note belum diaudit (customer-visible?). | Major | `ROOM-18` (room audit 2026-09-07) | inference | Hold validation | Multi-tenant notes sweep. |
+| 9 | CRM-09 | Accessibility | Klaim WCAG AA tanpa kriteria acceptance konkret utk room. | Major | `ROOM-19` (room audit 2026-09-07) | inference | Revise | Room-specific, terpisah dari list a11y (CLH-03). |
+| 10 | CRM-10 | Assignment | Assignment workflow room tak lengkap vs Detail/Permission/Sessions. | Major | `ROOM-23` (room audit 2026-09-07) | inference | Revise | Ownership model. |
+| 11 | CRM-11 | API contract | Message content capability matrix kanonik tak ada. | Major | `ROOM-24` (room audit 2026-09-07) | inference | Revise | Channel capability matrix. |
+| 12 | CRM-12 | Bot/SLA | Auto-reply bot bubble harus diekslusi dari SLA/agent metric. | Major | `ROOM-26` (room audit 2026-09-07) | inference | Split | Future auto-reply dependency. |
+| 13 | CRM-13 | Closed state | Closed immutable room butuh read-only/reopen composer state. | Major | `ROOM-27` (room audit 2026-09-07) | inference | Revise | State machine (⇄ CRX-03). |
+| 14 | CRM-14 | PII | Masking PII header room tak selaras masking list. | Major | `ROOM-32` (room audit 2026-09-07) | inference | Hold validation | Security/RBAC sweep. |
+| 15 | CRM-15 | Attachment security | Kontrak download/upload security attachment tak lengkap (scan/filename/PII). | Major | `ROOM-34` (room audit 2026-09-07) | inference | Hold validation | Media-service audit (⇄ CRX-15). |
+
+---
+
+## CONFIRMED/NEEDS-VALIDATION — Track J Conversation-Room product-reality (folded dari `detail-conversation/2026-09-07-conversation-room-product-reality-audit.md`)
+
+> Product-reality audit (reviewer gate `ok`): produk aktual FE/BE + memory + heuristik, BUKAN PRD-conformance. `confirmed` = code-verified via spot-check orchestrator (3 finding) + reviewer (6 finding); `needs-validation` = klaim security/runtime belum diuji (no load/axe/pentest). Blocking: **CRX-03** (state drift, confirmed) + **CRX-05/CRX-12** (send/join authz, needs-validation). Cross-ref objek bersama dgn Track I ada di tabel 🔗 Objek Bersama di kepala kedua file audit.
+> **Linked-only / positive (bukan ID baru):** ROOMX-04→ROOM-21 (empty state), ROOMX-08→F-07 (raw error leak, room evidence), ROOMX-16→ROOM-21 (degraded states). Dicatat evidence, bukan ID baru. ROOMX-18 (positive email BSON cap) → kontrol positif, bukan defect.
+
+| # | ID | Domain | Finding | Severity | Evidence | Status | Decision | Remediation/Note |
+|---|---|---|---|---|---|---|---|---|
+| 1 | CRX-01 | Performance | Timeline pakai react-infinite-scroll-component + .map semua item; tak ada virtualization. DOM tumbuh O(N). | Major | `ROOMX-01` (room audit 2026-09-07) | confirmed | Revise | Evidence kode baru; konsep overlap ROOM-05/06 (dicatat). |
+| 2 | CRX-02 | State/realtime | Message state duplikat di React-Query + Zustand + localStorage + socket queue; sumber kebenaran ganda. | Major | `ROOMX-02` (room audit 2026-09-07) | confirmed | Revise | Implementation-only; no PRD dup. |
+| 3 | CRX-03 | State machine | FE disable composer pakai status `'close'` sedangkan memory/data-model `'closed'` → drift; composer bisa aktif di room terminal. | Catastrophe | `ROOMX-03` (room audit 2026-09-07) | confirmed | Revise | Code drift confirmed (⇄ CRM-13/ROOM-27). |
+| 4 | CRX-04 | Accessibility | ARIA footprint di folder room hampir nol; icon-only button tanpa label. | Major | `ROOMX-05` (room audit 2026-09-07) | confirmed | Hold | Evidence kode kuat (⇄ CRM-09/ROOM-19). |
+| 5 | CRX-05 | Security/send | Outbound send authz tak terlihat di socket/service boundary. | Catastrophe | `ROOMX-07` (room audit 2026-09-07) | needs-validation | Hold | Actual-path evidence (⇄ ROOM-11/CRM-04). |
+| 6 | CRX-06 | PII | Header identity tanpa masking room-level padahal bubble mask. | Major | `ROOMX-09` (room audit 2026-09-07) | needs-validation | Hold validation | Code-specific (⇄ CRM-14/ROOM-32). |
+| 7 | CRX-07 | Composer | Enter-send abaikan IME composition guard → kirim prematur di input CJK/IME. | Medium | `ROOMX-11` (room audit 2026-09-07) | confirmed | Proceed w/ cond | Implementation-only UX. |
+| 8 | CRX-08 | Macro/a11y | Macro autocomplete tanpa listbox/option semantics. | Medium | `ROOMX-12` (room audit 2026-09-07) | confirmed | Revise | Room actual a11y. |
+| 9 | CRX-09 | Re-render | Bubble memo comparator abaikan prop render-affecting (pin/delete/edit/action-disabled) → UI stale. | Major | `ROOMX-13` (room audit 2026-09-07) | confirmed | Revise | Implementation-only. |
+| 10 | CRX-10 | State/memory | bubleRefsMap mutasi Zustand in-place, refs null/stale tak di-clear saat pindah room. | Medium | `ROOMX-14` (room audit 2026-09-07) | confirmed | Revise | Implementation-only. |
+| 11 | CRX-11 | Attachment | Download fallback pakai copy hardcoded + navigasi URL asli; bisa bypass signed-media path. | Major | `ROOMX-15` (room audit 2026-09-07) | needs-validation | Hold validation | Code evidence (⇄ CRM-15/ROOM-34). |
+| 12 | CRX-12 | Security/socket | Join room by id tanpa object-authorization terlihat di handler; klien authenticated bisa join room mana pun. | Catastrophe | `ROOMX-19` (room audit 2026-09-07) | needs-validation | Hold | Critical actual-code; needs-validation (⇄ ROOM-18/32). |
+| 13 | CRX-13 | Read path | Repository filter message tak menampakkan tenant/user scope di path yang diperiksa. | Major | `ROOMX-20` (room audit 2026-09-07) | needs-validation | Hold validation | Related read/search auth (⇄ ROOM-31/32). |
+| 14 | CRX-14 | UI perf | useIsFetching predikat luas bisa flicker header/input lintas query room/detail. | Low | `ROOMX-21` (room audit 2026-09-07) | inference | Proceed w/ cond | Implementation-only polish. |
+| 15 | CRX-15 | Quality gate | FE tanpa automated test padahal room sangat stateful; regresi lolos diam. | Major | `ROOMX-24` (room audit 2026-09-07) | confirmed | Revise | Tie C12/QA-01/INFRA-06 (quality-gate cluster). |
+| 16 | CRX-16 | No-session UX | No-session CTA hardcode path WhatsApp-Web; misroute user non-WA/WA-API. | Medium | `ROOMX-25` (room audit 2026-09-07) | needs-validation | Proceed w/ cond | Actual UX unless WA-only. |
+
+---
+
 ## CORRECTED
 
 | # | ID | Finding lama | Koreksi | Bukti koreksi |
@@ -159,10 +277,14 @@
 | ID(s) | Severity | Decision | Alasan |
 |---|---|---|---|
 | DI-01, DI-04, SEC-01, SEC-02, SEC-04, INT-03, F-07 | Major | **PROCEED** | Bug code-verified — langsung remediation, tak butuh keputusan bisnis |
-| ENV-01 | Major | **HOLD_FEATURE** | Blocker: lock branch target dulu sebelum ticketing confirmed items |
+| ENV-01 | Major | **CLOSED** | Target operasional sudah dikunci oleh PM: `prod-2.8.1`; memory FE/BE jadi patokan utama |
 | F-01, F-02 (V1, V2) | Catastrophe | **REVISE_PRD** | PRD saling bertentangan — butuh lock policy PM+Eng |
 | F-03, F-04, F-05, SLA-mode (V3-V6) | Major | **HOLD_FEATURE** | Keputusan bisnis SLA belum diambil |
-| C1-C15 (non-prioritas) | Major/Medium | **PROCEED** | Fix code-verified, backlog biasa |
+| C1-C16 + CSN-01..02 + CSN-04 + CSN-06..09 + CSN-12 + CLH-01..16 | Major/Medium/Low | **PROCEED** | Fix code-verified, backlog biasa |
+| CRX-03 | Catastrophe | **PROCEED** | Code drift `'close'` vs `'closed'` confirmed — patch shared status helper, quick fix |
+| CRX-05, CRX-12 | Catastrophe | **HOLD_FEATURE** | Object-authz socket send/join — validasi WsAuthGuard + negative test dulu sebelum ticket |
+| CRX-01, CRX-02, CRX-09, CRX-10, CRX-15 | Major/Medium | **PROCEED** | Code-verified engineering debt (virtualization, state coupling, memo, refs, test) |
+| CRM-01..15 | Major | **REVISE_PRD / SPLIT** per kolom Decision | Temuan dokumen — masuk backlog PRD revision, bukan ticket engineering langsung |
 
 ---
 
@@ -170,21 +292,27 @@
 
 | Status | Jumlah |
 |---|---|
-| Confirmed (prioritas) | 8 |
+| Confirmed (prioritas) | 7 |
 | Confirmed (kontrol positif) | 10 |
 | Confirmed (non-prioritas) | 16 |
-| Confirmed (Track G infra Critical) | 10 |
-| Needs-validation | 25 |
-| Corrected | 1 |
-| Closed (dup) | 1 |
-| **Total** | **71** |
+| Confirmed (Track F infra Critical) | 10 |
+| Confirmed (Track G sidebar-navigation) | 8 |
+| Confirmed (Track H conversation-list) | 17 |
+| Confirmed (Track J room product-reality) | 9 |
+| Inference (Track I room PRD) | 15 |
+| Inference (Track J room product-reality) | 1 |
+| Needs-validation | 35 |
+| Corrected | 2 |
+| Closed (dup/operational) | 2 |
+| **Total** | **132** |
 
 ---
 
 ## Catatan Eksekusi
 
-1. **Item 1-7 (confirmed prioritas)** = langsung jadi ticket engineering. Tidak butuh keputusan PM — bukti kode sudah cukup. **Tapi ENV-01 (item 8) blocker:** lock branch target dulu sebelum item 1-7 jadi ticket.
+1. **Item 1-7 (confirmed prioritas)** = langsung jadi ticket engineering. Tidak butuh keputusan PM — bukti kode sudah cukup. **ENV-01 sudah di-resolve operasional:** branch kerja sekarang `prod-2.8.1`; memory FE/BE tetap patokan utama bila dokumen lama menyebut 2.7.x/2.8.0.
 2. **Item V1-V6 (Catastrophe + SLA decisions)** = butuh **decision meeting PM+Eng** sebelum bisa jadi ticket. Ini bukan bug — ini keputusan bisnis yang belum diambil.
-3. **Item V8-V26 (needs-validation)** = butuh verifikasi kode/metric sebelum jadi keputusan. Sebagian bisa divalidasi dengan grep cepat, sebagian butuh load test.
+3. **Item V1-V6, V8-V26, CSN-03/05/10/11 (needs-validation / decision)** = butuh verifikasi kode/metric atau keputusan PM+Eng sebelum jadi ticket final. **CLH-17** sudah confirmed Low dan masuk backlog engineering; **CLH-18** closed/corrected, bukan ticket.
 4. **FS-05 (corrected)** = jangan masuk backlog. DLQ sudah ada. Tapi `retryTracker` in-memory = temuan lanjutan (state hilang antar-restart).
-5. **Branch:** repo lokal = `prod-2.7.0`. Memory = `v2.8.0` (dev branch). Temuan confirmed = status prod-2.7.0. Fitur v2.8.0 belum terverifikasi.
+5. **Branch:** target operasional sekarang `prod-2.8.1`; memory FE/BE adalah patokan utama. Dokumen lama yang menyebut `prod-2.7.0`/`v2.8.0` dianggap baseline historis.
+6. **Track I/J Conversation Room:** kerjakan per **objek bersama**, bukan per file. Buka cross-ref dua arah di kedua audit. CRM = PRD/contract work; CRX = code/runtime work. Jangan buat dua ticket untuk pasangan CRM⇄CRX yang satu objek; satu work package, dua acceptance layer.

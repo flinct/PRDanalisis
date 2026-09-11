@@ -5,13 +5,13 @@
 > - **Track D** — FE UX flow (first-time + returning user + interconnection Conversation↔Ticket↔Setting) — 41 finding.
 >
 > **Owner:** Dany Christian (PM) · **Eng Lead:** Naftal Yunior · **Tanggal:** 2026-09-02
-> **Repo:** BE `omnichannel-satuinbox-be`, FE `omnichannel-satuinbox-fe` (baseline `prod-2.7.0` / `prod-2.7.0-11`)
+> **Repo:** BE `omnichannel-satuinbox-be`, FE `omnichannel-satuinbox-fe`; branch operasional sekarang `prod-2.8.1`, memory FE/BE patokan utama.
 >
 > **Source detail (file:line penuh) diarsip di `_source/`:**
 > Track E: `conversation-functional-business-logic.md`, `2026-09-02-conversation-data-model-api-contract-audit.md`, `2026-09-02-conversation-security-perf-audit.md`.
 > Track D: `2026-09-02-conversation-first-time-user-flow-audit.md`, `2026-09-02-satuinbox-audit-2-conversation-returning-user-flow.md`.
 >
-> **Belum di-fold ke `core/audit-master-register.md`** — gate: ENV-01 branch-lock + dedup lintas-track (lihat `core/audit-review-and-reading-list.md` §4).
+> **Belum di-fold ke `01-audit-master-register.md`** — gate: dedup lintas-track (lihat `02-reading-list-and-conflicts.md` §4).
 
 ---
 
