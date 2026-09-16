@@ -5465,7 +5465,7 @@
 .rm-wrap .rules-area{flex-wrap:wrap}
 /* §80-116 timeline cells: drag affordance + empty-cell hint on hover */
 .rm-cell{cursor:pointer;user-select:none;position:relative}
-.rm-expand{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:10px;padding:0 3px 0 0;line-height:1}
+.rm-expand{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;padding:4px 5px;line-height:1;min-width:22px;min-height:22px;display:inline-flex;align-items:center;justify-content:center}
 .rm-expand:hover{color:var(--accent)}
 .rm-exp-row td{background:var(--elevated-1);padding:0 !important}
 .rm-exp{display:flex;gap:22px;padding:12px 16px;flex-wrap:wrap}
@@ -5574,7 +5574,7 @@
 .rm-ph{color:var(--text-4);font-style:italic}
 .rm-input{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-1);border:1px solid var(--accent-primary);border-radius:5px;padding:3px 6px;font-size:11px;font-family:inherit;outline:none;resize:vertical}
 .task-table td.num{white-space:nowrap}
-.rm-del{visibility:hidden;margin-left:4px;background:none;border:none;color:var(--accent-danger);font-size:14px;line-height:1;cursor:pointer;padding:0 2px}
+.rm-del{visibility:hidden;margin-left:9px;background:none;border:none;color:var(--accent-danger);font-size:14px;line-height:1;cursor:pointer;padding:0 2px}
 .task-table tbody tr:hover .rm-del{visibility:visible}
 /* flex column: KPI fixed at top, table-panel scrolls, footer fixed at bottom */
 .rm-flexroot{display:flex;flex-direction:column;min-height:0;flex:1}
@@ -6621,7 +6621,8 @@
                             </td>
                           </tr>
                           {g.rows.map((t) => (
-                            <tr key={t.id} data-tid={t.id} data-group={g.section}
+                            <React.Fragment key={t.id}>
+                            <tr data-tid={t.id} data-group={g.section}
                               onMouseEnter={() => depList(t).length && setHotId(t.id)}
                               onMouseLeave={() => setHotId((h) => (h === t.id ? null : h))}>
                               <td className="num sl">
@@ -6633,7 +6634,7 @@
                                 >
                                   {expandedId === t.id ? "▾" : "▸"}
                                 </button>
-                                <span className="rm-rank">{t.rank}</span>
+                                <span className="rm-rank" onClick={() => setExpandedId((e) => (e === t.id ? null : t.id))} style={{cursor:"pointer"}}>{t.rank}</span>
                                 <button
                                   type="button"
                                   className="rm-del"
@@ -6834,12 +6835,11 @@
                                 ></div>
                               </td>
                             </tr>
-                          ))}
-                          {g.rows.filter((t) => expandedId === t.id).map((t) => {
-                            const wp = wpCache[t.opId];
-                            const sch = t.schedule;
-                            return (
-                              <tr key={t.id + "_exp"} className="rm-exp-row">
+                            {expandedId === t.id && (() => {
+                              const wp = wpCache[t.opId];
+                              const sch = t.schedule;
+                              return (
+                              <tr className="rm-exp-row">
                                 <td colSpan={RM_COLSPAN}>
                                   <div className="rm-exp">
                                     <div className="rm-exp-col">
@@ -6888,8 +6888,10 @@
                                   </div>
                                 </td>
                               </tr>
-                            );
-                          })}
+                              );
+                            })()}
+                            </React.Fragment>
+                          ))}
                         </React.Fragment>
                       ))}
                     </tbody>
