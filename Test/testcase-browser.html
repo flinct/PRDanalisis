@@ -5484,6 +5484,16 @@
 .rm-exp-op-actions a{font-size:11px;color:var(--accent)}
 .rm-exp-op-status{font-size:11px;color:var(--text-3)}
 .rm-exp-op-status.err{color:var(--priority-p1-fg,#e57)}
+/* OP search: dropdown below the input */
+.op-search-wrap{position:relative}
+.op-search-input{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:4px;padding:3px 5px;font-size:11px;outline:none}
+.op-search-input:focus{border-color:var(--accent-primary)}
+.op-search-dd{position:absolute;top:calc(100% + 2px);left:0;right:0;z-index:60;max-height:220px;overflow:auto;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.5);padding:4px}
+.op-search-item{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.op-search-item:hover,.op-search-item.hl{background:var(--hover-bg)}
+.op-search-id{font-weight:700;color:var(--accent-secondary);flex-shrink:0}
+.op-search-subj{overflow:hidden;text-overflow:ellipsis}
+.op-search-hint{padding:4px 7px;font-size:10px;color:var(--text-4)}
 .rm-cell:hover .bar{outline:1px dashed var(--border-2);outline-offset:1px;min-height:8px}
 .task-table th.wk{width:17px;min-width:17px;text-align:center;padding:5px 1px;font-size:11px;font-weight:500;color:var(--text-5);border-left:1px solid var(--border-3)}
 .task-table td.wk{width:17px;min-width:17px;padding:7px 1px;text-align:center;border-left:1px solid var(--border-3)}
@@ -5878,6 +5888,79 @@
                 ))}
               </div>,
               document.body
+            )}
+          </div>
+        );
+      }
+
+      /* OP search: async search OpenProject work packages by title or ID */
+      function OpSearch({ value, onSelect }) {
+        const [q, setQ] = React.useState("");
+        const [results, setResults] = React.useState(null);
+        const [open, setOpen] = React.useState(false);
+        const [hl, setHl] = React.useState(0);
+        const timer = React.useRef(null);
+        const wrapRef = React.useRef(null);
+
+        React.useEffect(() => {
+          if (!q.trim()) { setResults(null); return; }
+          clearTimeout(timer.current);
+          timer.current = setTimeout(async () => {
+            try {
+              const rs = await fetch(`/api/dashboard/openproject/search?q=${encodeURIComponent(q.trim())}`);
+              const j = await rs.json();
+              if (j.ok) { setResults(j.results); setOpen(true); setHl(0); }
+            } catch {}
+          }, 300);
+          return () => clearTimeout(timer.current);
+        }, [q]);
+
+        // close on outside click
+        React.useEffect(() => {
+          if (!open) return;
+          const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+          document.addEventListener("mousedown", handler);
+          return () => document.removeEventListener("mousedown", handler);
+        }, [open]);
+
+        const pick = (r) => {
+          onSelect(String(r.id));
+          setQ("");
+          setOpen(false);
+          setResults(null);
+        };
+
+        const keyHandler = (e) => {
+          if (!results || !open) return;
+          if (e.key === "ArrowDown") { e.preventDefault(); setHl((h) => Math.min(h + 1, results.length - 1)); }
+          else if (e.key === "ArrowUp") { e.preventDefault(); setHl((h) => Math.max(h - 1, 0)); }
+          else if (e.key === "Enter" && results[hl]) { e.preventDefault(); pick(results[hl]); }
+          else if (e.key === "Escape") { setOpen(false); }
+        };
+
+        return (
+          <div className="op-search-wrap" ref={wrapRef}>
+            <input
+              className="op-search-input"
+              type="text"
+              placeholder="Search by title or WP ID…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onFocus={() => results && results.length && setOpen(true)}
+              onKeyDown={keyHandler}
+            />
+            {open && results && (
+              <div className="op-search-dd">
+                {results.length === 0 && <div className="op-search-hint">No results</div>}
+                {results.map((r, i) => (
+                  <div key={r.id} className={"op-search-item" + (i === hl ? " hl" : "")}
+                    onMouseDown={(e) => { e.preventDefault(); pick(r); }}
+                    onMouseEnter={() => setHl(i)}>
+                    <span className="op-search-id">#{r.id}</span>
+                    <span className="op-search-subj">{r.subject}</span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         );
@@ -6865,9 +6948,11 @@
                                     <div className="rm-exp-col">
                                       <h5>OpenProject</h5>
                                       <label className="rm-exp-field">
-                                        <span>WP&nbsp;ID</span>
-                                        <input type="text" value={t.opId || ""} placeholder="e.g. 1234"
-                                          onChange={(e) => updateTask(t.id, { opId: e.target.value.trim() })} />
+                                        <span>WP</span>
+                                        <div style={{flex:1}}>
+                                          <OpSearch value={t.opId || ""} onSelect={(id) => updateTask(t.id, { opId: id })} />
+                                          {t.opId && <div style={{fontSize:10,color:"var(--text-4)",marginTop:2}}>Linked: #{t.opId}</div>}
+                                        </div>
                                       </label>
                                       <div className="rm-exp-op-actions">
                                         <button type="button" disabled={!t.opId} onClick={() => fetchWp(t.opId)}>Sync status</button>

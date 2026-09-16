@@ -843,6 +843,37 @@ app.get("/api/dashboard/openproject/work-package/:id", async (req, res) => {
   }
 });
 
+// Search work packages by title (subject) or numeric ID.
+app.get("/api/dashboard/openproject/search", async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim();
+    if (!q) return res.json({ ok: true, results: [] });
+    const projectId = toIntOrNull(req.query.projectId) || 7;
+    let results;
+    if (/^\d+$/.test(q)) {
+      try {
+        const wp = await openProjectRequest(`/api/v3/work_packages/${q}`);
+        results = [normalizeWorkPackage(wp)];
+      } catch { results = []; }
+    } else {
+      const filters = JSON.stringify([
+        { project: { operator: "=", values: [String(projectId)] } },
+        { subject: { operator: "~", values: [q] } },
+      ]);
+      const sort = JSON.stringify([["updatedAt", "desc"]]);
+      const data = await openProjectRequest(
+        `/api/v3/work_packages?pageSize=15&filters=${encodeURIComponent(filters)}&sortBy=${encodeURIComponent(sort)}`
+      );
+      results = Array.isArray(data._embedded?.elements)
+        ? data._embedded.elements.map(normalizeWorkPackage)
+        : [];
+    }
+    res.json({ ok: true, results });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ─── API: GOOGLE (OAuth login) + DOCS + MIRROR ───────────────────────────────
 const gdocs = require("./scripts/gdocs.js");
 const gauth = require("./scripts/google-auth.js");
