@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversation Page Redesign — Role-aware Prototype</title>
+<style>
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --ink:#1a1d21; --muted:#6b7280;
+  --border:#e5e7eb; --accent:#2563eb; --accent-ink:#fff;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+  --ok-bg:#dcfce7; --warn-bg:#fef3c7; --danger-bg:#fee2e2;
+  --nav:#111827; --sidenav:#f9fafb; --radius:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --open-ms:200ms; --close-ms:150ms; --ease:cubic-bezier(0.2,0,0,1);
+}
+.wire{ --bg:#e8e8e8;--card:#fff;--ink:#333;--muted:#888;--border:#bbb;--accent:#666;
+  --ok:#666;--warn:#666;--danger:#444;--ok-bg:#eee;--warn-bg:#eee;--danger-bg:#e0e0e0;
+  --nav:#555;--sidenav:#f0f0f0;--shadow:none; }
+.wire .panel,.wire .card{ outline:1px dashed #999; }
+.wire *{ font-family:"Comic Sans MS","Segoe Print",var(--font)!important; }
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;padding:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.hide{display:none!important}
+
+/* ── control panel ── */
+#tweaks{position:sticky;top:0;z-index:300;background:var(--nav);color:#fff;padding:9px 12px;
+  border-radius:var(--radius);margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:8px 16px;font-family:var(--font)}
+#tweaks .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#tweaks .lab{font-size:10px;letter-spacing:.05em;opacity:.6;text-transform:uppercase;width:64px;flex:0 0 64px}
+#tweaks button{background:#374151;color:#fff;border:1px solid #4b5563;border-radius:5px;
+  padding:4px 9px;font-size:11px;cursor:pointer;font-family:var(--font)}
+#tweaks button.on{background:var(--accent);border-color:var(--accent)}
+.wire #tweaks button.on{background:#2563eb;border-color:#2563eb}
+
+/* ── shell ── */
+#stage{display:flex;justify-content:center}
+#app{display:flex;position:relative;height:720px;width:1280px;background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);
+  transition:width var(--open-ms) var(--ease)}
+#app.vp1440{width:1440px}
+.vp-label{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* ── app nav rail ── */
+.nav{width:64px;flex:0 0 64px;background:var(--nav);display:flex;flex-direction:column;
+  align-items:center;padding:12px 0;gap:6px}
+.nav .logo{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-weight:700;margin-bottom:8px}
+.nav .ico{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:#9ca3af;font-size:17px;cursor:pointer}
+.nav .ico.active{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── conversation sidenav (RESTORED) ── */
+.sidenav{flex:0 0 200px;width:200px;background:var(--sidenav);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;transition:flex-basis var(--open-ms) var(--ease),width var(--open-ms) var(--ease)}
+#app.sidenavCollapsed .sidenav{flex-basis:56px;width:56px;position:relative;z-index:30}
+/* peek: collapsed sidenav expands (flex-basis grows, negative margin keeps net 56px → overlays list, no reflow).
+   .peek is applied by JS: hover-mode on mouseenter, click-mode on the collapse-icon click. */
+#app.sidenavCollapsed .sidenav.peek{flex-basis:200px;width:200px;margin-right:-144px;box-shadow:2px 0 12px rgba(0,0,0,.18)}
+#app.sidenavCollapsed .sidenav.peek .sn-title,#app.sidenavCollapsed .sidenav.peek .txt,
+#app.sidenavCollapsed .sidenav.peek .sn-disc .chev,#app.sidenavCollapsed .sidenav.peek .sn-disc .dotind,
+#app.sidenavCollapsed .sidenav.peek .sn-add,#app.sidenavCollapsed .sidenav.peek .sn-disc span:not(.ic),
+#app.sidenavCollapsed .sidenav.peek .sn-div{display:revert}
+#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{display:flex}
+#app.sidenavCollapsed .sidenav.peek .sn-sub,#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{padding-left:8px}
+#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{padding-left:20px}
+#app.sidenavCollapsed .sidenav.peek .sn-item,#app.sidenavCollapsed .sidenav.peek .sn-disc{justify-content:flex-start;padding:7px 12px}
+#app.sidenavCollapsed .sidenav.peek .sn-disc{cursor:pointer}
+#app.sidenavCollapsed .sidenav.peek .sn-item .cnt{position:static;min-width:18px;height:auto;font-size:11px;line-height:normal;box-shadow:none;margin-left:0}
+#app.sidenavCollapsed .sidenav.peek .sn-group:has(.sn-item.active) .sn-disc{color:var(--muted)}
+.sn-head{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border-bottom:1px solid var(--border)}
+.sn-title{font-size:14px;font-weight:600}
+.sn-collapse{width:26px;height:26px;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:5px;font-size:15px}
+.sn-collapse:hover{background:var(--border)}
+.sn-group{padding:8px 0}
+.sn-glabel{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 12px 3px;font-weight:600}
+.sn-item{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;font-size:13px;position:relative;color:var(--ink)}
+.sn-item:hover{background:var(--border)}
+.sn-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.sn-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.sn-item .ic{width:18px;flex:0 0 18px;text-align:center;font-size:14px}
+.sn-item .txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-item .cnt{font-size:11px;background:var(--border);color:var(--ink);border-radius:9px;padding:0 6px;min-width:18px;text-align:center}
+.sn-item.active .cnt{background:var(--accent);color:#fff}
+.sn-disc{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;width:100%;border:none;background:none;text-align:left;font-family:inherit}
+.sn-disc:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:5px}
+.sn-disc .chev{margin-left:auto;transition:transform .15s}
+.sn-disc.open .chev{transform:rotate(90deg)}
+.sn-disc .dotind{color:var(--accent);font-size:16px;line-height:1;display:none}
+/* active-child indicator only when section collapsed */
+.sn-group:has(.sn-item.active) > .sn-disc:not(.open) .dotind{display:inline;margin-left:auto}
+.sn-group:has(.sn-item.active) > .sn-disc:not(.open) .chev{margin-left:6px}
+.sn-add{margin-left:6px;color:var(--muted);font-size:14px;cursor:pointer;border-radius:4px;padding:0 3px}
+.sn-add:hover{background:var(--border);color:var(--accent)}
+.sn-div{height:1px;background:var(--border);margin:6px 12px}
+.sn-sub{padding-left:8px}
+.sn-sub .sn-item{padding-left:20px;font-size:12px}
+/* collapsed sidenav: one icon per section + tooltip (spec §12) */
+#app.sidenavCollapsed .sn-title,#app.sidenavCollapsed .txt,
+#app.sidenavCollapsed .sn-glabel,#app.sidenavCollapsed .sn-disc .chev,
+#app.sidenavCollapsed .sn-disc .dotind,#app.sidenavCollapsed .sn-add,
+#app.sidenavCollapsed .sn-disc span:not(.ic),
+#app.sidenavCollapsed .sn-div{display:none}
+/* keep only the ACTIVE child visible as an icon (with its counter); hide the rest */
+#app.sidenavCollapsed .sn-sub .sn-item:not(.active){display:none}
+#app.sidenavCollapsed .sn-sub{padding-left:0}
+#app.sidenavCollapsed .sn-sub .sn-item{padding-left:0}
+#app.sidenavCollapsed .sn-item,#app.sidenavCollapsed .sn-disc{justify-content:center;padding:9px 0}
+#app.sidenavCollapsed .sn-disc{cursor:default}
+/* collapsed section with an active child → tint the section icon */
+#app.sidenavCollapsed .sn-group:has(.sn-item.active) .sn-disc{color:var(--accent)}
+#app.sidenavCollapsed .sn-item{position:relative}
+/* seamless count: move .cnt to a small pill hugging the icon's top-right */
+#app.sidenavCollapsed .sn-item .cnt{position:absolute;top:2px;left:50%;margin-left:2px;
+  min-width:15px;height:15px;padding:0 3px;font-size:9px;line-height:15px;border-radius:8px;
+  background:var(--accent);color:#fff;text-align:center;box-shadow:0 0 0 1.5px var(--sidenav)}
+#app.sidenavCollapsed .sn-item[data-cnt="0"] .cnt{display:none}
+.sn-item .badge-dot{display:none}
+/* role visibility */
+.role-spv,.role-admin{display:none}
+#app.role-spv .role-spv,#app.role-admin .role-admin,#app.role-admin .role-spv{display:block}
+#app.role-spv .agent-only,#app.role-admin .agent-only{}
+
+/* ── conversation list ── */
+.list{flex:0 0 280px;width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;
+  background:var(--card);transition:flex-basis var(--open-ms) var(--ease),width var(--open-ms) var(--ease)}
+.lhead{padding:11px 12px;border-bottom:1px solid var(--border)}
+.ltop{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+/* ── Responsive filter modes: Icon (≥1280 default) vs Expanded (≥1440 = #app.vp1440) ── */
+.filters{display:flex;flex-direction:column;gap:8px;padding:2px 12px 10px;position:relative}
+/* search row (both modes) */
+.fsearch{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:8px;padding:0 8px;height:36px;background:var(--card)}
+.fsearch:focus-within{border-color:var(--accent)}
+.fsearch-ic{font-size:15px;opacity:.7}
+.fsearch input{flex:1;border:none;outline:none;background:transparent;font-size:13px;color:var(--ink);min-width:0}
+.fsearch-clear{cursor:pointer;color:var(--muted);font-size:12px;display:none}
+.fsearch.has-val .fsearch-clear{display:inline}
+/* shared control button (icon-first, rounded, chevron) */
+.fctrl{display:inline-flex;align-items:center;gap:5px;height:34px;min-width:24px;padding:0 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--card);color:var(--ink);font-size:12px;cursor:pointer;position:relative}
+.fctrl:hover{border-color:var(--accent)}
+.fctrl:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.fctrl.active,.fctrl.on{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:var(--accent);color:var(--accent)}
+.fic{font-size:15px;line-height:1;display:inline-flex}
+.fchev{font-size:9px;opacity:.55}
+.fdot{position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--accent);display:none}
+.fctrl.hasfilter .fdot,.fdd.on .fdot{display:block}
+.fbadge{background:var(--accent);color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:600}
+/* ICON version bar */
+.fbar-icon{display:flex;align-items:center;gap:8px}
+.fbar-icon .fspacer{flex:1}
+.fico2{padding:0 8px}
+/* EXPANDED bar — Figma: filter area gap 12, pad-top 16 */
+.fbar-exp{display:none;flex-direction:column;gap:12px}
+.fgroup{display:flex;flex-direction:column;gap:4px}
+.fglabel{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fcols{display:flex;gap:12px}.fcols .fgroup{flex:1}
+.fctrl-lbl{width:100%;justify-content:flex-start}
+.fsecondary{display:flex;gap:8px;border-top:1px solid var(--border);padding-top:10px}
+.fsecondary .fctrl{flex:1}
+.seg-full{width:100%}.seg-full .seg{flex:1;justify-content:center;display:inline-flex;align-items:center;gap:5px}
+/* segment count badge (matches target design: Terbuka 300 / Tertutup 99) */
+.seg .segcnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;padding:0 5px;
+  border-radius:9px;font-size:10px;font-weight:700;background:var(--border);color:var(--muted);line-height:1}
+.seg.active .segcnt{background:var(--accent);color:#fff}
+/* read-state pill chips row (target design row 3) */
+.fchips{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;min-width:0}
+.ficons{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.fchip{border:1px solid var(--border);border-radius:16px;padding:5px 10px;font-size:12px;background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.fchip:hover:not(.active){border-color:var(--accent)}
+.fchip.active{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:var(--accent);color:var(--accent);font-weight:600}
+/* sort + icon-actions row (own row so it never overflows the 280px column) */
+.frow2{display:flex;align-items:center;gap:8px}
+.frow2 .fspacer{flex:1}
+.fchip.ico{padding:0;width:34px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;position:relative}
+/* List width option B — Figma 400px (menang atas default 280) */
+#app.list400 .list{flex-basis:400px;width:400px}
+/* Full-mode inbox header row (matches reference image row 1) */
+.finbox{display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid var(--border);margin-bottom:2px}
+.ftoggle,.ficonbtn{width:30px;height:30px;flex:0 0 30px;border:none;background:none;border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;display:grid;place-items:center}
+.ftoggle:hover,.ficonbtn:hover{background:var(--border);color:var(--ink)}
+.ftitle{font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* search row belongs to the mode that owns it */
+#app.filterFull #fsearch-icon{display:none}
+#app.filterIcon #fsearch-icon{display:flex}
+/* Filter style switch (tweaks) drives which bar shows — decoupled from viewport */
+#app.filterIcon .fbar-exp{display:none}
+#app.filterIcon .fbar-icon{display:flex}
+#app.filterFull .fbar-icon{display:none}
+#app.filterFull .fbar-exp{display:flex}
+/* anchored dropdown menu */
+.fmenu{position:absolute;z-index:60;min-width:190px;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.14);padding:4px;top:82px;left:12px}
+.fmenu.hide{display:none}
+.fitem{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border:none;border-radius:6px;background:transparent;
+  color:var(--ink);font-size:13px;cursor:pointer;text-align:left}
+.fitem:hover,.fitem:focus-visible{background:var(--bg);outline:none}
+.fitem.active{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:600}
+.fcount{margin-left:auto;color:var(--muted);font-size:11px;font-weight:400}
+.fitem.active .fcount{color:inherit}
+.fcheck{margin-left:6px;opacity:0;color:var(--accent);font-weight:700}
+.fitem.active .fcheck{opacity:1}
+.fic-dot{position:relative}.fic-dot::after{content:'';position:absolute;top:-1px;right:-2px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.seg-status{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg{border:none;padding:7px 12px;font-size:12px;background:var(--card);color:var(--ink);cursor:pointer;border-right:1px solid var(--border);white-space:nowrap}
+.seg:last-child{border-right:none}
+.seg.active{background:var(--accent);color:#fff}
+.seg:hover:not(.active){background:var(--border)}
+/* Figma spec — Full-mode filter bar (400px column) */
+.fbar-exp .seg-status{gap:4px;padding:4px;border-radius:10px;background:#F1F5F9;border:1px solid #CBD5E1;overflow:visible}
+.fbar-exp .seg{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 12px;border:none;border-right:none;border-radius:8px;background:transparent;color:var(--ink);font-weight:500}
+.fbar-exp .seg.active{background:#fff;color:var(--ink);box-shadow:0 6px 18px 0 #17203314}
+.fbar-exp .seg .segcnt{min-width:auto;height:16px;padding:0 5px}
+.fbar-exp .seg.active .segcnt{background:var(--accent);color:#fff}
+/* row1: segmented left, sort right (Figma sort 110x32) */
+.fbar-exp .frow2:first-of-type .fctrl{height:32px;padding:0 12px;border-radius:10px;border-color:#CBD5E1}
+/* row2 container: chips left + icon group right, space-between */
+.fchips{gap:4px}
+.fbar-exp .fchip{height:24px;padding:0 12px;border-radius:999px;font-size:12px;border-color:#CBD5E1}
+.fbar-exp .fchip.active{background:#EAF1FF;border-color:#2563EB;color:#2563EB}
+/* Figma: icon buttons 24x24 round, sit in their own right group */
+.fbar-exp .fchip.ico{width:24px;height:24px;padding:0;border-radius:999px;border-color:#CBD5E1;flex:0 0 24px}
+.filters{display:flex;flex-direction:column;gap:7px}
+.frow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ctrl{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--card);
+  cursor:pointer;display:inline-flex;gap:5px;align-items:center;color:var(--ink);position:relative}
+.ctrl:hover{border-color:var(--accent)}
+.ctrl .badge{background:var(--accent);color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:600}
+/* filter overlay (Layout A sheet) */
+.filter-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.filter-overlay.hide{display:none}
+.filter-sheet{background:var(--card);border-radius:8px;padding:16px;width:90%;max-width:400px;max-height:calc(100% - 32px);overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.fs-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.fs-row{margin-bottom:12px}
+.fs-row label{display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--muted)}
+.fs-btn{border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;background:var(--card);color:var(--ink);cursor:pointer}
+.fs-btn:hover{border-color:var(--accent)}
+.fs-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fs-action{border:1px solid var(--border);border-radius:6px;padding:8px 16px;font-size:13px;background:var(--card);color:var(--ink);cursor:pointer}
+.fs-action:hover{background:var(--border)}
+.fs-action.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fs-action.primary:hover{background:color-mix(in srgb,var(--accent) 90%,#000)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer}
+.chk input{width:15px;height:15px;accent-color:var(--accent)}
+.advrow{display:flex;gap:6px;align-items:center}
+.fs-sel,.fs-inp{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;background:var(--card);color:var(--ink);flex:1;min-width:0}
+/* toggle card (FE ToggleCard in LayoutColumnsModal) */
+.toggle-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--border);border-radius:8px}
+.toggle-card-left{display:flex;align-items:flex-start;gap:12px;flex:1}
+.toggle-card-img{width:56px;height:56px;flex-shrink:0;border:1px solid;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+/* CSS toggle switch */
+.switch{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--border);border-radius:22px;cursor:pointer;transition:.2s}
+.slider:before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:2px;top:2px;transition:.2s}
+.switch input:checked + .slider{background:var(--accent)}
+.switch input:checked + .slider:before{transform:translateX(18px)}
+/* selected filter badge */
+.badge-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--ink);background:var(--card)}
+.searchwrap{flex:1;position:relative}
+.searchwrap input{width:100%;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;background:var(--card);color:var(--ink)}
+.searchwrap input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+
+.litems{overflow-y:auto;flex:1}
+.li{display:flex;gap:9px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:center;position:relative}
+.li.sel{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.li:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+/* avatar-hover select: checkbox overlays the initial avatar on hover / when checked */
+.li .chk{position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:2;
+  width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);
+  display:none;place-items:center;cursor:pointer;font-size:15px;color:var(--muted)}
+.li:has(.avatar:hover) .chk,.li .chk:hover,.li .chk.on{display:grid}
+.li .chk.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.li:has(.avatar:hover) .avatar:not(.hasChkOn),.li .chk:hover~.avatar,.li .chk.on~.avatar{opacity:.35}
+.avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:#c7d2fe;color:#3730a3;
+  display:grid;place-items:center;font-weight:600;font-size:13px;position:relative;transition:opacity .1s}
+.wire .avatar{background:#ddd;color:#666}
+.avatar .ch{position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:var(--card);
+  border:1.5px solid var(--card);display:grid;place-items:center;font-size:9px}
+.li .body{flex:1;min-width:0}
+.li .name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .prev{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .rlabels{display:flex;gap:4px;margin-top:3px}
+.rchip{font-size:9px;padding:1px 6px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.li .meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:0 0 auto}
+.li .time{font-size:11px;color:var(--muted)}
+.unread{background:var(--accent);color:#fff;border-radius:10px;min-width:18px;height:18px;padding:0 5px;font-size:10px;font-weight:700;display:grid;place-items:center}
+.sla-dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.sla-dot.ok{background:var(--ok)}.sla-dot.warn{background:var(--warn)}.sla-dot.breach{background:var(--danger)}
+.avatar .dot-corner{position:absolute;top:-1px;left:-1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--card)}
+/* row inline indicators (FE ConversationCard) */
+.li .name-row{display:flex;align-items:center;gap:4px;min-width:0}
+.li .ch-ic{font-size:12px;flex:0 0 auto}
+.i-star{color:#facc15;font-size:12px}
+.i-pin{color:var(--muted);font-size:12px;transform:rotate(45deg)}
+/* conversation pin next to name — small, dim until active */
+.room-pin{font-size:12px;opacity:.4;cursor:pointer;margin-left:4px;vertical-align:middle;transition:opacity .12s,transform .12s}
+.room-pin:hover{opacity:.75}
+.room-pin.on{opacity:1;transform:rotate(-8deg)}
+/* drawer open → hide the open-drawer toggle (close button lives in drawer header) */
+#app.drawerOpen #drawerToggle{display:none}
+/* single Close: room-header button only when detail closed; when open it lives in drawer footer as icon */
+#app.drawerOpen #closeBtnRoom{display:none}
+.assign-row{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;flex-wrap:wrap}
+.assign-row .k{color:var(--muted);flex:0 0 110px}
+.assign-row .v{font-weight:600}
+.assign-btn{margin-left:auto;font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--accent);cursor:pointer}
+.assign-btn:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.pick-list{display:flex;flex-direction:column;gap:2px;max-height:280px;overflow:auto}
+.pick{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px}
+.pick:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.pick.sel{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.pick .pchk{margin-left:auto;color:var(--accent);font-weight:800}
+.pav{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--border);flex:0 0 26px}
+.dfoot .closeIcon{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ci-ic{font-weight:800}
+.i-mention{background:#dbeafe;color:#2563eb;border-radius:9px;min-width:16px;height:16px;padding:0 4px;font-size:10px;font-weight:700;display:grid;place-items:center}
+.sla-pill{display:inline-flex;align-items:center;gap:2px;background:#fef9c3;color:#ca8a04;border-radius:10px;padding:0 6px;height:16px;font-size:10px;font-weight:600}
+/* disconnected channel: list-row indicator (icon+tag, not a per-row banner — scannable) */
+.ch-off{filter:grayscale(1);opacity:.7}
+.disc-dot{background:#fee2e2;color:#b91c1c;font-size:9px;display:grid;place-items:center}
+.disc-tag{background:#fee2e2;color:#b91c1c;border-radius:9px;padding:0 6px;height:15px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;text-transform:uppercase;letter-spacing:.03em}
+.li.disc .name{color:var(--ink)}
+/* disconnected banner replacing composer (FE DisconnectedAccountBanner) */
+.disc-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border);background:var(--card)}
+.disc-banner .db-title{font-size:13px;font-weight:700;color:var(--ink)}
+.disc-banner .db-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.disc-banner .btn{margin-left:auto;white-space:nowrap}
+/* message status (FE IconMessageStatus): waiting/sent/delivered/read/failed */
+.read-rcpt{font-size:12px;font-weight:800;margin-right:3px;color:#64748b}/* SENT/DELIVERED = slate-500 */
+.read-rcpt.read{color:#16a34a}/* READ = green-600 */
+.read-rcpt.waiting{color:#64748b}/* PENDING/PROCESSING clock */
+.read-rcpt.failed{color:#dc2626;cursor:pointer}/* FAILED = red, click retry */
+.ticket-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#7c3aed;margin-top:3px}
+.phone-badge{display:inline-block;font-size:10px;background:#dcfce7;color:#15803d;border-radius:4px;padding:1px 6px;margin-top:3px}
+.li .qa{opacity:0;color:var(--muted);cursor:pointer;font-weight:700;padding:0 2px}
+.li:hover .qa{opacity:1}
+.typing-dots{display:inline-flex;gap:2px;align-items:center}
+.typing-dots i{width:4px;height:4px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing-dots i:nth-child(2){animation-delay:.2s}.typing-dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+/* quick-action menu + legend */
+.qa-menu{display:flex;flex-direction:column}
+.qa-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--ink)}
+.qa-row:hover{background:var(--bg)}
+.qa-row.danger{color:var(--danger)}
+.qa-row span{width:18px;text-align:center;flex:0 0 18px}
+.lg{display:flex;align-items:center;gap:8px}
+.lg>span:first-child{flex:0 0 auto;display:inline-flex;align-items:center}
+
+/* list states (loading/empty/error) */
+.lstate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px 20px;text-align:center;color:var(--muted)}
+.lstate .glyph{width:48px;height:48px;border-radius:12px;border:2px dashed var(--border);display:grid;place-items:center;font-size:22px}
+.skel{height:12px;border-radius:4px;background:linear-gradient(90deg,var(--border) 25%,#f0f0f0 50%,var(--border) 75%);background-size:200% 100%;animation:sh 1.3s infinite;margin:7px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-row{display:flex;gap:9px;padding:10px 12px;align-items:center;border-bottom:1px solid var(--border)}
+.skel-row .c{width:36px;height:36px;border-radius:50%;flex:0 0 36px}
+.btn{border:1px solid var(--border);background:var(--card);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger:hover{background:var(--danger-bg)}
+
+/* bulk bar */
+.bulkbar{display:none;padding:8px 12px;background:var(--nav);color:#fff;align-items:center;gap:8px;font-size:12px;position:relative}
+#app.bulkActive .bulkbar{display:flex}
+#app.bulkActive .filters{display:none}   /* bulk mode replaces filter section */
+.bulkbar .cnt{font-weight:600}
+.bulkbar .bbtn{background:#374151;border:1px solid #4b5563;color:#fff;border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer}
+.bulkbar .bbtn.d{border-color:var(--danger);color:#fca5a5}
+.bulk-menu{position:absolute;top:calc(100% - 2px);right:34px;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:170px;padding:4px;z-index:20;display:none}
+.bulk-menu.open{display:block}
+.bulk-menu .bmi{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.bulk-menu .bmi:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.bulk-menu .bmi.d{color:var(--danger)}
+
+/* ── workspace ── */
+.ws{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.ws-head{background:var(--card);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:10px}
+.ws-head .cust{display:flex;gap:10px;align-items:center;flex:1;min-width:0}
+.ws-head .name{font-weight:600;font-size:14px}
+.ws-head .sub{color:var(--muted);font-size:12px}
+.ws-actions{display:flex;gap:6px;align-items:center}
+.iconbtn{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;font-size:15px;color:var(--ink);position:relative}
+.iconbtn::before{content:"";position:absolute;inset:-6px}
+.iconbtn:hover{border-color:var(--accent)}
+.iconbtn.viewctl{color:var(--accent)}
+.iconbtn.viewctl.on{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.vdiv{width:1px;height:26px;background:var(--border);margin:0 4px}
+.vgroup{display:flex;gap:6px;align-items:center}
+/* overflow menu */
+.menu{position:absolute;top:38px;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.14);min-width:210px;z-index:60;padding:5px;display:none}
+.menu.open{display:block}
+.menu .mi{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px}
+.menu .mi:hover{background:var(--bg)}
+.menu .mi .ph{font-size:9px;color:var(--muted);margin-left:auto;border:1px solid var(--border);border-radius:4px;padding:0 4px}
+.menu .msep{height:1px;background:var(--border);margin:5px 0}
+.menu .mi.d{color:var(--danger)}
+
+.thread{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:9px;position:relative}
+.bub{max-width:70%;padding:9px 12px;border-radius:12px;font-size:13px;box-shadow:var(--shadow)}
+.bub.in{align-self:flex-start;background:var(--card);border-bottom-left-radius:3px}
+.bub.out{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.wire .bub.out{background:#ccc;color:#333}
+.bub .t{font-size:10px;opacity:.6;margin-top:4px}
+.daysep{align-self:center;font-size:11px;color:var(--muted);background:var(--bg);padding:2px 10px;border-radius:10px;margin:4px 0}
+.newmsg{position:sticky;bottom:6px;align-self:center;background:var(--accent);color:#fff;font-size:12px;
+  padding:5px 12px;border-radius:14px;cursor:pointer;box-shadow:var(--shadow)}
+.composer{background:var(--card);border-top:1px solid var(--border);padding:9px 14px;display:flex;gap:8px;align-items:center}
+.composer input{flex:1;border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-size:13px;color:var(--ink);background:var(--card)}
+.composer input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.composer .status{font-size:11px;color:var(--muted);min-width:56px;text-align:right}
+
+/* workspace empty/loading */
+.ws-empty,.ws-loading{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);text-align:center;padding:40px}
+.ws-empty .glyph{width:60px;height:60px;border-radius:14px;border:2px dashed var(--border);display:grid;place-items:center;font-size:28px}
+
+/* ── drawer: side-draw dari kanan, sticky, overlay DI ATAS workspace (tidak reflow) ── */
+.drawer{position:absolute;top:0;right:0;bottom:0;width:340px;background:var(--card);border-left:1px solid var(--border);overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:-8px 0 24px rgba(16,24,40,.10);
+  transform:translateX(100%);transition:transform var(--open-ms) var(--ease);z-index:40}
+#app.drawerOpen .drawer{transform:translateX(0)}
+#app.closing .drawer{transition-duration:var(--close-ms)}
+/* drawer mode INLINE (indexed / tidak floating): drawer jadi flex-item, mendorong workspace, tanpa shadow/overlay */
+#app.drawerInline .drawer{position:relative;transform:none;box-shadow:none;
+  flex:0 0 0;width:auto;transition:flex-basis var(--open-ms) var(--ease)}
+#app.drawerInline.drawerOpen .drawer{flex-basis:340px}
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.dhead .dt{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.dhead .cv{font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:4px}
+.dha{display:flex;align-items:center}
+.dha .gap16{width:16px}
+.iconbtn.pinned{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.copybtn{font-size:11px;color:var(--accent);border:none;background:none;cursor:pointer;padding:0 3px}
+.dbody{flex:1;overflow-y:auto}
+.sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sec h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
+.sec h4 .edit{font-size:11px;color:var(--accent);cursor:pointer;text-transform:none;letter-spacing:0}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.kv .k{color:var(--muted);font-size:12px}.kv .v{font-weight:500;font-size:13px;text-align:right}
+.cust-name{font-size:15px;font-weight:600}
+.cust-line{color:var(--muted);font-size:12px;margin-top:2px}
+.pill{display:inline-flex;gap:5px;align-items:center;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg);border:1px solid var(--border);margin-top:6px}
+.sla{display:flex;align-items:center;gap:10px;padding:6px 0}
+.sla .lbl{width:34px;font-weight:600;font-size:12px}
+.sla .val{width:64px;font-variant-numeric:tabular-nums;font-size:13px}
+.sla .state{font-size:12px;display:inline-flex;gap:5px;align-items:center;padding:2px 8px;border-radius:10px;font-weight:500}
+.sla .state.ok{background:var(--ok-bg);color:var(--ok)}.sla .state.warn{background:var(--warn-bg);color:var(--warn)}.sla .state.breach{background:var(--danger-bg);color:var(--danger)}
+.sla .info{color:var(--muted);cursor:help;font-size:11px;border:1px solid var(--border);border-radius:50%;width:14px;height:14px;display:inline-grid;place-items:center;position:relative}
+.sla .info:hover .tip,.sla .info:focus .tip{display:block}
+.tip{display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;
+  padding:7px 10px;border-radius:6px;font-size:11px;width:190px;z-index:5;line-height:1.4;text-align:left;font-weight:400}
+.tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--nav)}
+.rlabel-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.rlabel-chips .rchip{max-width:none;display:inline-flex;align-items:center;gap:4px}
+.rlabel-chips .rchip .x{cursor:pointer;color:var(--muted)}
+.rchip-add{width:20px;height:20px;border-radius:50%;border:1px dashed var(--border);background:transparent;color:var(--accent);font-size:13px;line-height:1;cursor:pointer;display:inline-grid;place-items:center}
+.rchip-add:hover{background:color-mix(in srgb,var(--accent) 10%,transparent);border-style:solid}
+.acc{border-bottom:1px solid var(--border)}
+.acc-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;cursor:pointer;font-size:13px;font-weight:500}
+.acc-head .chev{color:var(--muted);transition:transform .15s}
+.acc.open .acc-head .chev{transform:rotate(90deg)}
+.acc-body{display:none;padding:0 14px 12px;font-size:12px;color:var(--muted)}
+.acc.open .acc-body{display:block}
+.dfoot{padding:14px;border-top:1px solid var(--border);margin-top:auto}
+.ph-note{font-size:10px;color:var(--warn);border:1px dashed var(--warn);border-radius:5px;padding:2px 6px;display:inline-block;margin-top:4px}
+
+/* dialog */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.dialog{background:var(--card);border-radius:12px;padding:22px;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.dialog h3{font-size:16px;margin-bottom:8px}
+.dialog p{color:var(--muted);font-size:13px;margin-bottom:18px}
+.dialog .acts{display:flex;gap:8px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<div id="tweaks">
+  <div class="row"><span class="lab">Role</span>
+    <button id="r-agent" class="on" onclick="setRole('agent')">Agent</button>
+    <button id="r-spv" onclick="setRole('spv')">SPV</button>
+    <button id="r-admin" onclick="setRole('admin')">Admin</button></div>
+  <div class="row"><span class="lab">Fidelity</span>
+    <button id="f-hifi" class="on" onclick="setFidelity('hifi')">Hi-Fi</button>
+    <button id="f-wire" onclick="setFidelity('wire')">Wireframe</button></div>
+  <div class="row"><span class="lab">Ikon</span>
+    <button onclick="openModal('m-legend')" title="Semua indikator conversation list">Legenda</button></div>
+  <div class="row"><span class="lab">Viewport</span>
+    <button id="v-1280" class="on" onclick="setVp(1280)">1280</button>
+    <button id="v-1440" onclick="setVp(1440)">1440</button></div>
+  <div class="row"><span class="lab">List width</span>
+    <button id="lw-a" class="on" onclick="setListW('a')">A: sekarang</button>
+    <button id="lw-b" onclick="setListW('b')">B: 400px</button></div>
+  <div class="row"><span class="lab">Filter</span>
+    <button id="fs-full" onclick="setFilterStyle('full')">Full</button>
+    <button id="fs-icon" class="on" onclick="setFilterStyle('icon')">Icon only</button></div>
+  <div class="row"><span class="lab">Sidenav peek</span>
+    <button id="pk-hover" class="on" onclick="setPeekMode('hover')">Hover</button>
+    <button id="pk-click" onclick="setPeekMode('click')">Click</button></div>
+  <div class="row"><span class="lab">Drawer</span>
+    <button id="d-toggle" onclick="toggleDrawer()">Closed</button>
+    <button id="d-pin" onclick="togglePin()">Pin off</button></div>
+  <div class="row"><span class="lab">Drawer mode</span>
+    <button id="dm-float" class="on" onclick="setDrawerMode('float')">Floating</button>
+    <button id="dm-inline" onclick="setDrawerMode('inline')">Inline</button></div>
+  <div class="row"><span class="lab">List</span>
+    <button id="l-loaded" class="on" onclick="setList('loaded')">Loaded</button>
+    <button id="l-loading" onclick="setList('loading')">Loading</button>
+    <button id="l-empty" onclick="setList('empty')">Empty</button>
+    <button id="l-filtered" onclick="setList('filtered')">No filter match</button>
+    <button id="l-noresult" onclick="setList('noresult')">Search 0</button>
+    <button id="l-error" onclick="setList('error')">Error</button></div>
+  <div class="row"><span class="lab">Workspace</span>
+    <button id="w-loaded" class="on" onclick="setWs('loaded')">Loaded</button>
+    <button id="w-none" onclick="setWs('none')">No selection</button>
+    <button id="w-loading" onclick="setWs('loading')">Loading</button></div>
+  <div class="row"><span class="lab">Drawer data</span>
+    <button id="dc-loaded" class="on" onclick="setDrawer('loaded')">Loaded</button>
+    <button id="dc-loading" onclick="setDrawer('loading')">Loading</button>
+    <button id="dc-empty" onclick="setDrawer('empty')">Empty</button>
+    <button id="dc-error" onclick="setDrawer('error')">Error</button></div>
+  <div class="row"><span class="lab">Realtime</span>
+    <button id="rt-new" onclick="toggleNewMsg()">New-msg badge</button></div>
+  <div class="row"><span class="lab">Bulk</span>
+    <button id="b-mode" onclick="toggleBulk()">Clear selection</button></div>
+  <div class="row"><span class="lab">Compose</span>
+    <button id="c-idle" class="on" onclick="setCompose('idle')">Idle</button>
+    <button id="c-sending" onclick="setCompose('sending')">Sending</button>
+    <button id="c-error" onclick="setCompose('error')">Error</button>
+    <button id="c-offline" onclick="setCompose('offline')">Offline</button>
+    <button id="c-disconnected" onclick="setCompose('disconnected')">Disconnected</button></div>
+</div>
+
+<div id="stage"><div>
+<div id="app" class="role-agent filterIcon">
+  <!-- APP NAV RAIL -->
+  <nav class="nav">
+    <div class="logo">S</div>
+    <div class="ico active" title="Percakapan">💬</div>
+    <div class="ico" title="Kontak">👥</div>
+    <div class="ico" title="Broadcast">📣</div>
+    <div class="ico" title="Laporan">📊</div>
+    <div class="ico" title="Pengaturan" style="margin-top:auto">⚙</div>
+  </nav>
+
+  <!-- CONVERSATION SIDENAV (restored) -->
+  <aside class="sidenav panel">
+    <div class="sn-head">
+      <span class="sn-title">Inbox</span>
+      <button class="sn-collapse" title="Collapse (sidenav)" onclick="toggleSidenav()">⟨</button>
+    </div>
+    <!-- PRIMARY (default expanded) -->
+    <div class="sn-group">
+      <button class="sn-disc open" aria-expanded="true" onclick="toggleSec(this)"><span class="ic">💬</span><span>Personal Chat</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub">
+        <div class="sn-item active" data-cnt="26" title="Kotak Pesan Anda"><span class="ic">📥</span><span class="txt">Kotak Pesan Anda</span><span class="cnt">26</span></div>
+        <div class="sn-item role-spv" data-cnt="282" title="Belum Ditugaskan (FE show:!isAgent)"><span class="ic">📭</span><span class="txt">Belum Ditugaskan</span><span class="cnt">282</span></div>
+        <div class="sn-item role-spv" data-cnt="492" title="Semua Personal Chat (FE show:!isAgent)"><span class="ic">🗂</span><span class="txt">Semua</span><span class="cnt">492</span></div>
+        <div class="sn-item" data-cnt="0" title="Berbintang"><span class="ic">⭐</span><span class="txt">Berbintang</span><span class="cnt">0</span></div>
+      </div>
+    </div>
+    <div class="sn-group" title="Group chat = isGroup=true. Section terpisah dari Saluran: group = tipe percakapan, Saluran = sumber channel.">
+      <button class="sn-disc open" aria-expanded="true" onclick="toggleSec(this)"><span class="ic">👥</span><span>Group Chat</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub">
+        <div class="sn-item" data-cnt="32" title="Group dari WhatsApp Web"><span class="ic">🟢</span><span class="txt">WhatsApp Web Grup</span><span class="cnt">32</span></div>
+        <div class="sn-item" data-cnt="4" title="Group dari WhatsApp API"><span class="ic">🟩</span><span class="txt">WhatsApp API Grup</span><span class="cnt">4</span></div>
+      </div>
+    </div>
+    <div class="sn-div"></div>
+    <!-- SECONDARY (default collapsed) -->
+    <div class="sn-group">
+      <button class="sn-disc" aria-expanded="false" onclick="toggleSec(this)"><span class="ic">🛡</span><span>Karantina</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub hide">
+        <div class="sn-item" data-cnt="0" title="Spam"><span class="ic">🚫</span><span class="txt">Spam</span><span class="cnt">0</span></div>
+        <div class="sn-item" data-cnt="11" title="Junk"><span class="ic">🗑</span><span class="txt">Junk</span><span class="cnt">11</span></div>
+      </div>
+    </div>
+    <div class="sn-group">
+      <button class="sn-disc" aria-expanded="false" onclick="toggleSec(this)"><span class="ic">📡</span><span>Saluran</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub hide">
+        <div class="sn-item" data-cnt="8" title="Email"><span class="ic">✉</span><span class="txt">Email</span><span class="cnt">8</span></div>
+        <div class="sn-item" data-cnt="2" title="Facebook Messenger"><span class="ic">💬</span><span class="txt">Facebook Messenger</span><span class="cnt">2</span></div>
+        <div class="sn-item" data-cnt="5" title="Instagram"><span class="ic">📷</span><span class="txt">Instagram</span><span class="cnt">5</span></div>
+        <div class="sn-item" data-cnt="1" title="IG Comment"><span class="ic">💭</span><span class="txt">IG Comment</span><span class="cnt">1</span></div>
+        <div class="sn-item" data-cnt="0" title="Telegram"><span class="ic">✈</span><span class="txt">Telegram</span><span class="cnt">0</span></div>
+        <div class="sn-item" data-cnt="1" title="WhatsApp API"><span class="ic">🟩</span><span class="txt">WhatsApp API</span><span class="cnt">1</span></div>
+        <div class="sn-item" data-cnt="3" title="WhatsApp Web"><span class="ic">🟢</span><span class="txt">WhatsApp Web</span><span class="cnt">3</span></div>
+        <div class="sn-item" data-cnt="0" title="Widget"><span class="ic">🔵</span><span class="txt">Widget</span><span class="cnt">0</span></div>
+      </div>
+    </div>
+    <div class="sn-group" title="FE: teams visible to all; only +Create Team is SPV/Admin">
+      <button class="sn-disc" aria-expanded="false" onclick="toggleSec(this)"><span class="ic">🏢</span><span>Kotak Masuk Tim</span><span class="dotind">•</span><span class="chev">›</span><span class="sn-add" title="Buat tim (SPV/Admin)" onclick="event.stopPropagation();alert('Buat tim — FE +Create Team (SPV/Admin)')">＋</span></button>
+      <div class="sn-sub hide">
+        <div class="sn-item" data-cnt="5" title="Support"><span class="ic">🎧</span><span class="txt">Support</span><span class="cnt">5</span></div>
+        <div class="sn-item" data-cnt="2" title="Sales"><span class="ic">💼</span><span class="txt">Sales</span><span class="cnt">2</span></div>
+        <div class="sn-item" data-cnt="3" title="Customer Success"><span class="ic">🤝</span><span class="txt">Customer Success</span><span class="cnt">3</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONVERSATION LIST -->
+  <aside class="list panel">
+    <div class="lhead">
+      <div class="filters" id="filters">
+        <!-- Search row (ICON mode only — Full mode has its own title+search-icon header) -->
+        <div class="fsearch" id="fsearch-icon">
+          <span class="fsearch-ic">🔍</span>
+          <input id="listsearch" placeholder="Kotak Pesan Anda" oninput="onSearch(this.value)">
+          <span class="fsearch-clear" id="searchclear" onclick="clearSearch()" title="Bersihkan">✕</span>
+        </div>
+
+        <!-- ICON VERSION: three icon-first dropdowns in one row -->
+        <div class="fbar-icon">
+          <div class="fdd">
+            <button class="fctrl" id="dd-status-btn" aria-haspopup="listbox" onclick="toggleDD('status')" title="Terbuka / Tertutup">
+              <span class="fic" id="ic-status">🚪</span><span class="fchev">▾</span>
+            </button>
+          </div>
+          <div class="fdd">
+            <button class="fctrl" id="dd-read-btn" aria-haspopup="listbox" onclick="toggleDD('read')" title="Semua / Sudah dibaca / Belum dibaca">
+              <span class="fic" id="ic-read">💬</span><span class="fchev">▾</span>
+            </button>
+          </div>
+          <div class="fdd">
+            <button class="fctrl" id="dd-sort-btn" aria-haspopup="listbox" onclick="toggleDD('sort')" title="Urutkan">
+              <span class="fic" id="ic-sort">⇅</span><span class="fchev">▾</span>
+            </button>
+          </div>
+          <span class="fspacer"></span>
+          <button class="fctrl fico2" onclick="openModal('m-advanced')" title="Filter Lanjutan"><span class="fic">⚗</span><span class="fdot" id="adv-dot-i"></span></button>
+          <button class="fctrl fico2" onclick="openModal('m-layout')" title="Visibilitas"><span class="fic">⚙</span></button>
+        </div>
+
+        <!-- FULL VERSION (matches reference image exactly) -->
+        <div class="fbar-exp">
+          <!-- Row 1: sidebar-toggle · title · search icon -->
+          <div class="finbox">
+            <button class="ftoggle" onclick="toggleSidenav()" title="Sidebar">▤</button>
+            <span class="ftitle">Kotak Pesan Anda</span>
+            <span class="fspacer"></span>
+            <button class="ficonbtn" id="fsearch-open" onclick="toggleFullSearch()" title="Cari">🔍</button>
+          </div>
+          <!-- inline search (revealed by the icon, hidden by default per image) -->
+          <div class="fsearch hide" id="fsearch-full">
+            <span class="fsearch-ic">🔍</span>
+            <input id="listsearch2" placeholder="Cari percakapan…" oninput="onSearch(this.value)">
+            <span class="fsearch-clear" onclick="clearSearch()" title="Bersihkan">✕</span>
+          </div>
+          <!-- Row 2: status segmented (with count badge) · sort -->
+          <div class="frow2">
+            <div class="seg-status">
+              <button class="seg active" id="exp-open" onclick="setStatus('open')"><span>Terbuka</span> <span class="segcnt">300</span></button>
+              <button class="seg" id="exp-closed" onclick="setStatus('closed')"><span>Tertutup</span> <span class="segcnt">99</span></button>
+            </div>
+            <span class="fspacer"></span>
+            <button class="fctrl fctrl-lbl" style="width:auto" onclick="toggleDD('sort')"><span class="fic" id="ic-sort-x">⇅</span> <span id="lbl-sort">Terbaru</span> <span class="fchev">▾</span></button>
+          </div>
+          <!-- Row 3 (Figma 368x24): read chips left · setting+adv-filter icons right, space-between -->
+          <div class="frow2 frow3">
+            <div class="fchips">
+              <button class="fchip active" id="chip-all" onclick="pickReadChip('all',this)">Semua</button>
+              <button class="fchip" id="chip-read" onclick="pickReadChip('read',this)">Sudah dibaca</button>
+              <button class="fchip" id="chip-unread" onclick="pickReadChip('unread',this)">Belum dibaca</button>
+            </div>
+            <span class="fspacer"></span>
+            <div class="ficons">
+              <button class="fchip ico" onclick="openModal('m-layout')" title="Visibilitas"><span class="fic">⚙</span></button>
+              <button class="fchip ico" onclick="openModal('m-advanced')" title="Filter Lanjutan"><span class="fic">⚗</span><span class="fdot" id="adv-dot-x"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anchored dropdowns (shared by both modes) -->
+        <div class="fmenu hide" id="menu-status" role="listbox">
+          <button class="fitem active" onclick="pickStatus('open',this)"><span class="fic">🚪</span> Terbuka <span class="fcount">(29)</span><span class="fcheck">✓</span></button>
+          <button class="fitem" onclick="pickStatus('closed',this)"><span class="fic">🚪</span> Tertutup <span class="fcount">(164)</span><span class="fcheck">✓</span></button>
+        </div>
+        <div class="fmenu hide" id="menu-read" role="listbox">
+          <button class="fitem active" onclick="pickRead('all','💬','Semua',this)"><span class="fic">💬</span> Semua <span class="fcheck">✓</span></button>
+          <button class="fitem" onclick="pickRead('read','☑','Sudah dibaca',this)"><span class="fic">☑</span> Sudah dibaca <span class="fcount">(23)</span><span class="fcheck">✓</span></button>
+          <button class="fitem" onclick="pickRead('unread','💬','Belum dibaca',this)"><span class="fic fic-dot">💬</span> Belum dibaca <span class="fcount">(6)</span><span class="fcheck">✓</span></button>
+        </div>
+        <div class="fmenu hide" id="menu-sort" role="listbox">
+          <button class="fitem active" onclick="pickSort('newest','↓','Terbaru',this)"><span class="fic">↓</span> Terbaru <span class="fcheck">✓</span></button>
+          <button class="fitem" onclick="pickSort('oldest','↑','Terlama',this)"><span class="fic">↑</span> Terlama <span class="fcheck">✓</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="bulkbar" id="bulkbar">
+      <span class="cnt" id="bulkcnt">0 dipilih</span>
+      <button class="bbtn" onclick="alert('Bulk Assign — BulkAssignConversationModal (FE useBulkAssignConversation)')">Assign</button>
+      <button class="bbtn d" onclick="confirmResolve(true)">Tutup</button>
+      <button class="bbtn" onclick="toggleBulkMenu(event)">⋯ Aksi lain</button>
+      <div class="bulk-menu" id="bulkMenu">
+        <div class="bmi" onclick="bulkAct('Tandai dibaca')">✉️ Tandai dibaca</div>
+        <div class="bmi" onclick="bulkAct('Pengingat')">🕑 Pengingat</div>
+        <div class="bmi" onclick="bulkAct('Favoritkan')">★ Favoritkan</div>
+        <div class="bmi" onclick="bulkAct('Sematkan')">📌 Sematkan</div>
+        <div class="bmi d" onclick="bulkAct('Tandai spam')">⚠ Tandai spam</div>
+        <div class="bmi d" onclick="bulkAct('Tandai junk')">🗑 Tandai junk</div>
+      </div>
+      <span style="margin-left:auto;cursor:pointer" onclick="toggleBulk()">✕</span>
+    </div>
+
+    <div class="litems" id="litems">
+      <!-- Row 0: SEMUA indikator aktif (kitchen-sink demo) -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar">DK<span class="dot-corner sla-dot breach"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp API">🟢</span>
+            <span class="name">Dewi Kartika</span>
+            <span class="i-star" title="Difavoritkan">★</span>
+            <span class="i-pin" title="Disematkan">📌</span>
+            <span class="sla-pill" style="background:#fee2e2;color:#dc2626" title="SLA terlampaui">⏱ 5j 04m</span>
+          </div>
+          <div class="prev"><span class="read-rcpt read" title="Dibaca (READ)">✔✔</span>Oke kak, saya tunggu update-nya 🙏</div>
+          <div class="rlabels"><span class="rchip">VIP</span><span class="rchip">Retur</span><span class="rchip">Prioritas</span></div>
+          <span class="ticket-badge" title="Tiket dibuat">🎫 Tiket #5099</span>
+          <span class="phone-badge">+62 811-2233-4455</span>
+        </div>
+        <div class="meta">
+          <span class="time">15:10</span>
+          <div style="display:flex;align-items:center;gap:3px">
+            <span class="i-mention" title="Anda disebut">@</span>
+            <span class="unread">9</span>
+            <span class="qa" title="Aksi cepat" onclick="event.stopPropagation();openQuickAction(this)">⋯</span>
+          </div>
+        </div>
+      </div>
+      <!-- Row 1: WA Web · starred · SLA pill · pin · mention · tags · unread · read-receipt -->
+      <div class="li sel" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar">YD<span class="dot-corner sla-dot warn"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp Web">💻</span>
+            <span class="name">Yosep Danny</span>
+            <span class="i-star" title="Difavoritkan">★</span>
+            <span class="sla-pill" title="Durasi SLA">⏱ 2j 30m</span>
+          </div>
+          <div class="prev"><span class="read-rcpt read" title="Dibaca (READ)">✔✔</span>Baik kak, ditunggu ya…</div>
+          <div class="rlabels"><span class="rchip">VIP</span><span class="rchip">Retur</span></div>
+        </div>
+        <div class="meta">
+          <span class="time">14:52</span>
+          <div style="display:flex;align-items:center;gap:3px">
+            <span class="i-pin" title="Disematkan">📌</span>
+            <span class="i-mention" title="Anda disebut">@</span>
+            <span class="unread">3</span>
+            <span class="qa" title="Aksi cepat" onclick="event.stopPropagation();openQuickAction(this)">⋯</span>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2: WA API · SLA breach · typing indicator · phone badge -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar">RN<span class="dot-corner sla-dot breach"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp API">🟢</span>
+            <span class="name">Rina Nurul</span>
+            <span class="sla-pill" style="background:#fee2e2;color:#dc2626" title="SLA terlampaui">⏱ 4j 12m</span>
+          </div>
+          <div class="prev"><span class="typing-dots"><i></i><i></i><i></i></span> sedang mengetik…</div>
+          <span class="phone-badge">+62 812-3456-7890</span>
+        </div>
+        <div class="meta">
+          <span class="time">14:40</span>
+          <div style="display:flex;align-items:center;gap:3px"><span class="unread">1</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+        </div>
+      </div>
+      <!-- Row 3: Instagram · ticket badge · read (no unread) -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#fce7f3;color:#be185d">BS<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="Instagram">📷</span>
+            <span class="name">Budi Santoso</span>
+          </div>
+          <div class="prev"><span class="read-rcpt" title="Terkirim (SENT)">✔</span>Terima kasih infonya 🙏</div>
+          <span class="ticket-badge" title="Tiket dibuat">🎫 Tiket #4821</span>
+        </div>
+        <div class="meta"><span class="time">13:15</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+      </div>
+      <!-- Row 4: Email · subject row · unread -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#fee2e2;color:#b91c1c">AW<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="Email">✉️</span>
+            <span class="name">Ayu Wulandari</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);font-weight:500;margin-top:1px" title="Subjek email">Re: Nomor resi pengiriman</div>
+          <div class="prev">Nomor resinya berapa kak?</div>
+        </div>
+        <div class="meta"><span class="time">12:03</span><div style="display:flex;align-items:center;gap:3px"><span class="unread">2</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div></div>
+      </div>
+      <!-- Row 5: Live Chat / Widget · group avatar -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#e0e7ff;color:#4338ca">👥<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="Live Chat (Widget)">💬</span>
+            <span class="name">Grup Support Web</span>
+          </div>
+          <div class="prev">Halo, ada yang bisa dibantu?</div>
+        </div>
+        <div class="meta"><span class="time">11:20</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+      </div>
+      <!-- Row 6: WA API · waiting (PENDING) outgoing status -->
+      <div class="li" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#dcfce7;color:#15803d">TK<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp API">🟢</span>
+            <span class="name">Toko Kirana</span>
+          </div>
+          <div class="prev"><span class="read-rcpt waiting" title="Menunggu (PENDING)">🕒</span>Pesanan sedang diproses ya…</div>
+        </div>
+        <div class="meta"><span class="time">11:02</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+      </div>
+      <!-- Row 7: WA Web · account channel DISCONNECTED (click → banner replaces composer) -->
+      <div class="li disc" data-conn="off" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#fee2e2;color:#b91c1c">RS<span class="dot-corner disc-dot" title="Akun channel terputus">⚠</span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic ch-off" title="WhatsApp Web · Akun terputus">💻</span>
+            <span class="name">Rina Safitri</span>
+            <span class="disc-tag" title="Akun channel terputus — perlu disesuaikan">Terputus</span>
+          </div>
+          <div class="prev">Kak, apakah pesanan saya sudah dikirim?</div>
+        </div>
+        <div class="meta"><span class="time">10:47</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+      </div>
+    </div>
+
+    <!-- list alt states -->
+    <div class="litems hide" id="list-loading">
+      <div class="skel-row"><div class="skel c"></div><div style="flex:1"><div class="skel" style="width:60%"></div><div class="skel" style="width:85%"></div></div></div>
+      <div class="skel-row"><div class="skel c"></div><div style="flex:1"><div class="skel" style="width:50%"></div><div class="skel" style="width:75%"></div></div></div>
+      <div class="skel-row"><div class="skel c"></div><div style="flex:1"><div class="skel" style="width:65%"></div><div class="skel" style="width:80%"></div></div></div>
+    </div>
+    <div class="lstate hide" id="list-empty"><div class="glyph">📭</div><div><b>Tidak ada percakapan</b><br>Belum ada percakapan di tampilan ini.</div></div>
+    <div class="lstate hide" id="list-filtered"><div class="glyph">🔍</div><div><b>Tidak cocok dengan filter</b><br>Tidak ada percakapan yang cocok.</div><button class="btn" onclick="setList('loaded')">Bersihkan filter</button></div>
+    <div class="lstate hide" id="list-noresult"><div class="glyph">🔎</div><div><b>Tidak ada hasil</b><br>Coba kata kunci lain.</div></div>
+    <div class="lstate hide" id="list-error"><div class="glyph">⚠</div><div><b>Gagal memuat percakapan</b></div><button class="btn" onclick="setList('loaded')">Coba lagi</button></div>
+  </aside>
+
+  <!-- WORKSPACE -->
+  <section class="ws" id="ws">
+    <div class="ws-head" id="ws-head">
+      <div class="cust">
+        <div class="avatar" style="width:38px;height:38px;flex-basis:38px">YD</div>
+        <div><div class="name">Yosep Danny <span class="room-pin" id="roomPin" title="Sematkan percakapan" onclick="toggleRoomPin()">📌</span></div><div class="sub">+62 896 5505 7778 · WhatsApp · Open</div></div>
+      </div>
+      <div class="ws-actions">
+        <div class="vgroup">
+          <button class="btn danger" id="closeBtnRoom" onclick="confirmResolve(false)" title="Menutup percakapan (perlu konfirmasi)">Tutup Percakapan</button>
+        </div>
+        <div class="vdiv"></div>
+        <div class="vgroup" style="position:relative">
+          <button class="iconbtn" title="Aksi lainnya" onclick="toggleMenu(event)">⋯</button>
+          <div class="menu" id="overflow">
+            <div class="mi" onclick="closeMenu();alert('Reassign account channel (existing FE)')">Ganti akun channel <span class="ph">FE</span></div>
+            <div class="mi" onclick="closeMenu();alert('Room CRUD — rename/edit (existing FE)')">Ubah room <span class="ph">FE</span></div>
+            <div class="mi" onclick="closeMenu();alert('Relation label — apply/unlink (FE #2836)')">Label relasi <span class="ph">FE</span></div>
+            <div class="mi" onclick="closeMenu();alert('Screenshot capture — SnippingOverlay (existing FE)')">Tangkap layar <span class="ph">FE</span></div>
+          </div>
+        </div>
+        <div class="vdiv"></div>
+        <button class="iconbtn viewctl" id="drawerToggle" title="Panel Detail (Ctrl+Shift+D)" onclick="toggleDrawer()">▤</button>
+      </div>
+    </div>
+
+    <div class="thread" id="thread">
+      <div class="daysep">Hari ini</div>
+      <div class="bub in">Halo kak, pesanan saya sudah dikirim belum ya?<div class="t">14:48</div></div>
+      <div class="bub out">Halo kak Yosep, saya cek dulu ya 🙏<div class="t">14:49</div></div>
+      <div class="bub out">Pesanan sudah diproses, estimasi kirim hari ini.<div class="t">14:50</div></div>
+      <div class="bub in">Baik kak, ditunggu ya. Kalau sudah kirim tolong infokan resinya.<div class="t">14:52</div></div>
+      <div class="newmsg hide" id="newmsg" onclick="this.classList.add('hide')">↓ Pesan baru</div>
+    </div>
+    <div class="composer" id="composer">
+      <button class="iconbtn" title="Lampiran" onclick="alert('Attachment picker (existing FE)')">📎</button>
+      <input id="composeInput" placeholder="Ketik balasan…">
+      <span class="status" id="composeStatus"></span>
+      <button class="btn primary" id="sendBtn" onclick="doSend()">Kirim</button>
+    </div>
+
+    <!-- disconnected channel banner replaces composer (FE DisconnectedAccountBanner) -->
+    <div class="disc-banner hide" id="discBanner">
+      <div class="db-text">
+        <div class="db-title">Perlu Menyesuaikan Nomor WA Web</div>
+        <div class="db-sub">Anda tidak dapat mengirim pesan karena perlu menyesuaikan nomor di Satuinbox.</div>
+      </div>
+      <button class="btn" onclick="openModal('m-adjust-account')">⚙ Sesuaikan Akun</button>
+    </div>
+
+    <!-- ws alt states -->
+    <div class="ws-empty hide" id="ws-none"><div class="glyph">💬</div><div><b>Pilih percakapan</b><br>Pilih percakapan dari daftar untuk mulai bekerja.</div></div>
+    <div class="ws-loading hide" id="ws-loading"><div class="skel" style="width:180px"></div><div class="skel" style="width:120px"></div><div style="color:var(--muted)">Memuat percakapan…</div></div>
+  </section>
+
+  <!-- DRAWER -->
+  <aside class="drawer panel">
+    <div class="dhead">
+      <div><div class="dt">Detail Percakapan</div><div class="cv">CV-1730 <button class="copybtn" title="Salin" onclick="copied(this)">⧉ salin</button></div></div>
+      <div class="dha">
+        <button class="iconbtn" id="ticketBtn" title="Buat Tiket dari percakapan ini" onclick="alert('Buat Tiket dari percakapan ini — TicketDraftForm (FE create-ticket-from-conversation)')">🎫</button>
+        <span class="gap16"></span>
+        <button class="iconbtn" title="Tutup panel (Esc)" onclick="closeDrawer()">✕</button>
+      </div>
+    </div>
+
+    <div class="dbody" id="drawer-loaded">
+      <div class="sec">
+        <h4>Customer</h4>
+        <div class="cust-name">Yosep Danny</div>
+        <div class="cust-line">+62 896 5505 7778 <button class="copybtn" onclick="copied(this)">⧉</button></div>
+        <span class="pill">🟢 WhatsApp · Open</span>
+        <div class="rlabel-chips"><span class="rchip">VIP <span class="x" onclick="this.parentElement.remove()">✕</span></span><span class="rchip">Retur <span class="x" onclick="this.parentElement.remove()">✕</span></span><button class="rchip-add" title="Tambah label" onclick="openModal('m-add-label')">+</button></div>
+      </div>
+      <div class="sec">
+        <h4>SLA</h4>
+        <div class="sla"><span class="lbl">FRT</span><span class="val">12m 40s</span><span class="state warn">⚠ Approaching</span><span class="info" tabindex="0">i<span class="tip"><b>First Response Time</b> — waktu agent pertama merespons. SLA: 15 menit.</span></span></div>
+        <div class="sla"><span class="lbl">TTC</span><span class="val">2h 15m</span><span class="state ok">● On track</span><span class="info" tabindex="0">i<span class="tip"><b>Time To Close</b> — hingga percakapan selesai. SLA: 4 jam.</span></span></div>
+        <div class="sla"><span class="lbl">RLT</span><span class="val">45m</span><span class="state ok">● On track</span><span class="info" tabindex="0">i<span class="tip"><b>Resolution Time</b> — waktu penyelesaian. SLA: 2 jam.</span></span></div>
+        <div class="sla"><span class="lbl">Wait</span><span class="val">3m 10s</span><span class="state ok">● Antre</span><span class="info" tabindex="0">i<span class="tip"><b>Wait time in queue</b> (FE v2.8.0).</span></span></div>
+      </div>
+      <div class="sec">
+        <h4>Assignment</h4>
+        <div class="assign-row"><span class="k">Kotak Masuk (Tim)</span><span class="v">Tim Support A</span><button class="assign-btn" title="Alihkan tim" onclick="openModal('m-assign-team')">⇄ Ubah tim</button></div>
+        <div class="assign-row"><span class="k">Penerima (Agen)</span><span class="v">Dany Christian</span><button class="rchip-add" style="margin-left:auto" title="Tambah agen (add more)" onclick="openModal('m-assign-agent')">+</button></div>
+        <div class="kv"><span class="k">Sumber</span><span class="v">self-pull</span></div>
+        <span class="ph-note">assignment source: manual / self-pull / system / bulk (FE)</span>
+      </div>
+      <div class="sec">
+        <h4>Tiket</h4>
+        <div class="kv"><span class="k">Status</span><span class="v">Belum ada tiket</span></div>
+      </div>
+      <div class="sec">
+        <h4>Metadata</h4>
+        <div class="kv"><span class="k">Sumber</span><span class="v">WhatsApp Business</span></div>
+        <div class="kv"><span class="k">Akun</span><span class="v">CS-01</span></div>
+        <div class="kv"><span class="k">Dibuat</span><span class="v">09 Sep 2026, 14:30</span></div>
+      </div>
+      <div class="acc"><div class="acc-head" onclick="this.parentElement.classList.toggle('open')">Histori <span class="chev">›</span></div><div class="acc-body">3 percakapan sebelumnya · terakhir 02 Sep 2026.</div></div>
+      <div class="acc"><div class="acc-head" onclick="this.parentElement.classList.toggle('open')">Catatan <span class="chev">›</span></div><div class="acc-body">Belum ada catatan internal.</div></div>
+      <div class="acc"><div class="acc-head" onclick="this.parentElement.classList.toggle('open')">Log <span class="chev">›</span></div><div class="acc-body">14:30 dibuat · 14:32 di-assign ke Support A.</div></div>
+    </div>
+
+    <div class="dbody hide" id="drawer-loading">
+      <div class="sec"><h4>Customer</h4><div class="skel" style="width:60%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:40%"></div></div>
+      <div class="sec"><h4>SLA</h4><div class="skel"></div><div class="skel"></div><div class="skel" style="width:70%"></div></div>
+      <div class="sec"><h4>Assignment</h4><div class="skel" style="width:75%"></div><div class="skel" style="width:65%"></div></div>
+    </div>
+    <div class="dbody hide" id="drawer-empty"><div class="ws-empty"><div class="glyph">💬</div><div>Pilih percakapan<br>untuk melihat detail.</div></div></div>
+    <div class="dbody hide" id="drawer-error"><div class="ws-empty"><div class="glyph">⚠</div><div>Gagal memuat detail.</div><button class="btn" onclick="setDrawer('loaded')">Coba lagi</button></div></div>
+
+    <div class="dfoot" id="dfoot">
+      <button class="btn danger closeIcon" title="Tutup Percakapan (perlu konfirmasi)" onclick="confirmResolve(false)"><span class="ci-ic">✔</span><span class="ci-tx"> Tutup Percakapan</span></button>
+    </div>
+  </aside>
+</div>
+<div class="vp-label" id="vpLabel"></div>
+</div></div>
+
+<!-- confirmation dialog -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h3>Selesaikan percakapan?</h3>
+    <p id="dlgtext">Percakapan akan ditandai selesai dan pindah dari antrean aktif.</p>
+    <div class="acts">
+      <button class="btn" onclick="closeDialog()">Batal</button>
+      <button class="btn danger" onclick="doResolve()">Selesaikan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const app=document.getElementById('app');
+let pinned=false,vp=1280,bulkCount=0;
+
+function tw(id,on){document.getElementById(id).classList.toggle('on',on);}
+function setRole(r){['agent','spv','admin'].forEach(x=>{app.classList.toggle('role-'+x,x===r);tw('r-'+x,x===r);});}
+function setFidelity(f){document.body.classList.toggle('wire',f==='wire');tw('f-hifi',f==='hifi');tw('f-wire',f==='wire');}
+/* ── Filter state (single model, shared by Icon + Expanded; survives viewport switch) ── */
+const fstate={status:'open',read:'all',sort:'newest'};
+function toggleDD(k){
+  const menu=document.getElementById('menu-'+k);
+  const wasOpen=!menu.classList.contains('hide');
+  ['status','read','sort'].forEach(x=>document.getElementById('menu-'+x).classList.add('hide'));
+  if(wasOpen)return;
+  // anchor under the button that's visible in the current mode
+  const btn=document.getElementById('dd-'+k+'-btn');
+  const host=document.querySelector('.filters');
+  const hostBox=host.getBoundingClientRect();
+  const anchor=(btn&&btn.offsetParent)?btn:document.querySelector('#app.filterFull .fbar-exp button[onclick*="'+k+'"]')||host;
+  const b=anchor.getBoundingClientRect();
+  menu.classList.remove('hide'); // measure real width
+  const mw=menu.offsetWidth||190;
+  const maxL=hostBox.width-mw-4;
+  menu.style.left=Math.max(0,Math.min(b.left-hostBox.left,maxL))+'px';
+  menu.style.top=(b.bottom-hostBox.top+4)+'px';
+}
+function closeAllDD(){['status','read','sort'].forEach(x=>document.getElementById('menu-'+x).classList.add('hide'));}
+function _activate(menuId,el){document.getElementById(menuId).querySelectorAll('.fitem').forEach(i=>i.classList.remove('active'));el.classList.add('active');}
+function pickStatus(v,el){fstate.status=v;_activate('menu-status',el);syncStatusUI();closeAllDD();}
+function setStatus(v){fstate.status=v;syncStatusUI();
+  document.querySelectorAll('#menu-status .fitem').forEach((i,idx)=>i.classList.toggle('active',(v==='open')===(idx===0)));}
+function syncStatusUI(){
+  document.getElementById('exp-open').classList.toggle('active',fstate.status==='open');
+  document.getElementById('exp-closed').classList.toggle('active',fstate.status==='closed');
+}
+function syncReadUI(){
+  document.getElementById('dd-read-btn').classList.toggle('active',fstate.read!=='all');
+  document.getElementById('chip-all').classList.toggle('active',fstate.read==='all');
+  document.getElementById('chip-read').classList.toggle('active',fstate.read==='read');
+  document.getElementById('chip-unread').classList.toggle('active',fstate.read==='unread');
+}
+function pickRead(v,ic,lbl,el){fstate.read=v;_activate('menu-read',el);
+  document.getElementById('ic-read').textContent=ic;
+  syncReadUI();closeAllDD();}
+/* chips (full bar) → same shared state; sync icon dropdown too */
+function pickReadChip(v,el){fstate.read=v;
+  const map={all:['💬','Semua'],read:['☑','Sudah dibaca'],unread:['💬','Belum dibaca']};
+  document.getElementById('ic-read').textContent=map[v][0];
+  document.querySelectorAll('#menu-read .fitem').forEach((i,idx)=>i.classList.toggle('active',idx===({all:0,read:1,unread:2}[v])));
+  syncReadUI();}
+function pickSort(v,ic,lbl,el){fstate.sort=v;_activate('menu-sort',el);
+  document.getElementById('ic-sort').textContent=ic;document.getElementById('ic-sort-x').textContent=ic;
+  document.getElementById('lbl-sort').textContent=lbl;closeAllDD();}
+function onSearch(v){const w=document.querySelector('.fsearch');if(w)w.classList.toggle('has-val',!!v);}
+function clearSearch(){const i=document.getElementById('listsearch');i.value='';onSearch('');i.focus();}
+function toggleFullSearch(){const s=document.getElementById('fsearch-full');const show=s.classList.toggle('hide');if(!show)document.getElementById('listsearch2').focus();}
+function toggleSearch(){document.getElementById('listsearch').focus();}
+function segSwap(btn){btn.parentElement.querySelectorAll('.seg,.fs-btn').forEach(s=>s.classList.remove('active'));btn.classList.add('active');}
+document.addEventListener('click',e=>{if(!e.target.closest('.fdd,.fbar-exp,.fmenu'))closeAllDD();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllDD();});
+function openModal(id){document.getElementById(id).classList.remove('hide');}
+function closeModal(id){document.getElementById(id).classList.add('hide');}
+function openQuickAction(el){openModal('m-quickaction');}
+
+function refreshCompact(){
+  const open=app.classList.contains('drawerOpen');
+  updVpLabel();
+}
+function toggleDrawer(){app.classList.contains('drawerOpen')?closeDrawer():openDrawer();}
+function openDrawer(){app.classList.remove('closing');app.classList.add('drawerOpen');refreshCompact();syncD();}
+function closeDrawer(){app.classList.add('closing');app.classList.remove('drawerOpen');refreshCompact();syncD();}
+function togglePin(){pinned=!pinned;
+  tw('d-pin',pinned);document.getElementById('d-pin').textContent=pinned?'Pin on':'Pin off';
+  if(pinned&&!app.classList.contains('drawerOpen'))openDrawer();}
+let roomPinned=false;
+function toggleRoomPin(){roomPinned=!roomPinned;document.getElementById('roomPin').classList.toggle('on',roomPinned);}
+function syncD(){const o=app.classList.contains('drawerOpen');
+  document.getElementById('drawerToggle').classList.toggle('on',o);
+  const b=document.getElementById('d-toggle');b.classList.toggle('on',o);b.textContent=o?'Open':'Closed';}
+function toggleSidenav(){app.classList.toggle('sidenavCollapsed');document.querySelector('.sidenav').classList.remove('peek');updVpLabel();}
+/* peek expand mode: 'hover' (mouseenter) or 'click' (toggle on sidenav click) */
+let peekMode='hover';
+const sidenavEl=()=>document.querySelector('.sidenav');
+function setPeekMode(m){peekMode=m;sidenavEl().classList.remove('peek');tw('pk-hover',m==='hover');tw('pk-click',m==='click');}
+function setDrawerMode(m){const app=document.getElementById('app');app.classList.toggle('drawerInline',m==='inline');tw('dm-float',m==='float');tw('dm-inline',m==='inline');if(typeof updVpLabel==='function')updVpLabel();}
+document.addEventListener('DOMContentLoaded',()=>{
+  const sn=sidenavEl();
+  sn.addEventListener('mouseenter',()=>{if(peekMode==='hover'&&app.classList.contains('sidenavCollapsed'))sn.classList.add('peek');});
+  sn.addEventListener('mouseleave',()=>{if(peekMode==='hover')sn.classList.remove('peek');});
+  sn.addEventListener('click',e=>{ // click-mode: any click on the collapsed rail (except the collapse button) toggles peek
+    if(peekMode!=='click'||!app.classList.contains('sidenavCollapsed'))return;
+    if(e.target.closest('.sn-collapse'))return;
+    e.stopPropagation();sn.classList.toggle('peek');
+  });
+  document.addEventListener('click',e=>{if(peekMode==='click'&&!e.target.closest('.sidenav'))sn.classList.remove('peek');});
+});
+function toggleSec(btn){const open=btn.classList.toggle('open');btn.setAttribute('aria-expanded',open);btn.parentElement.querySelector('.sn-sub').classList.toggle('hide',!open);}
+
+let filterManual=false;
+function setVp(w){vp=w;app.classList.toggle('vp1440',w===1440);tw('v-1280',w===1280);tw('v-1440',w===1440);
+  if(!filterManual)setFilterStyle(w===1440?'full':'icon',true); // responsive default: 1280→icon, 1440→full
+  refreshCompact();}
+function setFilterStyle(s,auto){if(!auto)filterManual=true; // explicit click pins the choice
+  app.classList.toggle('filterIcon',s==='icon');app.classList.toggle('filterFull',s==='full');
+  tw('fs-full',s==='full');tw('fs-icon',s==='icon');}
+
+function showOne(ids,active,fallbackShow){ids.forEach(i=>document.getElementById(i).classList.toggle('hide',i!==active));}
+function setList(s){
+  const map={loaded:'litems',loading:'list-loading',empty:'list-empty',filtered:'list-filtered',noresult:'list-noresult',error:'list-error'};
+  Object.values(map).forEach(id=>document.getElementById(id).classList.add('hide'));
+  document.getElementById(map[s]).classList.remove('hide');
+  ['loaded','loading','empty','filtered','noresult','error'].forEach(k=>tw('l-'+k,k===s));
+}
+function setWs(s){
+  document.getElementById('ws-head').classList.toggle('hide',s!=='loaded');
+  document.getElementById('thread').classList.toggle('hide',s!=='loaded');
+  document.getElementById('composer').classList.toggle('hide',s!=='loaded');
+  document.getElementById('ws-none').classList.toggle('hide',s!=='none');
+  document.getElementById('ws-loading').classList.toggle('hide',s!=='loading');
+  ['loaded','none','loading'].forEach(k=>tw('w-'+k,k===s));
+  if(s==='none'){setDrawer('empty');} // no stale detail
+}
+function setDrawer(s){
+  ['loaded','loading','empty','error'].forEach(k=>{
+    document.getElementById('drawer-'+k).classList.toggle('hide',k!==s);
+    tw('dc-'+k,k===s);});
+  document.getElementById('dfoot').classList.toggle('hide',s!=='loaded');
+}
+function toggleNewMsg(){const n=document.getElementById('newmsg');n.classList.toggle('hide');
+  document.getElementById('rt-new').classList.toggle('on',!n.classList.contains('hide'));}
+
+/* bulk */
+/* bulk select via avatar-hover checkbox — no separate mode toggle */
+function closeBulkMenu(){document.getElementById('bulkMenu').classList.remove('open');}
+function toggleBulkMenu(e){e.stopPropagation();document.getElementById('bulkMenu').classList.toggle('open');}
+function bulkAct(name){closeBulkMenu();alert('Bulk '+name+' — '+bulkCount+' percakapan (FE useBulk* mutation)');}
+function clearSelection(){bulkCount=0;app.classList.remove('bulkActive');closeBulkMenu();
+  document.querySelectorAll('.li .chk.on').forEach(c=>{c.classList.remove('on');c.textContent='';c.nextElementSibling&&c.nextElementSibling.classList.remove('hasChkOn');});}
+function toggleBulk(){clearSelection();document.getElementById('b-mode').classList.remove('on');}
+function toggleChk(e,el){e.stopPropagation();const on=el.classList.toggle('on');
+  el.textContent=on?'✓':'';
+  const av=el.nextElementSibling;if(av&&av.classList.contains('avatar'))av.classList.toggle('hasChkOn',on);
+  bulkCount=document.querySelectorAll('.li .chk.on').length;
+  app.classList.toggle('bulkActive',bulkCount>0);
+  document.getElementById('bulkcnt').textContent=bulkCount+' dipilih';}
+
+/* overflow menu */
+function toggleMenu(e){e.stopPropagation();document.getElementById('overflow').classList.toggle('open');}
+function toggleSearch(){const s=document.getElementById('searchrow');if(!s){alert('search row not yet built — toggle pattern shown');return;}s.classList.toggle('hide');if(!s.classList.contains('hide'))setTimeout(()=>document.getElementById('listsearch').focus(),100);}
+function closeMenu(){document.getElementById('overflow').classList.remove('open');}
+document.addEventListener('click',()=>{closeMenu();closeBulkMenu();});
+
+/* resolve — single confirmation path (OD-03 resolved) */
+let bulkResolve=false;
+function confirmResolve(bulk){bulkResolve=bulk;
+  document.getElementById('dlgtext').textContent=bulk?bulkCount+' percakapan akan ditandai selesai.':'Percakapan akan ditandai selesai dan pindah dari antrean aktif.';
+  document.getElementById('overlay').classList.add('open');}
+function closeDialog(){document.getElementById('overlay').classList.remove('open');}
+function doResolve(){closeDialog();alert(bulkResolve?'Bulk resolve → processing → success (existing FE)':'Resolve → loading → success → list updates');}
+
+/* composer */
+function setCompose(s){const i=document.getElementById('composeInput'),b=document.getElementById('sendBtn'),st=document.getElementById('composeStatus');
+  const disc=s==='disconnected';
+  document.getElementById('composer').classList.toggle('hide',disc);      // disconnected → banner replaces composer
+  document.getElementById('discBanner').classList.toggle('hide',!disc);
+  if(disc){['idle','sending','error','offline'].forEach(k=>tw('c-'+k,false));return;}
+  ['idle','sending','error','offline'].forEach(k=>tw('c-'+k,k===s));
+  i.disabled=s==='sending';b.disabled=s==='sending';
+  st.textContent={idle:'',sending:'Mengirim…',error:'Gagal · coba lagi',offline:'Offline · tersimpan'}[s];
+  st.style.color=s==='error'?'var(--danger)':s==='offline'?'var(--warn)':'var(--muted)';}
+function doSend(){if(!document.getElementById('composeInput').value.trim())return;setCompose('sending');
+  setTimeout(()=>setCompose('idle'),900);}
+
+function copied(el){const t=el.textContent;el.textContent='✓ tersalin';setTimeout(()=>el.textContent=t,1000);}
+function selectConv(el){
+  document.querySelectorAll('.li.sel').forEach(l=>l.classList.remove('sel'));el.classList.add('sel');
+  setCompose(el.dataset.conn==='off'?'disconnected':'idle');   // disconnected row → banner
+}
+
+function updVpLabel(){
+  const open=app.classList.contains('drawerOpen');
+  const coll=app.classList.contains('sidenavCollapsed');
+  const l400=app.classList.contains('list400');
+  const side=coll?56:200, list=l400?400:280, drawer=open?340:0;
+  const inline=app.classList.contains('drawerInline');
+  const ws=vp-64-side-list-(inline?drawer:0);   // inline drawer mengurangi ws; float = overlay
+  document.getElementById('vpLabel').textContent=
+    `viewport ${vp} · rail 64 · sidenav ${side} · list ${list} · workspace ${ws}${open?' · drawer '+drawer+(inline?' (inline)':' (overlay)'):''}`;
+}
+function setListW(o){app.classList.toggle('list400',o==='b');tw('lw-a',o==='a');tw('lw-b',o==='b');updVpLabel();}
+
+/* keyboard */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(document.getElementById('overlay').classList.contains('open'))return closeDialog();if(!pinned)closeDrawer();}
+  if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='d'){e.preventDefault();toggleDrawer();}
+});
+
+syncD();updVpLabel();
+</script>
+
+<!-- Status modal (FE FilterPopover — Open/Closed conversation state) -->
+<div id="m-status" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:280px">
+    <div class="fs-head"><span style="font-weight:600;font-size:14px">Status</span>
+      <span onclick="closeModal('m-status')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <div class="fs-row" style="margin-bottom:0">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="fs-btn active" style="text-align:left;justify-content:space-between" onclick="segSwap(this)">Terbuka <span style="opacity:.5;font-size:11px">(29)</span></button>
+        <button class="fs-btn" style="text-align:left;justify-content:space-between" onclick="segSwap(this)">Tertutup <span style="opacity:.5;font-size:11px">(7)</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Layout/columns modal (FE LayoutColumnsModal — toggle list-item metadata visibility) -->
+<div id="m-layout" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:560px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Tata Letak dan Visibilitas</span>
+      <span onclick="closeModal('m-layout')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <div>
+      <h3 style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px">Visibilitas</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- WhatsApp Badge toggle card -->
+        <div class="toggle-card">
+          <div class="toggle-card-left">
+            <div class="toggle-card-img" style="background:#f0fdf4;border-color:#dcfce7">
+              <img src="/logos/layout-conversation-list-wa-web.png" alt="" width="40" height="40" style="object-fit:contain">
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">Tampilkan Lencana WhatsApp Web</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Tampilkan lencana yang menunjukkan akun WhatsApp Web asal setiap percakapan.</div>
+            </div>
+          </div>
+          <label class="switch"><input type="checkbox" checked onchange="this.parentElement.classList.toggle('on',this.checked)"><span class="slider"></span></label>
+        </div>
+        <!-- Tags toggle card -->
+        <div class="toggle-card">
+          <div class="toggle-card-left">
+            <div class="toggle-card-img" style="background:#eff6ff;border-color:#dbeafe">
+              <img src="/logos/layout-conversation-list-tags.png" alt="" width="40" height="40" style="object-fit:contain">
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">Tampilkan Tag</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Tampilkan tag yang ditetapkan dalam daftar percakapan Anda untuk memudahkan melihat kategori atau topik</div>
+            </div>
+          </div>
+          <label class="switch on"><input type="checkbox" checked onchange="this.parentElement.classList.toggle('on',this.checked)"><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Advanced filter modal (FE AdvanceFilterModal — Agents + Tags) -->
+<div id="m-advanced" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:480px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Filter Lanjutan</span>
+      <span onclick="closeModal('m-advanced')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <div style="display:flex;flex-direction:column;gap:24px;padding:16px 0">
+      <!-- Agents section -->
+      <section>
+        <p style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px">Agen</p>
+        <button class="fs-btn" style="width:100%;text-align:left;padding:8px 12px" onclick="alert('Searchable agent popover (existing FE FilterAgentPopover)')">Filter berdasarkan Agen</button>
+        <div id="selected-agents" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <!-- selected agent badges here (example) -->
+          <span class="badge-pill">Dany Christian <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:4px">&times;</span></span>
+          <span class="badge-pill">Agung D <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:4px">&times;</span></span>
+        </div>
+      </section>
+      <!-- Tags section -->
+      <section>
+        <p style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px">Tag</p>
+        <button class="fs-btn" style="width:100%;text-align:left;padding:8px 12px" onclick="alert('Searchable tag popover (existing FE FilterTagPopover)')">Filter berdasarkan Tag</button>
+        <div id="selected-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <!-- selected tag badges here (example) -->
+          <span class="badge-pill">VIP <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:4px">&times;</span></span>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Action menu (FE QuickAction — IconDots popover, 8 actions, permission-gated) -->
+<div id="m-quickaction" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:240px;padding:6px">
+    <div class="fs-head" style="padding:6px 8px;margin-bottom:4px"><span style="font-weight:600;font-size:13px">Aksi Cepat</span>
+      <span onclick="closeModal('m-quickaction')" style="cursor:pointer;font-size:16px;color:var(--muted)">&times;</span></div>
+    <div class="qa-menu">
+      <div class="qa-row" onclick="closeModal('m-quickaction')" title="MANAGE_ASSIGNEE"><span>👤</span> Tugaskan ke…</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')"><span>✉️</span> Tandai belum dibaca</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')"><span>📅</span> Atur pengingat</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')" title="PIN"><span>📌</span> Sematkan</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')"><span>✅</span> Selesaikan</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')"><span>★</span> Favoritkan</div>
+      <div class="qa-row" onclick="closeModal('m-quickaction')"><span>🚩</span> Tandai spam</div>
+      <div class="qa-row danger" onclick="closeModal('m-quickaction')"><span>🗑</span> Tandai junk</div>
+    </div>
+  </div>
+</div>
+
+<!-- Icon legend (semua indikator conversation list dari FE ConversationCard) -->
+<div id="m-legend" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:520px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Legenda Ikon — Conversation List</span>
+      <span onclick="closeModal('m-legend')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;font-size:12px;color:var(--ink)">
+      <div style="grid-column:1/-1;font-weight:600;color:var(--muted);margin-top:4px">Ikon Kanal (channel)</div>
+      <div class="lg"><span>🟢</span> WhatsApp API</div>
+      <div class="lg"><span>💻</span> WhatsApp Web</div>
+      <div class="lg"><span>📷</span> Instagram</div>
+      <div class="lg"><span>✉️</span> Email</div>
+      <div class="lg"><span>💬</span> Live Chat (Widget)</div>
+      <div style="grid-column:1/-1;font-weight:600;color:var(--muted);margin-top:8px">Indikator Status</div>
+      <div class="lg"><span class="i-star">★</span> Difavoritkan (star)</div>
+      <div class="lg"><span class="sla-pill">⏱ 2j</span> Durasi SLA (ticking)</div>
+      <div class="lg"><span class="i-pin">📌</span> Disematkan (pin)</div>
+      <div class="lg"><span class="i-mention">@</span> Anda disebut (mention)</div>
+      <div class="lg"><span class="unread">3</span> Jumlah belum dibaca</div>
+      <div class="lg"><span class="typing-dots"><i></i><i></i><i></i></span> Sedang mengetik</div>
+      <div style="grid-column:1/-1;font-weight:600;color:var(--muted);margin-top:8px">Status Pesan Keluar (IconMessageStatus)</div>
+      <div class="lg"><span class="read-rcpt waiting">🕒</span> Menunggu (PENDING/PROCESSING)</div>
+      <div class="lg"><span class="read-rcpt">✔</span> Terkirim (SENT) — abu</div>
+      <div class="lg"><span class="read-rcpt">✔✔</span> Sampai (DELIVERED) — abu</div>
+      <div class="lg"><span class="read-rcpt read">✔✔</span> Dibaca (READ) — hijau</div>
+      <div class="lg"><span class="read-rcpt failed">⚠</span> Gagal (FAILED) — merah, klik ulang</div>
+      <div class="lg"><span class="ticket-badge">🎫 Tiket</span> Tiket dibuat</div>
+      <div class="lg"><span class="phone-badge">+62…</span> Nomor akun (WA badge)</div>
+      <div class="lg"><span class="sla-dot warn" style="display:inline-block"></span> Dot presence/SLA (sudut avatar)</div>
+      <div class="lg"><span class="rchip">VIP</span> Tag / label relasi</div>
+      <div class="lg"><span>👥</span> Avatar grup / tiket</div>
+      <div class="lg"><span class="qa" style="opacity:1">⋯</span> Aksi cepat (hover)</div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:14px">Sumber: <code>ConversationCard.tsx</code> · <code>QuickAction.tsx</code>. Visibilitas WA badge &amp; Tag diatur di modal Tata Letak.</p>
+  </div>
+</div>
+
+<!-- Assign Team (team inbox list) — FE AssignTeamSingleModal -->
+<div id="m-assign-team" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:420px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Alihkan ke Tim</span>
+      <span onclick="closeModal('m-assign-team')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <input class="srch" placeholder="Cari tim…" style="width:100%;margin:8px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+    <div class="pick-list">
+      <div class="pick sel" onclick="closeModal('m-assign-team')"><span class="pav" style="background:#dbeafe">🎧</span> Tim Support A <span class="pchk">✓</span></div>
+      <div class="pick" onclick="closeModal('m-assign-team')"><span class="pav" style="background:#dcfce7">💬</span> Tim Support B</div>
+      <div class="pick" onclick="closeModal('m-assign-team')"><span class="pav" style="background:#fef9c3">💳</span> Tim Billing</div>
+      <div class="pick" onclick="closeModal('m-assign-team')"><span class="pav" style="background:#fae8ff">🚚</span> Tim Logistik</div>
+    </div>
+    <p class="ph-note">Sumber: <code>AssignTeamSingleModal.tsx</code> — daftar team inbox.</p>
+  </div>
+</div>
+
+<!-- Assign Agent (agent list) — FE AssignConversationModal -->
+<div id="m-assign-agent" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:420px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Tetapkan Agen</span>
+      <span onclick="closeModal('m-assign-agent')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <input class="srch" placeholder="Cari agen…" style="width:100%;margin:8px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+    <div class="pick-list">
+      <div class="pick sel" onclick="closeModal('m-assign-agent')"><span class="pav">DC</span> Dany Christian <span class="pchk">✓</span></div>
+      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">NY</span> Naftal Yunior</div>
+      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">AR</span> Agung Rahmat</div>
+      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">SW</span> Sari Wulandari</div>
+    </div>
+    <p class="ph-note">Sumber: <code>AssignConversationModal.tsx</code> — daftar agen. "＋ Tetapkan agen" = tambah penerima (multi-assignee).</p>
+  </div>
+</div>
+
+<!-- Sesuaikan Nomor Akun — FE adjust-account modal -->
+<div id="m-adjust-account" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:440px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Sesuaikan Nomor Akun</span>
+      <span onclick="closeModal('m-adjust-account')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <p style="font-size:12px;color:var(--muted);margin:6px 0 10px">Kami mendeteksi bahwa akun WhatsApp Web yang digunakan di Team Inbox telah terputus. Pilih sesi WhatsApp Web lain untuk menghubungkan kembali ke Team Inbox.</p>
+    <div style="font-size:12px;font-weight:600;margin-bottom:4px">Sesuaikan nomor akun</div>
+    <div class="pick-list">
+      <div class="pick" onclick="this.parentElement.querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));this.classList.add('sel')"><span class="pav" style="background:#dcfce7">💻</span> CS-02 · +62 812 3456 7890 <span class="pill" style="margin-left:auto">🟢 Connected</span></div>
+      <div class="pick" onclick="this.parentElement.querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));this.classList.add('sel')"><span class="pav" style="background:#dcfce7">💻</span> CS-03 · +62 813 9876 5432 <span class="pill" style="margin-left:auto">🟢 Connected</span></div>
+      <div class="pick" style="opacity:.45;cursor:not-allowed"><span class="pav" style="background:#fee2e2">💻</span> CS-01 · +62 811 2233 4455 <span class="pill" style="margin-left:auto;color:#b91c1c">🔴 Disconnected</span></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn" onclick="closeModal('m-adjust-account')">Batal</button>
+      <button class="btn primary" onclick="closeModal('m-adjust-account');setCompose('idle')">Simpan perubahan</button>
+    </div>
+    <p class="ph-note">Sumber: i18n <code>adjust-account</code> — bannerTitle/bannerButton/modalTitle/modalDescriptionWithChannels. Simpan → toast "Akun channel berhasil diubah".</p>
+  </div>
+</div>
+
+<!-- Tambah Label (relation tags) — FE relation label modal -->
+<div id="m-add-label" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:360px">
+    <div class="fs-head"><span style="font-weight:600;font-size:16px">Tambah Label</span>
+      <span onclick="closeModal('m-add-label')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <input class="srch" placeholder="Cari atau buat label…" style="width:100%;margin:8px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+    <div class="pick-list">
+      <div class="pick" onclick="closeModal('m-add-label')"><span class="pav" style="background:#dbeafe">🏷</span> VIP</div>
+      <div class="pick" onclick="closeModal('m-add-label')"><span class="pav" style="background:#fef9c3">📦</span> Retur</div>
+      <div class="pick" onclick="closeModal('m-add-label')"><span class="pav" style="background:#dcfce7">✅</span> Prioritas</div>
+      <div class="pick" onclick="closeModal('m-add-label')"><span class="pav" style="background:#fae8ff">🕑</span> Follow-up</div>
+    </div>
+    <p class="ph-note">Sumber: FE relation label modal — apply/unlink per contact (ref issue #2836). Search ketik = filter atau buat baru. Apply → tag di Customer section + list-row `rlabels`.</p>
+  </div>
+</div>
+
+</body>
+</html>

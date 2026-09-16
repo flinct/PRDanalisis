@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inbox Toolbar — clone (img3)</title>
+<style>
+  :root{
+    --bg:#f0f2f5; --card:#fff; --ink:#1f2937; --muted:#6b7280;
+    --accent:#2563eb; --accent-fill:#eff4ff; --border:#e5e7eb;
+    --badge-gray:#f1f3f5; --radius:14px; --chip-r:999px;
+    --fs:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; color:var(--ink);
+    background:var(--bg); padding:32px; line-height:1.4;
+  }
+  .stage{display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap}
+  .panel{display:flex;flex-direction:column;gap:10px}
+  .panel h2{font-size:15px;font-weight:700}
+  .panel .sub{font-size:12px;color:var(--muted);margin-top:-6px}
+
+  /* the toolbar card */
+  .tb{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);overflow:hidden}
+  /* width = the breakpoint the panel demos */
+  .w1280{width:520px} .w1440{width:660px}
+
+  .row{display:flex;align-items:center;justify-content:space-between;
+       gap:12px;padding:12px 16px}
+  .row.rule{border-bottom:1px solid var(--border)}
+  .rleft,.rright{display:flex;align-items:center;gap:8px}
+
+  /* header row */
+  .title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700}
+  .title .ic{color:var(--muted)}
+  .iconbtn{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--border);
+           border-radius:9px;background:#fff;color:var(--muted);cursor:pointer}
+  .iconbtn:hover{background:#f9fafb}
+  .iconbtn.dot{position:relative}
+  .iconbtn.dot::after{content:"";position:absolute;top:5px;right:5px;width:7px;height:7px;
+           border-radius:50%;background:var(--accent);box-shadow:0 0 0 1.5px #fff}
+
+  /* segmented control */
+  .seg{display:flex;background:#f3f4f6;border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+  .seg button{display:flex;align-items:center;gap:6px;border:0;background:transparent;cursor:pointer;
+       font:inherit;font-size:14px;font-weight:500;color:var(--muted);padding:6px 12px;border-radius:8px}
+  .seg button.on{background:#fff;color:var(--accent);font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+  .badge{font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--badge-gray);color:var(--muted)}
+  .seg button.on .badge{background:var(--accent);color:#fff}
+
+  /* dropdown chip */
+  .chip{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;
+       border-radius:9px;padding:7px 10px;font-size:14px;color:var(--ink);cursor:pointer;font:inherit}
+  .chip:hover{background:#f9fafb}
+  .chip .cv{color:var(--muted);font-size:12px}
+
+  /* pill toggles */
+  .pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pill{border:1px solid var(--border);background:#fff;color:var(--ink);border-radius:var(--chip-r);
+        padding:6px 14px;font-size:14px;font-weight:500;cursor:pointer;font:inherit}
+  .pill:hover{background:#f9fafb}
+  .pill.on{border-color:var(--accent);color:var(--accent);background:var(--accent-fill);font-weight:600}
+  .vr{width:1px;height:22px;background:var(--border);margin:0 2px}
+
+  /* COMPACT (1280) filter row = icon-only dropdown chips */
+  .cchip{display:flex;align-items:center;gap:4px;border:1px solid var(--border);background:#fff;
+       border-radius:9px;padding:7px 9px;color:var(--muted);cursor:pointer}
+  .cchip:hover{background:#f9fafb}
+  .cchip .cv{font-size:11px}
+
+  /* mode gating: default = expanded; .compact panel swaps to icon rows */
+  .mode-compact{display:none}
+  .compact .mode-expanded{display:none}
+  .compact .mode-compact{display:flex}
+
+  svg{display:block}
+  .tweaks{width:100%;margin-bottom:20px;display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+  .tweaks button{font:inherit;border:1px solid var(--border);background:#fff;border-radius:8px;padding:5px 10px;cursor:pointer}
+  .tweaks button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-fill)}
+</style>
+</head>
+<body>
+
+<div class="tweaks">
+  <span>Tweaks:</span>
+  <button id="t1280" class="on" onclick="setActive(1280)">1280 compact</button>
+  <button id="t1440" class="on" onclick="setActive(1440)">1440 expanded</button>
+  <span style="margin-left:8px">— toggle panels; both shown by default for comparison</span>
+</div>
+
+<div class="stage">
+
+  <!-- ============ 1280: compact (icon-only filters) ============ -->
+  <div class="panel" id="p1280">
+    <h2>1280px</h2>
+    <div class="sub">Compact filters (icon-only)</div>
+    <div class="tb w1280 compact">
+
+      <!-- Row 1: header -->
+      <div class="row rule">
+        <div class="title">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l2-4h14l2 4M3 8v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8M3 8h6l1 2h4l1-2h6"/></svg></span>
+          Your Inbox
+        </div>
+        <div class="rright">
+          <button class="iconbtn" title="Cari"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Row 2: segmented + sort -->
+      <div class="row rule">
+        <div class="seg">
+          <button class="on">Terbuka <span class="badge">300</span></button>
+          <button>Tertutup <span class="badge">99</span></button>
+        </div>
+        <button class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4v16M7 4L4 8M7 4l3 4M17 20V4M17 20l-3-4M17 20l3-4"/></svg>Terbaru <span class="cv">⌄</span></button>
+      </div>
+
+      <!-- Row 3: COMPACT = icon-only dropdown chips + advanced/layout -->
+      <div class="row">
+        <div class="rleft mode-compact">
+          <button class="cchip" title="Status"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="cv">⌄</span></button>
+          <button class="cchip" title="Dibaca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H5.2L4 17.5z"/></svg><span class="cv">⌄</span></button>
+          <button class="cchip" title="Urutkan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4v16M7 4L4 8M7 4l3 4M17 20V4M17 20l-3-4M17 20l3-4"/></svg><span class="cv">⌄</span></button>
+          <span class="vr"></span>
+          <button class="iconbtn dot" title="Filter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></button>
+          <button class="iconbtn" title="Tata letak"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        </div>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 1440: expanded (labeled filters) ============ -->
+  <div class="panel" id="p1440">
+    <h2>1440px</h2>
+    <div class="sub">Expanded filters (with labels)</div>
+    <div class="tb w1440">
+
+      <!-- Row 1: header -->
+      <div class="row rule">
+        <div class="title">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l2-4h14l2 4M3 8v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8M3 8h6l1 2h4l1-2h6"/></svg></span>
+          Your Inbox
+        </div>
+        <div class="rright">
+          <button class="iconbtn" title="Cari"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Row 2: segmented + sort -->
+      <div class="row rule">
+        <div class="seg">
+          <button class="on">Terbuka <span class="badge">300</span></button>
+          <button>Tertutup <span class="badge">99</span></button>
+        </div>
+        <button class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4v16M7 4L4 8M7 4l3 4M17 20V4M17 20l-3-4M17 20l3-4"/></svg>Terbaru <span class="cv">⌄</span></button>
+      </div>
+
+      <!-- Row 3: EXPANDED = labeled pills + advanced/layout -->
+      <div class="row">
+        <div class="pills">
+          <button class="pill on">Semua</button>
+          <button class="pill">Sudah dibaca</button>
+          <button class="pill">Belum dibaca</button>
+        </div>
+        <div class="rright">
+          <button class="iconbtn" title="Tata letak"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+          <button class="iconbtn dot" title="Filter"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // interactivity: segmented + pill toggles are live per toolbar
+  document.querySelectorAll('.seg').forEach(function(seg){
+    seg.querySelectorAll('button').forEach(function(b){
+      b.onclick=function(){seg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')};
+    });
+  });
+  document.querySelectorAll('.pills').forEach(function(grp){
+    grp.querySelectorAll('.pill').forEach(function(b){
+      b.onclick=function(){grp.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));b.classList.add('on')};
+    });
+  });
+  // Tweaks: show/hide each breakpoint panel
+  function setActive(bp){
+    var btn=document.getElementById('t'+bp), panel=document.getElementById('p'+bp);
+    var on=btn.classList.toggle('on');
+    panel.style.display=on?'flex':'none';
+  }
+</script>
+</body>
+</html>

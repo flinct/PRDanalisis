@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatuInbox — Conversation UI Samples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-0:#08090a;--bg-1:#0f1011;--bg-2:#161718;--bg-3:#1c1d1e;
+  --text-1:#f7f8f8;--text-2:rgba(255,255,255,.65);--text-3:rgba(255,255,255,.4);
+  --border:rgba(255,255,255,.08);--border-subtle:rgba(255,255,255,.04);
+  --accent:#5e6ad2;--accent-hover:#828fff;
+  --green:#3fb950;--yellow:#d29922;--red:#f85149;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-full:9999px;
+  --font:'Inter',-apple-system,system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg-0);color:var(--text-1);font-size:14px;line-height:1.5;font-feature-settings:"cv01","ss03";min-height:100vh}
+
+/* Tab bar */
+.tabs{display:flex;gap:2px;padding:8px 16px;background:var(--bg-1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.tab{padding:6px 16px;border-radius:var(--radius-full);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-3);transition:all .15s;border:none;background:none}
+.tab:hover{color:var(--text-2);background:var(--bg-2)}
+.tab.active{color:var(--text-1);background:var(--accent)}
+.tab-info{margin-left:auto;font-size:11px;color:var(--text-3);align-self:center}
+
+.sample{display:none;padding:0}
+.sample.active{display:block}
+
+/* Shared */
+.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);margin-bottom:8px;padding:12px 16px 4px}
+
+/* Layout mockup containers */
+.mockup{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin:16px;height:640px;display:flex}
+.mockup-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;background:var(--bg-1)}
+.mockup-sidebar{width:280px;min-width:240px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg-1)}
+.mockup-chat{flex:1;display:flex;flex-direction:column;min-width:0}
+.mockup-context{width:300px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg-1)}
+
+/* Conversation list items */
+.conv-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border-subtle);transition:background .1s;font-size:13px}
+.conv-item:hover{background:var(--bg-2)}
+.conv-item.active{background:var(--bg-2);border-left:2px solid var(--accent)}
+.conv-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.conv-name{font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-time{font-size:11px;color:var(--text-3);white-space:nowrap}
+.conv-preview{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-badges{display:flex;gap:4px;margin-top:4px}
+
+/* Badges */
+.badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:var(--radius-full);white-space:nowrap}
+.badge-wa{background:#25d366;color:#000}.badge-email{background:#ea4335;color:#fff}
+.badge-web{background:var(--accent);color:#fff}.badge-ig{background:#e1306c;color:#fff}
+.badge-sla-ok{background:rgba(63,185,80,.15);color:var(--green)}
+.badge-sla-warn{background:rgba(210,153,34,.15);color:var(--yellow)}
+.badge-sla-breach{background:rgba(248,81,73,.15);color:var(--red)}
+.badge-priority{background:rgba(248,81,73,.15);color:var(--red)}
+
+/* Search */
+.search-box{padding:8px 16px}
+.search-box input{width:100%;padding:7px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-1);font-size:13px;outline:none;font-family:var(--font)}
+.search-box input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(94,106,210,.2)}
+.search-box input::placeholder{color:var(--text-3)}
+
+/* Channel filter chips */
+.channel-filter{display:flex;gap:4px;padding:4px 16px 8px;overflow-x:auto}
+.chip{padding:4px 10px;border-radius:var(--radius-full);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;border:1px solid var(--border);background:transparent;color:var(--text-3);transition:all .15s}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Chat header */
+.chat-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg-1)}
+.avatar{width:32px;height:32px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+
+/* SLA bar */
+.sla-bar{display:flex;gap:16px;padding:6px 16px;background:rgba(248,81,73,.04);border-bottom:1px solid rgba(248,81,73,.1);font-size:11px}
+.sla-item{display:flex;align-items:center;gap:4px}
+.sla-dot{width:6px;height:6px;border-radius:50%}
+
+/* Messages */
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg-group{display:flex;gap:8px;max-width:70%}
+.msg-group.out{align-self:flex-end;flex-direction:row-reverse}
+.msg-group .bubble{padding:8px 12px;border-radius:var(--radius-lg);font-size:13px;line-height:1.5}
+.msg-group.in .bubble{background:var(--bg-2);border:1px solid var(--border)}
+.msg-group.out .bubble{background:var(--accent);color:#fff}
+.bubble .sender{font-size:11px;font-weight:600;color:var(--accent);margin-bottom:2px}
+.bubble .meta{font-size:10px;color:var(--text-3);margin-top:4px;text-align:right}
+.msg-group.out .bubble .meta{color:rgba(255,255,255,.6)}
+.msg-note{align-self:center;max-width:85%;padding:8px 16px;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.15);border-radius:var(--radius-md);font-size:12px;color:var(--yellow);text-align:center}
+.msg-note .label{font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.system-msg{align-self:center;font-size:11px;color:var(--text-3)}
+
+/* Typing indicator */
+.typing{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:8px;padding:4px 0}
+.typing-dots span{display:inline-block;width:5px;height:5px;background:var(--text-3);border-radius:50%;animation:bounce 1.4s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+/* Composer */
+.composer{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg-1)}
+.composer-row{display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;padding:8px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-1);font-size:13px;font-family:var(--font);resize:none;outline:none;min-height:38px;line-height:1.4}
+.composer textarea:focus{border-color:var(--accent)}
+.composer textarea::placeholder{color:var(--text-3)}
+.send-btn{width:38px;height:38px;border-radius:var(--radius-md);background:var(--accent);border:none;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.send-btn:hover{background:var(--accent-hover)}
+.composer-tools{display:flex;gap:4px;margin-top:8px}
+.composer-tools button{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:4px;border-radius:var(--radius-sm)}
+.composer-tools button:hover{color:var(--text-2)}
+
+/* Icon buttons */
+.icon-btn{width:32px;height:32px;border-radius:var(--radius-md);border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.icon-btn:hover{background:var(--bg-2);color:var(--text-1)}
+
+/* Context panel */
+.ctx-section{padding:16px;border-bottom:1px solid var(--border)}
+.ctx-section h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);margin-bottom:12px}
+.ctx-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.ctx-row .lbl{color:var(--text-3)}.ctx-row .val{color:var(--text-1);text-align:right}
+.tag{display:inline-block;padding:2px 8px;border-radius:var(--radius-full);font-size:11px;font-weight:500;margin:2px 4px 2px 0}
+.tag-vip{background:rgba(210,153,34,.15);color:var(--yellow)}
+.tag-ent{background:rgba(94,106,210,.15);color:var(--accent-hover)}
+
+.ctx-history{padding:4px 0;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.st-resolved{font-size:10px;padding:2px 6px;border-radius:var(--radius-full);background:rgba(63,185,80,.15);color:var(--green)}
+.st-open{font-size:10px;padding:2px 6px;border-radius:var(--radius-full);background:rgba(94,106,210,.15);color:var(--accent-hover)}
+
+/* Direction labels */
+.dir-label{padding:16px;font-size:13px;color:var(--text-2);line-height:1.6}
+.dir-label strong{color:var(--text-1)}
+
+/* Agent presence */
+.presence{display:flex;margin-left:auto}
+.mini-av{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg-1);margin-left:-6px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:600}
+
+/* Compact variant overrides */
+.compact .conv-item{padding:8px 12px}
+.compact .conv-name{font-size:12px}
+.compact .conv-preview{font-size:11px}
+
+/* Reply/Note toggle */
+.reply-toggle{display:flex;gap:8px;padding-bottom:8px}
+.reply-toggle button{padding:4px 12px;font-size:11px;border-radius:var(--radius-full);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-weight:500}
+.reply-toggle button.active{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tab active" onclick="show(0)">A — Information Dense</button>
+  <button class="tab" onclick="show(1)">B — Balanced</button>
+  <button class="tab" onclick="show(2)">C — Focused / Minimal</button>
+  <span class="tab-info">Based on: Intercom · Zendesk · Chatwoot · Front · Linear</span>
+</div>
+
+<!-- ==================== A: INFORMATION DENSE ==================== -->
+<div class="sample active" id="s0">
+  <div class="dir-label">
+    <strong>Direction A — Information Dense</strong><br>
+    3-panel layout (sidebar + chat + context). Optimized for power users, high conversation volume, frequent multitasking. Inspired by Zendesk Agent Workspace + Intercom. Compact spacing, all data visible at once.
+  </div>
+  <div class="mockup">
+    <!-- Left: Conversation List -->
+    <div class="mockup-sidebar">
+      <div class="mockup-header"><span style="flex:1">Conversations</span><span style="font-size:11px;color:var(--text-3)">24 open</span></div>
+      <div class="search-box"><input placeholder="Search... ⌘K"></div>
+      <div class="channel-filter">
+        <button class="chip active">All</button><button class="chip">📱 WA</button><button class="chip">📧 Email</button><button class="chip">💬 Web</button><button class="chip">📸 IG</button>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div class="conv-item active">
+          <div class="conv-top"><span class="conv-name">Budi Santoso</span><span class="conv-time">2m</span></div>
+          <div class="conv-preview">Order #1234 belum sampai, sudah 5 hari...</div>
+          <div class="conv-badges"><span class="badge badge-wa">📱 WA</span><span class="badge badge-sla-breach">🔴 SLA Breached</span><span class="badge badge-priority">Urgent</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span class="conv-name">Sari Dewi</span><span class="conv-time">15m</span></div>
+          <div class="conv-preview">Bagaimana cara return barang?</div>
+          <div class="conv-badges"><span class="badge badge-web">💬 Web</span><span class="badge badge-sla-ok">🟢 On Track</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span class="conv-name">Ahmad Fauzi</span><span class="conv-time">1h</span></div>
+          <div class="conv-preview">Terima kasih atas bantuannya!</div>
+          <div class="conv-badges"><span class="badge badge-email">📧 Email</span><span class="badge badge-sla-ok">🟢</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span class="conv-name">Maya Putri</span><span class="conv-time">3h</span></div>
+          <div class="conv-preview">Invoice bulan ini belum masuk</div>
+          <div class="conv-badges"><span class="badge badge-wa">📱 WA</span><span class="badge badge-sla-warn">🟡 Due Soon</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span class="conv-name">Rizki Pratama</span><span class="conv-time">5h</span></div>
+          <div class="conv-preview">Apakah produk X masih tersedia?</div>
+          <div class="conv-badges"><span class="badge badge-ig">📸 IG</span><span class="badge badge-sla-ok">🟢</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span class="conv-name">Diana Lestari</span><span class="conv-time">1d</span></div>
+          <div class="conv-preview">Pengiriman ke luar negeri bisa?</div>
+          <div class="conv-badges"><span class="badge badge-wa">📱 WA</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Chat -->
+    <div class="mockup-chat">
+      <div class="chat-header">
+        <div class="avatar" style="background:var(--accent)">BS</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">Budi Santoso</span><span style="font-size:11px;padding:2px 8px;border-radius:var(--radius-full);background:rgba(255,255,255,.06);color:var(--text-3)">📱 WhatsApp</span></div>
+          <div style="font-size:12px;color:var(--text-3)">+62 812-3456-7890 · PT Maju Bersama</div>
+        </div>
+        <div class="presence"><div class="mini-av" style="background:#3fb950;color:#000">AS</div></div>
+        <button class="icon-btn" title="Assign">👤</button>
+        <button class="icon-btn" title="Tag">🏷</button>
+        <button class="icon-btn" title="Resolve">✓</button>
+        <button class="icon-btn" title="More">⋯</button>
+      </div>
+      <div class="sla-bar">
+        <div class="sla-item"><span class="sla-dot" style="background:var(--red)"></span> First Response: <strong style="color:var(--red)">BREACHED</strong></div>
+        <div class="sla-item"><span class="sla-dot" style="background:var(--green)"></span> Resolution: <strong>4h 23m</strong></div>
+      </div>
+      <div class="messages">
+        <div class="system-msg">14 Sep 2026, 10:30 · WhatsApp</div>
+        <div class="msg-group in"><div class="bubble"><div class="sender">Budi Santoso</div>Halo, saya mau tanya tentang order #1234. Sudah 5 hari belum sampai juga. Mohon bantuannya 🙏<div class="meta">10:30 ✓✓</div></div></div>
+        <div class="msg-group in"><div class="bubble">Saya cek di resi masih status "dalam perjalanan" dari 3 hari lalu. Apakah ada masalah?<div class="meta">10:31 ✓✓</div></div></div>
+        <div class="msg-note"><span class="label">Private Note</span>Customer VIP — prioritas handling. Cek logistik. — Agent Sari</div>
+        <div class="msg-group out"><div class="bubble">Halo Pak Budi! Saya cek dulu ya status pengirimannya.<div class="meta">10:45 ✓✓</div></div></div>
+        <div class="msg-group out"><div class="bubble">Untuk order #1234, ternyata ada delay di sorting center JNE. Paket sudah dikeluarkan. Estimasi tiba besok.<div class="meta">10:47 ✓✓</div></div></div>
+        <div class="msg-group in"><div class="bubble">Baik, terima kasih infonya. Kalau besok belum sampai bagaimana?<div class="meta">10:50 ✓✓</div></div></div>
+        <div class="typing"><div class="typing-dots"><span></span><span></span><span></span></div> Agent Sari sedang mengetik...</div>
+      </div>
+      <div class="composer">
+        <div class="composer-row"><textarea rows="1" placeholder="Ketik pesan... (/ untuk canned response)"></textarea><button class="send-btn">➤</button></div>
+        <div class="composer-tools"><button title="Attachment">📎</button><button title="Canned">/</button><button title="Emoji">😊</button><button title="Note">📌</button><button title="Channel">📱</button></div>
+      </div>
+    </div>
+
+    <!-- Right: Context Panel -->
+    <div class="mockup-context">
+      <div class="ctx-section">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="avatar" style="width:40px;height:40px;font-size:15px;background:var(--accent)">BS</div>
+          <div><div style="font-size:14px;font-weight:600">Budi Santoso</div><div style="font-size:12px;color:var(--text-3)">budi@majubersama.co.id</div></div>
+        </div>
+        <div class="ctx-row"><span class="lbl">Phone</span><span class="val">+62 812-3456-7890</span></div>
+        <div class="ctx-row"><span class="lbl">Company</span><span class="val">PT Maju Bersama</span></div>
+        <div class="ctx-row"><span class="lbl">Plan</span><span class="val">Enterprise</span></div>
+        <div class="ctx-row"><span class="lbl">MRR</span><span class="val">Rp 5.000.000</span></div>
+        <div style="margin-top:8px"><span class="tag tag-vip">VIP</span><span class="tag tag-ent">Enterprise</span></div>
+      </div>
+      <div class="ctx-section"><h3>Order Info</h3>
+        <div class="ctx-row"><span class="lbl">Order #</span><span class="val">#1234</span></div>
+        <div class="ctx-row"><span class="lbl">Date</span><span class="val">9 Sep 2026</span></div>
+        <div class="ctx-row"><span class="lbl">Total</span><span class="val">Rp 2.450.000</span></div>
+        <div class="ctx-row"><span class="lbl">Status</span><span class="val" style="color:var(--yellow)">In Transit</span></div>
+      </div>
+      <div class="ctx-section"><h3>Recent Conversations</h3>
+        <div class="ctx-history"><span>#1230 — Payment issue</span><span class="st-resolved">Resolved</span></div>
+        <div class="ctx-history"><span>#1225 — Product inquiry</span><span class="st-resolved">Resolved</span></div>
+        <div class="ctx-history"><span>#1218 — Shipping delay</span><span class="st-open">Open</span></div>
+      </div>
+      <div class="ctx-section"><h3>Notes</h3>
+        <div style="font-size:12px;color:var(--text-2);padding:4px 0">Customer sejak 2024. Prefer WhatsApp. — Sari</div>
+        <button style="background:none;border:1px dashed var(--border);color:var(--text-3);width:100%;padding:8px;border-radius:var(--radius-md);cursor:pointer;font-size:12px;margin-top:8px">+ Add note</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== B: BALANCED ==================== -->
+<div class="sample" id="s1">
+  <div class="dir-label">
+    <strong>Direction B — Balanced</strong><br>
+    2-panel layout (list + chat) with centered content. Reply/Note toggle. Tab-based assignment filter. Cleaner, more readable. Inspired by Front + Help Scout. Wider message area, less chrome.
+  </div>
+  <div class="mockup">
+    <div class="mockup-sidebar compact" style="width:300px">
+      <div class="mockup-header"><span style="flex:1;font-size:15px">Inbox</span><span style="font-size:11px;color:var(--text-3);background:var(--bg-2);padding:2px 8px;border-radius:var(--radius-full)">24 open</span></div>
+      <div class="search-box"><input placeholder="Search..."></div>
+      <div style="display:flex;border-bottom:1px solid var(--border)">
+        <button style="flex:1;padding:8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--accent);border-bottom:2px solid var(--accent);cursor:pointer">My Open</button>
+        <button style="flex:1;padding:8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--text-3);cursor:pointer">Unassigned</button>
+        <button style="flex:1;padding:8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--text-3);cursor:pointer">All</button>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div class="conv-item active" style="border-left:3px solid var(--accent)">
+          <div class="conv-top"><span style="font-size:9px">📱</span><span class="conv-name" style="font-size:12px">Budi Santoso</span><span class="conv-time">2m</span></div>
+          <div class="conv-preview" style="font-size:11px">Order #1234 belum sampai...</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="badge badge-sla-breach" style="font-size:9px">🔴 Breached</span><span style="font-size:10px;color:var(--text-3)">You</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span style="font-size:9px">💬</span><span class="conv-name" style="font-size:12px">Sari Dewi</span><span class="conv-time">15m</span></div>
+          <div class="conv-preview" style="font-size:11px">Cara return barang?</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="badge badge-sla-ok" style="font-size:9px">🟢</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span style="font-size:9px">📧</span><span class="conv-name" style="font-size:12px">Ahmad Fauzi</span><span class="conv-time">1h</span></div>
+          <div class="conv-preview" style="font-size:11px">Terima kasih atas bantuannya!</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="font-size:10px;color:var(--green)">Resolved</span></div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-top"><span style="font-size:9px">📱</span><span class="conv-name" style="font-size:12px">Maya Putri</span><span class="conv-time">3h</span></div>
+          <div class="conv-preview" style="font-size:11px">Invoice bulan ini belum masuk</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="badge badge-sla-warn" style="font-size:9px">🟡</span><span style="font-size:10px;color:var(--text-3)">Unassigned</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-chat" style="background:var(--bg-0)">
+      <div class="chat-header" style="padding:8px 16px">
+        <div style="flex:1;display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="width:28px;height:28px;font-size:11px;background:var(--accent)">BS</div>
+          <div><div style="font-size:13px;font-weight:600">Budi Santoso</div><div style="font-size:11px;color:var(--text-3)">WhatsApp · PT Maju Bersama</div></div>
+        </div>
+        <span style="font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:rgba(248,81,73,.1);color:var(--red)">⚠ SLA: 3m overdue</span>
+        <button class="icon-btn" style="width:28px;height:28px;font-size:12px">⋯</button>
+      </div>
+      <div class="messages" style="padding:24px;max-width:720px;margin:0 auto;width:100%">
+        <div style="text-align:center;font-size:11px;color:var(--text-3);padding:16px 0;border-bottom:1px solid var(--border-subtle);margin-bottom:16px">Today, 14 Sep 2026</div>
+        <div class="msg-group in" style="max-width:85%"><div class="bubble"><div class="sender" style="font-size:12px">Budi Santoso · 📱</div>Halo, saya mau tanya tentang order #1234. Sudah 5 hari belum sampai juga. Mohon bantuannya 🙏<br><br>Saya cek di resi masih "dalam perjalanan" dari 3 hari lalu.<div class="meta">10:30</div></div></div>
+        <div class="msg-note" style="max-width:85%"><span class="label">Internal Note</span>Customer VIP — cek logistik. — Agent Sari</div>
+        <div class="msg-group out" style="max-width:85%"><div class="bubble">Halo Pak Budi! Ternyata ada delay di sorting center JNE. Estimasi tiba besok.<div class="meta">10:47 ✓✓</div></div></div>
+        <div class="msg-group in" style="max-width:85%"><div class="bubble">Baik, terima kasih. Kalau besok belum sampai bagaimana?<div class="meta">10:50</div></div></div>
+      </div>
+      <div class="composer" style="max-width:720px;margin:0 auto;width:100%">
+        <div class="reply-toggle"><button class="active">Reply</button><button>Note</button></div>
+        <div class="composer-row"><textarea rows="1" placeholder="Reply to Budi..."></textarea><button class="send-btn">➤</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== C: FOCUSED ==================== -->
+<div class="sample" id="s2">
+  <div class="dir-label">
+    <strong>Direction C — Focused / Minimal</strong><br>
+    Single-pane conversation with slide-out panels. Minimal chrome, maximum focus. Customer info as header instead of sidebar. Inspired by mobile-first design + Chatwoot's focused mode. Best for agents handling one conversation at a time.
+  </div>
+  <div class="mockup" style="flex-direction:column">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg-1)">
+      <button style="background:none;border:none;color:var(--text-2);cursor:pointer;font-size:18px;padding:4px">☰</button>
+      <div class="avatar" style="width:28px;height:28px;font-size:11px;background:var(--accent)">BS</div>
+      <span style="font-size:14px;font-weight:600;flex:1">Budi Santoso</span>
+      <span style="font-size:11px;padding:3px 8px;border-radius:var(--radius-full);background:rgba(255,255,255,.06);color:var(--text-3)">📱 WhatsApp</span>
+      <span style="font-size:11px;padding:3px 8px;border-radius:var(--radius-full);background:rgba(248,81,73,.1);color:var(--red)">⚠ SLA</span>
+      <button class="icon-btn" style="width:28px;height:28px;font-size:12px">ℹ</button>
+      <button class="icon-btn" style="width:28px;height:28px;font-size:12px">⋯</button>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div class="messages" style="flex:1;padding:32px 24px;max-width:680px;margin:0 auto;width:100%">
+        <div style="text-align:center;margin-bottom:32px">
+          <div class="avatar" style="width:48px;height:48px;font-size:18px;margin:0 auto 12px;background:var(--accent)">BS</div>
+          <div style="font-size:15px;font-weight:600">Budi Santoso</div>
+          <div style="font-size:12px;color:var(--text-3)">+62 812-3456-7890 · PT Maju Bersama</div>
+          <div style="margin-top:8px"><span class="tag tag-vip">VIP</span><span class="tag tag-ent">Enterprise</span></div>
+        </div>
+        <div class="msg-group in" style="max-width:100%"><div class="bubble">Halo, saya mau tanya tentang order #1234. Sudah 5 hari belum sampai. Mohon bantuannya 🙏<div class="meta">10:30</div></div></div>
+        <div class="msg-group in" style="max-width:100%"><div class="bubble">Saya cek di resi masih "dalam perjalanan" dari 3 hari lalu.<div class="meta">10:31</div></div></div>
+        <div class="msg-note" style="max-width:100%"><span class="label">Note</span>Customer VIP. Cek logistik. — Sari</div>
+        <div class="msg-group out" style="max-width:100%"><div class="bubble">Halo Pak Budi! Ternyata ada delay di sorting center JNE. Estimasi tiba besok.<div class="meta">10:47 ✓✓</div></div></div>
+        <div class="msg-group in" style="max-width:100%"><div class="bubble">Baik, terima kasih. Kalau besok belum sampai bagaimana?<div class="meta">10:50</div></div></div>
+        <div class="typing"><div class="typing-dots"><span></span><span></span><span></span></div> Agent Sari sedang mengetik...</div>
+      </div>
+      <div class="composer" style="max-width:680px;margin:0 auto;width:100%">
+        <div class="composer-row"><textarea rows="1" placeholder="Type a message..."></textarea><button class="send-btn">➤</button></div>
+        <div class="composer-tools"><button>📎</button><button>😊</button><button>📌</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.sample').forEach((s,j)=>s.classList.toggle('active',i===j));
+}
+</script>
+</body>
+</html>

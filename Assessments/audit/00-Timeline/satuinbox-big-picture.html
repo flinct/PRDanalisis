@@ -142,11 +142,13 @@
   .section-label{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:2px}
   .section-sublabel{font-size:10.5px;color:var(--text-3);margin-bottom:12px}
 
-  /* §22/§54 — inter-section flow node: sits in the gap, vertically centred, never a floating FAB */
+  /* §22/§54 — inter-section flow node: sits in the RIGHT gap of each panel,
+     vertically top-aligned (not center — panels have different heights).
+     left:-35px = -(36px gap / 2) - (34px / 2) + 1px = dead center of gap. */
   .flow-node{
-    position:absolute;top:50%;left:-31px;transform:translateY(-50%);
+    position:absolute;top:14px;right:-35px;
     width:34px;height:34px;border-radius:50%;
-    background:var(--next-bg);border:1px solid var(--next-border);color:var(--next-fg);
+    background:var(--next-bg);border:1.5px solid var(--next-border);color:var(--next-fg);
     display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;
     z-index:3;pointer-events:none;
   }
@@ -167,14 +169,14 @@
   .channel-icon svg{width:16px;height:16px;display:block}
   .connector-layer{position:relative;flex:0 0 46px;align-self:stretch;z-index:1}
   .connector-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-  .connector-svg path{fill:none;stroke:var(--connector);stroke-width:1.2px;stroke-dasharray:2 5;stroke-linecap:round;opacity:.75} /* §20/§21/§46 */
+  .connector-svg path{fill:none;stroke:var(--connector);stroke-width:1.6px;stroke-dasharray:3 6;stroke-linecap:round;opacity:.85} /* §20/§21/§46 */
   .next-flow{
     width:34px;height:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:center;
-    border-radius:50%;background:var(--next-bg);border:1px solid var(--next-border);color:var(--next-fg);font-size:17px;font-weight:600;z-index:3;
+    border-radius:50%;background:var(--next-bg);border:1.5px solid var(--next-border);color:var(--next-fg);font-size:17px;font-weight:600;z-index:3;
   }
 
   /* platform panel */
-  .platform-panel{background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px}
+  .platform-panel{position:relative;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:14px;padding:18px}
   .platform-panel h2{font-size:17px;font-weight:800;color:var(--text-1);text-align:center}
   .platform-panel .p-sub{font-size:11px;color:var(--text-3);text-align:center;margin-top:3px;margin-bottom:14px}
   .platform-features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
@@ -446,7 +448,6 @@
 
       <!-- Col 2: Platform -->
       <div class="platform-panel">
-        <div class="flow-node" aria-hidden="true">→</div>
         <h2>SatuInbox Platform</h2>
         <div class="p-sub">Omnichannel Customer Service Platform · 20 microservices · NestJS · MongoDB · RabbitMQ</div>
 
@@ -517,11 +518,11 @@
             <div class="pillar-desc">Adapt to your needs</div>
           </div>
         </div>
+        <div class="flow-node" aria-hidden="true">→</div>
       </div>
 
       <!-- Col 3: Product Modules -->
       <div class="modules-panel">
-        <div class="flow-node" aria-hidden="true">→</div>
         <div class="section-label">Product Modules</div>
         <div class="section-sublabel">Turn conversations into value.</div>
           <div class="module-item">
@@ -584,11 +585,11 @@
             <span><span class="lg" style="background:var(--text-4)"></span>Planned / backlog</span>
             <span class="legend-note">* Fraud broadcast: blocked, menunggu requirement Lincah</span>
           </div>
+        <div class="flow-node" aria-hidden="true">→</div>
       </div>
 
       <!-- Col 4: Business Value -->
       <div class="value-panel">
-        <div class="flow-node" aria-hidden="true">→</div>
         <div class="section-label">Business Value</div>
         <div class="section-sublabel">Create impact at every level.</div>
 

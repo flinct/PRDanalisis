@@ -4,7 +4,9 @@
 **Product Manager**: Dany Christian
 **Engineering Lead**: Naftal Yunior
 **Design Lead**: N/A (system/infrastructure PRD — no UI)
-**Version**: 2.0
+**Version**: 2.3
+**Link**: TBD
+**Contributors**: TBD
 **TRD**: — (until trd/trd-advance-export-phase-1-row-level-collections.md exists)
 
 ## **1. Revision History**
@@ -13,7 +15,9 @@
 | ----- | ----- | ----- | ----- |
 | v1.0 | 2026-08-12 | Dany Christian | Initial PRD for Phase 1: row-level export collections + zero-impact sync pipeline. |
 | v2.0 | 2026-08-19 | Dany Christian | Major revision: pivot from event-driven to pull-based sync (B-01); throttled primary-read backfill (B-02); manual load test as launch gate replacing APM (B-03); hash-based rowKey for broadcast + raw PII storage + erasure descoped (B-04); TTL on expireAt, retention 180 days (B-05); erasure moved to out-of-scope + PII classification table (B-06); ObjectId types for tenant/entity IDs (B-07); permission scope deferred to Phase 2 (B-08); added NFR-018..NFR-022 for export caps, timeouts, concurrency, storage (B-09); empty-range handling via coverage collection (B-10); terminology standardized to Phase-N; nits applied (EC-005, NFR-017, §16.B, revision history). |
-| v2.1 | 2026-08-19 | Dany Christian | Phase-3 (PRD-C) prerequisite corrections: (a) `broadcastexportdata.status` now stores the real `BroadcastStatusEnum` 12-value vocabulary (`libs/common/src/lib/enums/index.ts:1228`) with a display-mapping note, replacing the invented `SUCCESS/IN_PROGRESS/...` set; (b) added `batchId` (campaign key = `BroadcastBatch._id`) distinct from `broadcastId` (recipient row PK = `Broadcast._id`), and campaign-clean `batchName` from `BroadcastBatch.name`, enabling PRD-C campaign-level `$group`; (c) `rowKey` corrected — `broadcastId` IS the recipient PK, so `{companyId, organizationId, broadcastId}` alone is the deterministic recipient key; (d) `broadcastChannel` fixed to `BroadcastPlatformEnum` (`whatsapp_web`/`whatsapp_api`), `source` to `BroadcastTypeEnum` (`manual`/`import`/`open-api`) — "Open API" is a source `type`, not a platform; (e) US-013/INVALID_REQUEST scope softened to a deferred future capability (no domain record exists today — rejected Open API requests are discarded before persistence). |
+| v2.1 | 2026-08-19 | Dany Christian | Phase-3 (PRD-C) prerequisite corrections: (a) `broadcastexportdata.status` now stores the real `BroadcastStatusEnum` 12-value vocabulary (`libs/common/src/lib/enums/index.ts:1228`) with a display-mapping note, replacing the invented `SUCCESS/IN_PROGRESS/...` set; (b) added `batchId` (campaign key = `BroadcastBatch._id`) distinct from `broadcastId` (recipient row PK = `Broadcast._id`), and campaign-clean `batchName` from `BroadcastBatch.name`, enabling PRD-C campaign-level `$group`; (c) `rowKey` corrected — `broadcastId` IS the recipient PK, so `{companyId, organizationId, broadcastId}` alone is the deterministic recipient key; (d) `broadcastChannel` fixed to `BroadcastPlatformEnum` (`whatsapp_web`/`whatsapp_api`), `source` to `BroadcastTypeEnum` (`manual`/`import`/`open-api`) — "Open API" is a source `type`, not a platform (NOTE: `broadcastChannel` enum further corrected to `PlatformEnum` in v2.2 — see below); (e) US-013/INVALID_REQUEST scope softened to a deferred future capability (no domain record exists today — rejected Open API requests are discarded before persistence). |
+| v2.2 | 2026-09-14 | Dany Christian | Phase-1 re-review (READY WITH MINOR EDITS) fixes: (N-01) added FR-013a — `recipientName` resolved at projection time via people-service gRPC (exempt from FR-015), null fallback rendered `-`; (N-02) §10.3 `rowKey` example de-PII'd to 3-component form; (N-03) `recipientNumber`/`senderNumber` examples shown raw with export-time-masking note; (N-04) `teamId` retyped `ObjectId[]` (array) with `[]` default in §10.1 + §10.2, resolving type/default contradiction; (N-05) NFR-007 made derived from `MONGODB_ANALYTICS_MAX_POOL_SIZE` (drops absolute 50 vs 10 contradiction with NFR-021); (N-06) added FR-036a (live-day COMPLETE + stale-`lastSyncedAt` guard) + FR-036b (`DATA_EXPIRED` derived from retention window, not coverage state) + `expireAt` TTL field on `exportdatacoverage` §10.5 + Appendix G TTL correction; (N-08) `broadcastChannel` enum corrected from `BroadcastPlatformEnum` (2-value) to `PlatformEnum` (6-value, = `Broadcast.platform`, `broadcast.schema.ts:180-185`); nits: `status` columns name source enums (`ConversationStatusEnum`/`TicketStatusEnum`), `batchId` notes source FK field is `batch`, OQ-16 risk row marked RESOLVED, §10.4 `recipientName` scrub clarified "at export", header Version 2.0→2.2 + Link/Contributors rows. |
+| v2.3 | 2026-09-14 | Dany Christian | Cross-phase consistency fix from Phase-3 re-review (senderNumber 3-PRD inconsistency): `senderNumber` de-flagged from PII — it is the company-owned WA sender account number (`doc.sender ?? accountChannel.phoneNumber`, `broadcast-export.service.ts:302`), not recipient data; §10.3 row note rewritten (exported raw, no masking), §10.4 PII scrub table row reclassified COMPANY_OWNED / No masking. Aligns with PRD-B v2.2 FR-004/FR-061 + PRD-C v2.1 FR-041. |
 
 ## **2. Overview**
 
@@ -77,11 +81,11 @@
 | ----- | ----- |
 | **Collection Schema** | FR-001 [P0]: System MUST create collection `conversationexportdata` in `satuinbox_analytics` with fields defined in §10 (Field & Validation). FR-002 [P0]: System MUST create collection `ticketexportdata` in `satuinbox_analytics` with fields defined in §10. FR-003 [P0]: System MUST create collection `broadcastexportdata` in `satuinbox_analytics` with fields defined in §10. FR-004 [P0]: All three collections MUST have `companyId` and `organizationId` as mandatory dimensions on every document. FR-005 [P0]: Each collection MUST use the source entity's primary key as the natural dedup/upsert key. For `broadcastexportdata`, `rowKey` = `sha256(companyId\|organizationId\|broadcastId)` — `broadcastId` (= `Broadcast._id`) is the recipient row's unique PK, sufficient alone. Unique index on `{companyId, organizationId, rowKey}`. `recipientNumber` MUST NOT be part of any unique index. Campaign identity is carried by `batchId` (= `BroadcastBatch._id`), a separate non-unique field used by PRD-C for campaign-level `$group`. FR-006 [P0]: Collections MUST be append/upsert projections — they are NOT the source of truth. Domain services remain source of truth. FR-007 [P0]: System MUST NOT create read dependencies from analytics-service back to operational collections at query time. All data MUST be materialized in the analytics collections. |
 | **Indexes** | FR-008 [P0]: `conversationexportdata` MUST have compound index on `{companyId, organizationId, createdAt, status}`. FR-009 [P0]: `ticketexportdata` MUST have compound index on `{companyId, organizationId, createdAt, status}`. FR-010 [P0]: `broadcastexportdata` MUST have compound index on `{companyId, organizationId, createdAt, status}`. FR-011 [P0]: Each collection MUST have a unique index on its natural key for idempotent upsert (see FR-005). FR-012 [P1]: System SHOULD add secondary indexes on `channel`, `assignedTo`/`assignee`, and `closedAt` per collection — final index list decided in TRD based on query pattern. |
-| **Sync Pipeline — Pull-Based (Existing Pattern Extended)** | FR-013 [P0]: analytics-service MUST pull row-level data from domain services via RabbitMQ request/response using `ANALYTICS_AGGREGATE_*` patterns, extended to row-grain payloads. Domain services respond to RMQ aggregation requests (aggregation-scheduler.service.ts:208,434,549). Row-grain projection extends this pattern with per-entity payloads. FR-014 [P0]: System MUST project pulled data into the corresponding row-level collection via upsert. FR-015 [P0]: Pull sync MUST NOT make gRPC calls — only RabbitMQ request/response via existing MessagePattern handlers. FR-016 [P0]: System MUST process responses idempotently — re-processing the same response MUST NOT create duplicate rows. FR-017 [P0]: System MUST handle out-of-order responses — a later response with older `updatedAt` MUST NOT overwrite a more recent projection (last-writer-wins by `sourceUpdatedAt` or response timestamp, not by processing order). FR-018 [P0]: System MUST log and dead-letter responses that fail projection after 3 retry attempts. |
+| **Sync Pipeline — Pull-Based (Existing Pattern Extended)** | FR-013 [P0]: analytics-service MUST pull row-level data from domain services via RabbitMQ request/response using `ANALYTICS_AGGREGATE_*` patterns, extended to row-grain payloads. Domain services respond to RMQ aggregation requests (aggregation-scheduler.service.ts:208,434,549). Row-grain projection extends this pattern with per-entity payloads. FR-013a [P0]: For `broadcastexportdata`, `recipientName` MUST be resolved at projection time by batch-resolving unique `recipientNumber` values against people-service contacts via **gRPC** (mirroring the export-time lookup at `broadcast-export.service.ts:256-289`), de-duplicated per pull batch. This resolution is exempt from FR-015's no-gRPC rule because it is a sync-side enrichment, not an export-time dependency. If no contact matches, `recipientName` MUST be stored as `null` and rendered as `-` at export time. Resolution failures MUST NOT fail the row projection — the row is written with `recipientName = null` and retried on the next pull cycle. FR-014 [P0]: System MUST project pulled data into the corresponding row-level collection via upsert. FR-015 [P0]: Pull sync MUST NOT make gRPC calls — only RabbitMQ request/response via existing MessagePattern handlers. FR-016 [P0]: System MUST process responses idempotently — re-processing the same response MUST NOT create duplicate rows. FR-017 [P0]: System MUST handle out-of-order responses — a later response with older `updatedAt` MUST NOT overwrite a more recent projection (last-writer-wins by `sourceUpdatedAt` or response timestamp, not by processing order). FR-018 [P0]: System MUST log and dead-letter responses that fail projection after 3 retry attempts. |
 | **Sync Pipeline — Backfill** | FR-019 [P0]: Backfill MUST read from primary with throttled batches (500/batch, configurable delay). System MUST support `readPreference=secondaryPreferred` when `MONGODB_ANALYTICS_BACKFILL_URI` is provisioned (toggle: `ENABLE_SECONDARY_READ`). FR-020 [P0]: Backfill MUST be throttled and chunked (configurable chunk size, default 500 docs/batch, configurable delay between batches). FR-021 [P0]: Backfill MUST NOT exceed the latency guard (NFR-003). When `ENABLE_SECONDARY_READ=true`, backfill MUST use the secondary-read URI. FR-022 [P1]: Backfill MUST expose a progress metric (percentage complete, estimated time remaining). FR-023 [P1]: After backfill completes, system MUST run a parity check comparing source row counts to projected row counts per tenant per date range. FR-024 [P1]: Backfill MUST be pausable and resumable. |
 | **Tenant Scoping** | FR-025 [P0]: Every write to a row-level collection MUST include `companyId` and `organizationId`. FR-026 [P0]: Every read/query on a row-level collection MUST be scoped by `companyId` and `organizationId`. Phase 1 scope: company + organization isolation only. Row-level permission scope (team/agent/contactScope per PermissionsGuard and TicketViewEnum) is owned by Phase 2 FR-052. Phase 1 guarantees scoping fields (`teamId`, `assignedTo`, `assignee`) are populated in every projected row. FR-027 [P0]: System MUST NOT allow queries without both `companyId` and `organizationId` — unscoped queries MUST be rejected at the query-builder level. FR-028 [P0]: If a pulled response lacks `companyId` or `organizationId`, the system MUST reject the response, log an error, and send to dead-letter queue. |
 | **Retention / Lifecycle** | FR-029 [P1]: Row-level export data MUST be retained for `EXPORT_ROW_RETENTION_DAYS` (default 180, configurable). Retention MUST be >= backfill target range (90 days). FR-030 [P1]: System MUST enforce retention via TTL index on a dedicated `expireAt` field set at projection time: `expireAt = max(createdAt, sourceUpdatedAt) + RETENTION_DAYS`. NOT on `createdAt` — active entities must not be purged mid-lifecycle. FR-031 [P1]: TTL value MUST be configurable per environment without code change. |
-| **Consistency** | FR-034 [P0]: System MUST achieve eventual consistency — sync lag from domain event to analytics projection MUST be < 5 minutes at p95 (ASSUMED target — see OQ in Appendix). FR-035 [P1]: System MUST expose a `syncLagMs` metric per collection for monitoring. FR-036 [P0]: System MUST maintain an `exportdatacoverage` document per `{companyId, organizationId, collection, date}` recording state ∈ {NOT_BACKFILLED, BACKFILLING, COMPLETE}, `rowCount`, `lastSyncedAt`. Export consumers MUST read coverage before querying rows and MUST fail with `DATA_NOT_READY` when any requested date is not COMPLETE. |
+| **Consistency** | FR-034 [P0]: System MUST achieve eventual consistency — sync lag from domain event to analytics projection MUST be < 5 minutes at p95 (ASSUMED target — see OQ in Appendix). FR-035 [P1]: System MUST expose a `syncLagMs` metric per collection for monitoring. FR-036 [P0]: System MUST maintain an `exportdatacoverage` document per `{companyId, organizationId, collection, date}` recording state ∈ {NOT_BACKFILLED, BACKFILLING, COMPLETE}, `rowCount`, `lastSyncedAt`. Export consumers MUST read coverage before querying rows and MUST fail with `DATA_NOT_READY` when any requested date is not COMPLETE. FR-036a [P0]: The current UTC day's coverage document is maintained in state COMPLETE with a rolling `rowCount`/`lastSyncedAt` updated each pull cycle; export consumers MUST treat COMPLETE with `lastSyncedAt` older than the sync-lag SLO (NFR-004, 5 min) as `DATA_NOT_READY`. This prevents strict-reading failures on today's still-filling day. FR-036b [P0]: `DATA_EXPIRED` MUST be determined by comparing the requested date against `now - EXPORT_ROW_RETENTION_DAYS`, NOT from coverage state — coverage docs for dates outside the retention window are deleted by the same TTL policy (`expireAt`, see §10.5), so a COMPLETE-with-stale-rowCount state can never be read back. |
 | **Observability** | FR-037 [P0]: System MUST emit metrics: items consumed, items projected, items failed, sync lag per collection. FR-038 [P0]: System MUST emit backfill progress metrics: percentage complete, batch rate, estimated completion time. FR-039 [P0]: System MUST log every dead-letter item with full payload and failure reason. FR-040 [P0]: System MUST alarm via log warning + RMQ notification when estimated sync load exceeds safe threshold. Formal APM instrumentation (prom-client, Grafana) is post-MVP. |
 
 ## **7. Error Handling**
@@ -137,7 +141,7 @@
 | `contactName` | string | `Budi Santoso` | — | No | null | Domain data |
 | `contactPhone` | string | `+62812xxxx` | — | No | null | Domain data (PII — IDENTIFIER) |
 | `contactEmail` | string | `user@mail.com` | — | No | null | Domain data (PII — IDENTIFIER) |
-| `status` | string | `OPEN` | Valid enum | Yes | — | Domain data |
+| `status` | string | `OPEN` | `ConversationStatusEnum` (`enums/index.ts:680`) | Yes | — | Domain data |
 | `channel` | string | `whatsapp` | Valid platform | Yes | — | Domain data |
 | `platformId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0e5` | — | No | null | Domain data |
 | `assignedTo` | ObjectId[] | `[64a1b2c3d4e5f6a7b8c9d0e6, ...]` | — | Yes | [] | Domain data |
@@ -151,7 +155,7 @@
 | `subTopic` | string | `Pricing` | — | No | null | Domain data |
 | `inboxId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0e9` | — | No | null | Domain data |
 | `inboxName` | string | `Support - Jakarta` | — | No | null | Domain data |
-| `teamId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0ea` | — | Yes | [] | Domain data |
+| `teamId` | ObjectId[] | `["64a1b2c3d4e5f6a7b8c9d0ea"]` | — | No | [] | Domain data (array — a row may span multiple teams; populated for Phase-2 FR-052 scoping) |
 | `firstReplyTimeMs` | number | `4350000` | ≥ 0 | No | null | Domain data |
 | `firstResponseTimeMs` | number | `2710000` | ≥ 0 | No | null | Domain data |
 | `timeToCloseMs` | number | `29940000` | ≥ 0 | No | null | Domain data |
@@ -185,7 +189,7 @@
 | `ticketNumber` | string | `TK-6749104949` | — | Yes | — | Domain data (display code, string) |
 | `title` | string | `Life Problem` | — | No | null | Domain data |
 | `awb` | string | `AWB123456` | — | No | null | Domain data / custom field |
-| `status` | string | `UNASSIGNED` | Valid enum | Yes | — | Domain data |
+| `status` | string | `UNASSIGNED` | `TicketStatusEnum` (`enums/index.ts:1066`) | Yes | — | Domain data |
 | `currentStage` | string | `On Progress` | Unattended/Open/On Progress/Done | No | null | Domain data |
 | `stageDurationUnattendedMs` | number | `3600000` | ≥ 0 | No | null | Derived |
 | `stageDurationOpenMs` | number | `7200000` | ≥ 0 | No | null | Derived |
@@ -218,7 +222,7 @@
 | `tags` | string[] | `["shipping", "refund"]` | — | No | [] | Domain data |
 | `inboxId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0f6` | — | No | null | Domain data |
 | `inboxName` | string | `Support - Jakarta` | — | No | null | Domain data |
-| `teamId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0f7` | — | Yes | [] | Domain data |
+| `teamId` | ObjectId[] | `["64a1b2c3d4e5f6a7b8c9d0f7"]` | — | No | [] | Domain data (array — a row may span multiple teams; populated for Phase-2 FR-052 scoping) |
 | `description` | string | `Customer said hello` | — | No | null | Domain data (FREE_TEXT_MAY_CONTAIN_PII) |
 | `slaFrtStatus` | string | `MET` | MET/BREACHED/N/A | No | null | Domain data |
 | `slaResolveStatus` | string | `BREACHED` | MET/BREACHED/N/A | No | null | Domain data |
@@ -240,15 +244,15 @@
 | `_id` | ObjectId | — | Auto-generated | Auto | — | MongoDB |
 | `companyId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0e1` | Non-empty | Yes | — | Pull response |
 | `organizationId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d0e2` | Non-empty | Yes | — | Pull response |
-| `rowKey` | string | `sha256(comp\|org\|brd\|+628...)` | Deterministic hash | Yes | — | Computed at projection time |
-| `batchId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d100` | — | Yes | — | Domain data (campaign key = `BroadcastBatch._id`) |
+| `rowKey` | string | `sha256(comp\|org\|64a1b2c3d4e5f6a7b8c9d101)` | Deterministic hash | Yes | — | Computed at projection time. Three components only — `{companyId, organizationId, broadcastId}`. `recipientNumber` is NOT a key component (see FR-005). |
+| `batchId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d100` | — | Yes | — | Domain data (campaign key = `BroadcastBatch._id`; source FK field on the Broadcast doc is named `batch`, NOT `batchId` — `broadcast.schema.ts:107`) |
 | `batchName` | string | `Promo May` | — | No | null | Domain data (campaign name = `BroadcastBatch.name`, clean; NOT the per-recipient `Broadcast.name` which is suffixed with the recipient number) |
 | `broadcastId` | ObjectId | `64a1b2c3d4e5f6a7b8c9d101` | — | Yes | — | Domain data (recipient row PK = `Broadcast._id`) |
 | `broadcastName` | string | `Promo May - (+628...)` | — | No | null | Domain data (per-recipient `Broadcast.name`, suffixed — for recipient-level rows only) |
-| `broadcastChannel` | string | `whatsapp_api` | `whatsapp_web`/`whatsapp_api` (`BroadcastPlatformEnum`) | Yes | — | Domain data (= `Broadcast.platform`) |
+| `broadcastChannel` | string | `whatsapp_api` | `PlatformEnum` (`whatsapp_api`/`whatsapp_web`/`widget`/`email`/`instagram`/`facebook_messenger`) | Yes | — | Domain data (= `Broadcast.platform`, typed `PlatformEnum` at `broadcast.schema.ts:185`, enum at `enums/index.ts:691`). NOT `BroadcastPlatformEnum` — that 2-value enum is not used by the schema. Broadcast is WhatsApp-only in practice, but the field carries the full `PlatformEnum` domain — do NOT narrow the projection type or non-WhatsApp rows are dropped. |
 | `source` | string | `open-api` | `manual`/`import`/`open-api` (`BroadcastTypeEnum`) | No | null | Domain data (= `Broadcast.type`; "Open API" lives here, NOT in `broadcastChannel`) |
-| `recipientNumber` | string | `+628****3210` | — | Conditional | null | Domain data (PII — IDENTIFIER, stored raw) |
-| `recipientName` | string | `Budi` | — | No | null | Domain data (PII — IDENTIFIER) |
+| `recipientNumber` | string | `+6281234516710` | — | Conditional | null | Domain data (PII — IDENTIFIER, stored raw/unmasked; masking applied at export time only — Phase 3/D) |
+| `recipientName` | string | `Budi` | — | No | null | Domain data (PII — IDENTIFIER). NOT a `Broadcast` schema field — resolved at projection time via people-service contact lookup (see FR-013a). |
 | `status` | string | `delivered` | `raw`/`text_processing`/`text_processed`/`schedule`/`pending`/`processing`/`sent`/`delivered`/`failed`/`retry`/`invalid`/`canceled` (`BroadcastStatusEnum`, 12 values) | Yes | — | Domain data |
 | `reason` | string | `recipientNumber is required.` | — | No | null | Domain data |
 | `failureSource` | string | `OPEN_API` | OPEN_API/PROVIDER/SYSTEM/USER/empty | No | null | Domain data |
@@ -259,7 +263,7 @@
 | `teamInboxIdAtSendTime` | ObjectId | `64a1b2c3d4e5f6a7b8c9d103` | — | No | null | Domain data |
 | `teamInboxNameAtSendTime` | string | `Support` | — | No | null | Domain data |
 | `senderAccountName` | string | `WA Official Main` | — | No | null | Domain data |
-| `senderNumber` | string | `+628****7890` | — | No | null | Domain data |
+| `senderNumber` | string | `+6289876543210` | — | No | null | Domain data — company-owned sender account number (`doc.sender`/`accountChannel.phoneNumber`, `broadcast-export.service.ts:302`), NOT recipient PII → exported raw, no masking (aligns PRD-C FR-041) |
 | `templateUsed` | string | `order_update` | — | No | null | Domain data |
 | `messageContent` | string | `Your order is ready` | — | No | null | Domain data (FREE_TEXT_MAY_CONTAIN_PII) |
 | `requestId` | string | `REQ-123` | — | No | null | Domain data |
@@ -289,8 +293,8 @@
 | `contactEmail` | IDENTIFIER | Mask/redact | conversation |
 | `contactName` | IDENTIFIER | Redact | conversation |
 | `recipientNumber` | IDENTIFIER | Mask/redact | broadcast |
-| `recipientName` | IDENTIFIER | Redact | broadcast |
-| `senderNumber` | IDENTIFIER | Mask/redact | broadcast |
+| `recipientName` | IDENTIFIER | Redact at export | broadcast (resolved at projection via people-service — FR-013a) |
+| `senderNumber` | COMPANY_OWNED (not PII) | No masking | broadcast (company sender account number, not recipient data — PRD-C FR-041) |
 | `lastMessageText` | FREE_TEXT_MAY_CONTAIN_PII | Redact | conversation |
 | `customAttributes` | FREE_TEXT_MAY_CONTAIN_PII | Audit + redact PII keys | conversation |
 | `metadata` | FREE_TEXT_MAY_CONTAIN_PII | Audit + redact PII keys | conversation |
@@ -315,6 +319,7 @@
 | `state` | string | `COMPLETE` | NOT_BACKFILLED/BACKFILLING/COMPLETE | Yes | NOT_BACKFILLED | Backfill/sync |
 | `rowCount` | number | `1542` | ≥ 0 | Yes | 0 | Backfill/sync |
 | `lastSyncedAt` | Date | `2026-08-12T03:00:00Z` | — | Yes | — | Backfill/sync |
+| `expireAt` | Date | `2027-02-12T00:00:00Z` | = `date` + `EXPORT_ROW_RETENTION_DAYS` | Yes | — | Computed at write. TTL index on `expireAt` — coverage doc expires simultaneously with its rows. |
 
 **Unique index:** `{companyId, organizationId, collection, date}`
 
@@ -324,7 +329,7 @@
 | ----- | ----- |
 | **Performance — Zero-Impact** | NFR-001 [CRITICAL]: Before `ENABLE_ROW_LEVEL_SYNC=true`, engineering MUST run a load test measuring domain service p95/p99 latency (pre-sync baseline vs post-sync running 1 hour). If deviation > 2%, sync MUST remain disabled. Latency guard is a LAUNCH GATE enforced by manual pre/post load test. NFR-002 [CRITICAL]: Domain service p99 latency MUST NOT increase by more than **2%** from pre-sync baseline. Enforced per NFR-001 launch gate. NFR-003 [CRITICAL]: During backfill, the same 2% latency guard applies per NFR-001. Backfill MUST auto-pause if threshold is breached. |
 | **Performance — Sync** | NFR-004: Sync lag MUST be < 5 minutes at p95 under normal load (ASSUMED). NFR-005: Sync pipeline MUST handle burst of 10,000 items/minute without data loss (items may be delayed but MUST NOT be dropped). |
-| **Performance — Backfill** | NFR-006: Backfill MUST process at least 50,000 documents/hour per collection at default throttle settings. NFR-007: Backfill MUST NOT create > 50 concurrent MongoDB connections. |
+| **Performance — Backfill** | NFR-006: Backfill MUST process at least 50,000 documents/hour per collection at default throttle settings. NFR-007: Backfill concurrency MUST NOT exceed `MONGODB_ANALYTICS_MAX_POOL_SIZE` (currently 10, `.env.example:54`). Raising the ceiling requires an explicit pool-size increase per NFR-021 — this NFR carries no independent absolute number. |
 | **Reliability** | NFR-008: All upserts MUST be idempotent — same response processed N times produces same row state. NFR-009: Dead-letter queue MUST preserve failed items for at least 7 days for manual replay. NFR-010: Sync pipeline MUST recover from crash within 30 seconds and resume from last committed consumer offset. |
 | **Security** | NFR-011: All queries MUST be scoped by `companyId` + `organizationId`. Unscoped queries MUST be rejected. NFR-012: PII fields (phone, email, name) in export collections MUST follow the same governance as existing PII in operational collections. |
 | **Observability** | NFR-013: Metrics MUST include: `items_consumed_total`, `items_projected_total`, `items_failed_total`, `sync_lag_ms` (per collection), `backfill_progress_percent`, `backfill_batch_rate`. NFR-014: Alarm MUST fire within 5 minutes when domain-service latency deviation exceeds 2% (via log warning + RMQ notification; formal APM post-MVP). |
@@ -344,7 +349,7 @@
 | RabbitMQ infrastructure availability | Engineering (infra) | If RabbitMQ is down, sync pipeline stalls. | Dead-letter queue for failed items. Retry mechanism. Backfill as recovery mechanism. |
 | MongoDB primary read capacity for backfill | Engineering (infra) | Backfill reads from primary with throttled batches. Must not exceed latency guard. | Throttled batches (500/batch, configurable delay). Latency guard (NFR-001/003) as launch gate. Optional secondary-read URI when provisioned. |
 | Domain-service latency measurement baseline | Engineering | Cannot enforce 2% guard without baseline. | **Latency guard is a LAUNCH GATE (NFR-001).** Manual pre/post load test before enabling sync. If deviation > 2%, sync remains disabled. |
-| PII governance policy for analytics store | PM / Legal | If policy disallows PII in analytics, collection schema must be redesigned (masked fields). | Flag as Open Question — OQ-16. |
+| PII governance policy for analytics store | PM / Legal | If policy disallows PII in analytics, collection schema must be redesigned (masked fields). | **RESOLVED (OQ-16): PII allowed in Phase 1, erasure OUT OF SCOPE.** See §10.4 classification. |
 | Retention window decision | PM | Retention is 180 days (default). Must be >= backfill target range (90 days). | Retention exceeds backfill by 2x. Configurable per environment. |
 | Volume data per tenant | Engineering | If a tenant has millions of conversations, compound index performance must be validated. | Load test before GA. Storage estimate required per NFR-022. |
 
@@ -466,7 +471,7 @@
 | `conversationexportdata` rows | analytics-service | Pull-sync pipeline + backfill | 180 days from `expireAt` (TTL index) | TTL index auto-deletes on `expireAt`. No archive. | Exported via Phase 2/D consumers. File retained 7 days in S3 per existing offline-report PRD (SEVEN_DAYS_MS). | Contains PII: `contactName`, `contactPhone`, `contactEmail`. Erasure OUT OF SCOPE — `piiScrubbedAt` field for future readiness. |
 | `ticketexportdata` rows | analytics-service | Pull-sync pipeline + backfill | 180 days from `expireAt` (TTL index) | TTL index auto-deletes on `expireAt`. No archive. | Same as above. | Contains PII: contact info in custom fields. Erasure OUT OF SCOPE. |
 | `broadcastexportdata` rows | analytics-service | Pull-sync pipeline + backfill | 180 days from `expireAt` (TTL index) | TTL index auto-deletes on `expireAt`. No archive. | Same as above. | Contains PII: `recipientNumber`, `recipientName`. Erasure OUT OF SCOPE. |
-| `exportdatacoverage` | analytics-service | Backfill + sync pipeline | Same as parent collection (no independent TTL) | Dropped with parent collection if needed. | Not exported. | Non-PII metadata only. |
+| `exportdatacoverage` | analytics-service | Backfill + sync pipeline | Same as row collections (`EXPORT_ROW_RETENTION_DAYS`, default 180 days). TTL index on `expireAt` field. Coverage docs expire simultaneously with their rows — no orphaned COMPLETE docs after row TTL. | Dropped with parent collection if needed. | Not exported. | Non-PII metadata only. |
 | Dead-letter queue messages | analytics-service | Failed processing | 7 days | RabbitMQ TTL on DLQ exchange. | Not exported. | Contains raw response payload which may include PII. Access restricted to engineering. |
 
 ### **H. Concurrency, Rate Limit & Idempotency**

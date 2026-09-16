@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport:{width:1440,height:820} });
+await p.goto('http://localhost:3001/', { waitUntil:'domcontentloaded' });
+await p.waitForTimeout(3500);
+const ins = await p.$$('input');
+await ins[0].fill('admin');
+await ins[1].fill('admin123');
+await p.getByRole('button',{name:/sign in/i}).click();
+await p.waitForTimeout(3500);
+const after = await p.evaluate(()=>({txt:(document.body.innerText||'').slice(0,120), navLabels:[...document.querySelectorAll('*')].map(e=>e.children.length===0?e.textContent.trim():'').filter(t=>t&&t.length<20&&/roadmap|dashboard|tracker/i.test(t)).slice(0,10)}));
+console.log('after:',JSON.stringify(after,null,2));
+await b.close();

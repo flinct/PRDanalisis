@@ -14,6 +14,7 @@
 | Version | Date | Author | Changes |
 | ----- | ----- | ----- | ----- |
 | v0.1 | 2026-08-31 | Dany Christian | Initial PRD. Phase 1 = SatuInbox sends transcript/summary email directly via tenant connected mailbox, controlled by per-tenant send-mode flag, coexisting with the existing webhook delivery. Phase 2 references the existing reply-via-email PRD. |
+| v0.2 | 2026-09-15 | Dany Christian | Impact-analysis follow-up. Added: multi-mailbox default sender selection (FR-021/022, EC-004 hardened), Phase 2 activation flag (FR-023), retry-exhaustion notification (FR-024, EH-008), `both`-mode ordering rule (FR-025), rollback plan (§17). Resolves EC-004 build-blocker. |
 
 ---
 
@@ -80,7 +81,11 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | Content Reuse | 12. FR-012: System MUST reuse the existing transcript email content (subject, html, text, summary fields, transcript body, links) already produced for the webhook payload. 13. FR-013: System MUST include reply guidance copy only when Phase 2 (reply continuity) is enabled for the tenant; otherwise content matches the current transcript. |
 | Trigger & Dedup Reuse | 14. FR-014: System MUST reuse the existing trigger (widget conversation close, scheduled) — no new trigger. 15. FR-015: System MUST reuse existing dedup so at most one delivery per conversation per trigger occurs, independently per channel (webhook vs email) under mode `both`. 16. FR-016: System MUST reuse the existing retry policy (up to 3 attempts for retryable failures) for the email send path. |
 | Status & Audit | 17. FR-017: System MUST record delivery mode and per-channel status on the transcript delivery record. 18. FR-018: System MUST audit email send attempts with tenant, mode, sender account ID, sender address, recipient, status, and failure reason. |
-| Phase 2 Handoff | 19. FR-019: When mode is `email`/`both`, System MUST set a Reply-To resolvable to the tenant workspace so Phase 2 reply matching can attach. 20. FR-020: Reply continuity (inbound reply → Email conversation, auto-link, primary promotion) is governed by `PRD Inbox Conversation - reply via email.md` and MUST only be active when send mode is `email`/`both`. |
+| Multi-Mailbox Sender Selection | 21. FR-021: When a tenant has more than one connected Email channel account, System MUST require the tenant to designate exactly one account as the transcript sender before mode `email`/`both` can be enabled. 22. FR-022: System MUST block enabling mode `email`/`both` (with a "select sender" prompt) when multiple Email accounts are connected and no transcript sender is designated, and MUST re-check the designated sender is still connected/active at send time (FR-007). |
+| Both-Mode Ordering | 25. FR-025: When mode is `both`, System MUST enqueue the email send and post the webhook independently with no guaranteed ordering between them; neither path MAY depend on the other having completed. This is a documented limitation, not a bug. |
+| Retry-Exhaustion Notification | 24. FR-024: When email transcript send is marked `failed` after retries exhaust (EH-004), System MUST raise a workspace notification (existing notification system) to Admin/Supervisor with access, in addition to the audit event. System MUST NOT auto-fall-back to webhook when mode is `email`. |
+| Phase 2 Activation | 23. FR-023: Reply continuity (Phase 2) MUST be gated by a separate per-tenant flag (default OFF) AND require send mode `email`/`both`. Enabling send mode alone MUST NOT activate Phase 2. |
+| Phase 2 Handoff | 19. FR-019: When mode is `email`/`both`, System MUST set a Reply-To resolvable to the tenant workspace so Phase 2 reply matching can attach. 20. FR-020: Reply continuity (inbound reply → Email conversation, auto-link, primary promotion) is governed by `PRD Inbox Conversation - reply via email.md` and MUST only be active when send mode is `email`/`both` and the Phase 2 flag (FR-023) is ON. |
 
 ---
 
@@ -95,6 +100,8 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | EH-005 | Mode `both`, webhook succeeds but email fails | Keep webhook success. Independently audit email failure + retry. | No customer-facing UI. |
 | EH-006 | Mode `both`, email succeeds but webhook fails | Keep email success. Independently audit webhook failure per existing webhook behavior. | No customer-facing UI. |
 | EH-007 | Send mode misconfigured / unknown value | Fall back to `webhook` (safe default) and audit the anomaly. | No customer-facing UI. |
+| EH-008 | Email send `failed` after retry exhaustion | Raise workspace notification to Admin/Supervisor (FR-024) plus audit. No auto-fallback to webhook in mode `email`. | Show "Gagal mengirim email transkrip — cek koneksi mailbox" to users with access. |
+| EH-009 | Multiple mailboxes connected, no transcript sender designated | Block enabling mode `email`/`both`. | Show "Pilih akun email pengirim transkrip". |
 
 ---
 
@@ -105,7 +112,7 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | EC-001 | Tenant switches `email` → `webhook` after some sends. | New closes deliver via webhook only. In-flight scheduled sends keep the mode captured at schedule time. | No special UI. |
 | EC-002 | Tenant on `both` for the same conversation. | Webhook + email fire once each; per-channel dedup prevents duplicates within a channel. | Customer receives one email; tenant webhook consumer may also send — tenant responsibility. |
 | EC-003 | Mailbox deleted between selection and send. | Send-time re-check (FR-007) blocks the email; status `skipped`. | Audit reason. |
-| EC-004 | Multiple Email channel accounts connected. | Use the account designated as workspace default/transcript sender; if none designated, block and prompt selection. | Show sender selection requirement in settings. |
+| EC-004 | Multiple Email channel accounts connected. | Tenant MUST designate one account as transcript sender (FR-021). If none designated, mode `email`/`both` is blocked (EH-009). | Show "Pilih akun email pengirim transkrip" in settings. |
 | EC-005 | Mode `email` but Phase 2 not yet enabled. | Email is sent as a copy; replies land in the tenant mailbox but are not auto-linked until Phase 2 ships. | Reply guidance copy omitted (FR-013). |
 
 ---
@@ -123,7 +130,9 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | Context | UI Copy |
 | ----- | ----- |
 | Mailbox precondition (mode email/both blocked) | "Hubungkan akun email workspace dulu untuk mengaktifkan pengiriman email oleh SatuInbox" |
+| Multiple mailboxes, no sender designated | "Pilih akun email pengirim transkrip" |
 | Email transcript send failed | "Gagal mengirim email transkrip" |
+| Email transcript send failed (retry exhausted, notification) | "Gagal mengirim email transkrip — cek koneksi mailbox" |
 | Delivery mode label | "Metode pengiriman transkrip: Webhook / Email / Keduanya" |
 
 ---
@@ -133,6 +142,8 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | Field | Type | Example | Validation | Required |
 | ----- | ----- | ----- | ----- | ----- |
 | transcript_email_send_mode | Enum | email | Allowed: `webhook`, `email`, `both`. Default `webhook`. | Yes |
+| transcript_sender_account_id | String | EMAIL-ACC-001 | The designated transcript sender when >1 Email account is connected. Required to enable mode `email`/`both` if multiple accounts exist. | Conditional |
+| phase2_reply_continuity_enabled | Boolean | false | Separate Phase 2 gate (FR-023). Default `false`. Only effective when send mode is `email`/`both`. | Yes |
 | email_channel_account_id | String | EMAIL-ACC-001 | Must reference a connected active Email channel account when mode is `email`/`both`. | Conditional |
 | sender_email | Email | support@brand.com | Must match the connected Email channel account address. | Conditional |
 | reply_to_email | Email | support@brand.com | Must match the connected Email channel account address. | Conditional |
@@ -196,12 +207,26 @@ Reply continuity (customer replies → new Email conversation, auto-link, primar
 | ----- | ----- |
 | Sender uses the tenant connected Email channel account only. | Agent/team-specific senders not supported this phase. |
 | Mode `both` may cause double customer emails if the tenant's webhook consumer also sends. | Documented as tenant responsibility. |
+| Mode `both` has no ordering guarantee between webhook and email (FR-025). | A tenant webhook that assumes the email already sent will race; not supported. |
 | Reply continuity not available until Phase 2 ships. | Replies in mode `email` land in the tenant mailbox unlinked until then. |
 | Trigger unchanged (widget close, scheduled). | Manual resend and non-widget channels not covered. |
 
 ---
 
-## **16. Appendix**
+## **16. Rollback Plan**
+
+| Aspect | Plan |
+| ----- | ----- |
+| Trigger | Regression on webhook-only tenant, SMTP volume/deliverability incident, or email-service `EMAIL_SEND_MESSAGE` failure spike. |
+| Action | Flip affected tenants back to `transcript_email_send_mode = webhook` via config — **no code deploy required**. Default fallback (EH-007) already routes unknown/misconfigured values to `webhook`. |
+| Scope | Per-tenant (single tenant) or global (all tenants) — config-driven, no schema change to revert. |
+| Data | Additive schema (send mode, sender account, delivery mode/status fields) stays; no destructive migration to undo. Audit retains the mode captured per delivery for replay/inspection. |
+| In-flight sends | Sends already scheduled keep the mode captured at schedule time (EC-001); rollback affects new closes only. |
+| Phase 2 | Independent flag (FR-023, default OFF) — rolling back send mode does not touch Phase 2 state. |
+
+---
+
+## **17. Appendix**
 
 | Item | Definition |
 | ----- | ----- |

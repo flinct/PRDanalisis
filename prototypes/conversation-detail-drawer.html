@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversation Detail Drawer — Design & Wireframe</title>
+<style>
+/* ── Design tokens (mirror @satuinbox/ui shadcn/Tailwind v4 semantic) ── */
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --ink:#1a1d21; --muted:#6b7280;
+  --border:#e5e7eb; --accent:#2563eb; --accent-ink:#ffffff;
+  --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+  --ok-bg:#dcfce7; --warn-bg:#fef3c7; --danger-bg:#fee2e2;
+  --nav:#111827; --radius:8px; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --drawer-w:360px; --list-w:280px; --list-w-compact:120px; --nav-w:64px;
+  --open-ms:200ms; --close-ms:150ms; --ease:cubic-bezier(0.2,0,0,1);
+}
+/* Wireframe mode: strip color, expose structure */
+.wire{
+  --bg:#e8e8e8; --card:#fff; --ink:#333; --muted:#888; --border:#bbb;
+  --accent:#666; --accent-ink:#fff; --ok:#666; --warn:#666; --danger:#444;
+  --ok-bg:#eee; --warn-bg:#eee; --danger-bg:#e0e0e0; --nav:#555; --shadow:none;
+}
+.wire *{ font-family:"Comic Sans MS","Segoe Print",var(--font)!important; }
+.wire .card,.wire .panel{ outline:1px dashed #999; }
+.wire .fill{ background:repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 6px,#e6e6e6 6px,#e6e6e6 12px)!important;color:#777!important; }
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;padding:16px}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+
+/* ── Tweaks bar ── */
+#tweaks{position:sticky;top:0;z-index:200;background:var(--nav);color:#fff;
+  padding:10px 14px;border-radius:var(--radius);margin-bottom:14px;display:flex;
+  gap:18px;flex-wrap:wrap;align-items:center;font-family:var(--font)}
+#tweaks strong{font-size:12px;letter-spacing:.03em;opacity:.7;text-transform:uppercase;margin-right:4px}
+#tweaks .grp{display:flex;gap:6px;align-items:center}
+#tweaks label{font-size:12px;opacity:.85}
+#tweaks button{background:#374151;color:#fff;border:1px solid #4b5563;border-radius:6px;
+  padding:5px 11px;font-size:12px;cursor:pointer;font-family:var(--font)}
+#tweaks button.on{background:var(--accent,#2563eb);border-color:var(--accent,#2563eb)}
+.wire #tweaks button.on{background:#2563eb;border-color:#2563eb}
+#tweaks .sep{width:1px;height:20px;background:#374151}
+
+/* ── App shell: fixed viewport to prove pixel budget ── */
+#stage{display:flex;justify-content:center}
+#app{display:flex;height:720px;background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);
+  width:1280px;transition:width var(--open-ms) var(--ease)}
+#app.vp1440{width:1440px}
+.vp-label{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* ── Nav rail ── */
+.nav{width:var(--nav-w);flex:0 0 var(--nav-w);background:var(--nav);
+  display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:8px}
+.nav .logo{width:32px;height:32px;border-radius:8px;background:var(--accent);
+  color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;margin-bottom:10px}
+.nav .ico{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;
+  color:#9ca3af;font-size:17px;cursor:pointer}
+.nav .ico.active{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── Conversation list ── */
+.list{flex:0 0 var(--list-w);width:var(--list-w);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;background:var(--card);
+  transition:flex-basis var(--open-ms) var(--ease),width var(--open-ms) var(--ease)}
+#app.compactList .list{flex-basis:var(--list-w-compact);width:var(--list-w-compact)}
+.list .lhead{padding:12px;border-bottom:1px solid var(--border)}
+.list .ltitle{font-size:15px;font-weight:600;margin-bottom:10px}
+.filters{display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;
+  background:var(--card);cursor:pointer;display:inline-flex;gap:5px;align-items:center;color:var(--ink)}
+.chip .badge{background:var(--accent);color:#fff;border-radius:10px;padding:0 6px;font-size:10px;font-weight:600}
+.chip.ghost{color:var(--muted)}
+.searchbar{flex:1;border:1px solid var(--border);border-radius:6px;padding:5px 9px;
+  font-size:12px;color:var(--muted);background:var(--card)}
+.litems{overflow-y:auto;flex:1}
+.li{display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);
+  cursor:pointer;align-items:center;position:relative}
+.li.sel{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.li:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:#c7d2fe;
+  color:#3730a3;display:grid;place-items:center;font-weight:600;font-size:13px;position:relative}
+.wire .avatar{background:#ddd;color:#666}
+.li .body{flex:1;min-width:0}
+.li .name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .prev{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:0 0 auto}
+.li .time{font-size:11px;color:var(--muted)}
+.unread{background:var(--accent);color:#fff;border-radius:10px;min-width:18px;height:18px;
+  padding:0 5px;font-size:10px;font-weight:700;display:grid;place-items:center}
+/* SLA dot on list item (P1 rec #7) */
+.sla-dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.sla-dot.ok{background:var(--ok)} .sla-dot.warn{background:var(--warn)} .sla-dot.breach{background:var(--danger)}
+.avatar .dot-corner{position:absolute;top:-1px;right:-1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--card)}
+/* compact-list mode: hide text, show avatar+dot only */
+#app.compactList .li .body,#app.compactList .li .meta .time{display:none}
+#app.compactList .li{justify-content:center;padding:11px 6px}
+#app.compactList .li .meta{position:absolute;top:6px;right:8px}
+.list-hint{display:none;padding:8px 10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--warn) 10%,transparent)}
+#app.compactList .list-hint{display:block}
+
+/* ── Workspace ── */
+.ws{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.ws-head{background:var(--card);border-bottom:1px solid var(--border);padding:10px 14px;
+  display:flex;align-items:center;gap:12px}
+.ws-head .cust{display:flex;gap:10px;align-items:center;flex:1;min-width:0}
+.ws-head .name{font-weight:600;font-size:14px}
+.ws-head .sub{color:var(--muted);font-size:12px}
+.ws-actions{display:flex;gap:6px;align-items:center}
+.btn{border:1px solid var(--border);background:var(--card);border-radius:6px;padding:6px 11px;
+  font-size:12px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.iconbtn{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;font-size:16px;color:var(--ink);position:relative}
+/* 44x44 hit area via transparent padding */
+.iconbtn::before{content:"";position:absolute;inset:-6px}
+.iconbtn.viewctl{color:var(--accent)}
+.iconbtn.viewctl.on{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.vdiv{width:1px;height:24px;background:var(--border);margin:0 2px}
+
+.thread{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.bub{max-width:70%;padding:9px 12px;border-radius:12px;font-size:13px;box-shadow:var(--shadow)}
+.bub.in{align-self:flex-start;background:var(--card);border-bottom-left-radius:3px}
+.bub.out{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.wire .bub.out{background:#ccc;color:#333}
+.bub .t{font-size:10px;opacity:.6;margin-top:4px}
+.composer{background:var(--card);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;align-items:center}
+.composer .field{flex:1;border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--muted);font-size:13px}
+
+/* ── Drawer ── */
+.drawer{flex:0 0 0;width:0;background:var(--card);border-left:1px solid var(--border);
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:flex-basis var(--open-ms) var(--ease),width var(--open-ms) var(--ease);z-index:40}
+#app.drawerOpen .drawer{flex-basis:var(--drawer-w);width:var(--drawer-w)}
+#app.closing .drawer{transition-duration:var(--close-ms)}
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.dhead .dt{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.dhead .cv{font-size:11px;color:var(--muted);margin-top:2px}
+.dhead-actions{display:flex;align-items:center}
+.dhead-actions .gap16{width:16px} /* semantic separation Pin↔× */
+.iconbtn.pinned{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.dbody{flex:1;overflow-y:auto;padding:4px 0}
+.sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sec h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  font-weight:600;margin-bottom:9px}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.kv .k{color:var(--muted);font-size:12px}
+.kv .v{font-weight:500;font-size:13px;text-align:right}
+.cust-name{font-size:15px;font-weight:600}
+.cust-line{color:var(--muted);font-size:12px;margin-top:2px}
+.pill{display:inline-flex;gap:5px;align-items:center;font-size:11px;padding:2px 8px;border-radius:10px;
+  background:var(--bg);color:var(--ink);margin-top:6px;border:1px solid var(--border)}
+.copybtn{font-size:11px;color:var(--accent);border:none;background:none;cursor:pointer;padding:0 4px}
+
+/* SLA rows — text label ALWAYS, color is redundant cue (WCAG 1.4.1) */
+.sla{display:flex;align-items:center;gap:10px;padding:6px 0}
+.sla .lbl{width:34px;font-weight:600;font-size:12px}
+.sla .val{width:66px;font-variant-numeric:tabular-nums;font-size:13px}
+.sla .state{font-size:12px;display:inline-flex;gap:5px;align-items:center;padding:2px 8px;border-radius:10px;font-weight:500}
+.sla .state.ok{background:var(--ok-bg);color:var(--ok)}
+.sla .state.warn{background:var(--warn-bg);color:var(--warn)}
+.sla .state.breach{background:var(--danger-bg);color:var(--danger)}
+.sla .info{color:var(--muted);cursor:help;font-size:11px;border:1px solid var(--border);border-radius:50%;width:14px;height:14px;display:inline-grid;place-items:center;position:relative}
+.sla .info:hover .tip{display:block}
+.tip{display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);
+  background:var(--nav);color:#fff;padding:7px 10px;border-radius:6px;font-size:11px;
+  width:200px;z-index:5;line-height:1.4;text-align:left;font-weight:400}
+.tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--nav)}
+
+/* accordion "Lainnya" */
+.acc{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;
+  cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;font-weight:500}
+.acc .chev{color:var(--muted)}
+
+/* footer destructive — far from × */
+.dfoot{padding:14px;border-top:1px solid var(--border);margin-top:auto}
+.btn-danger{width:100%;border:1px solid var(--danger);color:var(--danger);background:var(--card);
+  border-radius:6px;padding:9px;font-size:13px;cursor:pointer;font-weight:500}
+
+/* skeleton loading */
+.skel{height:12px;border-radius:4px;background:linear-gradient(90deg,var(--border) 25%,#f0f0f0 50%,var(--border) 75%);
+  background-size:200% 100%;animation:sh 1.3s infinite;margin:7px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* empty state */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;color:var(--muted);padding:40px;text-align:center}
+.empty .glyph{width:56px;height:56px;border-radius:12px;border:2px dashed var(--border);
+  display:grid;place-items:center;font-size:26px}
+
+.hide{display:none!important}
+.state-tabs{display:flex;gap:4px}
+</style>
+</head>
+<body>
+
+<div id="tweaks">
+  <strong>Tweaks</strong>
+  <div class="grp"><label>Fidelity</label>
+    <button id="tw-hifi" class="on" onclick="setFidelity('hifi')">Hi-Fi</button>
+    <button id="tw-wire" onclick="setFidelity('wire')">Wireframe</button>
+  </div>
+  <div class="sep"></div>
+  <div class="grp"><label>Drawer</label>
+    <button id="tw-drawer" onclick="toggleDrawer()">Closed</button>
+    <button id="tw-pin" onclick="togglePin()">Pin off</button>
+  </div>
+  <div class="sep"></div>
+  <div class="grp"><label>Viewport</label>
+    <button id="tw-1280" class="on" onclick="setVp(1280)">1280</button>
+    <button id="tw-1440" onclick="setVp(1440)">1440</button>
+  </div>
+  <div class="sep"></div>
+  <div class="grp"><label>Drawer content</label>
+    <button id="tw-loaded" class="on" onclick="setContent('loaded')">Loaded</button>
+    <button id="tw-loading" onclick="setContent('loading')">Loading</button>
+    <button id="tw-empty" onclick="setContent('empty')">Empty</button>
+  </div>
+</div>
+
+<div id="stage">
+<div>
+<div id="app" class="drawerOpen">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="logo">S</div>
+    <div class="ico active" title="Percakapan">💬</div>
+    <div class="ico" title="Kontak">👥</div>
+    <div class="ico" title="Broadcast">📣</div>
+    <div class="ico" title="Laporan">📊</div>
+    <div class="ico" title="Pengaturan" style="margin-top:auto">⚙</div>
+  </nav>
+
+  <!-- LIST -->
+  <aside class="list panel">
+    <div class="lhead">
+      <div class="ltitle">Percakapan</div>
+      <div class="filters">
+        <div class="frow">
+          <span class="chip">Terbuka <span class="badge">4</span></span>
+          <span class="chip ghost">Semua Saluran ▾</span>
+        </div>
+        <div class="frow">
+          <span class="searchbar">🔎 Cari…</span>
+          <span class="chip ghost">Urutkan: Terbaru ▾</span>
+          <span class="chip">Filter <span class="badge">2</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="list-hint">List mode ringkas — workspace +160px</div>
+    <div class="litems">
+      <div class="li sel">
+        <div class="avatar">YD<span class="dot-corner sla-dot warn"></span></div>
+        <div class="body"><div class="name">Yosep Danny</div><div class="prev">Baik kak, ditunggu ya…</div></div>
+        <div class="meta"><span class="time">14:52</span><span class="unread">3</span></div>
+      </div>
+      <div class="li">
+        <div class="avatar">RN<span class="dot-corner sla-dot breach"></span></div>
+        <div class="body"><div class="name">Rina Nurul</div><div class="prev">Kok belum dibalas ya?</div></div>
+        <div class="meta"><span class="time">14:40</span><span class="unread">1</span></div>
+      </div>
+      <div class="li">
+        <div class="avatar">BS<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body"><div class="name">Budi Santoso</div><div class="prev">Terima kasih infonya 🙏</div></div>
+        <div class="meta"><span class="time">13:15</span></div>
+      </div>
+      <div class="li">
+        <div class="avatar">AW<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body"><div class="name">Ayu Wulandari</div><div class="prev">Nomor resinya berapa kak?</div></div>
+        <div class="meta"><span class="time">12:03</span><span class="unread">2</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- WORKSPACE -->
+  <section class="ws">
+    <div class="ws-head">
+      <div class="cust">
+        <div class="avatar" style="width:38px;height:38px;flex-basis:38px">YD</div>
+        <div><div class="name">Yosep Danny</div><div class="sub">+62 896 5505 7778 · WhatsApp · Open</div></div>
+      </div>
+      <div class="ws-actions">
+        <button class="btn">Alihkan</button>
+        <button class="btn">Transfer</button>
+        <button class="btn primary">Selesaikan</button>
+        <div class="vdiv"></div>
+        <button class="iconbtn viewctl on" id="drawerToggle" title="Panel Detail (Ctrl+Shift+D)" onclick="toggleDrawer()">▤</button>
+        <button class="iconbtn" title="Lainnya">⋯</button>
+      </div>
+    </div>
+    <div class="thread">
+      <div class="bub in">Halo kak, pesanan saya sudah dikirim belum ya?<div class="t">14:48</div></div>
+      <div class="bub out">Halo kak Yosep, saya cek dulu ya 🙏<div class="t">14:49</div></div>
+      <div class="bub out">Pesanan sudah diproses, estimasi kirim hari ini.<div class="t">14:50</div></div>
+      <div class="bub in">Baik kak, ditunggu ya. Kalau sudah kirim tolong infokan resinya.<div class="t">14:52</div></div>
+    </div>
+    <div class="composer">
+      <span class="field">Ketik balasan…</span>
+      <button class="btn">📎</button>
+      <button class="btn primary">Kirim</button>
+    </div>
+  </section>
+
+  <!-- DRAWER -->
+  <aside class="drawer panel">
+    <div class="dhead">
+      <div>
+        <div class="dt">Detail Percakapan</div>
+        <div class="cv">CV-1730 <button class="copybtn" title="Salin">⧉ salin</button></div>
+      </div>
+      <div class="dhead-actions">
+        <button class="iconbtn" id="pinBtn" title="Sematkan (drawer tetap terbuka)" onclick="togglePin()">📌</button>
+        <span class="gap16"></span>
+        <button class="iconbtn" title="Tutup panel (Esc)" onclick="closeDrawer()">✕</button>
+      </div>
+    </div>
+
+    <!-- LOADED content -->
+    <div class="dbody" id="dbody-loaded">
+      <div class="sec">
+        <h4>Customer</h4>
+        <div class="cust-name">Yosep Danny</div>
+        <div class="cust-line">+62 896 5505 7778 <button class="copybtn">⧉</button></div>
+        <span class="pill">🟢 WhatsApp · Open</span>
+      </div>
+
+      <div class="sec">
+        <h4>SLA</h4>
+        <div class="sla">
+          <span class="lbl">FRT</span><span class="val">12m 40s</span>
+          <span class="state warn">⚠ Approaching</span>
+          <span class="info" tabindex="0">i<span class="tip"><b>First Response Time</b> — waktu agent pertama merespons pelanggan. SLA: 15 menit.</span></span>
+        </div>
+        <div class="sla">
+          <span class="lbl">TTC</span><span class="val">2h 15m</span>
+          <span class="state ok">● On track</span>
+          <span class="info" tabindex="0">i<span class="tip"><b>Time To Close</b> — waktu hingga percakapan selesai. SLA: 4 jam.</span></span>
+        </div>
+        <div class="sla">
+          <span class="lbl">RLT</span><span class="val">45m</span>
+          <span class="state ok">● On track</span>
+          <span class="info" tabindex="0">i<span class="tip"><b>Resolution Time</b> — waktu penyelesaian. SLA: 2 jam.</span></span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h4>Assignment</h4>
+        <div class="kv"><span class="k">Kotak Masuk</span><span class="v">Tim Support A</span></div>
+        <div class="kv"><span class="k">Penerima</span><span class="v">Dany Christian</span></div>
+      </div>
+
+      <div class="sec">
+        <h4>Metadata</h4>
+        <div class="kv"><span class="k">Sumber</span><span class="v">WhatsApp Business</span></div>
+        <div class="kv"><span class="k">Akun</span><span class="v">CS-01</span></div>
+        <div class="kv"><span class="k">Dibuat</span><span class="v">09 Sep 2026, 14:30</span></div>
+      </div>
+
+      <div class="acc">Histori <span class="chev">›</span></div>
+      <div class="acc">Catatan <span class="chev">›</span></div>
+      <div class="acc">Log <span class="chev">›</span></div>
+    </div>
+
+    <!-- LOADING skeleton -->
+    <div class="dbody hide" id="dbody-loading">
+      <div class="sec"><h4>Customer</h4><div class="skel" style="width:60%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:40%"></div></div>
+      <div class="sec"><h4>SLA</h4><div class="skel"></div><div class="skel"></div><div class="skel" style="width:70%"></div></div>
+      <div class="sec"><h4>Assignment</h4><div class="skel" style="width:75%"></div><div class="skel" style="width:65%"></div></div>
+    </div>
+
+    <!-- EMPTY -->
+    <div class="dbody hide" id="dbody-empty">
+      <div class="empty">
+        <div class="glyph">💬</div>
+        <div>Pilih percakapan untuk<br>melihat detail</div>
+      </div>
+    </div>
+
+    <div class="dfoot" id="dfoot">
+      <button class="btn-danger" onclick="alert('AlertDialog konfirmasi (Radix) — mock')">Tutup Percakapan</button>
+    </div>
+  </aside>
+</div>
+<div class="vp-label" id="vpLabel"></div>
+</div>
+</div>
+
+<script>
+const app = document.getElementById('app');
+let pinned=false, vp=1280, fidelity='hifi', content='loaded';
+
+function setFidelity(f){ fidelity=f;
+  document.body.classList.toggle('wire', f==='wire');
+  tw('tw-hifi', f==='hifi'); tw('tw-wire', f==='wire'); }
+
+function refreshCompact(){
+  // P0 #1: at 1280 with drawer open → auto-compact list. At 1440 → stays full.
+  const open = app.classList.contains('drawerOpen');
+  app.classList.toggle('compactList', open && vp===1280);
+}
+function toggleDrawer(){
+  const open = app.classList.contains('drawerOpen');
+  if(open) return closeDrawer();
+  app.classList.remove('closing'); app.classList.add('drawerOpen');
+  refreshCompact(); syncDrawerBtns();
+}
+function closeDrawer(){
+  app.classList.add('closing'); app.classList.remove('drawerOpen');
+  refreshCompact(); syncDrawerBtns();
+}
+function togglePin(){
+  pinned=!pinned;
+  document.getElementById('pinBtn').classList.toggle('pinned', pinned);
+  tw('tw-pin', pinned); document.getElementById('tw-pin').textContent = pinned?'Pin on':'Pin off';
+  if(pinned && !app.classList.contains('drawerOpen')) toggleDrawer();
+}
+function setVp(w){ vp=w; app.classList.toggle('vp1440', w===1440);
+  tw('tw-1280', w===1280); tw('tw-1440', w===1440); refreshCompact(); updVpLabel(); }
+function setContent(c){ content=c;
+  ['loaded','loading','empty'].forEach(k=>{
+    document.getElementById('dbody-'+k).classList.toggle('hide', k!==c);
+    tw('tw-'+k, k===c);
+  });
+  document.getElementById('dfoot').classList.toggle('hide', c!=='loaded');
+}
+function syncDrawerBtns(){
+  const open=app.classList.contains('drawerOpen');
+  document.getElementById('drawerToggle').classList.toggle('on', open);
+  const b=document.getElementById('tw-drawer'); b.classList.toggle('on', open); b.textContent=open?'Open':'Closed';
+}
+function updVpLabel(){
+  const open=app.classList.contains('drawerOpen');
+  const listW = (open && vp===1280) ? 120 : 280;
+  const ws = vp - 64 - listW - (open?360:0);
+  document.getElementById('vpLabel').textContent =
+    `viewport ${vp}px · nav 64 · list ${listW} · workspace ${ws}px${open?' · drawer 360':''}  (min workspace 400px ${ws>=400?'✓':'✗'})`;
+}
+function tw(id,on){ document.getElementById(id).classList.toggle('on', on); }
+
+// Esc closes (unless pinned) — WCAG keyboard, matches motion spec
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && !pinned) closeDrawer();
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='d'){ e.preventDefault(); toggleDrawer(); }
+});
+
+syncDrawerBtns(); updVpLabel();
+</script>
+</body>
+</html>
