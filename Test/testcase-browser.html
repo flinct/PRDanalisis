@@ -6019,6 +6019,8 @@
                   dependency: t.dependency != null ? t.dependency : (s && s.dependency) || [],
                   risk: t.risk != null ? t.risk : (s && s.risk) || 1,
                   pm_front_weeks: t.pm_front_weeks != null ? t.pm_front_weeks : (s && s.pm_front_weeks) || 0,
+                  opId: t.opId || (s && s.opId) || "",
+                  prdStatus: t.prdStatus || "",
                 };
               };
               if (Array.isArray(stored) && stored.length) {
@@ -6933,7 +6935,7 @@
                                         <div><dt>Effort</dt><dd>{(t.effort || "—")}</dd></div>
                                         <div><dt>Testing</dt><dd>{(t.testing || "—")}</dd></div>
                                         <div><dt>Dependency</dt><dd>{depList(t).map((d) => nameById[d] || d).join(", ") || "—"}</dd></div>
-                                        <div><dt>Schedule</dt><dd>{sch ? `${sch.start} → ${sch.end}` : "not scheduled"}</dd></div>
+                                        <div><dt>Schedule</dt><dd>{sch ? `${sch.start.month||sch.start} W${sch.start.week||""} → ${sch.end.month||sch.end} W${sch.end.week||""}` : "not scheduled"}</dd></div>
                                       </dl>
                                     </div>
                                     <div className="rm-exp-col">
@@ -6949,7 +6951,7 @@
                                         <span>WP</span>
                                         <div style={{flex:1}}>
                                           <OpSearch value={t.opId || ""} onSelect={(id) => updateTask(t.id, { opId: id })} />
-                                          {t.opId && <div style={{fontSize:10,color:"var(--text-4)",marginTop:2}}>Linked: #{t.opId}</div>}
+                                          {t.opId && <div style={{fontSize:11,color:"var(--accent-secondary)",fontWeight:700,marginTop:2}}>Linked: #{t.opId}</div>}
                                         </div>
                                       </label>
                                       <div className="rm-exp-op-actions">
