@@ -831,6 +831,18 @@ app.get("/api/dashboard/openproject/work-packages", async (req, res) => {
   }
 });
 
+// Single work package by ID — used by roadmap row → OpenProject link.
+app.get("/api/dashboard/openproject/work-package/:id", async (req, res) => {
+  try {
+    const id = toIntOrNull(req.params.id);
+    if (!id) return res.status(400).json({ ok: false, error: "invalid id" });
+    const wp = await openProjectRequest(`/api/v3/work_packages/${id}`);
+    res.json({ ok: true, workPackage: normalizeWorkPackage(wp) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ─── API: GOOGLE (OAuth login) + DOCS + MIRROR ───────────────────────────────
 const gdocs = require("./scripts/gdocs.js");
 const gauth = require("./scripts/google-auth.js");

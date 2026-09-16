@@ -261,6 +261,9 @@
       .nr-block:hover .nr-hover-actions {
         opacity: 1 !important;
       }
+      [data-tooltip]{position:relative}
+      [data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 4px);left:0;background:var(--deep-bg);color:var(--text-1);padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;z-index:9999;pointer-events:none;opacity:0;transition:opacity .15s ease;transition-delay:0s}
+      [data-tooltip]:hover::after{opacity:1;transition-delay:.1s}
     </style>
   </head>
   <body>
@@ -2294,6 +2297,7 @@
 
         return (
           <div
+            data-tooltip={node.name}
             onClick={() => onSelect(node)}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
@@ -5432,6 +5436,13 @@
 .rm-saved{margin-left:auto;font-size:10px;font-weight:700;color:var(--priority-p1-fg);background:var(--priority-p1-bg);border-radius:4px;padding:2px 8px;opacity:0;transition:opacity .18s}
 .rm-saved.on{opacity:1}
 .rm-wrap .table-panel{margin-bottom:0}
+/* dependency connectors: SVG overlay spanning the scroll content, drawn between rank cells */
+.dep-svg{position:absolute;top:0;left:0;pointer-events:none;z-index:16;overflow:visible}
+.dep-svg path{fill:none;stroke:var(--accent-secondary);stroke-width:1.5;opacity:.35;transition:opacity .12s,stroke-width .12s;stroke-linecap:round;stroke-linejoin:round}
+.dep-svg path.hot{opacity:.9;stroke-width:2.2;stroke:var(--priority-p1-fg)}
+.dep-svg circle{fill:var(--accent-secondary);opacity:.35}
+.dep-svg circle.hot{fill:var(--priority-p1-fg);opacity:.9}
+.task-table tbody tr.dep-hot .sl{box-shadow:inset 2px 0 0 var(--priority-p1-fg)}
 .rm-combo{position:relative;display:inline-block;max-width:100%}
 .rm-trigger{display:flex;align-items:center;gap:4px;width:100%;box-sizing:border-box;background:transparent;border:1px solid transparent;border-radius:5px;padding:2px 5px;cursor:pointer;color:var(--text-2);font-size:11px}
 .rm-trigger:hover,.rm-trigger:focus-visible{background:var(--elevated-bg);border-color:var(--border-2);outline:none}
@@ -5440,6 +5451,7 @@
 .rm-caret{margin-left:auto;font-size:9px;color:var(--text-4);opacity:0;flex-shrink:0}
 .rm-trigger:hover .rm-caret,.rm-trigger:focus-visible .rm-caret,.rm-combo.open .rm-caret{opacity:1}
 .rm-menu{position:absolute;top:calc(100% + 2px);left:0;z-index:60;min-width:100%;max-height:240px;overflow:auto;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.5);padding:4px}
+.rm-menu-fixed{z-index:2000}
 .rm-search{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:5px;padding:4px 6px;font-size:11px;margin-bottom:4px;outline:none}
 .rm-search:focus{border-color:var(--accent-primary)}
 .rm-opt{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap}
@@ -5452,10 +5464,29 @@
 .rm-wrap .stat-block:last-of-type{border-right:none}
 .rm-wrap .rules-area{flex-wrap:wrap}
 /* §80-116 timeline cells: drag affordance + empty-cell hint on hover */
-.rm-cell{cursor:pointer;user-select:none}
+.rm-cell{cursor:pointer;user-select:none;position:relative}
+.rm-expand{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:10px;padding:0 3px 0 0;line-height:1}
+.rm-expand:hover{color:var(--accent)}
+.rm-exp-row td{background:var(--elevated-1);padding:0 !important}
+.rm-exp{display:flex;gap:22px;padding:12px 16px;flex-wrap:wrap}
+.rm-exp-col{min-width:200px;flex:1}
+.rm-exp-col h5{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3)}
+.rm-exp-desc{font-size:12px;color:var(--text-2);margin-bottom:8px;line-height:1.4}
+.rm-exp-meta{margin:0;font-size:11px}
+.rm-exp-meta>div{display:flex;gap:8px;padding:1px 0}
+.rm-exp-meta dt{color:var(--text-4);min-width:78px}
+.rm-exp-meta dd{margin:0;color:var(--text-2)}
+.rm-exp-field{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-3);margin-bottom:6px}
+.rm-exp-field select,.rm-exp-field input{background:var(--elevated-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:4px;padding:3px 5px;font-size:11px;outline:none}
+.rm-exp-op-actions{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.rm-exp-op-actions button{background:var(--accent);color:var(--on-accent,#fff);border:none;border-radius:4px;padding:3px 9px;font-size:11px;cursor:pointer}
+.rm-exp-op-actions button:disabled{opacity:.4;cursor:default}
+.rm-exp-op-actions a{font-size:11px;color:var(--accent)}
+.rm-exp-op-status{font-size:11px;color:var(--text-3)}
+.rm-exp-op-status.err{color:var(--priority-p1-fg,#e57)}
 .rm-cell:hover .bar{outline:1px dashed var(--border-2);outline-offset:1px;min-height:8px}
-.task-table th.wk{width:28px;min-width:28px;text-align:center;padding:5px 2px;font-size:9px;font-weight:500;color:var(--text-5);border-left:1px solid var(--border-3)}
-.task-table td.wk{width:28px;min-width:28px;padding:7px 2px;text-align:center;border-left:1px solid var(--border-3)}
+.task-table th.wk{width:17px;min-width:17px;text-align:center;padding:5px 1px;font-size:11px;font-weight:500;color:var(--text-5);border-left:1px solid var(--border-3)}
+.task-table td.wk{width:17px;min-width:17px;padding:7px 1px;text-align:center;border-left:1px solid var(--border-3)}
 .task-table th.mo{text-align:center;padding:7px 3px;border-left:1px solid var(--border-1)}
 .task-table td.mo-start,.task-table th.wk.mo-start{border-left:1px solid var(--border-1)}
 /* frozen identity/metadata columns: horizontal scroll only moves the timeline.
@@ -5472,14 +5503,59 @@
 .grp-label{position:sticky;left:0;display:inline-block}
 /* right edge of the frozen block */
 .task-table .sl-edge{box-shadow:2px 0 0 var(--border-1)}
+/* fixed column widths (no table-layout:fixed; inner widths make these resolve) */
+.task-table .w80{width:75px;max-width:75px;min-width:75px}
+.task-table .w-area{width:80px;max-width:80px;min-width:80px}
+.task-table .w250{width:250px;max-width:250px;min-width:250px}
 .status-pill{display:inline-block;border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap}
+.st-hold{background:var(--elevated-2);color:var(--text-4);border:1px solid var(--border-2)}
+.st-blocked{background:var(--priority-p1-bg);color:var(--accent-danger);border:1px solid var(--accent-danger)}
+.rule-cfg .cfg-row{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.rule-cfg label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;color:var(--text-4)}
+.rule-cfg input{width:72px;background:var(--elevated-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:4px;padding:2px 3px;font-size:11px;text-align:center;outline:none}
+.rule-cfg input:focus{border-color:var(--accent-primary)}
+.rule-cfg .rm-compute{width:100%;margin-top:2px}
+.rm-compute{background:var(--accent-primary);color:var(--accent-fg,inherit)}
+.rm-apply{background:var(--accent-secondary);color:var(--accent-fg,inherit)}
+.rm-discard{background:transparent;border:1px solid var(--border-2);color:var(--text-3)}
+.bar-ghost{position:absolute;inset:2px 0;border:1.5px dashed var(--accent-secondary);border-radius:3px;background:color-mix(in srgb,var(--accent-secondary) 18%,transparent);pointer-events:none}
+.rm-deferred{font-size:11px;color:var(--accent-danger);padding:3px 6px;margin-bottom:4px}
+.task-table th.wk.wk-over{background:var(--priority-p1-bg);color:var(--accent-danger);font-weight:700}
 .st-now{background:var(--priority-p1-bg);color:var(--priority-p1-fg);border:1px solid var(--priority-p1-fg)}
-.st-next{background:var(--elevated-2);color:var(--text-4);border:1px solid var(--border-2)}
-.dep-cell{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
-.dep-chip{display:inline-flex;align-items:center;gap:2px;font-size:10px;color:var(--accent-secondary);background:var(--elevated-2);border:1px solid var(--border-2);border-radius:5px;padding:1px 4px;max-width:100%}
+.st-next{background:transparent;color:var(--accent-secondary);border:1.5px solid var(--accent-secondary)}
+.st-backlog{background:transparent;color:var(--text-4);border:1px solid var(--border-3)}
+/* row opacity: Current > Next > Backlog */
+.task-table tbody tr[data-group="next"]{opacity:.82}
+.task-table tbody tr[data-group="backlog"]{opacity:.65}
+/* group header: Current bright accent, Next muted accent, Backlog neutral */
+.task-table tbody tr.grp[data-section="current"] td{background:var(--priority-p1-bg);border-left:3px solid var(--priority-p1-fg)}
+.task-table tbody tr.grp[data-section="current"] .grp-label{color:var(--priority-p1-fg);font-weight:700}
+.task-table tbody tr.grp[data-section="next"] td{background:var(--elevated-bg);border-left:3px solid var(--accent-secondary);font-weight:600}
+.task-table tbody tr.grp[data-section="next"] .grp-label{color:var(--accent-secondary);font-weight:700}
+.task-table tbody tr.grp[data-section="backlog"] td{background:var(--deep-bg);border-left:3px solid var(--text-4)}
+.task-table tbody tr.grp[data-section="backlog"] .grp-label{color:var(--text-4)}
+/* section divider: explicit gap + visible separator between sections */
+.task-table tbody tr.grp[data-section="next"] td,
+.task-table tbody tr.grp[data-section="backlog"] td{
+  border-top:2px solid var(--border-1);
+  /* ponytail: padding-top adds visual gap; sticky header covers it as you scroll,
+     but the border + bg color change is enough to signal the break */
+  padding-top:8px
+}
+/* spacer row: one empty row between sections for a visible breathing gap */
+.task-table tbody tr.sec-gap td{height:10px;border:none;background:var(--app-bg)}
+/* timeline bar: Next thinner, Backlog dashed (only timeline cells, not the Backlog column) */
+.bar.on-next{height:5px;border-radius:2px;background:var(--accent-secondary)}
+/* ponytail: specificity bump only on .wk cells — Backlog column (.mo) keeps injected amber fill */
+.task-table tbody tr[data-group="backlog"] td.wk .bar.on-backlog{height:4px;border-radius:2px;border:1px dashed var(--text-4);background:transparent!important}
+.dep-cell{display:flex;flex-wrap:wrap;gap:3px;align-items:center;max-width:100%}
+/* dep picker menu wide enough to read task names (trigger is tiny) */
+.task-table td.dep .rm-menu{min-width:180px}
+.dep-chip{display:inline-flex;align-items:center;gap:1px;font-size:10px;color:var(--accent-secondary);background:var(--elevated-2);border:1px solid var(--border-2);border-radius:5px;padding:0 2px;max-width:100%;min-width:0}
 .dep-x{background:none;border:none;color:var(--text-4);cursor:pointer;font-size:12px;line-height:1;padding:0 1px}
 .dep-x:hover{color:var(--priority-p1-fg)}
 .dep-add{font-size:10px;color:var(--text-4)}
+.dep-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .src-badge{display:inline-block;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700;white-space:nowrap;background:var(--elevated-2);border:1px solid var(--border-2)}
 .src-cur{color:var(--priority-p1-fg)}
 .src-feat{color:var(--accent-secondary)}
@@ -5493,7 +5569,7 @@
 .rm-addbtn:hover{filter:brightness(1.1)}
 .rm-addnext{background:var(--elevated-bg);color:var(--text-2);border:1px solid var(--border-2)}
 .rm-head .rm-saved{margin-left:8px}
-.rm-editable{display:inline-block;min-width:40px;min-height:16px;cursor:text;border-radius:4px;padding:1px 3px}
+.rm-editable{display:block;min-width:40px;min-height:16px;cursor:text;border-radius:4px;padding:1px 3px;white-space:pre-wrap;word-break:break-word}
 .rm-editable:hover{background:var(--elevated-bg);outline:1px dashed var(--border-2)}
 .rm-ph{color:var(--text-4);font-style:italic}
 .rm-input{width:100%;box-sizing:border-box;background:var(--elevated-2);color:var(--text-1);border:1px solid var(--accent-primary);border-radius:5px;padding:3px 6px;font-size:11px;font-family:inherit;outline:none;resize:vertical}
@@ -5504,12 +5580,16 @@
 .rm-flexroot{display:flex;flex-direction:column;min-height:0;flex:1}
 .rm-flexcol{display:flex;flex-direction:column;min-height:0;flex:1}
 .rm-flexcol .rm-sticky{flex:none}
-.rm-flexcol .table-panel{flex:1;min-height:0;overflow:auto}
+.rm-flexcol .table-panel{flex:1;min-height:0;overflow:auto;position:relative}
 .rm-flexcol .rm-footer{flex:none}
 /* header + group rows pin to top of the SCROLLING table-panel */
 .task-table thead th{position:sticky;top:0;z-index:30;background:var(--elevated-bg)}
 .task-table thead tr:nth-child(2) th{top:28px;z-index:29}
-.task-table tbody tr.grp td{position:sticky;top:50px;z-index:20;background:var(--elevated-2)}
+.task-table tbody tr.grp td{position:sticky;top:50px;z-index:20}
+/* section-specific sticky backgrounds: override the generic .grp sticky bg */
+.task-table tbody tr.grp[data-section="current"] td{background:var(--priority-p1-bg)}
+.task-table tbody tr.grp[data-section="next"] td{background:var(--elevated-bg)}
+.task-table tbody tr.grp[data-section="backlog"] td{background:var(--deep-bg)}
 `;
 
       function rmMetricClass(v) {
@@ -5561,13 +5641,22 @@
          multiline=true → textarea for description. ponytail: uncontrolled defaultValue
          + commit-on-blur, no per-keystroke state; add controlled value if live
          validation is ever needed. */
-      function RmEdit({ value, onCommit, multiline, placeholder }) {
+      function RmEdit({ value, onCommit, placeholder }) {
         const [editing, setEditing] = React.useState(false);
         const ref = React.useRef(null);
         React.useEffect(() => {
           if (editing && ref.current) {
             ref.current.focus();
             ref.current.select && ref.current.select();
+            // auto-grow textarea to fit content
+            const resize = () => {
+              if (!ref.current) return;
+              ref.current.style.height = "auto";
+              ref.current.style.height = ref.current.scrollHeight + "px";
+            };
+            resize();
+            ref.current.addEventListener("input", resize);
+            return () => ref.current?.removeEventListener("input", resize);
           }
         }, [editing]);
         const commit = () => {
@@ -5580,8 +5669,8 @@
             <span
               className="rm-editable"
               tabIndex={0}
-              title="Click to edit"
-              onClick={() => setEditing(true)}
+              title="Double-click to edit"
+              onDoubleClick={() => setEditing(true)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === "F2") setEditing(true);
               }}
@@ -5589,28 +5678,23 @@
               {value || <span className="rm-ph">{placeholder || "—"}</span>}
             </span>
           );
-        const common = {
-          ref,
-          className: "rm-input",
-          defaultValue: value || "",
-          onBlur: commit,
-          onKeyDown: (e) => {
-            if (e.key === "Escape") {
-              e.stopPropagation();
-              setEditing(false);
-            } else if (e.key === "Enter" && !multiline) {
-              e.preventDefault();
-              commit();
-            } else if (e.key === "Enter" && multiline && (e.metaKey || e.ctrlKey)) {
-              e.preventDefault();
-              commit();
-            }
-          },
-        };
-        return multiline ? (
-          <textarea rows={2} {...common} />
-        ) : (
-          <input type="text" {...common} />
+        return (
+          <textarea
+            ref={ref}
+            className="rm-input"
+            defaultValue={value || ""}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                e.stopPropagation();
+                setEditing(false);
+              } else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                commit();
+              }
+            }}
+            style={{ overflow: "hidden", minHeight: "28px" }}
+          />
         );
       }
 
@@ -5627,8 +5711,10 @@
         const [open, setOpen] = React.useState(false);
         const [q, setQ] = React.useState("");
         const [hl, setHl] = React.useState(0);
+        const [menuPos, setMenuPos] = React.useState(null); // {left,top,width} fixed coords when open (portal escapes scroll clip)
         const rootRef = React.useRef(null);
         const inputRef = React.useRef(null);
+        const menuRef = React.useRef(null);
 
         const all = React.useMemo(
           () =>
@@ -5644,7 +5730,10 @@
         React.useEffect(() => {
           if (!open) return;
           const onDown = (e) => {
-            if (rootRef.current && !rootRef.current.contains(e.target))
+            if (
+              rootRef.current && !rootRef.current.contains(e.target) &&
+              (!menuRef.current || !menuRef.current.contains(e.target))
+            )
               setOpen(false);
           };
           document.addEventListener("mousedown", onDown);
@@ -5654,6 +5743,33 @@
         React.useEffect(() => {
           if (open && searchable && inputRef.current) inputRef.current.focus();
         }, [open, searchable]);
+
+        const placeMenu = React.useCallback(() => {
+          const el = rootRef.current;
+          if (!el) return;
+          const r = el.getBoundingClientRect();
+          const menuW = Math.max(r.width, 160);
+          const spaceBelow = window.innerHeight - r.bottom;
+          const below = spaceBelow > 200 || spaceBelow > r.top;
+          setMenuPos({
+            left: Math.min(r.left, window.innerWidth - menuW - 8),
+            top: below ? r.bottom + 2 : undefined,
+            bottom: below ? undefined : window.innerHeight - r.top + 2,
+            width: menuW,
+          });
+        }, []);
+
+        React.useEffect(() => {
+          if (!open) return;
+          placeMenu();
+          const onScroll = () => placeMenu();
+          window.addEventListener("scroll", onScroll, true); // capture: any ancestor scroll
+          window.addEventListener("resize", onScroll);
+          return () => {
+            window.removeEventListener("scroll", onScroll, true);
+            window.removeEventListener("resize", onScroll);
+          };
+        }, [open, placeMenu]);
 
         function openMenu() {
           const i = all.findIndex((o) => o.v === value);
@@ -5713,12 +5829,24 @@
               {renderValue ? (
                 renderValue(value)
               ) : (
-                <span className="rm-txt">{value || "—"}</span>
+                <span className="rm-txt" title={value || undefined}>{value || "—"}</span>
               )}
               <span className="rm-caret">▾</span>
             </div>
-            {open && (
-              <div className="rm-menu" role="listbox" aria-label={label}>
+            {open && menuPos && ReactDOM.createPortal(
+              <div
+                ref={menuRef}
+                className="rm-menu rm-menu-fixed"
+                role="listbox"
+                aria-label={label}
+                style={{
+                  position: "fixed",
+                  left: menuPos.left,
+                  top: menuPos.top,
+                  bottom: menuPos.bottom,
+                  minWidth: menuPos.width,
+                }}
+              >
                 {searchable && (
                   <input
                     ref={inputRef}
@@ -5748,7 +5876,8 @@
                     {o.label}
                   </div>
                 ))}
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         );
@@ -5764,6 +5893,16 @@
         const savedTimer = React.useRef(null);
         const wrapRef = React.useRef(null);
         const stickyRef = React.useRef(null);
+        const panelRef = React.useRef(null);
+        const svgRef = React.useRef(null);
+        const [hotId, setHotId] = React.useState(null);
+        const [expandedId, setExpandedId] = React.useState(null); // roadmap row detail panel
+        const [wpCache, setWpCache] = React.useState({}); // {opId: {loading|error|data}}
+        // scheduler config (§ timeline-scheduling-formula.md): team capacity knobs
+        const RM_DEFAULT_CFG = { dev: 2, qa: 1, cap: 0.8 };
+        const [cfg, setCfg] = React.useState(RM_DEFAULT_CFG);
+        const [deferred, setDeferred] = React.useState([]); // ids blocked-downstream, unscheduled
+        const [preview, setPreview] = React.useState(null); // {id:{lo,hi}} scheduler result, not committed until Apply
 
         React.useEffect(() => {
           let alive = true;
@@ -5771,21 +5910,41 @@
           ensureBpTokenCss();
           (async () => {
             try {
+              const storedCfg = await loadRoadmapIDB("roadmap_cfg_v1");
+              if (alive && storedCfg && typeof storedCfg === "object")
+                setCfg({ ...RM_DEFAULT_CFG, ...storedCfg });
               const storedMonths = await loadRoadmapIDB("roadmap_months_v1");
               if (alive && Array.isArray(storedMonths) && storedMonths.length)
                 setMonths(storedMonths);
               const stored = await loadRoadmapIDB();
               if (!alive) return;
+              // always fetch seed — used as source for new scheduler fields (status/dependency/risk)
+              let seed = null;
+              try {
+                const rs = await fetch(`/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`);
+                if (rs.ok) seed = JSON.parse(await rs.text());
+              } catch {}
+              if (!alive) return;
+              // normalize: fill scheduler fields. seed value by id → else default.
+              // manual-added rows (not in seed) keep their own or get active/[]/1.
+              const seedById = Object.fromEntries((seed || []).map((s) => [s.id, s]));
+              const normalize = (t) => {
+                const s = seedById[t.id];
+                return {
+                  ...t,
+                  status: t.status || (s && s.status) || "active",
+                  dependency: t.dependency != null ? t.dependency : (s && s.dependency) || [],
+                  risk: t.risk != null ? t.risk : (s && s.risk) || 1,
+                  pm_front_weeks: t.pm_front_weeks != null ? t.pm_front_weeks : (s && s.pm_front_weeks) || 0,
+                };
+              };
               if (Array.isArray(stored) && stored.length) {
-                setTasks(stored);
+                const norm = stored.map(normalize);
+                setTasks(norm);
+                saveRoadmapIDB(norm); // persist normalized so it only runs once
                 return;
               }
-              const r = await fetch(
-                `/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`
-              );
-              if (!r.ok) throw new Error(r.statusText || "seed fetch failed");
-              const seed = JSON.parse(await r.text());
-              if (!alive) return;
+              if (!seed) throw new Error("seed fetch failed");
               setTasks(seed);
               saveRoadmapIDB(seed);
             } catch (e) {
@@ -5824,7 +5983,7 @@
             return next;
           });
         }, []);
-        const addTask = React.useCallback((cur) => {
+        const addTask = React.useCallback((cur, noSchedule) => {
           const id = "t" + Date.now().toString(36);
           setTasks((prev) => {
             const list = prev || [];
@@ -5843,7 +6002,8 @@
                 testing: "",
                 priority: "P3",
                 current: !!cur,
-                schedule: null,
+                // ponytail: Next gets a 1-week schedule starting this month; Backlog gets none
+                schedule: cur || noSchedule ? null : { start: { month: months[0], week: 1 }, end: { month: months[0], week: 2 } },
               },
             ];
             saveRoadmapIDB(next);
@@ -5899,6 +6059,162 @@
           const hi = slotOf(t.schedule.end.month, t.schedule.end.week);
           return lo < 0 || hi < 0 ? null : [lo, hi];
         };
+
+        /* ── Auto-scheduler (§ timeline-scheduling-formula.md v2) ──────────────
+           Greedy list-scheduling: DEV_WEEKS/QA_WEEKS from effort/testing, priority
+           score picks order, dev+qa lanes cap parallelism, deps honored (qa_end),
+           HOLD inert / BLOCKED defers downstream. Writes each task's schedule
+           {start,end} in week granularity. Validated against Python self-check. */
+        const DEV_WEEKS = { L: 2, M: 4, H: 8 };
+        const QA_WEEKS = { L: 1, M: 2, H: 3 };
+        const IMPW = { H: 3, M: 2, L: 1 };
+        const EFFINV = { L: 3, M: 2, H: 1 };
+        const prioScore = (t) => {
+          const P = { P1: 3, P2: 2, P3: 1, Backlog: 0 }[t.priority] || 0;
+          return (
+            P * 1000 +
+            (IMPW[t.impact] || 0) * 100 +
+            (EFFINV[t.effort] || 0) * 10 +
+            ({ L: 3, M: 2, H: 1 }[t.testing] || 0)
+          );
+        };
+        const computeSchedule = React.useCallback(() => {
+          const prev = tasks;
+          if (!prev) return;
+          const cap = cfg.cap > 0 ? cfg.cap : 0.8;
+          const nDev = Math.max(1, cfg.dev | 0);
+          const nQa = Math.max(1, cfg.qa | 0);
+          const byId = Object.fromEntries(prev.map((t) => [t.id, t]));
+          const isHold = (t) => t.status === "hold";
+          const isBlocked = (t) => t.status === "blocked";
+          // section = current | next | backlog (derived same as groups memo).
+          // backlog is NOT scheduled — leave unscheduled so it stays backlog.
+          const sectionOf = (t) => (t.current ? "current" : t.schedule ? "next" : "backlog");
+          const SECT = { current: 2, next: 1, backlog: 0 };
+          const active = prev.filter(
+            (t) => !isHold(t) && !isBlocked(t) && sectionOf(t) !== "backlog"
+          );
+          const blockedIds = new Set(prev.filter(isBlocked).map((t) => t.id));
+          const devFree = new Array(nDev).fill(0);
+          const qaFree = new Array(nQa).fill(0);
+          const done = {}; // id -> [devEnd, qaEnd]
+          const result = {}; // id -> {devStart, devEnd, qaEnd}
+          const remaining = new Set(active.map((t) => t.id));
+          const depsOf = (t) =>
+            Array.isArray(t.dependency) ? t.dependency : t.dependency ? [t.dependency] : [];
+          const depOk = (t) => {
+            for (const d of depsOf(t)) {
+              if (blockedIds.has(d)) return false; // BLOCKED dep → block downstream
+              const dt = byId[d];
+              if (!dt) continue; // stale/cross id → inert
+              if (isHold(dt)) continue; // HOLD dep → inert
+              if (remaining.has(d)) return false; // not scheduled yet
+            }
+            return true;
+          };
+          let guard = 0;
+          while (remaining.size && guard++ < 2000) {
+            let ready = active.filter((t) => remaining.has(t.id) && depOk(t));
+            if (!ready.length) break; // rest blocked-downstream → deferred
+            // section tier first (current before next), then priority score
+            ready.sort(
+              (a, b) =>
+                SECT[sectionOf(b)] - SECT[sectionOf(a)] ||
+                prioScore(b) - prioScore(a) ||
+                (a.rank || 0) - (b.rank || 0)
+            );
+            const t = ready[0];
+            const est = Math.max(0, ...depsOf(t).map((d) => (done[d] ? done[d][1] : 0)));
+            const pm = t.pm_front_weeks || 0;
+            const dl = devFree.indexOf(Math.min(...devFree));
+            const dStart = Math.max(devFree[dl], est, pm);
+            const risk = t.risk || 1;
+            const dEnd = dStart + ((DEV_WEEKS[t.effort] || 4) * risk) / cap;
+            devFree[dl] = dEnd;
+            const ql = qaFree.indexOf(Math.min(...qaFree));
+            const qStart = Math.max(qaFree[ql], dEnd);
+            const qEnd = qStart + (QA_WEEKS[t.testing] || 2) / cap;
+            qaFree[ql] = qEnd;
+            done[t.id] = [dEnd, qEnd];
+            result[t.id] = { dStart, dEnd, qEnd };
+            remaining.delete(t.id);
+          }
+          setDeferred([...remaining]);
+          // auto-extend months so every task gets its real slot (no pile-up clamp).
+          // makespan can exceed the visible 4-month window; grow `months` to fit.
+          let maxWeek = 0;
+          for (const id in result) maxWeek = Math.max(maxWeek, Math.ceil(result[id].dEnd));
+          const neededMonths = Math.max(months.length, Math.ceil(maxWeek / 4));
+          let cols = months;
+          if (neededMonths > months.length) {
+            const ext = [...months];
+            while (ext.length < neededMonths) {
+              const li = MONTH_NAMES.indexOf(ext[ext.length - 1]);
+              ext.push(MONTH_NAMES[(li + 1) % 12]);
+            }
+            cols = ext;
+            setMonths(ext);
+            saveRoadmapIDB(ext, "roadmap_months_v1");
+          }
+          const maxSlot = cols.length * 4 - 1;
+          const prov = {};
+          for (const id in result) {
+            const r = result[id];
+            const lo = Math.min(maxSlot, Math.round(r.dStart));
+            const hi = Math.min(maxSlot, Math.max(lo, Math.round(r.dEnd) - 1));
+            prov[id] = { lo, hi };
+          }
+          setPreview(prov); // preview only — commit via Apply
+        }, [tasks, cfg, months]);
+
+        // commit preview → write schedule to tasks + persist
+        const applyPreview = React.useCallback(() => {
+          if (!preview) return;
+          setTasks((prev) => {
+            if (!prev) return prev;
+            const next = prev.map((t) => {
+              const r = preview[t.id];
+              if (!r) return t; // untouched (hold/blocked/backlog/deferred)
+              return {
+                ...t,
+                schedule: {
+                  start: { month: slotMonth(r.lo), week: slotWeek(r.lo) },
+                  end: { month: slotMonth(r.hi), week: slotWeek(r.hi) },
+                },
+              };
+            });
+            saveRoadmapIDB(next);
+            return next;
+          });
+          setPreview(null);
+          setSaved(true);
+          clearTimeout(savedTimer.current);
+          savedTimer.current = setTimeout(() => setSaved(false), 1200);
+        }, [preview]);
+
+        const discardPreview = React.useCallback(() => setPreview(null), []);
+
+        // per-week-slot task count → overload highlight when count > dev lanes
+        const slotLoad = React.useMemo(() => {
+          const load = {};
+          (tasks || []).forEach((t) => {
+            if (t.status === "hold" || t.status === "blocked") return;
+            // preview active → count ghost span; else committed schedule
+            const pv = preview && preview[t.id];
+            const sp = pv
+              ? [pv.lo, pv.hi]
+              : t.schedule
+              ? [
+                  slotOf(t.schedule.start.month, t.schedule.start.week),
+                  slotOf(t.schedule.end.month, t.schedule.end.week),
+                ]
+              : null;
+            if (!sp || sp[0] < 0) return;
+            for (let s = sp[0]; s <= sp[1]; s++) load[s] = (load[s] || 0) + 1;
+          });
+          return load;
+        }, [tasks, months, preview]);
+
 
         /* KPI derived live from tasks — never hardcoded (§ prototype used static 30) */
         const kpi = React.useMemo(() => {
@@ -5969,10 +6285,12 @@
             return out;
           };
           const cur = ordered(list.filter((t) => t.current));
-          const rest = ordered(list.filter((t) => !t.current));
+          const next = ordered(list.filter((t) => !t.current && t.schedule));
+          const backlog = ordered(list.filter((t) => !t.current && !t.schedule));
           return [
-            { key: "current", label: "Current tasks — start now", rows: cur },
-            { key: "rest", label: "Next & backlog", rows: rest },
+            { key: "current", label: "CURRENT TASKS — START NOW", rows: cur, section: "current" },
+            { key: "next", label: "NEXT UP", rows: next, section: "next" },
+            { key: "backlog", label: "BACKLOG", rows: backlog, section: "backlog" },
           ].filter((g) => g.rows.length);
         }, [tasks, q]);
 
@@ -5983,7 +6301,7 @@
           if (!row) return;
           row.scrollIntoView({ behavior: "smooth", block: "center" });
           const edit = row.querySelector(".rm-editable");
-          if (edit) edit.click();
+          if (edit) edit.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
           setFocusId(null);
         }, [focusId, groups]);
 
@@ -6002,6 +6320,20 @@
             : t.dependency
             ? [t.dependency]
             : [];
+
+        // fetch a single OpenProject work package by id (server proxy), cache result
+        const fetchWp = React.useCallback((opId) => {
+          if (!opId) return;
+          setWpCache((c) => ({ ...c, [opId]: { loading: true } }));
+          fetch(`/api/dashboard/openproject/work-package/${encodeURIComponent(opId)}`)
+            .then((r) => r.json())
+            .then((j) => {
+              if (!j.ok) throw new Error(j.error || "fetch failed");
+              setWpCache((c) => ({ ...c, [opId]: { data: j.workPackage } }));
+            })
+            .catch((e) => setWpCache((c) => ({ ...c, [opId]: { error: e.message } })));
+        }, []);
+        const RM_PRD_STATES = ["", "Draft", "Review", "Approved", "Done"];
 
         // freeze the identity/metadata columns horizontally: only the timeline
         // scrolls sideways. Compute cumulative left from the header's sticky-cell
@@ -6033,6 +6365,62 @@
           ro.observe(panel);
           return () => ro.disconnect();
         }, [tasks, groups]);
+
+        /* dependency connectors: elbow lines in the left gutter between the rank
+           cells of a dep and its dependent — visible even when F is in P1 and A
+           is far below in P3. Redrawn on data/hover/scroll (anchors sit on sticky
+           cells, so horizontal scroll shifts their content-x). */
+        React.useEffect(() => {
+          const panel = panelRef.current, svg = svgRef.current;
+          if (!panel || !svg) return;
+          let raf = 0;
+          const NS = "http://www.w3.org/2000/svg";
+          const draw = () => {
+            raf = 0;
+            const pr = panel.getBoundingClientRect();
+            svg.setAttribute("width", panel.scrollWidth);
+            svg.setAttribute("height", panel.scrollHeight);
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+            panel.querySelectorAll("tr.dep-hot").forEach((r) => r.classList.remove("dep-hot"));
+            const rowOf = {};
+            panel.querySelectorAll("tr[data-tid]").forEach((r) => (rowOf[r.dataset.tid] = r));
+            const pt = (r) => {
+              const c = r.querySelector("td.num") || r;
+              const cr = c.getBoundingClientRect();
+              return { x: cr.right - pr.left + panel.scrollLeft - 6,
+                       y: cr.top - pr.top + panel.scrollTop + cr.height / 2 };
+            };
+            let lane = 0;
+            (tasks || []).forEach((t) => {
+              const to = rowOf[t.id];
+              if (!to) return;
+              depList(t).forEach((d) => {
+                const from = rowOf[d];
+                if (!from || from === to) return;
+                const a = pt(from), b = pt(to);
+                const x = panel.scrollLeft + 6 + (lane++ % 4) * 4;
+                const hot = hotId === t.id || hotId === d;
+                const p = document.createElementNS(NS, "path");
+                p.setAttribute("d", `M ${a.x} ${a.y} C ${x} ${a.y} ${x} ${b.y} ${b.x} ${b.y}`);
+                if (hot) p.setAttribute("class", "hot");
+                svg.appendChild(p);
+                [[a, 2.2], [b, 3.2]].forEach(([n, r]) => {
+                  const c = document.createElementNS(NS, "circle");
+                  c.setAttribute("cx", n.x); c.setAttribute("cy", n.y); c.setAttribute("r", r);
+                  if (hot) c.setAttribute("class", "hot");
+                  svg.appendChild(c);
+                });
+                if (hot) { from.classList.add("dep-hot"); to.classList.add("dep-hot"); }
+              });
+            });
+          };
+          const onScroll = () => { if (!raf) raf = requestAnimationFrame(draw); };
+          draw();
+          panel.addEventListener("scroll", onScroll);
+          const ro = new ResizeObserver(onScroll);
+          ro.observe(panel);
+          return () => { panel.removeEventListener("scroll", onScroll); ro.disconnect(); if (raf) cancelAnimationFrame(raf); };
+        }, [tasks, groups, hotId]);
 
         if (err)
           return (
@@ -6088,11 +6476,19 @@
                   <button type="button" className="rm-addbtn rm-addnext" onClick={() => addTask(false)}>
                     + Next
                   </button>
+                  <button type="button" className="rm-addbtn rm-addnext" onClick={() => addTask(false, true)} title="Add unscheduled task">
+                    + Backlog
+                  </button>
                   <button type="button" className="rm-addbtn rm-addnext" onClick={addMonth} title="Tambah bulan berikutnya ke timeline">
                     + Month
                   </button>
                   <span className={"rm-saved" + (saved ? " on" : "")}>Saved</span>
                 </div>
+                {deferred.length > 0 && (
+                  <div className="rm-deferred" role="status">
+                    ⚠ {deferred.length} task ter-defer (dependency BLOCKED): {deferred.join(", ")}
+                  </div>
+                )}
 
                 <div className="stats-row">
                   <div className="stat-block">
@@ -6135,6 +6531,26 @@
                   )}
 
                   <div className="rules-area">
+                    <div className="rule-box rule-cfg">
+                      <div className="rule-title">Auto-Schedule</div>
+                      <div className="cfg-row">
+                        <label>Dev<input type="number" min="1" max="9" value={cfg.dev}
+                          onChange={(e) => { const v = { ...cfg, dev: Math.max(1, +e.target.value || 1) }; setCfg(v); saveRoadmapIDB(v, "roadmap_cfg_v1"); }} /></label>
+                        <label>QA<input type="number" min="1" max="9" value={cfg.qa}
+                          onChange={(e) => { const v = { ...cfg, qa: Math.max(1, +e.target.value || 1) }; setCfg(v); saveRoadmapIDB(v, "roadmap_cfg_v1"); }} /></label>
+                        <label>Cap<input type="number" min="0.1" max="1" step="0.05" value={cfg.cap}
+                          onChange={(e) => { const v = { ...cfg, cap: Math.min(1, Math.max(0.1, +e.target.value || 0.8)) }; setCfg(v); saveRoadmapIDB(v, "roadmap_cfg_v1"); }} /></label>
+                      </div>
+                      <div className="cfg-row">
+                        <button type="button" className="rm-addbtn rm-compute" onClick={computeSchedule} title="Hitung timeline dari effort/testing/priority/dependency + kapasitas tim (preview)">⚡ Compute</button>
+                        {preview && (
+                          <>
+                            <button type="button" className="rm-addbtn rm-apply" onClick={applyPreview} title="Terapkan hasil scheduler ke timeline">✓ Apply</button>
+                            <button type="button" className="rm-addbtn rm-discard" onClick={discardPreview} title="Batalkan preview">✕ Discard</button>
+                          </>
+                        )}
+                      </div>
+                    </div>
                     <div className="rule-box">
                       <div className="rule-title">Priority Rule</div>
                       <div className="rule-item">1. Impact (H &gt; M &gt; L)</div>
@@ -6152,21 +6568,22 @@
                 </div>
                 </div>
 
-                <div className="table-panel">
+                <div className="table-panel" ref={panelRef}>
+                  <svg className="dep-svg" ref={svgRef}></svg>
                   <table className="task-table">
                     <thead>
                       <tr>
                         <th rowSpan={2} className="sl">#</th>
-                        <th rowSpan={2} className="sl">Task</th>
-                        <th rowSpan={2} className="sl">Strategic Area</th>
-                        <th rowSpan={2} className="sl">Description</th>
-                        <th rowSpan={2} className="sl">Source</th>
-                        <th rowSpan={2} className="sl">Impact</th>
-                        <th rowSpan={2} className="sl">Effort</th>
-                        <th rowSpan={2} className="sl">Testing</th>
-                        <th rowSpan={2} className="sl">Dependency</th>
-                        <th rowSpan={2} className="sl">Priority</th>
-                        <th rowSpan={2} className="sl sl-edge">Status</th>
+                        <th rowSpan={2} className="sl w250">Task</th>
+                        <th rowSpan={2} className="sl w-area">Strategic Area</th>
+                        <th rowSpan={2} className="sl w250">Description</th>
+                        <th rowSpan={2} className="sl w80">Source</th>
+                        <th rowSpan={2} className="sl w80">Impact</th>
+                        <th rowSpan={2} className="sl w80">Effort</th>
+                        <th rowSpan={2} className="sl w80">Testing</th>
+                        <th rowSpan={2} className="sl w80">Dependency</th>
+                        <th rowSpan={2} className="sl w80">Priority</th>
+                        <th rowSpan={2} className="sl sl-edge w80">Status</th>
                         {months.map((m, mi) => (
                           <th key={mi} className="mo" colSpan={4}>{m}</th>
                         ))}
@@ -6174,21 +6591,48 @@
                       </tr>
                       <tr>
                         {months.map((m, mi) =>
-                          [1, 2, 3, 4].map((w) => (
-                            <th key={mi + "-" + w} className={"wk" + (w === 1 ? " mo-start" : "")}>W{w}</th>
-                          ))
+                          [1, 2, 3, 4].map((w) => {
+                            const si = mi * 4 + (w - 1);
+                            const load = slotLoad[si] || 0;
+                            const over = load > cfg.dev;
+                            return (
+                              <th key={mi + "-" + w} className={"wk" + (w === 1 ? " mo-start" : "") + (over ? " wk-over" : "")}
+                                title={over ? load + " task paralel > " + cfg.dev + " dev (overload)" : "W" + w}>
+                                {over ? load + "/" + cfg.dev : "W" + w}
+                              </th>
+                            );
+                          })
                         )}
                       </tr>
                     </thead>
                     <tbody>
-                      {groups.map((g) => (
+                      {groups.map((g, gi) => (
                         <React.Fragment key={g.key}>
-                          <tr className="grp">
-                            <td colSpan={RM_COLSPAN}><span className="grp-label">{g.label}</span></td>
+                          {/* spacer row between sections */}
+                          {gi > 0 && (
+                            <tr className="sec-gap"><td colSpan={RM_COLSPAN}></td></tr>
+                          )}
+                          <tr className="grp" data-section={g.section}>
+                            <td colSpan={RM_COLSPAN}>
+                              <span className="grp-label">{g.label}</span>
+                              {g.section === "current" && <span style={{fontSize:10,color:"var(--text-3)",marginLeft:8}}>Start now</span>}
+                              {g.section === "next" && <span style={{fontSize:10,color:"var(--text-3)",marginLeft:8}}>Planned work</span>}
+                              {g.section === "backlog" && <span style={{fontSize:10,color:"var(--text-4)",marginLeft:8}}>Not scheduled</span>}
+                            </td>
                           </tr>
                           {g.rows.map((t) => (
-                            <tr key={t.id} data-tid={t.id}>
+                            <tr key={t.id} data-tid={t.id} data-group={g.section}
+                              onMouseEnter={() => depList(t).length && setHotId(t.id)}
+                              onMouseLeave={() => setHotId((h) => (h === t.id ? null : h))}>
                               <td className="num sl">
+                                <button
+                                  type="button"
+                                  className="rm-expand"
+                                  title={expandedId === t.id ? "Collapse" : "Expand detail"}
+                                  onClick={() => setExpandedId((e) => (e === t.id ? null : t.id))}
+                                >
+                                  {expandedId === t.id ? "▾" : "▸"}
+                                </button>
                                 <span className="rm-rank">{t.rank}</span>
                                 <button
                                   type="button"
@@ -6199,16 +6643,16 @@
                                   ×
                                 </button>
                               </td>
-                              <td className="tname sl">
+                              <td className="tname sl w250">
                                 <RmEdit
                                   value={t.task}
                                   placeholder="Task name"
                                   onCommit={(v) => updateTask(t.id, { task: v })}
                                 />
                               </td>
-                              <td className="area sl">
+                              <td className="area sl w-area">
                                 <RmCombo
-                                  width={196}
+                                  width={77}
                                   searchable
                                   value={t.strategicArea}
                                   options={RM_AREAS}
@@ -6218,27 +6662,55 @@
                                   label={`Strategic area for ${t.task}`}
                                 />
                               </td>
-                              <td className="tdesc sl">
+                              <td className="tdesc sl w250">
                                 <RmEdit
                                   value={t.desc}
-                                  multiline
                                   placeholder="Description"
                                   onCommit={(v) => updateTask(t.id, { desc: v })}
                                 />
                               </td>
-                              <td className="sl"><span className={rmSrcClass(t.sourceColumn)}>{t.sourceColumn || "—"}</span></td>
-                              <td className="sl">{level(t, "impact")}</td>
-                              <td className="sl">{level(t, "effort")}</td>
-                              <td className="sl">{level(t, "testing")}</td>
-                              <td className="dep sl">
+                              <td className="sl w80"><span className={rmSrcClass(t.sourceColumn)} title={t.sourceColumn || undefined}>{t.sourceColumn || "—"}</span></td>
+                              <td className="sl w80">{level(t, "impact")}</td>
+                              <td className="sl w80">{level(t, "effort")}</td>
+                              <td className="sl w80">{level(t, "testing")}</td>
+                              <td className="dep sl w80">
                                 {(() => {
                                   const deps = depList(t);
                                   const picked = new Set(deps);
+                                  // options for a picker: same section, exclude self and
+                                  // already-picked (optionally keep `keep` so a replace combo
+                                  // still shows its own current value as selectable context)
+                                  const optsFor = (keep) => [
+                                    ...(tasks || [])
+                                      .filter(
+                                        (o) =>
+                                          o.id !== t.id &&
+                                          (o.id === keep || !picked.has(o.id)) &&
+                                          !!o.current === !!t.current
+                                      )
+                                      .map((o) => ({ v: o.id, label: o.task })),
+                                  ];
                                   return (
                                     <div className="dep-cell">
                                       {deps.map((d) => (
-                                        <span key={d} className="dep-chip">
-                                          {nameById[d] || d}
+                                        <span key={d} className="dep-chip" title={nameById[d] || d}>
+                                          {/* click chip = replace this dep */}
+                                          <RmCombo
+                                            width={54}
+                                            searchable
+                                            value={d}
+                                            options={optsFor(d)}
+                                            onChange={(v) =>
+                                              v &&
+                                              updateTask(t.id, {
+                                                dependency: deps.map((x) => (x === d ? v : x)),
+                                              })
+                                            }
+                                            label={`Change dependency ${nameById[d] || d} for ${t.task}`}
+                                            renderValue={() => (
+                                              <span className="dep-name">{nameById[d] || d}</span>
+                                            )}
+                                          />
                                           <button
                                             type="button"
                                             className="dep-x"
@@ -6253,39 +6725,30 @@
                                           </button>
                                         </span>
                                       ))}
-                                      <RmCombo
-                                        width={140}
-                                        searchable
-                                        value=""
-                                        options={[
-                                          { v: "", label: "+ add dependency" },
-                                          ...(tasks || [])
-                                            .filter(
-                                              (o) =>
-                                                o.id !== t.id &&
-                                                !picked.has(o.id) &&
-                                                !!o.current === !!t.current
-                                            )
-                                            .map((o) => ({ v: o.id, label: o.task })),
-                                        ]}
-                                        onChange={(v) =>
-                                          v &&
-                                          updateTask(t.id, {
-                                            dependency: [...deps, v],
-                                          })
-                                        }
-                                        label={`Add dependency for ${t.task}`}
-                                        renderValue={() => (
-                                          <span className="dep-add">+ dep</span>
-                                        )}
-                                      />
+                                      {/* + dep only when nothing selected yet */}
+                                      {deps.length === 0 && (
+                                        <RmCombo
+                                          width={54}
+                                          searchable
+                                          value=""
+                                          options={optsFor()}
+                                          onChange={(v) =>
+                                            v &&
+                                            updateTask(t.id, { dependency: [...deps, v] })
+                                          }
+                                          label={`Add dependency for ${t.task}`}
+                                          renderValue={() => (
+                                            <span className="dep-add">+ dep</span>
+                                          )}
+                                        />
+                                      )}
                                     </div>
                                   );
                                 })()}
                               </td>
-                              <td className="sl">
+                              <td className="sl w80">
                                 <RmCombo
-                                  width={94}
+                                  width={72}
                                   value={t.priority}
                                   options={RM_PRIOS}
                                   onChange={(v) =>
@@ -6299,20 +6762,24 @@
                                   )}
                                 />
                               </td>
-                              <td className="sl sl-edge">
+                              <td className="sl sl-edge w80">
                                 <RmCombo
-                                  width={78}
-                                  value={t.current ? "Now" : "Next"}
-                                  options={["Now", "Next"]}
-                                  onChange={(v) =>
-                                    updateTask(t.id, { current: v === "Now" })
-                                  }
+                                  width={72}
+                                  value={t.status === "hold" ? "HOLD" : t.status === "blocked" ? "BLOCKED" : t.current ? "NOW" : t.schedule ? "NEXT" : "BACKLOG"}
+                                  options={["NOW", "NEXT", "BACKLOG", "HOLD", "BLOCKED"]}
+                                  onChange={(v) => {
+                                    if (v === "NOW") updateTask(t.id, { current: true, status: "active" });
+                                    else if (v === "NEXT") updateTask(t.id, { current: false, status: "active" });
+                                    else if (v === "BACKLOG") updateTask(t.id, { current: false, status: "active", schedule: null });
+                                    else if (v === "HOLD") updateTask(t.id, { status: "hold" });
+                                    else updateTask(t.id, { status: "blocked" });
+                                  }}
                                   label={`Status for ${t.task}`}
                                   renderValue={(v) => (
                                     <span
                                       className={
                                         "status-pill " +
-                                        (v === "Now" ? "st-now" : "st-next")
+                                        (v === "NOW" ? "st-now" : v === "NEXT" ? "st-next" : v === "HOLD" ? "st-hold" : v === "BLOCKED" ? "st-blocked" : "st-backlog")
                                       }
                                     >
                                       {v}
@@ -6323,6 +6790,8 @@
                               {Array.from({ length: RM_SLOTS }, (_, si) => {
                                 const span = schedSpan(t);
                                 const on = span && si >= span[0] && si <= span[1];
+                                const pv = preview && preview[t.id];
+                                const ghost = pv && si >= pv.lo && si <= pv.hi;
                                 const weekStart = si % 4 === 0;
                                 return (
                                   <td
@@ -6342,10 +6811,11 @@
                                       className={
                                         "bar" +
                                         (on
-                                          ? " " + rmBarClass(t.priority)
+                                          ? " " + (g.section === "current" ? rmBarClass(t.priority) : g.section === "next" ? "on-next" : "on-backlog")
                                           : "")
                                       }
                                     ></div>
+                                    {ghost && <div className="bar-ghost"></div>}
                                   </td>
                                 );
                               })}
@@ -6365,6 +6835,61 @@
                               </td>
                             </tr>
                           ))}
+                          {g.rows.filter((t) => expandedId === t.id).map((t) => {
+                            const wp = wpCache[t.opId];
+                            const sch = t.schedule;
+                            return (
+                              <tr key={t.id + "_exp"} className="rm-exp-row">
+                                <td colSpan={RM_COLSPAN}>
+                                  <div className="rm-exp">
+                                    <div className="rm-exp-col">
+                                      <h5>Detail</h5>
+                                      <div className="rm-exp-desc">{t.desc || "— no description —"}</div>
+                                      <dl className="rm-exp-meta">
+                                        <div><dt>Impact</dt><dd>{(t.impact || "—")}</dd></div>
+                                        <div><dt>Effort</dt><dd>{(t.effort || "—")}</dd></div>
+                                        <div><dt>Testing</dt><dd>{(t.testing || "—")}</dd></div>
+                                        <div><dt>Dependency</dt><dd>{depList(t).map((d) => nameById[d] || d).join(", ") || "—"}</dd></div>
+                                        <div><dt>Schedule</dt><dd>{sch ? `${sch.start} → ${sch.end}` : "not scheduled"}</dd></div>
+                                      </dl>
+                                    </div>
+                                    <div className="rm-exp-col">
+                                      <h5>PRD / Assessment</h5>
+                                      <label className="rm-exp-field">
+                                        <span>Status</span>
+                                        <select value={t.prdStatus || ""} onChange={(e) => updateTask(t.id, { prdStatus: e.target.value })}>
+                                          {RM_PRD_STATES.map((s) => <option key={s || "none"} value={s}>{s || "— none —"}</option>)}
+                                        </select>
+                                      </label>
+                                    </div>
+                                    <div className="rm-exp-col">
+                                      <h5>OpenProject</h5>
+                                      <label className="rm-exp-field">
+                                        <span>WP&nbsp;ID</span>
+                                        <input type="text" value={t.opId || ""} placeholder="e.g. 1234"
+                                          onChange={(e) => updateTask(t.id, { opId: e.target.value.trim() })} />
+                                      </label>
+                                      <div className="rm-exp-op-actions">
+                                        <button type="button" disabled={!t.opId} onClick={() => fetchWp(t.opId)}>Sync status</button>
+                                        {t.opId && <a href={`https://project.ordo.co.id/work_packages/${t.opId}`} target="_blank" rel="noreferrer">Open ↗</a>}
+                                      </div>
+                                      {wp?.loading && <div className="rm-exp-op-status">Loading…</div>}
+                                      {wp?.error && <div className="rm-exp-op-status err">{wp.error}</div>}
+                                      {wp?.data && (
+                                        <dl className="rm-exp-meta">
+                                          <div><dt>Status</dt><dd>{wp.data.statusName || "—"}</dd></div>
+                                          <div><dt>Type</dt><dd>{wp.data.typeName || "—"}</dd></div>
+                                          <div><dt>Assignee</dt><dd>{wp.data.assigneeName || "—"}</dd></div>
+                                          <div><dt>Progress</dt><dd>{wp.data.percentageDone}%</dd></div>
+                                          <div><dt>Due</dt><dd>{wp.data.dueDate || "—"}</dd></div>
+                                        </dl>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </React.Fragment>
                       ))}
                     </tbody>
@@ -6383,6 +6908,7 @@
                     <span><span className="lg" style={{background:"var(--priority-backlog-fg)"}}></span>Backlog — belum ready dijadwalkan</span>
                     <span>Impact / Effort / Testing: <span className="metric metric-high">H</span> <span className="metric metric-medium">M</span> <span className="metric metric-low">L</span> <span className="metric metric-unknown">?</span></span>
                     <span>⛔ = blocked external</span>
+                    <span>Timeline: <span style={{display:"inline-block",width:20,height:6,borderRadius:2,background:"var(--priority-p1-fg)",verticalAlign:"middle"}}></span> NOW &nbsp; <span style={{display:"inline-block",width:20,height:5,borderRadius:2,background:"var(--accent-secondary)",verticalAlign:"middle",opacity:.7}}></span> NEXT &nbsp; <span style={{display:"inline-block",width:20,height:4,borderRadius:2,border:"1px dashed var(--text-4)",verticalAlign:"middle",opacity:.4}}></span> BACKLOG</span>
                   </div>
                   <div className="exec-clarity">
                     <div className="ec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></div>
@@ -6400,6 +6926,52 @@
 
       function App() {
         const APP_NAV_STATE_KEY = "qa_browser_nav_state_v1";
+        // ── Hash routing ─────────────────────────────────────────────────────
+        const SECTION_ID_TO_WORKSPACE_NAV = {
+          brd: "brd",
+          assessments: "assessment",
+          prd: "prd",
+          test: "testcase",
+          feature: "feature-list",
+          "incident-report": "incident-report",
+          summary: "summary",
+          "release-notes": "release-notes",
+          uat: "uat",
+          presentation: "presentation",
+          gdocs: "google-docs",
+        };
+        const WORKSPACE_NAV_TO_SECTION_ID = Object.fromEntries(
+          Object.entries(SECTION_ID_TO_WORKSPACE_NAV).map(([k, v]) => [v, k]),
+        );
+        function parseHash() {
+          const raw = window.location.hash.replace(/^#\/?/, "");
+          if (!raw) return {};
+          const parts = raw.split("/");
+          const page = parts[0];
+          if (page === "workspace") {
+            return {
+              mainNav: "workspace",
+              workspaceNav: parts[1] || null,
+              filePath: parts.slice(2).join("/") || null,
+            };
+          }
+          return { mainNav: page };
+        }
+        function navToHash(mn, wn, sel) {
+          if (mn === "workspace") {
+            let h = "#/workspace";
+            if (wn) {
+              h += "/" + wn;
+              if (sel?.path) {
+                // strip section folder prefix (first segment)
+                const rel = sel.path.replace(/^[^/]+\//, "");
+                if (rel !== sel.path) h += "/" + rel;
+              }
+            }
+            return h;
+          }
+          return "#/" + mn;
+        }
         function readAppNavState() {
           try {
             return (
@@ -6464,16 +7036,23 @@
         const urlOpenPath = new URLSearchParams(window.location.search).get(
           "open",
         );
+        const hashState = parseHash();
+        const hashFilePathRef = useRef(hashState.filePath || null);
+        const hashWorkspaceNavRef = useRef(hashState.workspaceNav || null);
         const savedNavState = readAppNavState();
         const initialMainNav = urlOpenPath
           ? "workspace"
-          : normalizeMainNav(savedNavState.mainNav);
+          : hashState.mainNav
+            ? normalizeMainNav(hashState.mainNav)
+            : normalizeMainNav(savedNavState.mainNav);
         const initialWorkspaceNav = urlOpenPath
           ? null
-          : normalizeWorkspaceNav(savedNavState.workspaceNav, initialMainNav);
+          : hashState.mainNav
+            ? normalizeWorkspaceNav(hashState.workspaceNav, initialMainNav)
+            : normalizeWorkspaceNav(savedNavState.workspaceNav, initialMainNav);
         const [sections, setSections] = useState([]);
         const [selected, setSelected] = useState(() =>
-          urlOpenPath ? null : normalizeSelected(savedNavState.selected),
+          urlOpenPath || hashFilePathRef.current ? null : normalizeSelected(savedNavState.selected),
         ); // { path, sectionId, name, ext }
         const [fileData, setFileData] = useState(null);
         const [loading, setLoading] = useState(false);
@@ -6577,6 +7156,29 @@
             );
           } catch {}
         }, [mainNav, workspaceNav, selected]);
+
+        // ── Hash sync: state → URL ──────────────────────────────────────────
+        useEffect(() => {
+          const h = navToHash(mainNav, workspaceNav, selected);
+          if (window.location.hash !== h) {
+            history.replaceState(null, "", h);
+          }
+        }, [mainNav, workspaceNav, selected?.path]);
+
+        // ── Hash sync: URL → state (back/forward) ──────────────────────────
+        useEffect(() => {
+          function onHash() {
+            const h = parseHash();
+            if (!h.mainNav) return;
+            const nm = normalizeMainNav(h.mainNav);
+            setMainNav(nm);
+            if (nm === "workspace") {
+              setWorkspaceNav(normalizeWorkspaceNav(h.workspaceNav, nm));
+            }
+          }
+          window.addEventListener("hashchange", onHash);
+          return () => window.removeEventListener("hashchange", onHash);
+        }, []);
 
         const isDraggingRef = useRef(false);
         const dragStartXRef = useRef(0);
@@ -6756,20 +7358,7 @@
           });
           if (!options.keepNav) {
             setMainNav("workspace");
-            const workspaceSectionMap = {
-              brd: "brd",
-              assessments: "assessment",
-              prd: "prd",
-              test: "testcase",
-              feature: "feature-list",
-              "incident-report": "incident-report",
-              summary: "summary",
-              "release-notes": "release-notes",
-              uat: "uat",
-              presentation: "presentation",
-              gdocs: "google-docs",
-            };
-            setWorkspaceNav(workspaceSectionMap[sectionId] || null);
+            setWorkspaceNav(SECTION_ID_TO_WORKSPACE_NAV[sectionId] || null);
           }
           setActiveSection(sectionId);
           setLoading(true);
@@ -6994,6 +7583,7 @@
           return (
             <div>
               <div
+                data-tooltip={node.name}
                 style={{
                   padding: `4px 8px 4px ${pad}px`,
                   display: "flex",
@@ -7156,6 +7746,7 @@
             return [
               <div
                 key={node.path}
+                data-tooltip={node.name}
                 onClick={() => openFile(node, sectionId)}
                 style={{
                   padding: `5px 8px 5px ${pad}px`,
@@ -7457,6 +8048,22 @@
           if (!node) return;
           openFile(node, section.id);
         }, [urlOpenPath, allSections, fileData]);
+
+        // ── Resolve hash-based file path after sections load ─────────────
+        useEffect(() => {
+          const fp = hashFilePathRef.current;
+          const wn = hashWorkspaceNavRef.current;
+          if (!fp || !wn || !allSections.length || fileData) return;
+          const secId = WORKSPACE_NAV_TO_SECTION_ID[wn];
+          if (!secId) return;
+          const section = allSections.find((s) => s.id === secId);
+          if (!section) return;
+          const fullPath = section.folderName + "/" + fp;
+          const node = findNodeByPath(section.tree || [], fullPath);
+          if (!node) return;
+          hashFilePathRef.current = null;
+          openFile(node, section.id);
+        }, [allSections, fileData]);
 
         // ── Nav items ───────────────────────────────────────────────────────────
         const NAV_ITEMS = [
