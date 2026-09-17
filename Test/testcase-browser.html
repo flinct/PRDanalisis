@@ -5443,6 +5443,9 @@
 .dep-svg circle{fill:var(--accent-secondary);opacity:.35}
 .dep-svg circle.hot{fill:var(--priority-p1-fg);opacity:.9}
 .task-table tbody tr.dep-hot .sl{box-shadow:inset 2px 0 0 var(--priority-p1-fg)}
+.task-table tbody tr.dep-clustered td{box-shadow:inset 3px 0 0 var(--accent-secondary);background:color-mix(in srgb, var(--elevated-bg) 92%, var(--accent-secondary) 8%)}
+.task-table tbody tr[data-tid]{cursor:pointer}
+.task-table tbody tr.dep-selected td{box-shadow:inset 3px 0 0 var(--priority-p1-fg);background:var(--priority-p1-bg)}
 .rm-combo{position:relative;display:inline-block;max-width:100%}
 .rm-trigger{display:flex;align-items:center;gap:4px;width:100%;box-sizing:border-box;background:transparent;border:1px solid transparent;border-radius:5px;padding:2px 5px;cursor:pointer;color:var(--text-2);font-size:11px}
 .rm-trigger:hover,.rm-trigger:focus-visible{background:var(--elevated-bg);border-color:var(--border-2);outline:none}
@@ -6534,6 +6537,33 @@
             ? [t.dependency]
             : [];
 
+        /* dependency cluster on hover: forward deps of hovered + reverse
+           (tasks that depend on hovered). Used by clusteredGroups to
+           temporarily move dep rows adjacent to the hovered row. */
+        const hotDeps = React.useMemo(() => {
+          if (!hotId || !tasks) return new Set();
+          const hovered = tasks.find((x) => x.id === hotId);
+          const ids = new Set(depList(hovered));
+          tasks.forEach((t) => { if (t.id !== hotId && depList(t).includes(hotId)) ids.add(t.id); });
+          return ids;
+        }, [hotId, tasks]);
+
+        const clusteredGroups = React.useMemo(() => {
+          if (!hotDeps.size || !groups.length) return groups;
+          const depTasks = [];
+          const remaining = groups.map((g) => {
+            const kept = [];
+            g.rows.forEach((t) => { (hotDeps.has(t.id) ? depTasks : kept).push({ ...t, _fromGroup: g.key }); });
+            return { ...g, rows: kept };
+          });
+          if (!depTasks.length) return groups;
+          return remaining.map((g) => {
+            const idx = g.rows.findIndex((t) => t.id === hotId);
+            if (idx < 0) return g;
+            return { ...g, rows: [...g.rows.slice(0, idx + 1), ...depTasks, ...g.rows.slice(idx + 1)] };
+          });
+        }, [groups, hotId, hotDeps]);
+
         // fetch a single OpenProject work package by id (server proxy), cache result
         const fetchWp = React.useCallback((opId) => {
           if (!opId) return;
@@ -6819,7 +6849,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {groups.map((g, gi) => (
+                      {clusteredGroups.map((g, gi) => (
                         <React.Fragment key={g.key}>
                           {/* spacer row between sections */}
                           {gi > 0 && (
@@ -6835,9 +6865,14 @@
                           </tr>
                           {g.rows.map((t) => (
                             <React.Fragment key={t.id}>
-                            <tr data-tid={t.id} data-group={g.section}
-                              onMouseEnter={() => depList(t).length && setHotId(t.id)}
-                              onMouseLeave={() => setHotId((h) => (h === t.id ? null : h))}>
+                            <tr data-tid={t.id} data-group={t._fromGroup || g.section}
+                              className={(hotId === t.id ? "dep-selected " : "") + (hotDeps.has(t.id) ? "dep-clustered" : "")}
+                              title="Klik untuk sorot dependency"
+                              onClick={(e) => {
+                                // ponytail: guard via closest() — controls inside the row keep their own clicks
+                                if (e.target.closest("button,input,textarea,select,a,[contenteditable],.rm-combo")) return;
+                                setHotId((h) => (h === t.id ? null : t.id));
+                              }}>
                               <td className="num sl">
                                 <button
                                   type="button"
@@ -6852,7 +6887,9 @@
                                   type="button"
                                   className="rm-del"
                                   title="Delete task"
-                                  onClick={() => removeTask(t.id)}
+                                  onClick={() => {
+                                    if (window.confirm(`Hapus task "${t.task}"?`)) removeTask(t.id);
+                                  }}
                                 >
                                   ×
                                 </button>
