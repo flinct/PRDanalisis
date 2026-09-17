@@ -6870,7 +6870,7 @@
                               title="Klik untuk sorot dependency"
                               onClick={(e) => {
                                 // ponytail: guard via closest() — controls inside the row keep their own clicks
-                                if (e.target.closest("button,input,textarea,select,a,[contenteditable],.rm-combo")) return;
+                                if (e.target.closest("button,input,textarea,select,a,[contenteditable],.rm-combo,.rm-cell")) return;
                                 setHotId((h) => (h === t.id ? null : t.id));
                               }}>
                               <td className="num sl">
