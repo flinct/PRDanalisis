@@ -874,6 +874,31 @@ app.get("/api/dashboard/openproject/search", async (req, res) => {
   }
 });
 
+// ─── API: HERMES (roadmap review — spawn oneshot, localhost-only) ────────────
+// POST /api/hermes {prompt} → runs `hermes chat --oneshot`, returns its stdout.
+// Localhost-only: this executes an agent on the host machine, never expose to LAN.
+app.post("/api/hermes", (req, res) => {
+  const ip = (req.ip || req.connection?.remoteAddress || "").replace("::ffff:", "");
+  const loopback = ip === "127.0.0.1" || ip === "::1" || ip.startsWith("127.");
+  if (!loopback) return res.status(403).json({ error: "hermes hanya dari localhost", ip });
+  const prompt = String(req.body?.prompt || "").trim();
+  if (!prompt) return res.status(400).json({ error: "prompt kosong" });
+  // --query-file '-' reads stdin verbatim → no shell interpolation of the prompt.
+  const child = spawn("hermes", ["chat", "--query-file", "-", "--oneshot", "-Q"], {
+    cwd: BASE,
+    shell: false,
+  });
+  let out = "", err = "";
+  child.stdout.on("data", (d) => (out += d));
+  child.stderr.on("data", (d) => (err += d));
+  child.on("error", (e) => res.status(500).json({ error: e.message }));
+  child.on("close", (code) =>
+    res.json({ ok: code === 0, code, output: out.replace(/^session_id:[^\n]*\n/, ""), stderr: err }),
+  );
+  child.stdin.end(prompt);
+});
+// ponytail: buffered oneshot; add SSE streaming when reviews get long enough to watch live.
+
 // ─── API: GOOGLE (OAuth login) + DOCS + MIRROR ───────────────────────────────
 const gdocs = require("./scripts/gdocs.js");
 const gauth = require("./scripts/google-auth.js");

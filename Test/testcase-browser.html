@@ -5600,6 +5600,23 @@
 .task-table tbody tr.grp[data-section="current"] td{background:var(--priority-p1-bg)}
 .task-table tbody tr.grp[data-section="next"] td{background:var(--elevated-bg)}
 .task-table tbody tr.grp[data-section="backlog"] td{background:var(--deep-bg)}
+/* workload panel */
+.wl-panel{margin:14px 0;padding:12px 14px;background:var(--elevated-bg);border:1px solid var(--border-1);border-radius:10px;flex:none}
+.wl-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.wl-title{font-size:13px;font-weight:700;color:var(--text-1)}
+.wl-sub{font-size:11px;color:var(--text-4)}
+.wl-bars{display:flex;flex-wrap:wrap;gap:6px}
+.wl-week{display:flex;align-items:center;gap:5px;background:var(--deep-bg);border:1px solid var(--border-2);border-radius:6px;padding:3px 7px}
+.wl-wk{font-size:10px;font-weight:700;color:var(--text-3);min-width:44px}
+.wl-cell{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.wl-cell.wl-over{color:var(--priority-p1-fg);font-weight:700}
+.wl-review-box{margin-top:12px}
+.wl-review-sum{cursor:pointer;font-size:11px;font-weight:700;color:var(--text-3);padding:4px 0;list-style:none;user-select:none}
+.wl-review-sum::-webkit-details-marker{display:none}
+.wl-review-sum::before{content:"▾ ";color:var(--text-4)}
+.wl-review-box:not([open]) .wl-review-sum::before{content:"▸ "}
+.wl-review{margin-top:6px;padding:10px 12px;background:var(--deep-bg);border:1px solid var(--border-2);border-radius:8px;font-size:12px;line-height:1.55;color:var(--text-2);white-space:pre-wrap;max-height:40vh;overflow:auto}
+.wl-review-err{color:var(--priority-p1-fg);border-color:var(--priority-p1-fg)}
 `;
 
       function rmMetricClass(v) {
@@ -5961,6 +5978,117 @@
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        );
+      }
+
+      /* ── Workload compute (local, deterministic) ─────────────────────────────
+         effort/testing L|M|H → person-weeks. dev-load from `effort`, qa-load from
+         `testing`. Each task's load is spread evenly across the weeks in its
+         schedule range, then summed per (month,week). No LLM — pure arithmetic. */
+      const WL_PW = { L: 1, M: 2, H: 3 }; // person-weeks per level — the knob
+      const WL_CAP = { dev: 3, qa: 2 };   // capacity per week — the knob
+      function monthWeekKeys(months) {
+        // ordered list of "Mon w#" cells across the visible months, 4 weeks each
+        const keys = [];
+        months.forEach((m) => [1, 2, 3, 4].forEach((w) => keys.push(m + " w" + w)));
+        return keys;
+      }
+      function taskWeekSpan(t, orderKeys) {
+        const s = t.schedule?.start, e = t.schedule?.end;
+        if (!s?.month || !e?.month) return [];
+        const si = orderKeys.indexOf(s.month + " w" + (s.week || 1));
+        const ei = orderKeys.indexOf(e.month + " w" + (e.week || 4));
+        if (si < 0 || ei < 0 || ei < si) return [];
+        return orderKeys.slice(si, ei + 1);
+      }
+      function computeWorkload(tasks, months) {
+        const order = monthWeekKeys(months);
+        const perWeek = Object.fromEntries(order.map((k) => [k, { dev: 0, qa: 0 }]));
+        (tasks || []).forEach((t) => {
+          if (t.status === "backlog" || t.priority === "Backlog") return;
+          const span = taskWeekSpan(t, order);
+          if (!span.length) return;
+          const dev = (WL_PW[t.effort] || 0) / span.length;
+          const qa = (WL_PW[t.testing] || 0) / span.length;
+          span.forEach((k) => { perWeek[k].dev += dev; perWeek[k].qa += qa; });
+        });
+        const total = Object.values(perWeek).reduce(
+          (a, w) => ({ dev: a.dev + w.dev, qa: a.qa + w.qa }), { dev: 0, qa: 0 });
+        return { order, perWeek, total };
+      }
+
+      function WorkloadPanel({ tasks, months }) {
+        const wl = React.useMemo(() => computeWorkload(tasks, months), [tasks, months]);
+        const [review, setReview] = React.useState(null); // {loading, text, err}
+        const runReview = async () => {
+          setReview({ loading: true });
+          const lines = (tasks || [])
+            .filter((t) => t.status !== "backlog" && t.priority !== "Backlog")
+            .map((t) => `- ${t.id} "${t.task}" [${t.priority}] area=${t.strategicArea || "-"} effort=${t.effort} testing=${t.testing} ` +
+              `sched=${t.schedule?.start?.month}w${t.schedule?.start?.week}→${t.schedule?.end?.month}w${t.schedule?.end?.week}` +
+              (Array.isArray(t.dependency) && t.dependency.length ? ` deps=${t.dependency.join(",")}` : "") +
+              (t.opId ? ` WP#${t.opId}` : "") +
+              (t.desc ? `\n    desc: ${t.desc}` : ""));
+          const load = wl.order
+            .filter((k) => wl.perWeek[k].dev || wl.perWeek[k].qa)
+            .map((k) => `${k}: dev ${wl.perWeek[k].dev.toFixed(1)}/${WL_CAP.dev} qa ${wl.perWeek[k].qa.toFixed(1)}/${WL_CAP.qa}`);
+          const prompt =
+            "Review SatuInbox roadmap timeline. Capacity per week: dev " + WL_CAP.dev +
+            " person-weeks, qa " + WL_CAP.qa + ".\n\nWeekly load (already computed):\n" +
+            load.join("\n") + "\n\nTasks:\n" + lines.join("\n") +
+            "\n\nBeri analisa singkat: (1) minggu overload dev/qa, (2) konflik dependency/urutan (deps yang sudah ditandai), " +
+            "(3) DEPENDENCY TERSEMBUNYI — dari desc & area, tebak pasangan task yang kemungkinan saling bergantung tapi belum ditandai deps, sebut id-nya + alasan singkat, (4) QA bottleneck, (5) saran geser jadwal. Bahasa Indonesia, ringkas, poin-poin.";
+          try {
+            const r = await fetch("/api/hermes", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prompt }),
+            });
+            const j = await r.json();
+            if (!r.ok || j.error) setReview({ err: j.error || ("HTTP " + r.status) });
+            else setReview({ text: j.output || j.stderr || "(kosong)" });
+          } catch (e) {
+            setReview({ err: e.message });
+          }
+        };
+        return (
+          <div className="wl-panel">
+            <div className="wl-head">
+              <span className="wl-title">Workload dev &amp; QA</span>
+              <span className="wl-sub">
+                total dev {wl.total.dev.toFixed(1)} pw · qa {wl.total.qa.toFixed(1)} pw
+                &nbsp;·&nbsp; L=1 M=2 H=3 · cap dev {WL_CAP.dev}/qa {WL_CAP.qa} per minggu
+              </span>
+              <button type="button" className="rm-addbtn" style={{ marginLeft: "auto" }}
+                onClick={runReview} disabled={review?.loading}>
+                {review?.loading ? "Reviewing…" : "Review timeline (Hermes)"}
+              </button>
+            </div>
+            <div className="wl-bars">
+              {wl.order.map((k) => {
+                const w = wl.perWeek[k];
+                if (!w.dev && !w.qa) return null;
+                const dOver = w.dev > WL_CAP.dev, qOver = w.qa > WL_CAP.qa;
+                return (
+                  <div key={k} className="wl-week">
+                    <span className="wl-wk">{k}</span>
+                    <span className={"wl-cell" + (dOver ? " wl-over" : "")}>dev {w.dev.toFixed(1)}</span>
+                    <span className={"wl-cell" + (qOver ? " wl-over" : "")}>qa {w.qa.toFixed(1)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {review && !review.loading && (
+              <details className="wl-review-box" open>
+                <summary className="wl-review-sum">
+                  {review.err ? "⚠ Review error" : "Hasil review — klik untuk minimize/expand"}
+                </summary>
+                <div className={"wl-review" + (review.err ? " wl-review-err" : "")}>
+                  {review.err ? "⚠ " + review.err : review.text}
+                </div>
+              </details>
             )}
           </div>
         );
@@ -6982,6 +7110,8 @@
                     </tbody>
                   </table>
                 </div>
+
+                <WorkloadPanel tasks={tasks} months={months} />
 
                 <div className="takeaways rm-footer">
                   <div className="takeaway-label">
