@@ -1673,28 +1673,122 @@
         }
       }
 
-      async function saveRoadmapIDB(tasks, key = "roadmap_v1") {
+      // Push ALL roadmap state to the shared seed file (the "DB").
+      // IndexedDB = local cache; seed file = shared persist. No-change → skip network.
+      const RM_SEED_SAVE_PATH = "Assessments/audit/00-Timeline/.roadmap-seed.json";
+      const RM_SERVER_KEYS = ["roadmap_v1","roadmap_quarters_v1","roadmap_q_link_v1","roadmap_assignees_v1","roadmap_weeks_v1","roadmap_cfg_v1","roadmap_op_edits_v1"];
+      let _rmSeedLastJSON = null;   // last body confirmed written (dedup guard)
+      let _rmSeedTimer = null;      // debounce burst edits into one PUT
+      let _rmSeedUnpacked = false;  // one-time seed→IDB hydration flag
+      let _rmUnpackDone = null;     // Promise — all loadRoadmapIDB calls await this
+      let _rmSaveCountdown = 0;
+      let _rmSaveCountdownTimer = null;
+      let _rmSavedFlashUntil = 0;   // show "✓ saved" until this timestamp
+      let _rmReady = false;         // suppress save countdown during initial load
+      setTimeout(() => { _rmReady = true; }, 2000);
+      async function _doSave() {
         try {
           const db = await openIDB();
-          db.transaction("handles", "readwrite")
-            .objectStore("handles")
-            .put(tasks, key);
+          const store = db.transaction("handles", "readonly").objectStore("handles");
+          const snapshot = {};
+          await Promise.all(RM_SERVER_KEYS.map(k => new Promise(res => {
+            const r = store.get(k);
+            r.onsuccess = () => { if (r.result != null) snapshot[k] = r.result; res(); };
+            r.onerror = () => res();
+          })));
+          const body = JSON.stringify(snapshot, null, 2);
+          if (body === _rmSeedLastJSON) { _rmSaveCountdown = 0; clearInterval(_rmSaveCountdownTimer); return; }
+          const resp = await fetch("/api/files/content?path=" + encodeURIComponent(RM_SEED_SAVE_PATH), {
+            method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: body }),
+          });
+          if (!resp.ok) throw new Error(await resp.text());
+          _rmSeedLastJSON = body;
+          _rmSavedFlashUntil = Date.now() + 3000; // show "✓ saved" for 3s
+          console.log("[RM] seed saved OK, keys:", Object.keys(snapshot).join(","));
+        } catch (e) { console.warn("[RM] seed save failed:", e.message || e); }
+        _rmSaveCountdown = 0; clearInterval(_rmSaveCountdownTimer);
+      }
+      function saveRoadmapServer() {
+        if (!_rmReady) return; // suppress during initial load
+        clearTimeout(_rmSeedTimer);
+        _rmSaveCountdown = 10;
+        clearInterval(_rmSaveCountdownTimer);
+        _rmSaveCountdownTimer = setInterval(() => {
+          _rmSaveCountdown = Math.max(0, _rmSaveCountdown - 1);
+          if (_rmSaveCountdown <= 0) clearInterval(_rmSaveCountdownTimer);
+        }, 1000);
+        _rmSeedTimer = setTimeout(() => _doSave(), 10000);
+      }
+      // Flush on page unload only — keep visibilitychange off so countdown stays visible
+      window.addEventListener("beforeunload", () => {
+        if (!_rmSeedTimer) return;
+        clearTimeout(_rmSeedTimer); _rmSeedTimer = null;
+        _doSave(); // fire-and-forget
+      });
+      // ─── FLOATING SAVE BANNER ─────────────────────────────────────────────────
+      // Always-visible banner at top-right — independent of which component is mounted.
+      (function initSaveBanner() {
+        const el = document.createElement("div");
+        el.id = "rm-save-banner";
+        el.style.cssText = "position:fixed;top:5vh;right:10vw;z-index:99999;padding:6px 18px;border-radius:8px;font-size:13px;font-weight:700;font-family:system-ui,sans-serif;pointer-events:none;transition:opacity .3s;opacity:0;display:flex;align-items:center;gap:6px;";
+        document.body.appendChild(el);
+        setInterval(() => {
+          const cd = _rmSaveCountdown;
+          const flash = _rmSavedFlashUntil > Date.now();
+          if (cd > 0) {
+            el.textContent = "⏳ auto-save in " + cd + "s";
+            el.style.background = "#f59e0b22"; el.style.color = "#f59e0b"; el.style.border = "1px solid #f59e0b55"; el.style.opacity = "1";
+          } else if (flash) {
+            el.textContent = "✓ saved to server";
+            el.style.background = "#22c55e22"; el.style.color = "#22c55e"; el.style.border = "1px solid #22c55e55"; el.style.opacity = "1";
+          } else {
+            el.style.opacity = "0";
+          }
+        }, 500);
+      })();
+      async function saveRoadmapIDB(data, key = "roadmap_v1") {
+        try {
+          const db = await openIDB();
+          db.transaction("handles", "readwrite").objectStore("handles").put(data, key);
         } catch {}
+        saveRoadmapServer();
       }
       async function loadRoadmapIDB(key = "roadmap_v1") {
+        // First call per page load: unpack new-format seed into IDB so all keys hydrate.
+        if (!_rmSeedUnpacked) {
+          _rmSeedUnpacked = true;
+          _rmUnpackDone = (async () => {
+            try {
+              const rs = await fetch("/api/files/content?path=" + encodeURIComponent(RM_SEED_SAVE_PATH));
+              if (rs.ok) {
+                const parsed = JSON.parse(await rs.text());
+                console.log("[RM] unpack: format=" + (Array.isArray(parsed) ? "array" : "dict") + " tasks=" + (Array.isArray(parsed) ? parsed.length : (parsed.roadmap_v1 || []).length));
+                if (parsed && !Array.isArray(parsed)) {
+                  const db = await openIDB();
+                  const tx = db.transaction("handles", "readwrite");
+                  const store = tx.objectStore("handles");
+                  for (const k of RM_SERVER_KEYS) { if (parsed[k] != null) store.put(parsed[k], k); }
+                  await new Promise(res => { tx.oncomplete = res; tx.onerror = res; });
+                  _rmSeedLastJSON = JSON.stringify(parsed, null, 2);
+                  console.log("[RM] unpack: wrote", RM_SERVER_KEYS.filter(k => parsed[k] != null).join(","), "to IDB");
+                } else {
+                  console.log("[RM] unpack: skipped (array format)");
+                }
+              } else {
+                console.log("[RM] unpack: fetch failed, status=" + rs.status);
+              }
+            } catch (e) { console.warn("[RM] unpack error:", e); }
+          })();
+        }
+        if (_rmUnpackDone) await _rmUnpackDone; // wait for unpack to complete before reading
         try {
           const db = await openIDB();
           return new Promise((res) => {
-            const r = db
-              .transaction("handles", "readonly")
-              .objectStore("handles")
-              .get(key);
+            const r = db.transaction("handles", "readonly").objectStore("handles").get(key);
             r.onsuccess = () => res(r.result || null);
             r.onerror = () => res(null);
           });
-        } catch {
-          return null;
-        }
+        } catch { return null; }
       }
 
       // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -6492,6 +6586,9 @@
         React.useEffect(() => { localStorage.setItem("rm_footer_open", footerOpen ? "1" : "0"); }, [footerOpen]);
         React.useEffect(() => { localStorage.setItem("rm_wl_open", wlOpen ? "1" : "0"); }, [wlOpen]);
         const savedTimer = React.useRef(null);
+        const [saveCd, setSaveCd] = React.useState(0); // countdown to server save
+        const [savedFlash, setSavedFlash] = React.useState(false); // "✓ saved" flash after save
+        React.useEffect(() => { const iv = setInterval(() => { setSaveCd(_rmSaveCountdown); setSavedFlash(_rmSavedFlashUntil > Date.now()); }, 500); return () => clearInterval(iv); }, []);
         const wrapRef = React.useRef(null);
         const stickyRef = React.useRef(null);
         const panelRef = React.useRef(null);
@@ -6538,7 +6635,7 @@
               let seed = null;
               try {
                 const rs = await fetch(`/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`);
-                if (rs.ok) seed = JSON.parse(await rs.text());
+                if (rs.ok) { seed = JSON.parse(await rs.text()); if (seed && !Array.isArray(seed)) seed = seed.roadmap_v1 || null; }
               } catch {}
               if (!alive) return;
               // normalize: fill scheduler fields. seed value by id → else default.
@@ -7296,7 +7393,7 @@
                   <button type="button" className="rm-addbtn rm-addnext" onClick={addMonth} title="Tambah bulan berikutnya ke timeline">
                     + Month
                   </button>
-                  <span className={"rm-saved" + (saved ? " on" : "")}>Saved</span>
+                  <span className={"rm-saved" + (saved || saveCd > 0 || savedFlash ? " on" : "")}>{saveCd > 0 ? `saving in ${saveCd}s` : savedFlash ? "✓ saved" : saved ? "✓ saved" : ""}</span>
                 </div>
 
                 {/* Month-view tabs (only visible when a month is selected) */}
@@ -8149,7 +8246,7 @@
       // [#, task, area, prio, status, E, I, T, assignees[], [mStart,mEnd]]  — month index 0 = Okt (RoadmapPage Q4 start)
       const RM_CAL = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Mei: 4, Jun: 5, Jul: 6, Aug: 7, Agu: 7, Sep: 8, Oct: 9, Okt: 9, Nov: 10, Dec: 11, Des: 11 };
       function tasksToSections(tasks) {
-        const mIdx = (mn) => Math.max(0, (RM_CAL[mn] != null ? RM_CAL[mn] : 9) - 9); // calendar → RoadmapPage index (Okt=0)
+        const mIdx = (mn) => ((RM_CAL[mn] != null ? RM_CAL[mn] : 9) - 9 + 12) % 12; // calendar → RoadmapPage index (Okt=0, Jan=3, Sep=11)
         const span = (t) => t.schedule ? [mIdx(t.schedule.start.month), mIdx(t.schedule.end.month)] : [0, 0];
         // v2: "backlog" is a STATUS, not a priority. status===backlog → BACKLOG section regardless of schedule.
         const stat = (t) => t.status === "backlog" ? "backlog" : t.status === "hold" ? "hold" : t.status === "blocked" ? "blocked"
@@ -8170,6 +8267,7 @@
         const isOP = (t) => t._source === "op" || (typeof t.id === "string" && t.id.startsWith("op-")) || t.sourceColumn === "OP";
         const buckets = { now: [], next: [], backlog: [] };
         const kept = (tasks || []).filter((t) => !isOP(t));
+        console.log("[RM] tasksToSections: total=" + (tasks||[]).length + " kept=" + kept.length + " op=" + ((tasks||[]).length - kept.length));
         // resolve dependency task-ids → task names (fallback to raw id if unknown). matches v1 which stores deps as ids.
         const nameById = Object.fromEntries(kept.map((t) => [t.id, t.task || t.id]));
         const depIds = (t) => (Array.isArray(t.dependency) ? t.dependency : t.dependency ? [t.dependency] : []);
@@ -8188,6 +8286,9 @@
           { label: "Q3 2027", dot: "#475569", months: ["Jul", "Agu", "Sep"] },
         ];
         const [QUARTERS, setQuarters] = React.useState(QUARTERS_INIT);
+        const [saveCd, setSaveCd] = React.useState(0); // countdown to server save
+        const [savedFlash, setSavedFlash] = React.useState(false); // "✓ saved" flash after save
+        React.useEffect(() => { const iv = setInterval(() => { setSaveCd(_rmSaveCountdown); setSavedFlash(_rmSavedFlashUntil > Date.now()); }, 500); return () => clearInterval(iv); }, []);
         const qLoaded = React.useRef(false);
         // persist custom quarter list to IDB (roadmap_quarters_v1) — load on mount, save on change (same pattern as qLink)
         React.useEffect(() => {
@@ -8329,6 +8430,13 @@
             responsibleId: o.responsibleId != null ? o.responsibleId : null,
           };
         };
+        // OP rows follow the same roadmap order rule as tasksToSections: prio(P0<P1<P2<P3) → impact(H<M<L) → effort(L<M<H) → testing(L<M<H). ties keep stable order.
+        const opSortRows = (rows) => {
+          const PR = { P0: 0, P1: 1, P2: 2, P3: 3 }, HI = { H: 0, M: 1, L: 2 }, LO = { L: 0, M: 1, H: 2 };
+          const g = (m, v) => (v in m ? m[v] : 1); // unset → M (matches lvl() coercion)
+          const key = (wp) => { const v = opRowView(wp); return [PR[v.prio] != null ? PR[v.prio] : 3, g(HI, v.impact), g(LO, v.effort), g(LO, v.testing)]; };
+          return [...rows].sort((a, b) => { const ka = key(a), kb = key(b); return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2] || ka[3] - kb[3]; });
+        };
         // roadmap→OP id lookups for push
         const RM_PRIO_TO_OP_NAME = { P0: "urgent", P1: "high", P2: "normal", P3: "low" };
         const RM_STATUS_TO_OP_NAME = { next: "new", done: "closed", now: "in progress", backlog: "new", hold: "on hold", blocked: "rejected" };
@@ -8408,7 +8516,7 @@
             // backfill dependency (+ scheduler fields) from seed by id — same as the v1 RoadmapView normalize.
             // v1 is disabled now, so v2 must self-backfill; otherwise deps stay empty on IDBs never normalized by v1.
             let seed = null;
-            try { const rs = await fetch(`/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`); if (rs.ok) seed = JSON.parse(await rs.text()); } catch {}
+            try { const rs = await fetch(`/api/files/content?path=${encodeURIComponent(RM_SEED_PATH)}`); if (rs.ok) { seed = JSON.parse(await rs.text()); if (seed && !Array.isArray(seed)) seed = seed.roadmap_v1 || null; } } catch {}
             if (!alive) return;
             const seedById = {};
             (seed || []).forEach((sd) => {
@@ -8906,6 +9014,8 @@
                     {rmPill(k.total, "Total")}{rmPill(k.current, "Current")}
                     {k.p0 > 0 && rmPill(k.p0, "P0", prio.P0)}{rmPill(k.p1, "P1", prio.P1)}{rmPill(k.p2, "P2", prio.P2)}{rmPill(k.backlog, "Backlog", stat.backlog)}
                     {lkInScope && !mvOp.loading && mvOp.rows.length > 0 && rmPill(mvOp.rows.length, "OP", "#f59e0b")}
+                    {saveCd > 0 && <span style={{fontSize:10,fontWeight:600,color:"#f59e0b",marginLeft:8,opacity:0.9}}>saving in {saveCd}s</span>}
+                    {savedFlash && <span style={{fontSize:10,fontWeight:600,color:"#22c55e",marginLeft:8,opacity:0.9}}>✓ saved</span>}
                   </div>);
                 })()}
               </div>
@@ -8994,7 +9104,7 @@
                       <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Loading OP tasks…</div>
                     ) : mvOp.rows.length === 0 ? (
                       <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Tidak ada task OP di version ini.</div>
-                    ) : mvOp.rows.map((wp, wi) => {
+                    ) : opSortRows(mvOp.rows).map((wp, wi) => {
                       const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
                       const v = opRowView(wp);
                       const opWk = opWeeksForMonth(wp, monthAbs); // [w1,w4] when this WP is worked in this month, or null
@@ -9041,10 +9151,10 @@
                             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 12 }}>
                               <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Assignee</div>
                                 <MemberSelect mode="single" value={v.assigneeId} people={opPeople} placeholder="PIC utama…" onChange={(id) => setOpEdit(wp.id, "assigneeId", id ? Number(id) : null)} /></div>
-                              <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Accountable</div>
-                                <MemberSelect mode="single" value={v.responsibleId} people={opPeople} placeholder="Penanggung jawab…" onChange={(id) => setOpEdit(wp.id, "responsibleId", id ? Number(id) : null)} /></div>
                               <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>QA Assignee (multi)</div>
                                 <MemberSelect mode="multi" value={v.qa} people={opPeople} placeholder="Tim QA…" onChange={(ids) => setOpEdit(wp.id, "qa", ids)} /></div>
+                              <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Accountable</div>
+                                <MemberSelect mode="single" value={v.responsibleId} people={opPeople} placeholder="Penanggung jawab…" onChange={(id) => setOpEdit(wp.id, "responsibleId", id ? Number(id) : null)} /></div>
                             </div>
                             {opPeople.length === 0 && <div style={{ fontSize: 11, color: "#b45309" }}>⚠ Daftar assignee OP kosong (token OpenProject tak punya izin baca users). Assignee/QA/Accountable belum bisa dipilih.</div>}
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
