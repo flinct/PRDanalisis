@@ -1,0 +1,156 @@
+URL: https://www.nngroup.com/articles/breadcrumbs/
+FETCHED_AS: https://www.nngroup.com/articles/breadcrumbs/
+
+Breadcrumbs: 11 Design Guidelines for Desktop and Mobile - NN/G 
+Skip to content 
+
+6 
+
+Breadcrumbs: 11 Design Guidelines for Desktop and Mobile 
+
+Page Laubheimer 
+
+Page Laubheimer 
+December 23, 2018 · Last reviewed Sep. 1, 2026 2026-09-01 
+
+Share 
+
+Email article 
+
+Share on LinkedIn 
+
+Share on Twitter 
+
+Summary: Support wayfinding by including breadcrumbs that reflect your site's information hierarchy. On mobile, avoid using breadcrumbs that are too tiny or wrap. 
+
+Breadcrumbs are an important navigational element that supports wayfinding — making users aware of their current location within the hierarchical structure of a website. Breadcrumbs are a list of links representing the current page and its “ancestors” (parent page, grandparent page, and so on), typically going all the way back to the site homepage. NN/g has been recommending breadcrumbs since 1995 , as they provide many benefits to users at almost no cost to the UI. 
+
+Breadcrumbs are represented as a trail of links at the top of the page, usually just below the global navigation; the home page (or root node of the hierarchy) is the first link and the links are usually separated by the symbols “>” or “/”.  We recommend the “>” character, though there is no functional difference, and either is acceptable. 
+REI.com: A breadcrumb trail (1) is displayed in its typical location at the top of the page, just below the global navigation bar. The trail shows the location of the current page within the hierarchy of the site. Each item in the breadcrumb trail is a link to an ancestor page; the “>” character separates the breadcrumbs. In this example, the home page and current page are omitted from the breadcrumb trail, which is not recommended. 
+If users reach a deep page after traveling from the homepage through all the ancestor pages of that page, they will have a fairly clear understanding of where they are in the site’s information hierarchy. But when they skip some of these levels (for example, because they arrived to the site by clicking on an external link such as a search-engine result), breadcrumbs orient them and help them find their way to other, possibly more relevant, pages. 
+
+A deep page typically shows content on a relatively narrow, specific topic, but the breadcrumb trail can lead users to more-general content in the current page’s parent and grandparent nodes. 
+
+In This Article: 
+
+Guidelines for Using Breadcrumbs on Desktop 
+
+Guidelines for Using Breadcrumbs on Mobile 
+
+Guidelines for Using Breadcrumbs on Desktop 
+
+1. Breadcrumbs Should Not Replace the Global Navigation Bar or the Local Navigation Within a Section. 
+
+Breadcrumbs are intended to supplement other navigational components, such as a global navigation bar that stretches across the top of every page or a local navigation bar that is often found on the left hand side. Breadcrumbs augment but do not replace those main forms of navigation. 
+Travelsouthdakota.com displays a breadcrumb trail that also serves as section navigation. Instead of a traditional breadcrumb trail (which would be: Home /Explore /Itineraries / Cultural Immersion), the breadcrumb trail includes a tier-1 item (Explore) and the parent page (Itineraries). The link to the parent page is a dropdown menu , with the current page’s siblings (bottom image). A better design would  have a separate UI for the local navigation, to enable users to travel to lateral pages in the current section of the site. 
+2. Breadcrumbs Should Display the Current Location in the Site’s Hierarchical Structure, Not the Session History. 
+
+Breadcrumbs are not intended to show the history of pages traversed during a session on the site ( a la a browser’s native Back button); they are intended to show the hierarchical structure of the site. We’ve noted this for many years, but it still bears repeating; attempting to show a list of the pages a user has accessed, in order, will quickly become long and confusing, with a lot of repetition, and won’t provide any benefit for users who arrive on a deep page directly from an external link, which is one of the key uses of breadcrumbs. 
+
+3. For Polyhierarchical Sites, Breadcrumbs Should Show a Single Pathway in the Site’s Polyhierarchy. 
+
+Breadcrumbs pose an inherent tension with polyhierarchical sites (in which a page has more than one parent). In such situations, we do not recommend showing two or more breadcrumb trails reflecting the different paths in the polyhierarchy, because they will confuse users and take a lot of space at the top of the page. 
+
+If a page has multiple different parents, identify a canonical path to it in the site hierarchy and  show that path in  the breadcrumb trail. Don’t attempt to personalize the breadcrumb trail so that it will reflect each user’s individual path within the site hierarchy, because you will end up sending mixed signals to search engines. And you will still need to designate one path in the hierarchy as the primary trail for those visitors coming from an external link. 
+
+4. Include the Current Page as the Last Item in the Breadcrumb Trail. 
+
+5. In the Breadcrumb Trail, the Breadcrumb Corresponding to the Current Page Should Not Be a Link. 
+
+You should never have a link that does nothing. The last breadcrumb (denoting the current page) should not be a link. To avoid confusing users, visually differentiate between the current page and the preceding linked breadcrumb items, preferably using underlined or blue text. 
+On the British Red Cross site, there is no visual differentiation between the breadcrumbs that are links and the Volunteer in emergencies item, which is (correctly) not a link. 
+6. Breadcrumbs Should Include Only Site Pages, Not Logical Categories in Your IA. 
+
+Each node in the breadcrumb trail should be a link to an ancestor page (with the important exception of the link corresponding to the current page, as noted above). If some of the subcategory labels in the global navigation don’t have a separate page dedicated to them do not include these subcategories in the breadcrumb trail. 
+
+The ability to “click-and-go” is a crucial part of users’ understanding of breadcrumbs, so all items (except the current page) should represent a place the user can go to. 
+Newegg.com: The global-navigation megamenu (top) has subcategories that don’t have a page of their own — for example, Commercial Networking ( 1) . On the Wired Networking page (bottom), the breadcrumb trail (2) does not include Commercial Networking , because that subcategory does not have an associated page. 
+7. Breadcrumbs Aren’t Necessary (or Useful) for Sites With Flat Hierarchies That Are Only 1 or 2 Levels Deep, or Sites That Are Linear in Structure. 
+
+For sites with flat hierarchies with only 1 or 2 levels of categories, a breadcrumb isn’t needed as a wayfinding device. In this case, consider clearly indicating the top-level section or the category that the page lives within. 
+MIT’s main website has a flat hierarchy, with only 1 page in each section. While it features a breadcrumb at the top of the page, this breadcrumb isn’t necessary. In the main navigation, the location of the page is highlighted. NPR features a minisite about the history of color, which is designed as a linear experience, where users will encounter each page in order. This site’s structure is nonhierarchical, and so there is no need (or value) in including a breadcrumb trail. 
+8. Breadcrumb Trails Should Start With a Link to the Homepage. 
+
+Much like our guidelines for global navigation, links to the homepage (labeled Home ) are still necessary. However, note that duplicating the Home link in both the global navigation and the breadcrumb trail is not recommended — one or the other is fine. 
+The Oregon state government website includes a breadcrumb trail, but omits a link to the homepage. However, in this case this is acceptable, as the site also includes a Home link in the global navigation — duplicating that homepage link is not necessary, but it does need to be shown in one of the two places. 
+Guidelines for Using Breadcrumbs on Mobile 
+
+Unfortunately, on mobile, the cost of using breadcrumbs can quickly overwhelm the benefits. 
+
+9. Don’t Use Breadcrumbs that Wrap to Multiple Lines. 
+
+On mobile sites, breadcrumbs can quickly wrap to multiple lines and eat up valuable space on an already crowded mobile display. A multiline breadcrumb trail does not illustrate the structure of the chain well (particularly when some items take up their own line, and others may have two or more links in a single row) 
+REI.com’s mobile site uses so much real estate for the breadcrumb trail that it pushes the name of the product below the fold , even on a large mobile device (in this case, an iPhone X). 
+10. Don’t Use Breadcrumbs That Are Too Small or Too Crowded Together. 
+
+Some sites attempt to get breadcrumbs take less screen space by making the links smaller or closer together. Unfortunately, this solution doesn’t work on touchscreens: tap targets need to be at least 1 cm X 1 cm . 
+
+11. Consider Shortening the Breadcrumb Trail to Include Only the Last Level(s). 
+
+On some pages, a single breadcrumb pointing up a level may be all that is necessary to support the main user goals. For example, on an ecommerce site, if a user lands on a product-detail page (via a Google search, for example), she may wish to see other product options in that same category to comparison shop, so a breadcrumb linking up to the parent level in the hierarchy can support this common task. This solution avoids a long, crowded breadcrumb trail that eats up precious mobile real estate. 
+
+Note that this advice conflicts with guideline #8, and should only be done on mobile. On desktop — where there’s more room — always show the full trail. 
+Bestbuy.com: The mobile site (top) showed a truncated breadcrumb trail (1) , allowing access up to the immediate parent category. The desktop site (bottom) presented the full breadcrumb trail (2) . This compromise on mobile supports some wayfinding, but avoids taking up precious real estate. 
+Summary 
+
+Breadcrumbs are a secondary form of navigation that assists users in getting to content nearby in the hierarchical structure. They are especially useful when users arrive to the site through an external link and don’t start with the homepage. Ensure that all items in the breadcrumb trail are links and that each individual node gets more specific as you progress down into the site. On mobile, breadcrumbs can take up too much space or can be hard to tap; consider shortening the breadcrumb trail if your users’ tasks allow it. 
+
+Related Courses 
+
+Information Architecture 
+
+Organize and structure information to improve findability and discoverability 
+
+Interaction 
+
+Information Architecture,Navigation,Visual Design,responsive design,screen size 
+
+Related Topics 
+
+Information Architecture Information Architecture 
+
+Navigation 
+
+Visual Design 
+
+Learn More: 
+
+Organize Information with "LATCH" 
+
+Huei-Hsin Wang · 4 min 
+
+Card Sorting: Why & When 
+
+Samhita Tankala · 3 min 
+
+Information Architecture: 3 Key Models 
+
+Page Laubheimer · 3 min 
+
+Related Articles: 
+
+Polyhierarchies Improve Findability for Ambiguous IA Categories 
+
+Page Laubheimer · 5 min 
+
+Navigation: You Are Here 
+
+Susan Farrell · 6 min 
+
+Utility Navigation: What It Is and How to Design It 
+
+Susan Farrell · 4 min 
+
+Audience-Based Navigation: 5 Reasons to Avoid It 
+
+Katie Sherwin · 5 min 
+
+The Difference Between Information Architecture (IA) and Navigation 
+
+Jen Cardello · 3 min 
+
+Flat vs. Deep Website Hierarchies 
+
+Kathryn Whitenton · 5 min 
+
+Back to Top

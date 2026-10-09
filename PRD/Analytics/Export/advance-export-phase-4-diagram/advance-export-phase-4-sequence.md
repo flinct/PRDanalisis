@@ -179,3 +179,6 @@ sequenceDiagram
 > object under the **same** `{companyId}/{resource}/{mediaName}` key shape
 > media-service builds (`apps/media-service/src/app/app.service.ts:301-314`).
 > A different key layout would silently break both download and deletion.
+
+---
+_Diagram supporting **PRD-D v2.1** (SAP Template Preset). Reviewed vs PRD-D + BE 2026-09-16: gate order now matches activity (entitlement→PII→duplicate→rate→precount). BE-verified: media key shape, privacy perms enums:96-97, expireJob reuse requires same key layout._

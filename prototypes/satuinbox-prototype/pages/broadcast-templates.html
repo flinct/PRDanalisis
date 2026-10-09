@@ -1,0 +1,93 @@
+<!-- Broadcast Template — card grid of WA templates -->
+<div class="broadcast-layout">
+  <aside class="broadcast-sidenav">
+    <div class="sn-title">Broadcast Massal</div>
+    <div class="sn-item" onclick="go('broadcast/messages')">📢 Pesan</div>
+    <div class="sn-item" onclick="go('broadcast/draft')">📝 Draft</div>
+    <div class="sn-item active" onclick="go('broadcast/templates')">📋 Template</div>
+  </aside>
+  <div class="broadcast-body">
+    <div class="page-header">
+      <h1>Template Pesan</h1>
+      <button class="btn primary" onclick="openTplModal()">+ Buat Template</button>
+    </div>
+    <div class="page-body" id="tplGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="tplModal">
+  <div class="modal">
+    <h3 id="tplModalTitle">Buat Template</h3>
+    <label>Nama Template<input type="text" id="tplName" placeholder="contoh: promo_ramadan"></label>
+    <label>Isi Pesan<textarea id="tplBody" rows="4" placeholder="Gunakan {{1}}, {{2}} untuk variabel"></textarea></label>
+    <label>Bahasa<select id="tplLang"><option value="id">Indonesia</option><option value="en">English</option></select></label>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeTplModal()">Batal</button>
+      <button class="btn primary" onclick="saveTpl()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let tplEditId=null;
+
+function tplStatusColor(s){
+  return s==='approved'?'background:#dcfce7;color:#15803d':s==='pending'?'background:#fef3c7;color:#b45309':'background:#fef2f2;color:#ef4444';
+}
+
+function renderTplGrid(){
+  const el=document.getElementById('tplGrid');
+  el.innerHTML=DB.templates.map(t=>`
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <b>${t.name}</b>
+        <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;${tplStatusColor(t.status)}">${t.status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${t.body}</div>
+      <div style="font-size:11px;color:var(--muted)">Bahasa: ${t.lang==='id'?'Indonesia':'English'}</div>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <button class="btn" onclick="editTpl('${t.id}')" style="font-size:11px">✏️ Edit</button>
+        <button class="btn danger" onclick="delTpl('${t.id}')" style="font-size:11px">🗑 Hapus</button>
+      </div>
+    </div>
+  `).join('')||'<div style="text-align:center;color:var(--muted);padding:40px;grid-column:1/-1">Belum ada template</div>';
+}
+
+function openTplModal(id){
+  tplEditId=id||null;
+  document.getElementById('tplModalTitle').textContent=id?'Edit Template':'Buat Template';
+  if(id){
+    const t=dbFind('templates',id);
+    document.getElementById('tplName').value=t.name;
+    document.getElementById('tplBody').value=t.body;
+    document.getElementById('tplLang').value=t.lang;
+  }else{
+    document.getElementById('tplName').value='';
+    document.getElementById('tplBody').value='';
+    document.getElementById('tplLang').value='id';
+  }
+  document.getElementById('tplModal').classList.add('open');
+}
+function closeTplModal(){document.getElementById('tplModal').classList.remove('open')}
+
+function saveTpl(){
+  const name=document.getElementById('tplName').value.trim();
+  const body=document.getElementById('tplBody').value.trim();
+  if(!name||!body)return showToast('Nama dan isi pesan wajib diisi');
+  const lang=document.getElementById('tplLang').value;
+  if(tplEditId){
+    dbUpdate('templates',tplEditId,{name,body,lang});
+    showToast('Template diperbarui');
+  }else{
+    dbAdd('templates',{id:genId('tpl'),name,status:'pending',body,lang});
+    showToast('Template dibuat');
+  }
+  closeTplModal();renderTplGrid();
+}
+
+function editTpl(id){openTplModal(id)}
+function delTpl(id){dbRemove('templates',id);renderTplGrid();showToast('Template dihapus')}
+
+renderTplGrid();
+</script>

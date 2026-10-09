@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SatuInbox — Auth Flow Prototype</title>
+<style>
+  /* ponytail: palette copied from repo FE brand tokens, single source here */
+  :root{
+    --pri:#155dfc; --priD:#1447e6; --priBg:#eff6ff;
+    --text:#1d293d; --muted:#62748e; --faint:#90a1b9;
+    --bg:#f1f5f9; --card:#fff; --border:#e2e8f0; --line:#cad5e2;
+    --danger:#e11d48; --dangerBg:#fff1f2; --ok:#16a34a; --okBg:#f0fdf4;
+    --warn:#b45309; --warnBg:#fffbeb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Roboto,"Segoe UI",system-ui,sans-serif;background:#0b1220;color:var(--text);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 12px}
+  .bar{width:100%;max-width:960px;display:flex;gap:8px;align-items:center;justify-content:space-between;
+    margin-bottom:16px;color:#cbd5e1;font-size:13px}
+  .bar button{background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:8px;
+    padding:6px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{background:#334155}
+  .bar .crumbs{font-weight:600}
+  .toggle{display:flex;gap:4px;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:3px}
+  .toggle button{border:none;background:transparent;border-radius:6px;padding:5px 12px}
+  .toggle button.on{background:var(--pri);color:#fff}
+  /* phone frame */
+  .phone{width:400px;max-width:100%;background:var(--bg);border-radius:22px;border:1px solid var(--border);
+    overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  /* web mode: 2-column shell (brand panel + content card) */
+  .brand{display:none}
+  body.web .phone{width:960px;max-width:100%;display:flex;border-radius:16px;background:var(--card);min-height:620px}
+  body.web .brand{display:flex;flex-direction:column;justify-content:center;gap:18px;
+    width:42%;padding:48px 44px;background:linear-gradient(160deg,var(--pri),var(--priD));color:#fff}
+  body.web .brand .mark{background:rgba(255,255,255,.18)}
+  body.web .brand h3{font-size:26px;line-height:1.25}
+  body.web .brand p{font-size:14px;opacity:.9;line-height:1.5}
+  body.web .brand ul{list-style:none;display:flex;flex-direction:column;gap:10px;font-size:13px;opacity:.95}
+  body.web .brand li{display:flex;gap:8px;align-items:center}
+  body.web .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);
+    border-radius:0 16px 16px 0}
+  body.web .stage .screen.active{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:32px 30px}
+  /* mobile mode: brand panel hidden, phone is the frame itself */
+  body:not(.web) .stage{display:contents}
+  .screen{display:none;padding:34px 30px;flex-direction:column;gap:16px;animation:fade .18s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .logo{display:flex;align-items:center;gap:9px;margin-bottom:2px}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--pri);display:flex;
+    align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700}
+  .logo b{font-size:19px}
+  h1{font-size:23px;line-height:1.2}
+  h2{font-size:18px;line-height:1.25}
+  p.sub{font-size:13px;color:var(--muted);line-height:1.45}
+  label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
+  .field{margin-bottom:2px}
+  input,select{width:100%;height:44px;border:1px solid var(--line);border-radius:10px;
+    padding:0 14px;font-size:14px;background:var(--card);color:var(--text);font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 2px var(--priBg)}
+  .btn{width:100%;height:48px;border:none;border-radius:10px;background:var(--pri);color:#fff;
+    font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn:hover{background:var(--priD)}
+  .btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--bg)}
+  .link{color:var(--pri);font-weight:700;font-size:13px;cursor:pointer}
+  .row{display:flex;align-items:center;gap:6px}
+  .between{justify-content:space-between}
+  .center{justify-content:center}
+  .muted{color:var(--muted);font-size:13px}
+  .steps{display:flex;gap:6px}
+  .steps i{height:4px;flex:1;border-radius:2px;background:var(--border)}
+  .steps i.on{background:var(--pri)}
+  /* plans */
+  .plan{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--card);cursor:pointer}
+  .plan:hover{border-color:var(--pri)}
+  .plan.sel{border-color:var(--pri);box-shadow:0 0 0 2px var(--priBg)}
+  .plan .pt{font-weight:700;font-size:15px}
+  .plan .pp{color:var(--pri);font-weight:700;font-size:17px;margin:4px 0}
+  .plan .pf{font-size:12px;color:var(--muted);line-height:1.5}
+  .plan.hot{position:relative}
+  .plan.hot:after{content:"Populer";position:absolute;top:-10px;right:14px;background:var(--pri);
+    color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .plan .link{display:inline-block;margin-top:8px}
+  /* feature matrix (detail) */
+  .fgroup{margin-top:14px}
+  .fgroup h4{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+  .frow{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .frow:last-child{border-bottom:none}
+  .frow .ic{flex:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:700;margin-top:1px}
+  .frow.yes .ic{background:var(--okBg);color:var(--ok)}
+  .frow.no .ic{background:var(--bg);color:var(--faint)}
+  .frow.no{color:var(--faint)}
+  .frow .fv{margin-left:auto;font-weight:700;color:var(--text);font-size:12px}
+  /* status icon */
+  .status{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:40px;margin:0 auto}
+  .s-ok{background:var(--okBg);color:var(--ok)}
+  .s-fail{background:var(--dangerBg);color:var(--danger)}
+  .s-pend{background:var(--warnBg);color:var(--warn)}
+  .vacard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;
+    display:flex;flex-direction:column;gap:8px}
+  .vacard .r{display:flex;justify-content:space-between;font-size:13px}
+  .vacard .r b{font-weight:700}
+  .banner{border-radius:12px;padding:14px;font-size:13px;line-height:1.5}
+  .banner.warn{background:var(--warnBg);color:var(--warn);border:1px solid #fde68a}
+  .banner.danger{background:var(--dangerBg);color:var(--danger);border:1px solid #fecdd3}
+  .tcenter{text-align:center}
+  .otp{display:flex;gap:8px;justify-content:space-between}
+  .otp input{text-align:center;font-size:20px;font-weight:700;padding:0}
+  .pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--priBg);color:var(--pri)}
+  .hint{font-size:12px;color:var(--faint)}
+  .err{color:var(--danger);font-size:12px;margin-top:4px;display:none}
+  .err.show{display:block}
+  select.untouched{color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="bar">
+  <button onclick="back()">‹ Back</button>
+  <span class="crumbs" id="crumb">Login</span>
+  <div class="toggle">
+    <button id="tMobile" class="on" onclick="setMode(false)">Mobile</button>
+    <button id="tWeb" onclick="setMode(true)">Web</button>
+  </div>
+  <button onclick="go('login',true)">↺ Restart</button>
+</div>
+
+<div class="phone">
+  <aside class="brand">
+    <div class="logo"><span class="mark">✉</span><b style="font-size:19px">SatuInbox</b></div>
+    <h3>Satu inbox untuk semua percakapan pelanggan.</h3>
+    <p>WhatsApp, broadcast, tiket, dan tim agent — dikelola dari satu tempat.</p>
+    <ul>
+      <li>✓ Integrasi WhatsApp Business</li>
+      <li>✓ Broadcast & auto-reply</li>
+      <li>✓ Kolaborasi tim multi-agent</li>
+      <li>✓ Analitik percakapan</li>
+    </ul>
+  </aside>
+  <div class="stage">
+
+  <!-- 1 LOGIN -->
+  <section class="screen active" data-k="login">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <h1>Masuk ke SatuInbox</h1>
+    <p class="sub">Kelola semua percakapan pelanggan di satu tempat.</p>
+    <div class="field"><label>Email</label><input type="email" placeholder="nama@perusahaan.com"></div>
+    <div class="field"><label>Password</label><input type="password" placeholder="password kamu"></div>
+    <div class="row between"><span></span><span class="link" onclick="go('forgot')">Lupa password?</span></div>
+    <button class="btn" onclick="go('reg')">Masuk</button>
+    <div class="row center"><span class="muted">Belum punya akun?</span><span class="link" onclick="go('reg')">Daftar</span></div>
+  </section>
+
+  <!-- 2 REGISTER EMAIL -->
+  <section class="screen" data-k="reg">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <div class="steps"><i class="on"></i><i></i><i></i></div>
+    <h1>Buat akun</h1>
+    <p class="sub">Mulai dari email kerja. Kami kirim kode verifikasi.</p>
+    <div class="field"><label>Email kerja</label><input type="email" placeholder="nama@perusahaan.com"></div>
+    <button class="btn" onclick="go('verify')">Kirim kode</button>
+    <div class="row center"><span class="muted">Sudah punya akun?</span><span class="link" onclick="go('login')">Masuk</span></div>
+  </section>
+
+  <!-- 3 VERIFY EMAIL -->
+  <section class="screen" data-k="verify">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+    <h1>Verifikasi email</h1>
+    <p class="sub">Masukkan 6 digit kode yang kami kirim ke email kamu.</p>
+    <div class="otp">
+      <input maxlength="1" value="4"><input maxlength="1" value="8"><input maxlength="1" value="2">
+      <input maxlength="1"><input maxlength="1"><input maxlength="1">
+    </div>
+    <button class="btn" onclick="go('profile')">Verifikasi</button>
+    <div class="row center"><span class="link">Kirim ulang kode (0:42)</span></div>
+  </section>
+
+  <!-- 4 COMPLETE PROFILE + industry dropdown -->
+  <section class="screen" data-k="profile">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <h1>Lengkapi profil</h1>
+    <p class="sub">nama@perusahaan.com sudah terverifikasi.</p>
+    <div class="field"><label>Nama perusahaan</label><input placeholder="PT Contoh Nusantara"></div>
+    <div class="field"><label>Nama kamu</label><input placeholder="Nama lengkap"></div>
+    <div class="field">
+      <label>Jenis usaha</label>
+      <select class="untouched" id="industry" onchange="this.classList.remove('untouched')">
+        <option value="" disabled selected>Pilih jenis usaha</option>
+        <!-- 19 options: 18 repo BUSINESS_TYPE_OPTIONS + Other -->
+      </select>
+    </div>
+    <button class="btn" onclick="go('plans')">Lanjut</button>
+  </section>
+
+  <!-- 5 PLANS -->
+  <section class="screen" data-k="plans">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <h2>Pilih paket</h2>
+    <p class="sub">Harga placeholder — final dari pricing team.</p>
+    <div class="plan" onclick="selPlan(this,'Starter')">
+      <div class="pt">Starter</div><div class="pp">Rp299rb<span class="muted" style="font-size:12px">/bln</span></div>
+      <div class="pf">1 channel · 3 agent · broadcast dasar</div>
+      <span class="link" onclick="viewDetail(event,'Starter')">Lihat detail paket ›</span></div>
+    <div class="plan hot sel" onclick="selPlan(this,'Growth')">
+      <div class="pt">Growth</div><div class="pp">Rp799rb<span class="muted" style="font-size:12px">/bln</span></div>
+      <div class="pf">3 channel · 10 agent · broadcast + API · analitik</div>
+      <span class="link" onclick="viewDetail(event,'Growth')">Lihat detail paket ›</span></div>
+    <div class="plan" onclick="selPlan(this,'Business')">
+      <div class="pt">Business</div><div class="pp">Rp1.499rb<span class="muted" style="font-size:12px">/bln</span></div>
+      <div class="pf">10 channel · 30 agent · analitik lanjutan · role & kolaborasi</div>
+      <span class="link" onclick="viewDetail(event,'Business')">Lihat detail paket ›</span></div>
+    <div class="plan" onclick="selPlan(this,'Enterprise')">
+      <div class="pt">Enterprise</div><div class="pp" style="font-size:15px">Hubungi sales</div>
+      <div class="pf">Unlimited · KYB · fitur via SuperAdmin · dedicated support</div>
+      <span class="link" onclick="viewDetail(event,'Enterprise')">Lihat detail paket ›</span></div>
+    <button class="btn" onclick="payFor()">Lanjut ke pembayaran</button>
+  </section>
+
+  <!-- 5b PLAN DETAIL (rendered from PLANS data) -->
+  <section class="screen" data-k="detail">
+    <div class="row between">
+      <h2 id="dName">Growth</h2><span class="pill" id="dPrice">Rp799.000/bln</span>
+    </div>
+    <p class="sub" id="dTag"></p>
+    <div id="dQuota" class="vacard"></div>
+    <div id="dFeatures"></div>
+    <button class="btn" onclick="selectFromDetail()">Pilih paket ini</button>
+    <button class="btn ghost" onclick="go('plans')">‹ Kembali ke daftar paket</button>
+  </section>
+
+  <!-- 6 PAYMENT -->
+  <section class="screen" data-k="pay">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <h2>Pembayaran</h2>
+    <p class="sub">Paket <b id="payPlan">Growth</b> — <b>Rp799.000</b>/bln</p>
+    <div class="field"><label>Metode</label>
+      <select><option>Virtual Account BCA</option><option>Virtual Account Mandiri</option><option>QRIS</option><option>Kartu kredit</option></select></div>
+    <p class="hint">Simulasikan hasil pembayaran:</p>
+    <button class="btn" onclick="go('pay_ok')">Bayar sekarang (sukses)</button>
+    <button class="btn ghost" onclick="go('pay_pend')">Bayar via VA (pending)</button>
+    <button class="btn ghost" style="color:var(--danger)" onclick="go('pay_fail')">Simulasi gagal</button>
+  </section>
+
+  <!-- 7 PAY OK -->
+  <section class="screen" data-k="pay_ok">
+    <div class="status s-ok">✓</div>
+    <h2 class="tcenter">Pembayaran berhasil</h2>
+    <p class="sub tcenter">Paket <b id="okPlan">Growth</b> kamu sudah aktif. Selamat datang di SatuInbox!</p>
+    <button class="btn" onclick="go('login',true)">Masuk ke dashboard</button>
+    <button class="btn ghost">Lihat invoice</button>
+  </section>
+
+  <!-- 8 PAY FAIL -->
+  <section class="screen" data-k="pay_fail">
+    <div class="status s-fail">✕</div>
+    <h2 class="tcenter">Pembayaran gagal</h2>
+    <p class="sub tcenter">Transaksi tidak dapat diproses. Dana tidak terpotong. Coba lagi atau ganti metode.</p>
+    <button class="btn" onclick="go('pay')">Coba bayar lagi</button>
+    <button class="btn ghost" onclick="go('pay')">Ganti metode pembayaran</button>
+  </section>
+
+  <!-- 9 PAY PENDING -->
+  <section class="screen" data-k="pay_pend">
+    <div class="status s-pend">⏱</div>
+    <h2 class="tcenter">Menunggu pembayaran</h2>
+    <p class="sub tcenter">Selesaikan transfer ke Virtual Account sebelum batas waktu. Status diperbarui otomatis.</p>
+    <div class="vacard">
+      <div class="r"><span class="muted">Virtual Account</span><span>8808 1234 5678</span></div>
+      <div class="r"><span class="muted">Jumlah</span><b>Rp 799.000</b></div>
+      <div class="r"><span class="muted">Batas waktu</span><span>23:59 hari ini</span></div>
+    </div>
+    <button class="btn" onclick="go('pay_ok')">Saya sudah bayar</button>
+    <button class="btn ghost" onclick="go('plans')">Batalkan</button>
+  </section>
+
+  <!-- 10 BANNER H-10 -->
+  <section class="screen" data-k="banner">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <h2>Dashboard</h2>
+    <div class="banner warn">⚠ Langganan kamu berakhir dalam <b>10 hari</b>. Perpanjang sekarang agar inbox tetap aktif.</div>
+    <p class="sub">(Simulasi tampilan dalam app saat mendekati masa habis.)</p>
+    <button class="btn" onclick="go('pay')">Perpanjang sekarang</button>
+    <button class="btn ghost" onclick="go('expired')">Lewati (lihat state expired)</button>
+  </section>
+
+  <!-- 11 FORGOT -->
+  <section class="screen" data-k="forgot">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <h1>Reset password</h1>
+    <p class="sub">Masukkan email akun kamu. Kami kirim link untuk atur ulang password.</p>
+    <div class="field"><label>Email</label><input type="email" placeholder="nama@perusahaan.com"></div>
+    <button class="btn" onclick="go('login')">Kirim link reset</button>
+    <div class="row center"><span class="link" onclick="go('login')">‹ Kembali ke Masuk</span></div>
+  </section>
+
+  <!-- 12 EXPIRED LOCK -->
+  <section class="screen" data-k="expired">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <div class="status s-fail">🔒</div>
+    <h2 class="tcenter">Langganan berakhir</h2>
+    <p class="sub tcenter">Akses inbox terkunci. Perpanjang untuk mengaktifkan kembali akun tim kamu.</p>
+    <button class="btn" onclick="go('pay')">Perpanjang langganan</button>
+    <button class="btn ghost" onclick="go('login',true)">Keluar</button>
+  </section>
+
+  <!-- 13 ENTERPRISE KYB -->
+  <section class="screen" data-k="kyb">
+    <div class="logo"><span class="mark">✉</span><b>SatuInbox</b></div>
+    <div class="row between"><h2>Verifikasi bisnis (KYB)</h2><span class="pill">Enterprise</span></div>
+    <p class="sub">Tim kami meninjau dokumen sebelum fitur enterprise diaktifkan SuperAdmin.</p>
+    <div class="field"><label>Nama legal perusahaan</label><input placeholder="PT Contoh Nusantara"></div>
+    <div class="field"><label>NIB / NPWP</label><input placeholder="Nomor izin berusaha"></div>
+    <div class="field"><label>Dokumen pendukung</label><input value="akta-perusahaan.pdf" readonly></div>
+    <button class="btn" onclick="go('login',true)">Kirim untuk ditinjau</button>
+    <p class="hint tcenter">Status: menunggu persetujuan (1–2 hari kerja)</p>
+  </section>
+
+  </div><!-- /stage -->
+</div>
+
+<script>
+// 19 industries: 18 from repo apps/omnichannel/constants/business-type.ts + Other
+var INDUSTRIES=['Agriculture','BioTech','Construction','Education','Energy','Food & Beverage',
+ 'Healthcare','Hospitality','Insurance','Logistics','Manufacturing','Media','Real Estate','Retail',
+ 'Software as a Service','Technology','Telecommunications','Transportation','Other (tulis jenis usaha lain)'];
+(function(){var s=document.getElementById('industry');
+ INDUSTRIES.forEach(function(o){var e=document.createElement('option');e.value=o;e.textContent=o;s.appendChild(e);});})();
+
+var hist=['login'];
+function render(k){document.querySelectorAll('.screen').forEach(function(s){s.classList.toggle('active',s.dataset.k===k);});
+ document.getElementById('crumb').textContent=document.querySelector('.screen[data-k="'+k+'"] h1, .screen[data-k="'+k+'"] h2')?.textContent||k;
+ window.scrollTo(0,0);}
+function go(k,reset){if(reset)hist=['login'];if(hist[hist.length-1]!==k)hist.push(k);render(k);}
+function back(){if(hist.length>1)hist.pop();render(hist[hist.length-1]);}
+
+// ponytail: dummy tier gating — repo billing is metered (RulePrice[]), NOT named tiers.
+// Feature NAMES are real repo modules (app/[locale]/(main)/** routes); tier mapping is placeholder.
+var PLANS={
+ Starter:{price:'Rp299.000/bln',tag:'Untuk tim kecil yang baru mulai layanan pelanggan.',
+  quota:[['Channel',1],['Agent',3],['Broadcast / bln','1.000']],
+  groups:[
+   ['Inbox & Percakapan',[['Conversation inbox',1],['Team inbox',1],['Auto-assignment (routing)',0],['Macros / quick reply',0],['SLA policy',0],['CSAT survey',0]]],
+   ['Channel',[['WhatsApp Web',1],['WhatsApp Business API',0],['Live chat widget',1]]],
+   ['Broadcast',[['Broadcast message',1],['Template & draft',0]]],
+   ['Ticket & Sales',[['Ticketing',0],['Contacts',1],['Leads / sales pipeline',0]]],
+   ['Analitik & Organisasi',[['Statistik responsiveness',0],['Roles & permission',0],['Shift hours',0],['Tags',1]]],
+   ['Developer',[['Webhook & API',0],['Sync contact',0]]],
+  ]},
+ Growth:{price:'Rp799.000/bln',tag:'Paling populer — tim yang scaling dengan multi-channel.',
+  quota:[['Channel',3],['Agent',10],['Broadcast / bln','10.000']],
+  groups:[
+   ['Inbox & Percakapan',[['Conversation inbox',1],['Team inbox',1],['Auto-assignment (routing)',1],['Macros / quick reply',1],['SLA policy',1],['CSAT survey',1]]],
+   ['Channel',[['WhatsApp Web',1],['WhatsApp Business API',1],['Live chat widget',1]]],
+   ['Broadcast',[['Broadcast message',1],['Template & draft',1]]],
+   ['Ticket & Sales',[['Ticketing',1],['Contacts',1],['Leads / sales pipeline',1]]],
+   ['Analitik & Organisasi',[['Statistik responsiveness',1],['Roles & permission',1],['Shift hours',0],['Tags',1]]],
+   ['Developer',[['Webhook & API',1],['Sync contact',0]]],
+  ]},
+ Business:{price:'Rp1.499.000/bln',tag:'Operasi besar dengan kolaborasi & governance penuh.',
+  quota:[['Channel',10],['Agent',30],['Broadcast / bln','50.000']],
+  groups:[
+   ['Inbox & Percakapan',[['Conversation inbox',1],['Team inbox',1],['Auto-assignment (routing)',1],['Macros / quick reply',1],['SLA policy',1],['CSAT survey',1]]],
+   ['Channel',[['WhatsApp Web',1],['WhatsApp Business API',1],['Live chat widget',1]]],
+   ['Broadcast',[['Broadcast message',1],['Template & draft',1]]],
+   ['Ticket & Sales',[['Ticketing',1],['Contacts',1],['Leads / sales pipeline',1]]],
+   ['Analitik & Organisasi',[['Statistik responsiveness',1],['Roles & permission',1],['Shift hours',1],['Tags',1]]],
+   ['Developer',[['Webhook & API',1],['Sync contact',1]]],
+  ]},
+ Enterprise:{price:'Hubungi sales',tag:'Unlimited, KYB, fitur via SuperAdmin, dedicated support.',
+  quota:[['Channel','Unlimited'],['Agent','Unlimited'],['Broadcast / bln','Unlimited']],
+  groups:[
+   ['Inbox & Percakapan',[['Conversation inbox',1],['Team inbox',1],['Auto-assignment (routing)',1],['Macros / quick reply',1],['SLA policy',1],['CSAT survey',1]]],
+   ['Channel',[['WhatsApp Web',1],['WhatsApp Business API',1],['Live chat widget',1]]],
+   ['Broadcast',[['Broadcast message',1],['Template & draft',1]]],
+   ['Ticket & Sales',[['Ticketing',1],['Contacts',1],['Leads / sales pipeline',1]]],
+   ['Analitik & Organisasi',[['Statistik responsiveness',1],['Roles & permission',1],['Shift hours',1],['Tags',1]]],
+   ['Developer',[['Webhook & API',1],['Sync contact',1]]],
+  ]},
+};
+var PLAN={Starter:'Rp299.000',Growth:'Rp799.000',Business:'Rp1.499.000',Enterprise:'Hubungi sales'};
+var chosen='Growth';
+function selPlan(el,name){document.querySelectorAll('.plan').forEach(function(p){p.classList.remove('sel');});
+ el.classList.add('sel');chosen=name;}
+
+function viewDetail(ev,name){ev.stopPropagation();chosen=name;renderDetail(name);go('detail');}
+function selectFromDetail(){
+ document.querySelectorAll('.plan').forEach(function(p){
+  p.classList.toggle('sel',p.querySelector('.pt').textContent===chosen);});
+ go('plans');}
+function renderDetail(name){
+ var d=PLANS[name];
+ document.getElementById('dName').textContent=name;
+ document.getElementById('dPrice').textContent=d.price;
+ document.getElementById('dTag').textContent=d.tag;
+ document.getElementById('dQuota').innerHTML=d.quota.map(function(q){
+  return '<div class="r"><span class="muted">'+q[0]+'</span><b>'+q[1]+'</b></div>';}).join('');
+ document.getElementById('dFeatures').innerHTML=d.groups.map(function(g){
+  var rows=g[1].map(function(f){
+   var on=f[1]===1,val=(typeof f[1]==='string')?f[1]:'';
+   return '<div class="frow '+(on||val?'yes':'no')+'"><span class="ic">'+(on||val?'✓':'–')+'</span>'
+     +'<span>'+f[0]+'</span>'+(val?'<span class="fv">'+val+'</span>':'')+'</div>';}).join('');
+  return '<div class="fgroup"><h4>'+g[0]+'</h4>'+rows+'</div>';}).join('');
+}
+function payFor(){
+ if(chosen==='Enterprise'){go('kyb');return;}
+ document.getElementById('payPlan').textContent=chosen;
+ document.getElementById('okPlan').textContent=chosen;
+ var amt=PLAN[chosen];
+ document.querySelector('[data-k="pay"] .sub').innerHTML='Paket <b id="payPlan">'+chosen+'</b> — <b>'+amt+'</b>/bln';
+ go('pay');
+}
+function setMode(web){document.body.classList.toggle('web',web);
+ document.getElementById('tWeb').classList.toggle('on',web);
+ document.getElementById('tMobile').classList.toggle('on',!web);}
+render('login');
+</script>
+</body>
+</html>

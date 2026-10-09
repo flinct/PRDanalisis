@@ -1,0 +1,129 @@
+<!-- Settings: Billing / Cost Control -->
+<style>
+.st-section{margin-bottom:28px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.st-section h3{margin:0 0 16px;font-size:15px;font-weight:700}
+.st-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.st-row:last-child{border-bottom:none}
+.st-row .label{font-size:13px;font-weight:500}
+.st-row .desc{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle input{display:none}
+.toggle .slider{position:absolute;inset:0;background:#cbd5e1;border-radius:12px;transition:.2s}
+.toggle input:checked+.slider{background:var(--accent)}
+.toggle .slider::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.toggle input:checked+.slider::after{left:23px}
+.cost-input{width:160px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:right;background:var(--bg);color:inherit}
+.cost-input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.preview-box{margin-top:16px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.6}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item active" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">Kontrol Biaya WhatsApp API</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px">Atur batas estimasi biaya per percakapan. Berlaku hanya untuk channel WhatsApp API.</p>
+
+    <div class="st-section">
+      <h3>💰 Batas Biaya per Percakapan</h3>
+      <div class="st-row">
+        <div>
+          <div class="label">Cap Estimasi Biaya</div>
+          <div class="desc">Batas maksimum biaya per percakapan per bulan. Setelah mencapai batas, aturan di bawah berlaku.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--muted)">Rp</span>
+          <input type="number" class="cost-input" id="cfgCapPerChat" min="0" step="1000" onchange="saveCostConfig()">
+        </div>
+      </div>
+      <div class="preview-box" id="capPreview"></div>
+    </div>
+
+    <div class="st-section">
+      <h3>🔔 Notifikasi Melebihi Batas</h3>
+      <div class="st-row">
+        <div>
+          <div class="label">Alert Ketika Melebihi Batas</div>
+          <div class="desc">Tampilkan peringatan visual di percakapan ketika estimasi biaya melebihi cap.</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cfgAlertEnabled" onchange="saveCostConfig()"><span class="slider"></span></label>
+      </div>
+      <div class="preview-box">Ketika aktif, agen akan melihat banner kuning ⚠️ "Biaya percakapan telah melebihi batas" di area chat.</div>
+    </div>
+
+    <div class="st-section">
+      <h3>🚫 Blokir Pengiriman Saat Melebihi Batas</h3>
+      <div class="st-row">
+        <div>
+          <div class="label">Blokir Kirim Pesan Saat Melebihi Batas</div>
+          <div class="desc">Jika aktif, agen tidak dapat mengirim pesan lagi di percakapan yang sudah melebihi cap biaya bulanan.</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cfgBlockOnExceed" onchange="saveCostConfig()"><span class="slider"></span></label>
+      </div>
+      <div class="preview-box">Ketika aktif, composer pesan akan diganti dengan banner merah: "Batas biaya percakapan tercapai. Pesan tidak dapat dikirim." Pengiriman template pesan tetap diizinkan.</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn primary" onclick="saveCostConfig();showToast('Pengaturan biaya disimpan')">Simpan Perubahan</button>
+      <button class="btn" onclick="resetCostConfig()">Reset ke Default</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function initCostSettings(){
+  const cfg=(DB.costConfig)||{capPerChat:50000,alertEnabled:true,blockOnExceed:false};
+  document.getElementById('cfgCapPerChat').value=cfg.capPerChat;
+  document.getElementById('cfgAlertEnabled').checked=cfg.alertEnabled;
+  document.getElementById('cfgBlockOnExceed').checked=cfg.blockOnExceed;
+  updateCapPreview();
+}
+function updateCapPreview(){
+  const cap=parseInt(document.getElementById('cfgCapPerChat').value)||0;
+  const rate=358;
+  const maxBubbles=cap>0?Math.floor(cap/rate):0;
+  const capFmt='Rp '+cap.toLocaleString('id-ID');
+  document.getElementById('capPreview').innerHTML=
+    `<b>Preview:</b> Cap ${capFmt}/bulan = maksimal <b>${maxBubbles} bubble</b> per percakapan (${rate}/bubble).<br>`+
+    (cap>0?`Jika percakapan sudah mengirim ≥${maxBubbles} bubble bulan ini, aturan alert/blokir berlaku.`:'<span style="color:var(--danger)">Cap diset ke 0 — tidak ada batasan.</span>');
+}
+function saveCostConfig(){
+  DB.costConfig={
+    capPerChat:parseInt(document.getElementById('cfgCapPerChat').value)||0,
+    alertEnabled:document.getElementById('cfgAlertEnabled').checked,
+    blockOnExceed:document.getElementById('cfgBlockOnExceed').checked,
+  };
+  saveStore();
+  updateCapPreview();
+}
+function resetCostConfig(){
+  DB.costConfig={capPerChat:50000,alertEnabled:true,blockOnExceed:false};
+  saveStore();
+  initCostSettings();
+  showToast('Pengaturan direset ke default');
+}
+document.getElementById('cfgCapPerChat').addEventListener('input',updateCapPreview);
+initCostSettings();
+</script>

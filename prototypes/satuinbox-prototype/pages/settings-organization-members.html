@@ -1,0 +1,143 @@
+<!-- Settings: Organisasi — Anggota -->
+<style>
+.st-role-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.st-role-badge.admin{background:#fef3c7;color:#b45309}
+.st-role-badge.spv{background:#dbeafe;color:#2563eb}
+.st-role-badge.agent{background:#dcfce7;color:#15803d}
+.st-status-dot{display:inline-flex;align-items:center;gap:4px;font-size:12px}
+.st-status-dot::before{content:'';width:8px;height:8px;border-radius:50%;background:#9ca3af}
+.st-status-dot.online::before{background:#22c55e}
+.st-status-dot.busy::before{background:#f59e0b}
+.st-status-dot.offline::before{background:#9ca3af}
+.st-max-inputs{display:flex;gap:16px;align-items:flex-end}
+.st-max-inputs label{flex:1;font-size:13px;font-weight:500}
+.st-max-inputs label input{display:block;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:13px;background:var(--bg)}
+.st-del-confirm{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;font-size:13px;color:var(--danger);margin-top:10px}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav" id="stNav"></aside>
+  <div class="settings-body">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div><h2 style="margin-bottom:4px">Anggota</h2><p style="font-size:13px;color:var(--muted)">Kelola anggota dan kapasitas percakapan.</p></div>
+      <button class="btn primary" onclick="openAddMember()">+ Tambah Anggota</button>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="data-table" id="membersTable">
+        <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Tim</th><th>Max Conv</th><th>Conv Saat Ini</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="membersBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Edit max conversation modal -->
+    <div class="modal-overlay" id="modalMaxConv">
+      <div class="modal">
+        <h3>Ubah Maks. Percakapan</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px" id="maxConvAgent"></p>
+        <div class="st-max-inputs">
+          <label>Saat Ini (read-only)<input type="number" id="maxConvCurrent" readonly></label>
+          <label>Maks. Baru<input type="number" id="maxConvNew" min="1"></label>
+        </div>
+        <div class="modal-actions"><button class="btn" onclick="closeModal('modalMaxConv')">Batal</button><button class="btn primary" onclick="saveMaxConv()">Simpan</button></div>
+      </div>
+    </div>
+
+    <!-- Add member modal -->
+    <div class="modal-overlay" id="modalAddMember">
+      <div class="modal">
+        <h3>Tambah Anggota</h3>
+        <label>Nama<input type="text" id="addName"></label>
+        <label>Email<input type="email" id="addEmail"></label>
+        <label>Role<select id="addRole"><option value="agent">Agent</option><option value="spv">SPV</option><option value="admin">Admin</option></select></label>
+        <label>Tim<select id="addTeam"></select></label>
+        <label>Maks. Percakapan<input type="number" id="addMaxConv" value="20" min="1"></label>
+        <div class="modal-actions"><button class="btn" onclick="closeModal('modalAddMember')">Batal</button><button class="btn primary" onclick="saveAddMember()">Tambah</button></div>
+      </div>
+    </div>
+
+    <!-- Remove confirm modal -->
+    <div class="modal-overlay" id="modalRemove">
+      <div class="modal">
+        <h3>Hapus Anggota</h3>
+        <div class="st-del-confirm" id="removeMsg"></div>
+        <div class="modal-actions"><button class="btn" onclick="closeModal('modalRemove')">Batal</button><button class="btn danger" onclick="confirmRemove()">Hapus</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.getElementById('stNav').innerHTML=renderSettingsNav('organization-members');
+
+  const teams=DB.teams||[];
+  const users=DB.users||[];
+  let editingAgentId=null;
+
+  function teamName(tid){const t=teams.find(t=>t.id===tid);return t?t.name:'-'}
+
+  function render(){
+    const tbody=document.getElementById('membersBody');
+    if(!DB.agents.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">Belum ada anggota.</td></tr>';return}
+    tbody.innerHTML=DB.agents.map(a=>{
+      const u=users.find(u=>u.id===a.id);
+      const email=u?u.email:'-';
+      return `<tr style="cursor:pointer" onclick="openMaxConv('${a.id}')">
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--accent);width:28px;height:28px;font-size:10px">${a.initials}</div>${a.name}</div></td>
+        <td style="font-size:12px;color:var(--muted)">${email}</td>
+        <td><span class="st-role-badge ${a.role}">${a.role.toUpperCase()}</span></td>
+        <td>${teamName(a.teamId)}</td>
+        <td>${a.maxConv}</td>
+        <td>${a.currentConv}</td>
+        <td><span class="st-status-dot ${a.status}">${a.status}</span></td>
+        <td><button class="btn danger" style="font-size:11px;padding:3px 10px" onclick="event.stopPropagation();openRemove('${a.id}')">Hapus</button></td>
+      </tr>`;
+    }).join('');
+  }
+  render();
+
+  window.openMaxConv=function(id){
+    editingAgentId=id;
+    const a=dbFind('agents',id);
+    document.getElementById('maxConvAgent').textContent=a.name;
+    document.getElementById('maxConvCurrent').value=a.maxConv;
+    document.getElementById('maxConvNew').value=a.maxConv;
+    document.getElementById('modalMaxConv').classList.add('open');
+  };
+
+  window.saveMaxConv=function(){
+    const v=parseInt(document.getElementById('maxConvNew').value);
+    if(v>0){dbUpdate('agents',editingAgentId,{maxConv:v});render();showToast('Maks. percakapan diperbarui')}
+    closeModal('modalMaxConv');
+  };
+
+  window.openAddMember=function(){
+    document.getElementById('addName').value='';
+    document.getElementById('addEmail').value='';
+    document.getElementById('addRole').value='agent';
+    document.getElementById('addMaxConv').value='20';
+    const sel=document.getElementById('addTeam');
+    sel.innerHTML=teams.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+    document.getElementById('modalAddMember').classList.add('open');
+  };
+
+  window.saveAddMember=function(){
+    const name=document.getElementById('addName').value.trim();
+    const email=document.getElementById('addEmail').value.trim();
+    if(!name){showToast('Nama wajib diisi');return}
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const newId=genId('u');
+    const agent={id:newId,name,initials,role:document.getElementById('addRole').value,teamId:document.getElementById('addTeam').value,currentConv:0,maxConv:parseInt(document.getElementById('addMaxConv').value)||20,status:'offline'};
+    dbAdd('agents',agent);
+    if(email){DB.users.push({id:newId,name,email,password:'',role:agent.role,initials,org:DB.settings.org.name});saveStore()}
+    render();closeModal('modalAddMember');showToast('Anggota ditambahkan');
+  };
+
+  let removeId=null;
+  window.openRemove=function(id){removeId=id;const a=dbFind('agents',id);document.getElementById('removeMsg').textContent=`Yakin ingin menghapus ${a.name}? Tindakan ini tidak dapat dibatalkan.`;document.getElementById('modalRemove').classList.add('open')};
+  window.confirmRemove=function(){dbRemove('agents',removeId);DB.users=DB.users.filter(u=>u.id!==removeId);saveStore();render();closeModal('modalRemove');showToast('Anggota dihapus')};
+
+  window.closeModal=function(id){document.getElementById(id).classList.remove('open')};
+})();
+</script>

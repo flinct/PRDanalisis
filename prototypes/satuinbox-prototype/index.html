@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SatuInbox — Prototype</title>
+<link rel="stylesheet" href="shared/theme.css">
+</head>
+<body>
+
+<!-- AUTH SCREENS -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">S<span>atuInbox</span></div>
+    <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px">Log in sekarang</p>
+
+    <!-- LOGIN -->
+    <form id="auth-login" class="auth-form" onsubmit="return doLogin(event)">
+      <label>Username / Email<input type="text" id="login-email" value="dany@satuinbox.id" placeholder="Masukan username atau email" required></label>
+      <label>Password<input type="password" id="login-pass" value="password123" placeholder="Masukan password" required></label>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px"><input type="checkbox" id="remember-me" checked> <label for="remember-me" style="margin:0">Ingat saya</label></div>
+      <div id="login-err" class="auth-err hide">Email dan/atau password salah. Coba lagi atau <a onclick="showAuth('forgot')" style="color:var(--accent);font-weight:600">reset password</a> anda.</div>
+      <button type="submit" class="btn primary full">Log in</button>
+      <p class="auth-link"><a onclick="showAuth('forgot')">Tidak bisa login?</a> · <a onclick="showAuth('register')">Buat akun</a></p>
+    </form>
+
+    <!-- REGISTER -->
+    <form id="auth-register" class="auth-form hide" onsubmit="return doRegister(event)">
+      <h2>Daftar untuk melanjutkan!</h2>
+      <label>Nama Lengkap<input type="text" id="reg-name" placeholder="John Doe" required></label>
+      <label>Nama Pengguna<input type="text" id="reg-username" placeholder="johndoe" required></label>
+      <label>Email<input type="email" id="reg-email" placeholder="johndoe@mail.com" required></label>
+      <label>Nomor Whatsapp<div style="display:flex;gap:6px;margin-top:4px"><span style="padding:10px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-size:13px;flex:0 0 auto">+62</span><input type="tel" id="reg-phone" placeholder="8xxxxxxxxxx" style="flex:1" required></div></label>
+      <label>Kata Sandi<input type="password" id="reg-pass" placeholder="Setidaknya 8 karakter" minlength="8" required></label>
+      <label>Masukan Kembali Kata Sandi<input type="password" id="reg-pass2" placeholder="Masukan kembali kata sandi anda" required></label>
+      <div id="reg-err" class="auth-err hide"></div>
+      <button type="submit" class="btn primary full">Daftar</button>
+      <p class="auth-link">Sudah memiliki akun? <a onclick="showAuth('login')">Log In Sekarang!</a></p>
+    </form>
+
+    <!-- FORGOT PASSWORD -->
+    <form id="auth-forgot" class="auth-form hide" onsubmit="return doForgot(event)">
+      <h2>Reset Kata Sandi</h2>
+      <p style="font-size:13px;color:var(--muted)">Masukkan email Anda. Kami akan mengirim link reset.</p>
+      <label>Email<input type="email" id="forgot-email" required></label>
+      <div id="forgot-ok" class="auth-ok hide">Link reset telah dikirim ke email Anda.</div>
+      <button type="submit" class="btn primary full">Kirim Link Reset</button>
+      <p class="auth-link"><a onclick="showAuth('login')">← Kembali ke Masuk</a></p>
+    </form>
+
+    <!-- ONBOARDING -->
+    <div id="auth-onboarding" class="auth-form hide">
+      <h2>Verifikasi Perusahaan atau Organisasi Anda</h2>
+      <div style="border-top:1px solid var(--border);margin:10px 0"></div>
+      <p style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">Informasi Perusahaan atau Organisasi</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Masukkan detail resmi perusahaan atau organisasi Anda.</p>
+      <label>Nama Organisasi<input type="text" id="onb-org" placeholder="Nama organisasi Anda" required></label>
+      <label>Nomor NIB (Opsional)<input type="text" id="onb-nib" placeholder="1234XX78XX123"></label>
+      <label>Nomor NPWP (Opsional)<input type="text" id="onb-npwp" placeholder="12.345.XXX.9-012.XXX"></label>
+      <div style="border-top:1px solid var(--border);margin:10px 0"></div>
+      <p style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">Informasi Penanggung Jawab</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Masukkan detail penanggung jawab yang mengelola akun organisasi ini.</p>
+      <label>Nomor Induk Kependudukan (KTP) (Opsional)<input type="text" id="onb-ktp" placeholder="32XX 01XX 45XX 89XX"></label>
+      <button class="btn primary full" onclick="doOnboarding()">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL — mirror FE: SideNav (w-16 rail, no TopNav) + section -->
+<div id="app" class="app hide">
+  <div class="app-flex">
+    <!-- SIDE NAV (rail) — matches FE SideNav: bg-background-navbar w-16 py-5 -->
+    <aside class="sidenav-rail" id="sidenavRail">
+      <div class="rail-logo">S</div>
+      <nav class="rail-nav" id="railNav">
+        <div class="rail-btn active" data-page="conversation" title="Percakapan" onclick="go('conversation')">📥</div>
+        <!-- Search button — mirror FE: placed after first nav item -->
+        <div class="rail-btn" title="Cari" onclick="openSearchModal()">🔍</div>
+        <div class="rail-btn" data-page="ticketing" title="Tiket" onclick="go('ticketing')">🎫</div>
+        <div class="rail-btn" data-page="broadcast/messages" title="Broadcast" onclick="go('broadcast/messages')">📢</div>
+        <div class="rail-btn" data-page="statistic" title="Laporan" onclick="go('statistic')">📊</div>
+        <div class="rail-btn" data-page="contacts" title="Kontak" onclick="go('contacts')">📇</div>
+        <div class="rail-btn" data-page="leads" title="Prospek" onclick="go('leads')">💰</div>
+        <div class="rail-btn" id="layoutBtn" title="Layout Prospek (A/B/C/D)" onclick="openLayoutModal()">🎨</div>
+      </nav>
+      <!-- Footer — mirror FE SideNavFooter: notification + settings + user avatar -->
+      <div class="rail-footer">
+        <div class="rail-btn" data-page="notification" title="Notifikasi" onclick="go('notification')">
+          🔔<span class="notif-badge hide" id="notifBadge"></span>
+        </div>
+        <div class="rail-btn" title="FAQ" onclick="alert('FAQ page — belum diimplementasikan di FE')">❓</div>
+        <div class="rail-btn" data-page="settings" title="Pengaturan" onclick="go('settings/organization-general')">⚙</div>
+        <div class="rail-btn" title="Lihat sebagai (role)" onclick="openRoleModal()">🎭</div>
+        <div class="rail-btn" id="userPopBtn" onclick="toggleUserPop()" title="Akun">
+          <span class="rail-user-av" id="userAvatarSmall">DC</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- User popover — mirror FE UserPopoverContent -->
+    <div class="user-popover hide" id="userPopover">
+      <div class="up-name" id="upName">Dany Christian</div>
+      <div class="up-role" id="upRole">Admin</div>
+      <div style="border-top:1px solid var(--border);margin:8px 0"></div>
+      <div class="up-item" onclick="doLogout()">🚪 Keluar</div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <main id="page-content" class="page-content"></main>
+  </div>
+</div>
+
+<!-- GLOBAL SEARCH MODAL — mirror FE GlobalSearchModal -->
+<div class="modal-overlay" id="searchModal" onclick="if(event.target===this)closeSearchModal()">
+  <div class="modal" style="max-width:580px;min-height:120px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:18px">🔍</span>
+      <input type="text" id="globalSearchInput" placeholder="Cari percakapan, kontak, tiket…" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg)" oninput="doGlobalSearchLive(this.value)">
+      <span style="cursor:pointer;font-size:18px;color:var(--muted)" onclick="closeSearchModal()">✕</span>
+    </div>
+    <div id="searchResults" style="margin-top:12px;max-height:300px;overflow-y:auto;font-size:13px"></div>
+  </div>
+</div>
+
+<!-- ROLE SWITCHER MODAL — prototype-only: pilih view sebagai role -->
+<div class="modal-overlay" id="roleModal" onclick="if(event.target===this)closeRoleModal()">
+  <div class="modal" style="max-width:420px">
+    <h3 style="margin:0 0 4px">Lihat sebagai</h3>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--muted)">Pilih role untuk menguji visibilitas fitur. Hanya untuk prototipe.</p>
+    <div id="roleOptions" style="display:flex;flex-direction:column;gap:8px">
+      <button class="role-opt" data-role="admin" onclick="setViewRole('admin')">👑 Admin<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Akses penuh — semua menu &amp; pengaturan</span></button>
+      <button class="role-opt" data-role="spv" onclick="setViewRole('spv')">🛡️ Supervisor<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Belum Ditugaskan, Semua Percakapan, tim</span></button>
+      <button class="role-opt" data-role="agent" onclick="setViewRole('agent')">🎧 Agent<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Hanya percakapan yang ditugaskan</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT SWITCHER MODAL — pilih tata letak toolbar Prospek (A/B/C/D) -->
+<div class="modal-overlay" id="layoutModal" onclick="if(event.target===this)closeLayoutModal()">
+  <div class="modal" style="max-width:440px">
+    <h3 style="margin:0 0 4px">Layout Prospek</h3>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--muted)">Pilih tata letak toolbar halaman Prospek. Tersimpan otomatis.</p>
+    <div id="layoutOptions" style="display:flex;flex-direction:column;gap:8px">
+      <button class="role-opt" data-layout="a" onclick="setSalesLayout('a')">🅰️ Grouped + Quiet State<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Grup rapi, active-state lembut, CTA full-width</span></button>
+      <button class="role-opt" data-layout="b" onclick="setSalesLayout('b')">🅱️ FAB + Filter Scroll<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Tombol buat mengambang, filter 1-baris scroll</span></button>
+      <button class="role-opt" data-layout="c" onclick="setSalesLayout('c')">🇨 Tab Underline<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Stage jadi tab garis-bawah (bukan pill)</span></button>
+      <button class="role-opt" data-layout="d" onclick="setSalesLayout('d')">🇩 Compact<span style="display:block;font-size:12px;color:var(--muted);font-weight:400">Rapat & hemat ruang + FAB</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openRoleModal(){
+  const cur=(document.getElementById('app').className.match(/role-(\w+)/)||[])[1]||'agent';
+  document.querySelectorAll('#roleOptions .role-opt').forEach(b=>b.classList.toggle('active',b.dataset.role===cur));
+  document.getElementById('roleModal').classList.add('open');
+}
+function closeRoleModal(){document.getElementById('roleModal').classList.remove('open')}
+function setViewRole(r){
+  const app=document.getElementById('app');
+  var lay=(app.className.match(/\blayout-\w\b/)||['layout-a'])[0];
+  app.className='app role-'+r+' '+lay;
+  localStorage.setItem('viewRole',r);
+  const up=document.getElementById('upRole');if(up)up.textContent=r.charAt(0).toUpperCase()+r.slice(1);
+  closeRoleModal();
+  if(typeof showToast==='function')showToast('Sekarang melihat sebagai '+r.charAt(0).toUpperCase()+r.slice(1));
+  onHash(); // re-render current page with new role gating
+}
+// === LAYOUT SWITCHER (toolbar Prospek A/B/C/D) ===
+function openLayoutModal(){
+  var cur=(document.getElementById('app').className.match(/layout-(\w)/)||[])[1]||'a';
+  document.querySelectorAll('#layoutOptions .role-opt').forEach(b=>b.classList.toggle('active',b.dataset.layout===cur));
+  document.getElementById('layoutModal').classList.add('open');
+}
+function closeLayoutModal(){document.getElementById('layoutModal').classList.remove('open')}
+function setSalesLayout(v){
+  var app=document.getElementById('app');
+  app.className=app.className.replace(/\blayout-\w\b/g,'').trim()+' layout-'+v;
+  localStorage.setItem('salesLayout',v);
+  closeLayoutModal();
+  if(typeof showToast==='function')showToast('Layout Prospek: '+v.toUpperCase());
+}
+</script>
+
+<!-- page fragments (self-register to window.__PAGES; regenerate with build.py) -->
+<script src="pages/broadcast-draft.js"></script>
+<script src="pages/broadcast-messages.js"></script>
+<script src="pages/broadcast-templates.js"></script>
+<script src="pages/contacts.js"></script>
+<script src="pages/conversation.js"></script>
+<script src="pages/leads.js"></script>
+<script src="pages/visits.js"></script>
+<script src="pages/settings-lead-pipeline.js"></script>
+<script src="pages/notification.js"></script>
+<script src="pages/settings-channels-wa-api.js"></script>
+<script src="pages/settings-channels-wa-web.js"></script>
+<script src="pages/settings-channels-widget.js"></script>
+<script src="pages/settings-billing-cost.js"></script>
+<script src="pages/settings-developer-webhook.js"></script>
+<script src="pages/settings-inbox-assignments.js"></script>
+<script src="pages/settings-inbox-csat.js"></script>
+<script src="pages/settings-inbox-macros.js"></script>
+<script src="pages/settings-inbox-sla.js"></script>
+<script src="pages/settings-inbox-team-inbox.js"></script>
+<script src="pages/settings-inbox-tickets.js"></script>
+<script src="pages/settings-organization-general.js"></script>
+<script src="pages/settings-organization-members.js"></script>
+<script src="pages/settings-organization-roles.js"></script>
+<script src="pages/settings-organization-tags.js"></script>
+<script src="pages/settings-shift-hours.js"></script>
+<script src="pages/statistic.js"></script>
+<script src="pages/ticketing.js"></script>
+<script src="shared/data.js"></script>
+<script src="shared/router.js"></script>
+<script src="shared/auth.js"></script>
+</body>
+</html>

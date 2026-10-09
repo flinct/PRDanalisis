@@ -374,11 +374,12 @@ window.TrackerModule = (function(){
     };
     if (!rows.length) return next;
     let sum = 0;
+    let overallCount = 0; // ponytail: 'on hold' excluded from overall progress avg (still counted in status/difficulty/etc)
     const versions = new Set();
     const usedDifficulties = new Set();
     rows.forEach(row => {
-      sum += getEffectiveProgress(row, rows);
       const s = getStatus ? getStatus(row) : row.status;
+      if (s !== 'on hold') { sum += getEffectiveProgress(row, rows); overallCount += 1; }
       if (s) next.statuses[s] = (next.statuses[s] || 0) + 1;
       if (row.version) versions.add(row.version);
       if (row.difficulty) { usedDifficulties.add(row.difficulty); next.difficulties[row.difficulty] = (next.difficulties[row.difficulty] || 0) + 1; }
@@ -389,7 +390,7 @@ window.TrackerModule = (function(){
       if (row.week && next.weeks[row.week] !== undefined) next.weeks[row.week] += 1;
       else next.weeks.unset += 1;
     });
-    next.overall = sum / rows.length;
+    next.overall = overallCount ? sum / overallCount : 0;
     next.version = versions.size;
     next.difficulty = usedDifficulties.size;
     return next;
@@ -440,6 +441,14 @@ window.TrackerModule = (function(){
     console.assert(groupByOwner(rows)[0].summary.overall === (100 + 100 + 0) / 3, 'tracker summary overall failed');
     console.assert(groupByOwner(rows)[0].summary.priorities.high === 1, 'tracker priority summary failed');
     console.assert(groupByOwner(rows)[0].summary.weeks.now === 1, 'tracker week summary failed');
+    // 'on hold' excluded from overall avg: 2 complete@100 + 1 on-hold@0 → 100, not 66.7
+    const held = normalizeRows([
+      { id:'h1', owner:'A', sourceSheet:'S', type:'milestone', task:'A', status:'complete', progress:100 },
+      { id:'h2', owner:'A', sourceSheet:'S', type:'milestone', task:'B', status:'complete', progress:100 },
+      { id:'h3', owner:'A', sourceSheet:'S', type:'milestone', task:'C', status:'on hold', progress:0 },
+    ]);
+    console.assert(summarizeRows(held).overall === 100, 'tracker on-hold excluded from overall failed');
+    console.assert(summarizeRows(held).statuses['on hold'] === 1, 'tracker on-hold still counted in status failed');
 
     // periodBuckets — pick a fixed anchor so tests are deterministic.
     // ref = Wed 2026-07-29 → this = 2026-07-23..2026-07-29, last = 2026-07-16..2026-07-22.
@@ -1077,6 +1086,27 @@ window.TrackerModule = (function(){
     const [rows, setRows] = React.useState(() => normalizeRows(DEFAULT_ROWS));
     const [savedJson, setSavedJson] = React.useState(JSON.stringify(normalizeRows(DEFAULT_ROWS)));
     const [meta, setMeta] = React.useState({ loading:true, saving:false, error:'', updatedAt:null, updatedBy:null, storage:'server', sheetTabs:[] });
+    const [csvHeaders, setCsvHeaders] = React.useState([]);
+    const [csvRows, setCsvRows] = React.useState([]);
+    const handleCsv = React.useCallback((ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const lines = String(reader.result || '').trim().split(/\r?\n/);
+        if (!lines.length) return;
+        // ponytail: handles standard quoted CSV (all cells wrapped in double quotes).
+        // Breaks on embedded commas inside quotes — fine for cost-export data.
+        const parse = line => line.split('","').map((s, i, arr) => {
+          if (i === 0) return s.replace(/^"/, '');
+          if (i === arr.length - 1) return s.replace(/"$/, '');
+          return s;
+        });
+        setCsvHeaders(parse(lines[0]));
+        setCsvRows(lines.slice(1).map(parse));
+      };
+      reader.readAsText(file);
+    }, []);
     const [dragId, setDragId] = React.useState('');
     // Controlled from parent when props provided; fall back to local for standalone use.
     const [localTab, setLocalTab] = React.useState('statistics');
@@ -1130,9 +1160,11 @@ window.TrackerModule = (function(){
       };
       animRef.current = requestAnimationFrame(step);
     }, []);
-    // ponytail: builds standalone slideshow doc from hidden export decks. Data flow:
-    //   Cover: doughnut + 4 KPI from all-sheet aggregate (period-filtered).
-    //   Then per sheet (Dany/Naftal/Agung/...): divider slide + 5 content slides.
+    // ponytail: builds standalone slideshow doc from hidden export decks. Story order
+    // follows the 5 presentation cores: keseluruhan progress / statistic task / list
+    // task, then per user (Dany/Naftal/Agung/...): progress + statistic task.
+    // ponytail: per-user Task List + Last/Now split tables stay UI-only — add as
+    // appendix slides here if a presentation ever needs them.
     const buildSlideshowHtml = React.useCallback(() => {
       const root = document.querySelector('[data-export-decks]');
       if (!root) return '';
@@ -1146,46 +1178,53 @@ window.TrackerModule = (function(){
         (bm.startDate || bm.endDate ? ` · ${bm.startDate || '?'} → ${bm.endDate || '?'}` : '');
       const pick = (deck, parts) => parts.map(p => deck.querySelector(`[data-slide-part="${p}"]`)).filter(Boolean);
       const slides = [];
-      // Cover deck: only overview part (doughnut + 4 KPI cards).
+      const statParts = ['task-status', 'activity-chart', 'diff-priority'];
+      // Section 1 — keseluruhan (all sheets): one slide per presentation core.
       const coverDeck = root.querySelector('[data-deck-role="cover"]');
       if (coverDeck) {
-        const overview = coverDeck.querySelector('[data-slide-part="overview"]');
-        if (overview) {
-          slides.push({ kind:'cover', title:'All Sheets · Overall', name:'Doughnut + KPI', html:overview.outerHTML });
-        }
+        [
+          { name:'Progress', parts:['overview'] },
+          { name:'Statistic Task', parts:statParts },
+          { name:'List Task', parts:['task-list'], solo:true },
+        ].forEach(g => {
+          const nodes = pick(coverDeck, g.parts);
+          if (!nodes.length) return;
+          slides.push({ kind:'content', solo:!!g.solo, title:'Keseluruhan', name:g.name, html:nodes.map(n => n.outerHTML).join('') });
+        });
       }
-      // Per-sheet decks: divider + 5 content slides.
+      // Section 2 — per user: divider + progress + statistic task.
       const sheetDecks = Array.from(root.querySelectorAll('[data-deck-role="sheet"]'));
       sheetDecks.forEach(deck => {
         const name = deck.getAttribute('data-deck') || '—';
-        slides.push({ kind:'divider', title:name, name:'Sheet' });
-        const groups = [
-          { name:'Overview · Task Status', parts:['overview', 'task-status'] },
-          { name:'Activity · Difficulty · Priority', parts:['activity-chart', 'diff-priority'] },
-          { name:'Task List', parts:['task-list'] },
-          { name:'Last Period', parts:['last-period'] },
-          { name:'This Period', parts:['this-period'] },
-        ];
-        groups.forEach(g => {
+        slides.push({ kind:'divider', title:name, name:'Per User' });
+        [
+          { name:'Progress', parts:['overview'] },
+          { name:'Statistic Task', parts:statParts },
+        ].forEach(g => {
           const nodes = pick(deck, g.parts);
           if (!nodes.length) return;
           slides.push({ kind:'content', title:name, name:g.name, html:nodes.map(n => n.outerHTML).join('') });
         });
       });
+      // Cost Explorer slide — query live DOM (outside export decks), only if CSV loaded
+      const costNode = document.querySelector('[data-slide-part="cost-explorer"]');
+      if (costNode && costNode.querySelector('table')) {
+        slides.push({ kind:'content', title:'Cost Explorer', name:'Cost Breakdown', html:costNode.outerHTML });
+      }
       if (!slides.length) return '';
       const total = slides.length;
       const slideHtml = slides.map((s, i) => {
         if (s.kind === 'divider') {
           return `<section class="slide slide-divider" data-idx="${i}">
             <div class="divider-inner">
-              <div class="divider-eyebrow">Sheet</div>
+              <div class="divider-eyebrow">Per User</div>
               <div class="divider-title">${escapeHtml(s.title)}</div>
               <div class="divider-meta">${escapeHtml(metaLine)}</div>
             </div>
           </section>`;
         }
-        const badge = s.kind === 'cover' ? 'Cover' : escapeHtml(s.name);
-        return `<section class="slide" data-idx="${i}">
+        const badge = escapeHtml(s.name);
+        return `<section class="slide${s.solo ? ' slide-solo' : ''}" data-idx="${i}">
           <div class="slide-head">
             <div class="slide-title"><strong>${escapeHtml(s.title)}</strong> · ${badge}</div>
             <div class="slide-meta">${escapeHtml(metaLine)} · ${i + 1}/${total}</div>
@@ -1206,6 +1245,12 @@ window.TrackerModule = (function(){
   .slide-title { font-size: 20px; color: var(--text-1); }
   .slide-meta { font-size: 12px; color: var(--text-3); }
   .slide-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 6px; }
+  /* List Task slide (.slide-solo): card fits the slide exactly — header + KPI stay
+     put, only the list area scrolls, no slide-body scrollbar. Class-scoped on the
+     section (no :has dependency), other slides keep the fallback scroll. */
+  .slide-solo .slide-body { display: flex; flex-direction: column; overflow: hidden; }
+  .slide-solo .slide-body > [data-slide-part="task-list"] { flex: 1 1 auto; min-height: 0; margin-top: 0 !important; display: flex; flex-direction: column; }
+  .slide-solo .slide-body > [data-slide-part="task-list"] > :last-child { flex: 1 1 auto; min-height: 0; }
   .slide-body [data-noexport], .slide-body button { display: none !important; }
   .slide-body input, .slide-body select, .slide-body textarea { pointer-events: none; background: transparent !important; border: 0 !important; color: inherit !important; padding: 0 !important; -webkit-appearance: none; appearance: none; }
   .slide-divider { align-items: center; justify-content: center; padding: 0; }
@@ -1990,7 +2035,31 @@ window.TrackerModule = (function(){
                   )
                 )
               )
+            ),
+        // ponytail: CSV cost viewer — upload file, parse, display table
+        e('div', { 'data-slide-part':'cost-explorer', style:{ ...shell, padding:16, marginTop:16, background:THEME.bgSecondary, border:`1px solid ${THEME.border}` } },
+          e('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 } },
+            e('div', { style:{ fontSize:14, fontWeight:600, color:'#fff' } }, 'Cost Explorer'),
+            e('label', { 'data-noexport':'1', style:{ cursor:'pointer', fontSize:12, padding:'6px 12px', borderRadius:999, border:`1px solid ${THEME.border}`, background:'var(--sidebar-bg)', color:'var(--text-2)', fontWeight:600 } },
+              csvHeaders.length ? 'Ganti CSV' : 'Upload CSV',
+              e('input', { type:'file', accept:'.csv', onChange:handleCsv, style:{ display:'none' } })
             )
+          ),
+          csvHeaders.length ? e('div', { style:{ maxHeight:'60vh', overflow:'auto', borderRadius:12 } },
+            e('table', { style:{ width:'100%', borderCollapse:'collapse', fontSize:12 } },
+              e('thead', null,
+                e('tr', null,
+                  ...csvHeaders.map((h, i) => e('th', { key:i, style:{ textAlign:'left', fontSize:11, fontWeight:600, color:THEME.textSecondary, letterSpacing:0.4, padding:'8px 12px', background:THEME.tableHeaderBg, borderBottom:`1px solid ${THEME.divider}`, textTransform:'uppercase', position:'sticky', top:0, zIndex:1, whiteSpace:'nowrap' } }, h))
+                )
+              ),
+              e('tbody', null,
+                ...csvRows.map((row, ri) => e('tr', { key:ri, className:'tracker-row', style:{ background: ri % 2 === 1 ? THEME.bgSecondary : 'transparent' } },
+                  ...row.map((cell, ci) => e('td', { key:ci, style:{ padding:'6px 12px', borderBottom:`1px solid ${THEME.divider}`, color:THEME.textPrimary, fontSize:12, whiteSpace:'nowrap', fontFamily:'monospace', textAlign: ci > 0 ? 'right' : 'left' } }, cell))
+                ))
+              )
+            )
+          ) : e('div', { style:{ fontSize:12, color:THEME.textMuted, textAlign:'center', padding:24 } }, 'Upload file CSV untuk melihat data cost.')
+        )
       ),
       tab === 'statistics' ? e('button', {
         type:'button',
@@ -2002,5 +2071,5 @@ window.TrackerModule = (function(){
       }, '↓') : null
     );
   }
-  return { TrackerView };
+  return { TrackerView, summarizeRows, groupByOwner, getEffectiveProgress, readTrackerLocal, DEFAULT_ROWS };
 })();

@@ -1,0 +1,95 @@
+<!-- Settings: Organisasi — Role & Permission -->
+<style>
+.st-role-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px}
+.st-role-head{display:flex;align-items:center;justify-content:space-between}
+.st-role-name{font-size:15px;font-weight:600}
+.st-perm-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.st-perm-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#f3f4f6;color:#374151}
+.st-perm-chip.all{background:#fef3c7;color:#b45309}
+.st-check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.st-check-grid label{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.st-check-grid input[type=checkbox]{accent-color:var(--accent)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav" id="stNav"></aside>
+  <div class="settings-body">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div><h2 style="margin-bottom:4px">Role & Permission</h2><p style="font-size:13px;color:var(--muted)">Kelola role dan hak akses anggota.</p></div>
+      <button class="btn primary" onclick="openAddRole()">+ Tambah Role</button>
+    </div>
+    <div id="rolesList"></div>
+
+    <!-- Add/Edit role modal -->
+    <div class="modal-overlay" id="modalRole">
+      <div class="modal">
+        <h3 id="roleModalTitle">Tambah Role</h3>
+        <label>Nama Role<input type="text" id="roleName"></label>
+        <div style="margin-bottom:8px"><strong style="font-size:13px">Permission:</strong></div>
+        <div class="st-check-grid" id="permChecks"></div>
+        <div class="modal-actions"><button class="btn" onclick="document.getElementById('modalRole').classList.remove('open')">Batal</button><button class="btn primary" onclick="saveRole()">Simpan</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.getElementById('stNav').innerHTML=renderSettingsNav('organization-roles');
+
+  const ALL_PERMS=['all','reply','assign','view_all','view_assigned','manage_members','manage_settings','export_data'];
+  const PERM_LABELS={all:'Semua Akses',reply:'Balas Pesan',assign:'Tugaskan',view_all:'Lihat Semua',view_assigned:'Lihat Ditugaskan',manage_members:'Kelola Anggota',manage_settings:'Kelola Pengaturan',export_data:'Export Data'};
+  let editingRoleId=null;
+
+  function render(){
+    const el=document.getElementById('rolesList');
+    if(!DB.settings.roles.length){el.innerHTML='<p style="color:var(--muted);padding:20px">Belum ada role.</p>';return}
+    el.innerHTML=DB.settings.roles.map(r=>`
+      <div class="st-role-card">
+        <div class="st-role-head">
+          <span class="st-role-name">${r.name}</span>
+          <button class="btn" style="font-size:11px;padding:3px 10px" onclick="openEditRole('${r.id}')">✏ Edit</button>
+        </div>
+        <div class="st-perm-list">${r.perms.map(p=>`<span class="st-perm-chip ${p==='all'?'all':''}">${PERM_LABELS[p]||p}</span>`).join('')}</div>
+      </div>
+    `).join('');
+  }
+  render();
+
+  function renderPermChecks(selected){
+    return ALL_PERMS.map(p=>`<label><input type="checkbox" value="${p}" ${selected.includes(p)?'checked':''}> ${PERM_LABELS[p]}</label>`).join('');
+  }
+
+  window.openAddRole=function(){
+    editingRoleId=null;
+    document.getElementById('roleModalTitle').textContent='Tambah Role';
+    document.getElementById('roleName').value='';
+    document.getElementById('permChecks').innerHTML=renderPermChecks([]);
+    document.getElementById('modalRole').classList.add('open');
+  };
+
+  window.openEditRole=function(id){
+    editingRoleId=id;
+    const role=DB.settings.roles.find(x=>x.id===id);
+    document.getElementById('roleModalTitle').textContent='Edit Role';
+    document.getElementById('roleName').value=role.name;
+    document.getElementById('permChecks').innerHTML=renderPermChecks(role.perms);
+    document.getElementById('modalRole').classList.add('open');
+  };
+
+  window.saveRole=function(){
+    const name=document.getElementById('roleName').value.trim();
+    if(!name){showToast('Nama role wajib diisi');return}
+    const perms=[...document.querySelectorAll('#permChecks input:checked')].map(c=>c.value);
+    if(editingRoleId){
+      const role=DB.settings.roles.find(x=>x.id===editingRoleId);
+      role.name=name;role.perms=perms;
+    }else{
+      DB.settings.roles.push({id:genId('r'),name,perms});
+    }
+    saveStore();render();
+    document.getElementById('modalRole').classList.remove('open');
+    showToast(editingRoleId?'Role diperbarui':'Role ditambahkan');
+  };
+})();
+</script>

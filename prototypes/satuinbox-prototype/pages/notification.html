@@ -1,0 +1,56 @@
+<!-- Notification Page -->
+<style>
+.notif-list{display:flex;flex-direction:column;gap:2px}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;cursor:pointer;border-radius:8px;transition:.1s}
+.notif-item:hover{background:var(--bg)}
+.notif-item.unread{background:rgba(79,70,229,.04);border-left:3px solid var(--accent)}
+.notif-icon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:16px;flex:0 0 36px}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:13px;font-weight:600}.notif-text{font-size:12px;color:var(--muted);margin-top:2px}
+.notif-time{font-size:11px;color:var(--muted);flex:0 0 auto;margin-top:2px}
+.notif-actions{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+</style>
+
+<div class="page-header">
+  <h1>🔔 Notifikasi</h1>
+  <button class="btn" onclick="markAllRead()">Tandai Semua Dibaca</button>
+</div>
+<div class="page-filters">
+  <span class="filter-chip active" onclick="filterNotif(this,'all')">Semua</span>
+  <span class="filter-chip" onclick="filterNotif(this,'unread')">Belum Dibaca</span>
+</div>
+<div class="page-body">
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<script>
+let notifFilter='all';
+const ICONS={message:'💬',ticket:'🎫',broadcast:'📣',assignment:'👤',lead:'📋'};
+
+function renderNotifs(){
+  const el=document.getElementById('notifList');
+  let items=DB.notifications.filter(n=>notifFilter==='all'||!n.read);
+  items.sort((a,b)=>new Date(b.time)-new Date(a.time));
+  el.innerHTML=items.map(n=>`<div class="notif-item ${n.read?'':'unread'}" onclick="readNotif('${n.id}','${n.link||''}')">
+    <div class="notif-icon" style="background:var(--bg)">${ICONS[n.type]||'🔔'}</div>
+    <div class="notif-body"><div class="notif-title">${n.title}</div><div class="notif-text">${n.body}</div></div>
+    <div class="notif-time">${fmtTime(n.time)}</div>
+  </div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:40px">Tidak ada notifikasi</div>';
+}
+
+function filterNotif(el,f){
+  document.querySelectorAll('.page-filters .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');notifFilter=f;renderNotifs();
+}
+
+function readNotif(id,link){
+  dbUpdate('notifications',id,{read:true});
+  if(link)go(link);else renderNotifs();
+}
+
+function markAllRead(){
+  DB.notifications.forEach(n=>n.read=true);saveStore();renderNotifs();showToast('Semua notifikasi ditandai dibaca');
+}
+
+renderNotifs();
+</script>

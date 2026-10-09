@@ -1,0 +1,185 @@
+URL: https://www.smashingmagazine.com/?s=CRM+UX+design
+FETCHED_AS: https://www.smashingmagazine.com/?s=CRM+UX+design
+
+Smashing Magazine — For Web Designers And Developers 
+Skip to main content Jump to list of all articles Jump to all topics 
+
+Victor Ayomipo wrote 
+Stop Treating CSS Container Queries Like Traditional Media Queries 
+Sep 16, 2026 
+
+Despite broad browser support, container queries remain surprisingly underused and frequently misunderstood. Let’s look at how they differ from media queries, when to reach for each, and how container queries help reusable components respond naturally to the contexts in which they appear. - CSS - Tools - Techniques 
+
+Continue reading ↬ 
+
+Alex Williams / Sep 11, 2026 
+
+Building A UX ROI Case That Survives The Boardroom 
+
+Carrie Webster / Sep 9, 2026 in UX , Design , AI 
+
+The Death Of The Button: Why The Best Interface Is No Interface 
+
+Email Newsletter 
+Useful front-end & UX tips, delivered once a week. 
+
+With tools to help you get your work done better. Subscribe and get Vitaly’s Smart Interface Design Checklists PDF delivered straight into your inbox. 🎁 
+
+Your (smashing) email 
+
+On front-end & UX . Trusted by 182,000+ folks. 
+
+Accessible Front-End Components 
+
+Reliable accessible UI components: :focus styles, modals, date pickers, navigation, tables, buttons, SVGs. 
+Explore Accessible Components 
+
+CSS Generators & Tools 
+
+Useful CSS tools for animations, shadows, cubic-bezier curves, easing gradients, filters, overlays, type scales. 
+Explore CSS Generators 
+
+Front-End Boilerplates & Starter Kits 
+
+HTML boilerplates, CSS resets, forms, dev themes, gitignore, CSS snippets, static sites, style guides. 
+Explore Front-End Boilerplates 
+See All Guides 
+
+Latest Posts 
+
+Cosima Mielke wrote 
+The Many Faces Of September (2026 Wallpapers Edition) 
+
+Could there be a better way to welcome the new month than with a new collection of desktop wallpapers? Whether you’re holding tightly onto summer or eagerly awaiting autumn, we’ve got some eye-catching designs to make your September just a bit more colorful. Enjoy! 
+
+August 31, 2026 in Wallpapers 
+
+Meriem Benhabiles wrote 
+Rethinking Data Visualisation: A UX Approach To Dashboards That Actually Drives Decisions 
+
+Data visualisation sits at the intersection of two disciplines that rarely talk to each other: data and design. Meriem Benhabiles explores what changes when you bring structured UX thinking to dashboards and data presentations, from the questions you ask before opening any tool to the decisions that determine whether an insight actually lands. 
+
+August 26, 2026 in Data Visualization , UX , Design 
+
+Pierre Burgy wrote 
+Why Your Website Should Never Stop Changing 
+
+Every website peaks on launch day and slowly drifts from there, not because it breaks, but because nobody has time to keep it current. Autonomous websites, continuously optimized by agents after launch, aim to change that. Pierre Burgy shares what they learned building for full website autonomy and the deeper design problem they uncovered along the way. 
+
+August 25, 2026 in Tools , Design , AI 
+
+Johan Grobler wrote 
+Timing Charts: A Blueprint For SMIL Animations 
+
+Discover SMIL, the often-overlooked way to animate SVGs that works inside <img> tags and can fully animate everything in an SVG without JavaScript. 
+
+August 20, 2026 in CSS , SVG , Design 
+
+Join 1,916 Smashing Members 
+
+A friendly community for people who design and build the web. With books, workshops, goodies and early-birds — for just 1 coffee a month. Take a look around. 
+
+Join the community ↬ Already have an account? Sign in! 
+
+Vitaly Friedman wrote 
+New EU Guidelines For AI Labelling 
+
+New EU guidelines, why AI sparkles aren’t enough, when AI labels are required, and what the rules mean for AI-powered features and products. 
+
+August 13, 2026 in AI , Design , UX 
+
+Alexey Kopytin wrote 
+Building Tactile UX: Honoring Intentional Design With Lottie 
+
+When tasked with building a highly interactive, tactile web experience, the architecture must serve the art direction. In this article, Alexey Kopytin explains their architectural rationale for building a digital stress-relief squeeze toy game using Lottie animations, DOM events, and distance-based math to maintain absolute control over their designers’ intentional motion. 
+
+August 11, 2026 in UX , Design , Animation 
+
+Jad Joubran wrote 
+How Baseline Can Help You Ship Less JavaScript 
+
+The gap between “you need a library for this” and “the browser does this” keeps closing. A practical guide to auditing your dependencies and finding what the web platform can now handle for you. 
+
+August 7, 2026 in JavaScript , Coding , Techniques 
+
+Cosima Mielke wrote 
+Small Joys And Big Adventures (August 2026 Wallpapers Edition) 
+
+Whether you’re enjoying some well-earned time off this August or are jumping headfirst into a new project, how about some new desktop wallpapers to accompany you on all those big and small adventures the month might bring? Well, we’ve got you covered! 
+
+July 31, 2026 in Wallpapers 
+
+See More Latest Articles 
+
+That’s The Smashing Family. 
+
+Smashing Magazine is so much more than articles. 
+
+Smashing Books 
+
+14 printed books and 67 eBooks . Written for web developers, designers and marketeers. 
+
+Jump to books ↬ Free airmail shipping wordlwide. No ifs or buts. 
+
+Smashing Workshops 
+
+Online workshops with experts. Broken into 2.5h-segments, with interactive, live sessions. 
+
+Jump to workshops ↬ 2.5h live sessions, with video recordings and Q&A. 
+
+Smashing Membership 
+
+A friendly community for people who design and build the web. With discounts, goodies and fancy cats. 
+
+Jump to Membership ↬ For just 1 coffee a month. 
+
+Smashing Newsletter 
+
+Weekly tips on front-end & UX, delivered straight to your inbox. Just practical stuff that you can use. 
+
+Jump to Newsletter ↬ You can unsubscribe with 1 click any time. 
+
+Winter–Spring 2026 • New Workshops 
+Boost Your Skills Online, 
+On Front-End, Design & UX 
+
+Meet Smashing Workshops , with practical, actionable insights from experts — live. With interactive exercises, slides, video recordings and a friendly Q&A. 
+Explore all speakers and topics → 
+
+Community Links 
+
+Person Of The Week 
+
+Ruby Pryor is the founder of Rex , a UX research and strategic design consulting firm specializing in Southeast Asia. For the past decade, she has worked in design and customer experience across Australia and Asia, including for Boston Consulting Group, Grab, and Nous Group. Ruby is passionate about sharing her knowledge with others. When she’s not speaking at conferences or appearing on podcasts, she runs client workshops and teaches design and UX research to students worldwide through live masterclasses and cohort programs. Thank you for everything you do for the community, dear Ruby! 
+
+David Dias wrote 
+Front-End Checklist 
+
+September 21, 2026 — Created by David Dias, Front-End Checklist is a collection of front-end quality rules and guided workflows for humans and AI agents. It covers launch, review, accessibility, performance, security, privacy, and SEO. 
+
+Maria Panagiotidi wrote 
+Hidden Vs. Disabled States 
+
+September 18, 2026 — Hidden or disabled — which state should you use in which situation? Maria Panagiotidi explores the advantages and disadvantages of both to help you make an informed decision. 
+
+Slava Shestopalov wrote 
+Optical Effects In User Interfaces 
+
+September 17, 2026 — If you understand the peculiarities of human vision, you can create better designs. Slava Shestopalov wrote a guide on how to make optically balanced icons, correct shape alignment, and perfect corner rounding. 
+
+Bramus Van Damme wrote 
+Animating CSS Grid Layouts 
+
+September 16, 2026 — How to create an animated grid layout where the grid nicely reorganizes itself when the viewport changes? Bramus Van Damme shows how CSS Anchor Positioning makes it possible . 
+
+Sharang Sharma wrote 
+Voice AI UX Patterns 
+
+September 15, 2026 — AI has unlocked new use cases and interaction patterns for voice. Sharang Sharma explores emerging Voice AI UX patterns , the perceived role of the AI agent within each, and the key design decisions and limitations that shape them. 
+
+Andreas Eldh wrote 
+Building Contextual Menus 
+
+September 14, 2026 — Contextual menus make applications faster and easier to use when navigating a page with a mouse. Andreas Eldh shares insights into how the team at Linear designed a small detail that improves how sub-menus work. 
+
+More links on Twitter

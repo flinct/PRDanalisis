@@ -137,16 +137,25 @@ function parseIdFromHref(href) {
   return m ? Number(m[1]) : null;
 }
 
-function openProjectRequest(apiPath) {
+// opts: { method, body } — default GET with no body (every existing caller).
+function openProjectRequest(apiPath, opts = {}) {
   return new Promise((resolve, reject) => {
     if (!OPENPROJECT_API_KEY)
       return reject(new Error("OPENPROJECT_API_KEY missing"));
     const url = new URL(apiPath, OPENPROJECT_BASE_URL);
+    const payload =
+      opts.body === undefined ? null : Buffer.from(JSON.stringify(opts.body));
     const req = https.request(
       url,
       {
-        method: "GET",
+        method: opts.method || "GET",
         headers: {
+          ...(payload
+            ? {
+                "Content-Type": "application/json",
+                "Content-Length": payload.length,
+              }
+            : {}),
           Authorization:
             "Basic " +
             Buffer.from(`apikey:${OPENPROJECT_API_KEY}`).toString("base64"),
@@ -174,6 +183,7 @@ function openProjectRequest(apiPath) {
       },
     );
     req.on("error", reject);
+    if (payload) req.write(payload);
     req.end();
   });
 }
@@ -636,6 +646,33 @@ app.get("/api/files", (_req, res) => {
   res.json(result);
 });
 
+// PRD author classification — scans first 500 chars for "Product Manager" field
+app.get("/api/prd/authors", (_req, res) => {
+  const prdDir = path.join(BASE, "PRD");
+  const groups = { yusril: [], dany: [], collab: [], unknown: [] };
+  function walk(dir, rel) {
+    if (!fs.existsSync(dir)) return;
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const abs = path.join(dir, ent.name);
+      const relPath = rel ? rel + "/" + ent.name : ent.name;
+      if (ent.isDirectory()) { walk(abs, relPath); continue; }
+      if (!ent.name.endsWith(".md")) continue;
+      try {
+        const head = fs.readFileSync(abs, "utf8").slice(0, 500).toLowerCase();
+        const hasY = head.includes("yusril") || head.includes("ibnu");
+        const hasD = head.includes("dany") || head.includes("hermes");
+        const node = { name: ent.name, path: "PRD/" + relPath };
+        if (hasY && hasD) groups.collab.push(node);
+        else if (hasY) groups.yusril.push(node);
+        else if (hasD) groups.dany.push(node);
+        else groups.unknown.push(node);
+      } catch {}
+    }
+  }
+  walk(prdDir, "");
+  res.json(groups);
+});
+
 app.get("/api/files/content", (req, res) => {
   try {
     const fp = safePath(req.query.path || "");
@@ -840,6 +877,63 @@ app.get("/api/dashboard/openproject/work-package/:id", async (req, res) => {
     res.json({ ok: true, workPackage: normalizeWorkPackage(wp) });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// Write-back: subject + priority only. Roadmap edits → OpenProject.
+app.patch("/api/dashboard/openproject/work-package/:id", async (req, res) => {
+  try {
+    const id = toIntOrNull(req.params.id);
+    if (!id) return res.status(400).json({ ok: false, error: "invalid id" });
+    // lockVersion must be read immediately before the write (optimistic lock).
+    const current = await openProjectRequest(`/api/v3/work_packages/${id}`);
+    const body = { lockVersion: current.lockVersion };
+    const links = {};
+    if (typeof req.body.subject === "string" && req.body.subject.trim())
+      body.subject = req.body.subject.trim();
+    // description: full replacement (frontend prepends its managed roadmap-meta block).
+    if (typeof req.body.description === "string")
+      body.description = { raw: req.body.description };
+    const priorityId = toIntOrNull(req.body.priorityId);
+    if (priorityId) links.priority = { href: `/api/v3/priorities/${priorityId}` };
+    const statusId = toIntOrNull(req.body.statusId);
+    if (statusId) links.status = { href: `/api/v3/statuses/${statusId}` };
+    // assignee / responsible: id or explicit null to clear. ("" / undefined = leave unchanged)
+    if (req.body.assigneeId !== undefined)
+      links.assignee = toIntOrNull(req.body.assigneeId) ? { href: `/api/v3/users/${toIntOrNull(req.body.assigneeId)}` } : { href: null };
+    if (req.body.responsibleId !== undefined)
+      links.responsible = toIntOrNull(req.body.responsibleId) ? { href: `/api/v3/users/${toIntOrNull(req.body.responsibleId)}` } : { href: null };
+    if (Object.keys(links).length) body._links = links;
+    if (Object.keys(body).length < 2)
+      return res.status(400).json({ ok: false, error: "nothing to update" });
+    const updated = await openProjectRequest(`/api/v3/work_packages/${id}`, {
+      method: "PATCH",
+      body,
+    });
+    res.json({ ok: true, workPackage: normalizeWorkPackage(updated) });
+  } catch (e) {
+    const conflict = /\b(409|422)\b/.test(e.message);
+    res.status(conflict ? 409 : 500).json({
+      ok: false,
+      error: conflict
+        ? "work package changed in OpenProject — refetch and retry: " + e.message
+        : e.message,
+    });
+  }
+});
+
+// Available assignees for the project (users assignable to work packages).
+// The flat /users endpoint is unauthorized for this token; available_assignees usually is not.
+app.get("/api/dashboard/openproject/available-assignees", async (req, res) => {
+  try {
+    const projectId = toIntOrNull(req.query.projectId) || 7;
+    const data = await openProjectRequest(
+      `/api/v3/projects/${projectId}/available_assignees?pageSize=200`,
+    );
+    const els = Array.isArray(data._embedded?.elements) ? data._embedded.elements : [];
+    res.json({ ok: true, assignees: els.map((u) => ({ id: u.id, name: u.name || "", email: u.email || "" })) });
+  } catch (e) {
+    res.json({ ok: false, error: e.message, assignees: [] });
   }
 });
 

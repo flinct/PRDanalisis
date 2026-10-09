@@ -1,0 +1,1051 @@
+total cases =			55							
+DEV				STAGGING			PROD			
+Passed			0	Passed		0	Passed	0		
+Failed			0	Failed		0	Failed	0		
+On test			0	On test		0	On test	0		
+No Status			55	No Status		55	No Status	55		
+Test ID	SIX-GRP-A01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			load group room - text inbound realtime		Pre-Condition	akun WA connected & member group; group tidak ephemeral	DATE	2026-10-05		
+Url					Description	terima text dari member lain ke group	ENV	DEV	STAGGING	PROD
+Steps		1	akun WA sudah connected		test type	POSITIVE				
+		2	buka inbox SatuInbox							
+		3	member lain kirim text ke group		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				conversation group muncul realtime di inbox				
+		5				nama conversation = subject group				
+		6				isi message = text terkirim, sender ter-resolve				
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group image/video/document inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima media group	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim image dengan caption		test type	POSITIVE				
+		2	member kirim video							
+		3	member kirim document		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				image tampil + caption terbaca				
+		5				video tampil + attachment ter-download				
+		6				document tampil + attachment ter-download				
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group voice note inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima audio group	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim voice note ke group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message tipe audio muncul dengan attachment				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group sticker inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima sticker group	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim sticker ke group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message sticker muncul				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group location inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima location group	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim location ke group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message location muncul				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A06							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group contact vcard inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima contact group	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim 1 kontak		test type	POSITIVE				
+		2	member kirim multi-kontak							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				contactMessage muncul				
+		5				contactsArrayMessage muncul				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A07							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group poll inbound		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima poll group	ENV	DEV	STAGGING	PROD
+Steps		1	member buat poll di group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				pollCreationMessage muncul sebagai message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A08							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group DISAPPEARING (ephemeral) message - BUG UTAMA		Pre-Condition	akun member group; disappearing messages ON	DATE	2026-10-05		
+Url					Description	terima text pada group ephemeral	ENV	DEV	STAGGING	PROD
+Steps		1	aktifkan disappearing messages di group		test type	NEGATIVE				
+		2	member kirim text ke group							
+		3	amati inbox SatuInbox		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] message di-drop, conversation TIDAK muncul (bug wrapper tidak di-unwrap)				
+		5				[TARGET] message muncul normal setelah fix normalizeMessageContent				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A09							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group view-once V2 message		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima view-once V2	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim view-once image (format V2)		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] viewOnceMessageV2 ter-drop				
+		5				[TARGET] muncul sebagai view-once				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A10							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group reply / quoted message		Pre-Condition	ada message sebelumnya di group	DATE	2026-10-05		
+Url					Description	terima reply group	ENV	DEV	STAGGING	PROD
+Steps		1	member reply salah satu message di group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message baru tampil dengan referensi quoted yang benar				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A11							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group edited message		Pre-Condition	ada message terkirim di group	DATE	2026-10-05		
+Url					Description	terima edit message group	ENV	DEV	STAGGING	PROD
+Steps		1	pengirim edit message yang sudah terkirim		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				konten message di SatuInbox ter-update, bukan message baru				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A12							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group deleted (revoke) message		Pre-Condition	ada message terkirim di group	DATE	2026-10-05		
+Url					Description	terima revoke group	ENV	DEV	STAGGING	PROD
+Steps		1	pengirim hapus-untuk-semua		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message ditandai deleted / hilang sesuai perilaku delete				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A13							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group message fromMe via LID		Pre-Condition	akun kirim dari device lain ke group	DATE	2026-10-05		
+Url					Description	validasi fromMe group	ENV	DEV	STAGGING	PROD
+Steps		1	kirim pesan sendiri ke group dari HP		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message tercatat fromMe=true, tidak dianggap inbound customer				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A14							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group message pengirim LID belum resolve		Pre-Condition	pengirim pakai LID, mapping belum ada	DATE	2026-10-05		
+Url					Description	validasi LID resolution	ENV	DEV	STAGGING	PROD
+Steps		1	pengirim ber-LID kirim text ke group		test type	NEGATIVE				
+		2	cek apakah message masuk							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				jika participant tak ter-resolve message bisa drop				
+		5				verifikasi recovery setelah mapping tersedia				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A15							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group mention @all		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima mention all	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim pesan dengan @all		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				mentionAll flag true, message tetap masuk				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-A16							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group mention spesifik member		Pre-Condition	akun member group	DATE	2026-10-05		
+Url					Description	terima mention spesifik	ENV	DEV	STAGGING	PROD
+Steps		1	member kirim pesan mention 1 member		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				mentions berisi JID yang benar				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			nama group = subject		Pre-Condition	group punya subject	DATE	2026-10-05		
+Url					Description	validasi nama group	ENV	DEV	STAGGING	PROD
+Steps		1	terima message group pertama		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				contact group bernama subject group				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group tanpa subject - fallback name		Pre-Condition	group tanpa subject	DATE	2026-10-05		
+Url					Description	validasi fallback name	ENV	DEV	STAGGING	PROD
+Steps		1	terima message dari group tanpa subject		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				nama fallback 'Group <ownerPn>'				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group photo profile ter-ambil		Pre-Condition	group punya foto	DATE	2026-10-05		
+Url					Description	validasi avatar group	ENV	DEV	STAGGING	PROD
+Steps		1	terima message group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				avatar group tampil di inbox				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			participant list tersimpan		Pre-Condition	group dengan N member	DATE	2026-10-05		
+Url					Description	validasi saveParticipants	ENV	DEV	STAGGING	PROD
+Steps		1	terima message group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				semua participant tersimpan				
+		5				admin flag benar				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			akun sudah DI-KICK dari group		Pre-Condition	akun tidak lagi member; ada message historis	DATE	2026-10-05		
+Url					Description	validasi group metadata gagal	ENV	DEV	STAGGING	PROD
+Steps		1	akun dikeluarkan dari group		test type	NEGATIVE				
+		2	pairing / terima backfill group tsb							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				groupMetadata gagal -> buildGroupInboundPayload null -> group TIDAK muncul				
+		5				dokumentasikan sebagai expected-gap atau bug sesuai keputusan				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B06							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group metadata cache TTL 1 hari		Pre-Condition	terima >=2 message berturut dari group sama	DATE	2026-10-05		
+Url					Description	validasi cache metadata	ENV	DEV	STAGGING	PROD
+Steps		1	kirim 2 message berturut dari group sama		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message ke-2 pakai metadata cache, tidak hit WA lagi				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B07							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group metadata transient-fail lengket 24 jam		Pre-Condition	groupMetadata gagal transient saat first fetch	DATE	2026-10-05		
+Url					Description	validasi cache kegagalan	ENV	DEV	STAGGING	PROD
+Steps		1	trigger kegagalan groupMetadata transient		test type	NEGATIVE				
+		2	lalu kondisi normal kembali							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				kegagalan ter-cache -> group hilang s/d TTL habis (risiko)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-B08							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			sender participant jadi contact		Pre-Condition	member baru pertama kali kirim	DATE	2026-10-05		
+Url					Description	validasi sender contact	ENV	DEV	STAGGING	PROD
+Steps		1	member baru kirim message ke group		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				senderContactId ter-resolve jadi client contact terpisah dari group contact				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group pesan <30 hari muncul setelah pairing		Pre-Condition	group ada pesan dalam 30 hari terakhir	DATE	2026-10-05		
+Url					Description	validasi backfill group	ENV	DEV	STAGGING	PROD
+Steps		1	scan QR / pairing baru		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				setelah backfill drain group muncul di inbox (mungkin perlu refresh)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group pesan terakhir >30 hari - age cutoff		Pre-Condition	pesan terakhir group 31+ hari lalu	DATE	2026-10-05		
+Url					Description	validasi age cutoff 30d	ENV	DEV	STAGGING	PROD
+Steps		1	pairing baru dengan group pesan terakhir >30 hari		test type	NEGATIVE				
+		2	set WHATSAPP_HISTORY_SYNC_MAX_AGE_DAYS=0 lalu pairing ulang							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] group TIDAK muncul (age cutoff 30d)				
+		5				dengan MAX_AGE_DAYS=0 group harus muncul				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			age cutoff boundary tepat 30 hari		Pre-Condition	pesan tepat di batas 29/30/31 hari	DATE	2026-10-05		
+Url					Description	validasi boundary cutoff	ENV	DEV	STAGGING	PROD
+Steps		1	pairing dengan group pesan 29 hari		test type	NEGATIVE				
+		2	pairing dengan group pesan 31 hari							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				29d muncul, 31d tidak				
+		5				konfirmasi perilaku tepat di 30d				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			per-chat cap 50 message		Pre-Condition	group dengan >50 message historis	DATE	2026-10-05		
+Url					Description	validasi per-chat cap	ENV	DEV	STAGGING	PROD
+Steps		1	pairing dengan group >50 message historis		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				maks 50 message/chat ter-persist				
+		5				conversation tetap muncul				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			backfill group TIDAK realtime perlu refresh		Pre-Condition	group historis lolos filter	DATE	2026-10-05		
+Url					Description	validasi backfill no-socket	ENV	DEV	STAGGING	PROD
+Steps		1	pairing		test type	NEGATIVE				
+		2	amati inbox tanpa refresh							
+		3	refresh / ganti folder		Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] group baru nongol setelah refresh (backfill tidak emit socket)				
+		5				dokumentasikan sebagai UX gap				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C06							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			backfill queue dimatikan		Pre-Condition	WHATSAPP_HISTORY_SYNC_BACKFILL_QUEUE_ENABLED=false	DATE	2026-10-05		
+Url					Description	validasi flag drain off	ENV	DEV	STAGGING	PROD
+Steps		1	set flag backfill queue=false		test type	NEGATIVE				
+		2	pairing baru							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				group historis TIDAK terkirim ke conversation-service (expected saat flag off)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C07							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			isLatest menutup history sync		Pre-Condition	multi-batch history	DATE	2026-10-05		
+Url					Description	validasi history sync complete	ENV	DEV	STAGGING	PROD
+Steps		1	pairing dengan multi-batch history sync		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				setelah batch isLatest=true historySyncComplete=true, outbound tidak lagi diblok				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-C08							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			history ephemeral group		Pre-Condition	group historis ephemeral	DATE	2026-10-05		
+Url					Description	validasi ephemeral historis	ENV	DEV	STAGGING	PROD
+Steps		1	pairing dengan group historis ephemeral		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] pesan ephemeral historis ter-drop				
+		5				[TARGET] muncul setelah fix				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			tipe konten whitelisted lolos		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi whitelist MESSAGE_TYPES	ENV	DEV	STAGGING	PROD
+Steps		1	kirim tiap tipe di MESSAGE_TYPES (text, media, poll, event, buttons, list, interactive)		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				semua masuk sebagai message				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			ephemeralMessage wrapper - BUG UTAMA		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi unwrap ephemeral	ENV	DEV	STAGGING	PROD
+Steps		1	kirim text dalam group ephemeral		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] drop				
+		5				[TARGET] unwrap -> masuk				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			viewOnceMessageV2 / Extension wrapper		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi unwrap viewOnceV2	ENV	DEV	STAGGING	PROD
+Steps		1	kirim view-once V2		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] drop				
+		5				[TARGET] unwrap -> masuk				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			deviceSentMessage wrapper		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi unwrap deviceSent	ENV	DEV	STAGGING	PROD
+Steps		1	kirim dari device lain yang jadi deviceSent		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				[CURRENT] drop				
+		5				[TARGET] unwrap -> masuk				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			editedMessage wrapper jalur non-edit		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi unwrap edited	ENV	DEV	STAGGING	PROD
+Steps		1	kirim message yang terbungkus editedMessage		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				konsisten dengan A11 setelah unwrap				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D06							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group-system message (member add/subject/created)		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi system message bukan konten	ENV	DEV	STAGGING	PROD
+Steps		1	tambah member ke group		test type	NEGATIVE				
+		2	ganti subject group							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				tidak dianggap message konten -> tidak bikin conversation (expected)				
+		5				group dgn HANYA aktivitas sistem tidak muncul				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D07							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			regression - unwrap tidak merusak view-once lama		Pre-Condition	post-fix	DATE	2026-10-05		
+Url					Description	regression view-once V1	ENV	DEV	STAGGING	PROD
+Steps		1	post-fix: kirim view-once V1 (key.isViewOnce)		test type	REGRESSION				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				tetap jalan via extractViewOnceMessageData, tidak double-handle				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-D08							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			regression - unwrap tidak merusak documentWithCaption		Pre-Condition	post-fix	DATE	2026-10-05		
+Url					Description	regression documentWithCaption	ENV	DEV	STAGGING	PROD
+Steps		1	post-fix: kirim document with caption		test type	REGRESSION				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				caption & attachment tetap benar				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-E01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			conversation group dibuat sekali		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi idempoten create	ENV	DEV	STAGGING	PROD
+Steps		1	terima message group pertama		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				1 conversation baru dibuat				
+		5				counter inbound naik				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-E02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			dedup message-id		Pre-Condition	replay message-id sama	DATE	2026-10-05		
+Url					Description	validasi dedup	ENV	DEV	STAGGING	PROD
+Steps		1	kirim ulang message-id yang sama (replay)		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				message duplikat di-ack & di-skip, tidak dobel				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-E03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group TIDAK dapat auto-pull/SLA		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi group no SLA	ENV	DEV	STAGGING	PROD
+Steps		1	terima group message		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				auto-pull & SLA tidak berlaku untuk group (isGroup branch)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-E04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			backfill tidak emit socket, live emit		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi path live vs backfill	ENV	DEV	STAGGING	PROD
+Steps		1	bandingkan path live vs backfill		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				live emit socket				
+		5				backfill tidak emit socket (konsisten C05)				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-E05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			ticket sync untuk group		Pre-Condition	group conversation jadi ticket	DATE	2026-10-05		
+Url					Description	validasi ticket sync group	ENV	DEV	STAGGING	PROD
+Steps		1	jadikan group conversation sebagai ticket		test type	POSITIVE				
+		2	terima message baru							
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				inbound group message ikut ter-sync ke ticket room				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-F01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group tampil di list conversation		Pre-Condition	ada group conversation	DATE	2026-10-05		
+Url					Description	validasi FE list	ENV	DEV	STAGGING	PROD
+Steps		1	buka inbox		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				group tampil di daftar				
+		5				avatar group & badge group tampil				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-F02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			SLA & screenshot disembunyikan untuk group		Pre-Condition	group conversation dibuka	DATE	2026-10-05		
+Url					Description	validasi FE hide SLA	ENV	DEV	STAGGING	PROD
+Steps		1	buka detail group conversation		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				panel SLA & screenshot tidak muncul (kosmetik isGroup)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-F03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			bulk action dibatasi untuk group		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi FE bulk action group	ENV	DEV	STAGGING	PROD
+Steps		1	pilih group di list		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				opsi open/close bulk disesuaikan branch isGroup				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-F04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group tidak difilter keluar dari list		Pre-Condition	ada group + direct	DATE	2026-10-05		
+Url					Description	regression FE filter	ENV	DEV	STAGGING	PROD
+Steps		1	buka inbox default		test type	REGRESSION				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				group tetap muncul berdampingan dengan direct, tidak ada filter yang hide group				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G01							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			message tanpa remoteJid / id		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi field cacat	ENV	DEV	STAGGING	PROD
+Steps		1	inject message tanpa remoteJid/id		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				di-skip aman tanpa crash (validateMessageFields)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G02							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			socket belum siap saat message		Pre-Condition	sock/lidMappingStore null	DATE	2026-10-05		
+Url					Description	validasi socket not ready	ENV	DEV	STAGGING	PROD
+Steps		1	trigger message saat reconnect (sock null)		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				extractMessageData return null, tidak crash				
+		5				verifikasi re-delivery, message tidak hilang permanen				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G03							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			reconnect saat history sync		Pre-Condition	disconnect di tengah history	DATE	2026-10-05		
+Url					Description	validasi reconnect saat sync	ENV	DEV	STAGGING	PROD
+Steps		1	putus koneksi saat history sync berjalan		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				history sync resume / timeout auto-unblock, tidak stuck				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G04							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group JID tidak di-ignore		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi shouldIgnoreJid	ENV	DEV	STAGGING	PROD
+Steps		1	terima message dari JID @g.us		test type	POSITIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				shouldIgnoreJid false -> tidak di-skip (hanya broadcast/status/newsletter yang di-ignore)				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G05							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			unread message cap per group		Pre-Condition	-	DATE	2026-10-05		
+Url					Description	validasi unread cap 500	ENV	DEV	STAGGING	PROD
+Steps		1	banjiri group dengan >500 unread		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				list Redis di-trim ke 500 terakhir, TTL 1 hari				
+		5								
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										
+Test ID	SIX-GRP-G06							On test		
+Create at			2026-10-05		created by	Dany	Tester	Dany		
+Scenario			group besar ratusan participant		Pre-Condition	group ~500 member	DATE	2026-10-05		
+Url					Description	validasi group besar	ENV	DEV	STAGGING	PROD
+Steps		1	terima message dari group ~500 member		test type	NEGATIVE				
+		2								
+		3			Status Response	Expected Result	Actual Result	Status	Status	Status
+		4				saveParticipants selesai tanpa timeout				
+		5				message tetap masuk				
+		6								
+		7								
+		8								
+		9								
+										
+										
+										
+										
+										
+										

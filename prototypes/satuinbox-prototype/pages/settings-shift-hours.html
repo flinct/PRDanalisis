@@ -1,0 +1,119 @@
+<!-- Settings: Organisasi — Jadwal Kerja (Shift Hours) -->
+<style>
+.st-shift-form label{display:block;font-size:13px;font-weight:500;margin-bottom:12px}
+.st-shift-form label input,.st-shift-form label select{display:block;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:13px;background:var(--bg)}
+.st-shift-form label input:focus,.st-shift-form label select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav" id="stNav"></aside>
+  <div class="settings-body">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div><h2 style="margin-bottom:4px">Jadwal Kerja</h2><p style="font-size:13px;color:var(--muted)">Atur shift kerja agen.</p></div>
+      <button class="btn primary" onclick="openShiftModal()">+ Tambah Shift</button>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="data-table">
+        <thead><tr><th>Nama Shift</th><th>Jam Mulai</th><th>Jam Selesai</th><th>Hari</th><th>Aksi</th></tr></thead>
+        <tbody id="shiftBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Add/Edit shift modal -->
+    <div class="modal-overlay" id="modalShift">
+      <div class="modal">
+        <h3 id="shiftModalTitle">Tambah Shift</h3>
+        <div class="st-shift-form">
+          <label>Nama Shift<input type="text" id="sfName"></label>
+          <label>Jam Mulai<input type="time" id="sfStart"></label>
+          <label>Jam Selesai<input type="time" id="sfEnd"></label>
+          <label>Hari<select id="sfDays"><option>Senin-Jumat</option><option>Sabtu-Minggu</option><option>Senin-Minggu</option><option>Senin-Kamis</option><option>Jumat-Minggu</option></select></label>
+        </div>
+        <div class="modal-actions"><button class="btn" onclick="closeShiftModal()">Batal</button><button class="btn primary" onclick="saveShift()">Simpan</button></div>
+      </div>
+    </div>
+
+    <!-- Delete confirm -->
+    <div class="modal-overlay" id="modalShiftDel">
+      <div class="modal">
+        <h3>Hapus Shift</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px" id="shiftDelMsg"></p>
+        <div class="modal-actions"><button class="btn" onclick="document.getElementById('modalShiftDel').classList.remove('open')">Batal</button><button class="btn danger" onclick="confirmShiftDel()">Hapus</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.getElementById('stNav').innerHTML=renderSettingsNav('organization-shift-hours');
+
+  let editingShiftId=null;
+  let delShiftId=null;
+
+  function render(){
+    const tbody=document.getElementById('shiftBody');
+    if(!DB.settings.shiftHours.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Belum ada shift.</td></tr>';return}
+    tbody.innerHTML=DB.settings.shiftHours.map(s=>`<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.start}</td>
+      <td>${s.end}</td>
+      <td>${s.days}</td>
+      <td>
+        <button class="btn" style="font-size:11px;padding:3px 10px" onclick="openShiftModal('${s.id}')">✏</button>
+        <button class="btn danger" style="font-size:11px;padding:3px 10px" onclick="openShiftDel('${s.id}')">🗑</button>
+      </td>
+    </tr>`).join('');
+  }
+  render();
+
+  window.openShiftModal=function(id){
+    editingShiftId=id||null;
+    document.getElementById('shiftModalTitle').textContent=id?'Edit Shift':'Tambah Shift';
+    if(id){
+      const s=DB.settings.shiftHours.find(x=>x.id===id);
+      document.getElementById('sfName').value=s.name;
+      document.getElementById('sfStart').value=s.start;
+      document.getElementById('sfEnd').value=s.end;
+      document.getElementById('sfDays').value=s.days;
+    }else{
+      document.getElementById('sfName').value='';
+      document.getElementById('sfStart').value='08:00';
+      document.getElementById('sfEnd').value='16:00';
+      document.getElementById('sfDays').value='Senin-Jumat';
+    }
+    document.getElementById('modalShift').classList.add('open');
+  };
+
+  window.closeShiftModal=function(){document.getElementById('modalShift').classList.remove('open')};
+
+  window.saveShift=function(){
+    const name=document.getElementById('sfName').value.trim();
+    if(!name){showToast('Nama shift wajib diisi');return}
+    const data={name,start:document.getElementById('sfStart').value,end:document.getElementById('sfEnd').value,days:document.getElementById('sfDays').value};
+    if(editingShiftId){
+      const s=DB.settings.shiftHours.find(x=>x.id===editingShiftId);
+      Object.assign(s,data);
+    }else{
+      DB.settings.shiftHours.push({id:genId('sh'),...data});
+    }
+    saveStore();render();closeShiftModal();
+    showToast(editingShiftId?'Shift diperbarui':'Shift ditambahkan');
+  };
+
+  window.openShiftDel=function(id){
+    delShiftId=id;
+    const s=DB.settings.shiftHours.find(x=>x.id===id);
+    document.getElementById('shiftDelMsg').textContent=`Yakin ingin menghapus shift "${s.name}"?`;
+    document.getElementById('modalShiftDel').classList.add('open');
+  };
+
+  window.confirmShiftDel=function(){
+    DB.settings.shiftHours=DB.settings.shiftHours.filter(x=>x.id!==delShiftId);
+    saveStore();render();
+    document.getElementById('modalShiftDel').classList.remove('open');
+    showToast('Shift dihapus');
+  };
+})();
+</script>

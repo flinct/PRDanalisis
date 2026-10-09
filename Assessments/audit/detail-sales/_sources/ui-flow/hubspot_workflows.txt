@@ -1,0 +1,292 @@
+URL: https://knowledge.hubspot.com/workflows/create-workflows
+FETCHED_AS: https://knowledge.hubspot.com/workflows/create-workflows
+
+Create workflows 
+
+Skip to content 
+
+Home 
+Knowledge Base Menu 
+
+Help Center 
+
+Documentation 
+
+Knowledge Base Setup, how-to, and troubleshooting guides 
+
+Developer Documentation Reference for API & CMS development 
+
+Training 
+
+Academy Content Library A complete library of Academy’s free online video lessons and certification courses. 
+
+Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy. 
+
+Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience. 
+
+Community 
+
+CRM & Sales Hub Ask and answer questions about using HubSpot’s CRM and Sales Hub. 
+
+Marketing Hub Discuss and learn HubSpot’s marketing tools and inbound strategy. 
+
+Service Hub Learn about Service Hub and share your expertise. 
+
+Meet the Experts Learn how to get the most out of HubSpot from those who know it best. 
+
+Submit Ideas Search, vote for, and submit ideas to improve the HubSpot platform. 
+
+HubSpot Developers Ask questions and connect with users building on HubSpot. 
+
+HubSpot User Groups Meet regularly with your local community of HubSpot users. 
+
+Blogs 
+
+HubSpot Blog Marketing, sales, agency, and customer success blog content. 
+
+Customer Blog Examples of how real customers use HubSpot for their business. 
+
+Product Updates Blog Updates on the latest releases from HubSpot’s Product team. 
+
+Knowledge Base 
+
+Automation 
+
+Workflows 
+
+Create workflows 
+
+Create workflows 
+
+Last updated: August 3, 2026 
+
+Available with any of the following subscriptions , except where noted: 
+
+Marketing Hub Professional, Enterprise 
+
+Sales Hub Professional, Enterprise 
+
+Service Hub Professional, Enterprise 
+
+Data Hub Professional, Enterprise 
+
+Smart CRM Professional, Enterprise 
+
+Revenue Hub Professional, Enterprise 
+
+HubSpot Credits required for certain features 
+
+Seats required for certain features 
+
+Create workflows in HubSpot to automate your processes. First, you can choose to create your workflow using AI, templates, or from scratch. In the workflow editor, add enrollment triggers and configure re-enrollment and unenrollment settings. Then, add actions to your workflow. 
+
+When building larger workflows, use the minimap for a quick view of your workflow architecture. Finally, configure your workflow settings, then turn on and publish your workflow. When building a workflow, you can also learn how to quickly undo and redo action. Follow this step-by-step to learn how to build workflows. 
+
+For example, you can enroll all contacts that have submitted a specific form, then send a marketing email and assign these contacts to a user. You can also take action on associated records, such as updating an enrolled contact’s associated company. It is recommended to use the community workflow library for ideas when setting up your workflow. 
+
+Permissions required To create workflows, users must have Edit permissions for workflows or Super Admin permissions . To publish workflows, users must have Publish permissions for workflows. 
+
+Step 1: Choose how to create your workflow 
+
+Create workflows from scratch, create a workflow using AI, or use workflow templates to guide you along. 
+
+The number of workflows you can create depends on your account's subscriptions. 
+
+You can create most workflow object types with the subscriptions listed above, but certain workflows, such as quote or contract based workflows require specific subscription types. Learn more about the different workflow object types available in HubSpot. 
+
+How to create a workflow from scratch 
+
+When creating a workflow from scratch, you can select the enrollment triggers you want to use, then select the corresponding object type. You can select from manual enrollment, triggering your workflow based on a set frequency, or selecting from specific enrollment triggers. 
+
+To create a workflow from scratch: 
+
+In your HubSpot account, click More , then navigate to Automation > Workflows . If More doesn't appear in your account, navigate to Automation > Workflows directly. 
+
+In the upper right, click Create workflow and select From scratch . 
+
+In the workflow editor, continue setting up your enrollment triggers and object type. Learn more about creating workflows from scratch . 
+
+How to create a workflow with AI 
+
+Generate a workflow using Breeze Assistant , including enrollment triggers and actions. 
+
+In your HubSpot account, click More , then navigate to Automation > Workflows . If More doesn't appear in your account, navigate to Automation > Workflows directly. 
+
+In the upper right, click Create workflow and select With AI . 
+
+In the Breeze Assistant panel, enter your workflow prompt . It is recommended to use the When [this happens], then [do this] structure when entering your prompt 
+
+After creating your workflow with Breeze Assistant, click the workflow name to navigate to the editor and continue setting up your workflow. 
+
+How to create a new workflow using templates 
+
+Use a workflow template aligned with your goals to streamline your automation processes. You can access the workflow template library from the workflows tool or use workflow templates from the HubSpot Marketplace . 
+
+In your HubSpot account, click More , then navigate to Automation > Workflows . If More doesn't appear in your account, navigate to Automation > Workflows directly. 
+
+In the upper right, click Create workflow and select From template . 
+
+To review only templates compatible with your HubSpot plan, click to toggle the Compatible with my plan only switch on. 
+
+To search for a specific template, use the search bar at the top of the page. You can search by name, description, or template objective. 
+
+To filter your templates, in the top right, click Filters . Then, select from the following: 
+Hub plan: filter by the HubSpot subscription required to use the workflow template. 
+
+Objective: filter by the objective of the workflow template. 
+
+To sort your templates, click the Sort by dropdown and select Relevance , Alphabetical , Newest , or Most popular . 
+
+To use a template, click the template name . 
+
+On the workflow template listing, review the following information: 
+Overview: summary of what the workflow template does, including enrollment triggers and actions, as well as any prerequisites for the template. 
+
+Details: details about the workflow template including the template's author, the count of installs, and objective of the template. 
+
+Legal : any legal details for the template. 
+
+To use a template, click Use template . You'll automatically be redirected to the workflow editor with the templated triggers and actions applied. 
+
+Step 2: Set up enrollment triggers 
+
+Enrollment triggers are a set of criteria that automatically enroll records in a workflow. You can set enrollment triggers manually, or generate triggers using AI . 
+
+If you don’t want to automatically enroll records into a workflow, you can choose to enroll records manually instead. 
+When setting up enrollment triggers, you can use the following enrollment trigger types: 
+
+Filter-based 
+
+Event-based 
+
+Based on a schedule 
+
+Based on webhooks 
+To set up your enrollment triggers: 
+
+In the workflow editor, click the Trigger enrollment for [object] box . 
+
+In the left panel, set up your enrollment triggers . 
+
+Step 3: Set workflow re-enrollment and unenrollment settings 
+By default, records will only enroll in a workflow the first time they meet the enrollment triggers. To enable re-enrollment: 
+In the left panel, click the Settings tab. 
+
+Click to toggle the Re-enroll switch on. Then, select the triggers that you want to use for re-enrollment. Learn more about adding re-enrollment triggers to workflows . 
+
+Click to toggle your unenrollment criteria . Learn more about managing unenrollment . 
+
+Please note: 
+
+Records that are currently enrolled in a workflow cannot be re-enrolled into that same workflow until they complete the workflow . Re-enrollment settings will only apply after the record has completed the workflow and is enrolled again based on re-enrollment triggers or manual enrollment. 
+
+Turning on re-enrollment does not automatically enroll records into the workflow multiple times. A record can only re-enroll if it has completed the workflow, and is enrolled again. Either by meeting the re-enrollment triggers or through manual enrollment. 
+
+Step 4: Add actions in workflows 
+
+You can use AI to generate actions for a workflow or manually select and add actions. For example, you can use a workflow to send a marketing email or assign your records. Learn more about the different workflow actions available in HubSpot. 
+
+After adding an action, you can clone or move it to streamline the workflow building process. If you'd like to leave a note on a workflow action for reference, learn how to add comments to workflow actions . 
+
+Please note: the actions available to you depend on your subscription. locked Locked actions require an account upgrade to use. 
+
+To add actions to a workflow: 
+
+In the workflow editor, click the + plus icon . 
+
+In the left panel, select an action . 
+For certain actions, such as the Create task action, you can also use the data panel to insert data variables from different object sources. Learn more about adding data variables to workflow actions. 
+
+You can also reference records previously created in your workflow, within the same workflow. For example, after creating an associated deal record, you can immediately send an internal notification with those record details. Learn how to use records created earlier in the same workflow . 
+
+After setting up the details of the action, click Save . 
+Or, if you're adding the action as a placeholder, click Save without filling out the action details. 
+
+Placeholder actions must be filled out before you can turn on the workflow. Learn more about placeholder actions . 
+
+Step 5: Navigate your workflow with a minimap 
+When building larger workflows, you can use the workflow minimap for a quicker view of your workflow architecture and faster navigation. To use the workflow minimap: 
+
+In the upper left of the workflow editor, click Show minimap panel . 
+
+With the minimap open, you can hover over workflow actions to view the action name, and click an area of the minimap to navigate there. 
+
+If your workflow requires any changes before it can be published, the action will be highlighted in yellow. Click the link in the alert and review the changes that need to be made. 
+
+Step 6: Manage your workflow's settings 
+
+To manage your workflow settings: 
+
+In the top left, click Settings to manage the workflow's execution, notification, and metric settings. Learn more about managing your workflow settings . 
+
+In the top left, click Edit > Edit enrollment trigger to manage the workflow's enrollment, unenrollment, and re-enrollment settings. 
+
+Step 7: Turn on and publish your workflow 
+
+To review and turn on your workflow: 
+
+In the upper right corner, click Review and publish . 
+
+In the right panel, review your workflow details: 
+See all contacts in lists: if you have a Marketing Hub Starter , Professional , or Enterprise account, in contact-based workflows you can view a static list of contacts that meet the enrollment criteria. The list will automatically be saved and can be accessed from your lists dashboard. 
+
+Do you want to enroll contacts that currently meet the enrollment criteria when the workflow turns on: Choose to enroll records that currently meet the enrollment triggers or only enroll records that meet the triggers in the future. 
+Yes, enroll existing [objects] which meet the trigger criteria as of now: enroll all existing records that meet the enrollment triggers. 
+
+No, only enroll [objects] which meet the trigger criteria after turning the workflow on: only enroll records that meet the enrollment triggers after the workflow is turned on. When this option is selected: 
+If the [object] changes to meet the enrollment triggers for the first time after the workflow is turned on, the [object] will be enrolled. 
+
+If the [object] changes to meet the enrollment criteria again and re-enrollment is turned on, the [object] will be enrolled. Learn more about re-enrollment triggers . 
+
+Please note: the number of existing contacts displayed on the review page is an estimate. To view an exact number of contacts, create a static list of contacts that meet the criteria by clicking See all contacts in lists . 
+
+At the bottom, click Next . You can review your workflow's Timing & Notifications , and Connections . Or, click Skip to turn on . 
+
+If you haven't entered a Name or Description for your workflow, it'll be automatically generated by AI. To update these details, click Edit under the respective sections. 
+
+At the bottom, click Turn on workflow . 
+
+Generally, only records that meet enrollment triggers after the workflow is turned on will enter the workflow. Unless, the option Yes, enroll existing [objects] which meet the trigger criteria as of now has been selected. 
+
+For scheduled workflows, if you choose not to enroll existing records at activation, those records are not enrolled immediately, but they can still be enrolled the next time the workflow runs on its schedule if they still meet the enrollment criteria. 
+
+After you turn your workflow on, you can review the workflow history to monitor the records that are enrolled. If you've saved any placeholder actions , they must be completed before you can turn on the workflow. 
+
+Necessary disclosure: 
+HubSpot will store workflow action logs data within the below time periods: 
+
+90 days: all workflow action log data will be stored, including high-level action log data such as object ID (which contact, company, deal, etc.), event type (enrollment, unenrollment, etc.), and action type. 
+
+6 months: workflow enrollment history will be stored. 
+
+2 years+: historical data of enrollments will be retained in our system to enable workflow-based filters. 
+
+How to undo or redo changes in workflows 
+
+When editing your workflow you can undo or redo changes made to the workflow in the previous 30 days. You cannot undo or redo certain changes such as, c ustom code actions. 
+
+To undo or redo an action: 
+
+To undo an action, click the undo undo icon in the top left. Changes will be undone one at a time. 
+
+To redo an action, click the redo redo icon in the top left. Changes will be redone one at a time. 
+
+Workflows 
+
+Was this article helpful? Yes No 
+Thanks for letting us know. How would you describe this article? 
+Inaccurate: it doesn’t reflect what I see in the product 
+Unclear: it’s difficult to understand 
+Missing information: it’s not comprehensive enough 
+Irrelevant: it doesn’t match what I searched for 
+Great! Is there anything we could change to make it even more helpful? Is there anything we could change to make this article helpful? 
+Allow HubSpot to contact me about my documentation feedback. 
+Email address 
+Only used if we need clarification on your feedback. 
+
+Thank you for your feedback, it means a lot to us. 
+This form is used for documentation feedback only. Learn how to get help with HubSpot . 
+
+Table of contents Menu 
+
+Related content

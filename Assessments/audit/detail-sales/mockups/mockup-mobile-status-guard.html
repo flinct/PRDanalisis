@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; width: 390px; min-height: 844px; }
+  
+  /* Bottom sheet pattern */
+  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 20; }
+  .sheet { position: fixed; bottom: 0; left: 0; width: 390px; max-height: 85vh; background: #1e293b; border-radius: 16px 16px 0 0; z-index: 30; overflow-y: auto; }
+  .sheet-handle { display: flex; justify-content: center; padding: 8px; }
+  .sheet-handle div { width: 36px; height: 4px; border-radius: 2px; background: #475569; }
+  
+  .sheet-header { padding: 0 16px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+  .sheet-header h2 { font-size: 16px; font-weight: 600; }
+  .sheet-header .close { font-size: 20px; color: #94a3b8; padding: 4px; }
+  .current-badge { font-size: 12px; padding: 3px 10px; border-radius: 6px; background: #1e3a5f; color: #60a5fa; }
+  
+  /* Option groups */
+  .group { padding: 12px 16px; }
+  .group-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .group-label .line { flex: 1; height: 1px; background: #334155; }
+  
+  .option { display: flex; align-items: center; justify-content: space-between; padding: 14px 12px; border-radius: 10px; margin-bottom: 6px; border: 1px solid #334155; }
+  .option:active { background: #334155; }
+  .option.forward { border-left: 4px solid #3b82f6; }
+  .option.terminal { border-left: 4px solid #ef4444; background: #1a000020; }
+  .option.locked { opacity: 0.35; border-left: 4px solid #475569; }
+  .opt-left { display: flex; align-items: center; gap: 10px; }
+  .opt-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .opt-name { font-size: 14px; font-weight: 500; }
+  .opt-right { display: flex; align-items: center; gap: 6px; }
+  .opt-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+  .badge-next { background: #1e3a5f; color: #60a5fa; }
+  .badge-terminal { background: #7f1d1d; color: #fca5a5; }
+  .badge-locked { background: #334155; color: #64748b; }
+  .opt-arrow { font-size: 16px; color: #475569; }
+  
+  /* Confirmation sheet */
+  .confirm-area { margin: 8px 16px 16px; background: #292524; border-radius: 10px; padding: 14px; border: 1px solid #44403c; }
+  .confirm-title { font-size: 14px; font-weight: 600; color: #fbbf24; margin-bottom: 10px; }
+  .confirm-label { font-size: 12px; color: #a8a29e; margin-bottom: 6px; }
+  .confirm-select { width: 100%; background: #1c1917; border: 1px solid #57534e; border-radius: 8px; padding: 12px; color: #e7e5e4; font-size: 14px; margin-bottom: 10px; }
+  .confirm-textarea { width: 100%; background: #1c1917; border: 1px solid #57534e; border-radius: 8px; padding: 12px; color: #e7e5e4; font-size: 14px; height: 60px; resize: none; }
+  
+  /* Full-width buttons for mobile */
+  .btn-row { display: flex; gap: 8px; padding: 0 16px 24px; }
+  .btn { flex: 1; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 600; text-align: center; border: none; }
+  .btn-cancel { background: #334155; color: #94a3b8; }
+  .btn-confirm { background: #dc2626; color: white; }
+  
+  /* Legend */
+  .legend { padding: 10px 16px; background: #0f172a; border-top: 1px solid #334155; display: flex; gap: 12px; justify-content: center; }
+  .legend span { font-size: 10px; color: #64748b; display: flex; align-items: center; gap: 4px; }
+  .legend i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  
+  .footer-note { padding: 12px 16px; font-size: 10px; color: #334155; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- Dimmed background -->
+<div class="backdrop"></div>
+
+<!-- Bottom sheet -->
+<div class="sheet">
+  <div class="sheet-handle"><div></div></div>
+  
+  <div class="sheet-header">
+    <h2>Ubah Status</h2>
+    <span class="current-badge">🟢 Qualified</span>
+    <span class="close">✕</span>
+  </div>
+  
+  <!-- Forward -->
+  <div class="group">
+    <div class="group-label">Maju <span class="line"></span></div>
+    <div class="option forward">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#fbbf24;"></div>
+        <span class="opt-name">Proposal</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-next">Next</span>
+        <span class="opt-arrow">›</span>
+      </div>
+    </div>
+    <div class="option forward">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#f97316;"></div>
+        <span class="opt-name">Negotiation</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-next">Skip OK</span>
+        <span class="opt-arrow">›</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Terminal -->
+  <div class="group" style="padding-top:0;">
+    <div class="group-label">Terminal <span class="line"></span> ⚠️ Alasan wajib</div>
+    <div class="option terminal">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#22c55e;"></div>
+        <span class="opt-name">Won</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-terminal">🔒 Terminal</span>
+      </div>
+    </div>
+    <div class="option terminal">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#ef4444;"></div>
+        <span class="opt-name">Lost</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-terminal">🔒 Terminal</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Backward (locked) -->
+  <div class="group" style="padding-top:0;">
+    <div class="group-label">Mundur <span class="line"></span> 🔒 Butuh approval</div>
+    <div class="option locked">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#a78bfa;"></div>
+        <span class="opt-name">Contacted</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-locked">Supervisor</span>
+      </div>
+    </div>
+    <div class="option locked">
+      <div class="opt-left">
+        <div class="opt-dot" style="background:#60a5fa;"></div>
+        <span class="opt-name">New</span>
+      </div>
+      <div class="opt-right">
+        <span class="opt-badge badge-locked">Supervisor</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation -->
+  <div class="confirm-area">
+    <div class="confirm-title">⚠️ Konfirmasi: Lost</div>
+    <div class="confirm-label">Alasan (wajib):</div>
+    <select class="confirm-select">
+      <option>Pilih alasan...</option>
+      <option>Budget tidak tersedia</option>
+      <option>Memilih kompetitor</option>
+      <option>Tidak ada kebutuhan</option>
+      <option>Tidak ada respon</option>
+    </select>
+    <textarea class="confirm-textarea" placeholder="Catatan tambahan..."></textarea>
+  </div>
+  
+  <div class="btn-row">
+    <button class="btn btn-cancel">Batal</button>
+    <button class="btn btn-confirm">Konfirmasi Lost</button>
+  </div>
+  
+  <div class="legend">
+    <span><i style="background:#3b82f6;"></i> Forward</span>
+    <span><i style="background:#ef4444;"></i> Terminal</span>
+    <span><i style="background:#475569;"></i> Locked</span>
+  </div>
+  
+  <div class="footer-note">Mobile: bottom sheet pattern, full-width tombol, thumb-friendly spacing</div>
+</div>
+
+</body>
+</html>

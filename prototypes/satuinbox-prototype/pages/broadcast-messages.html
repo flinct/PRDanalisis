@@ -1,0 +1,108 @@
+<!-- Broadcast Pesan — table of broadcasts -->
+<div class="broadcast-layout">
+  <aside class="broadcast-sidenav">
+    <div class="sn-title">Broadcast Massal</div>
+    <div class="sn-item active" onclick="go('broadcast/messages')">📢 Pesan</div>
+    <div class="sn-item" onclick="go('broadcast/draft')">📝 Draft</div>
+    <div class="sn-item" onclick="go('broadcast/templates')">📋 Template</div>
+  </aside>
+  <div class="broadcast-body">
+    <div class="page-header">
+      <h1>Broadcast</h1>
+      <button class="btn primary" onclick="openBcModal()">+ Buat Broadcast</button>
+    </div>
+    <div class="page-filters" id="bcFilters"></div>
+    <div class="page-body">
+      <table class="data-table" id="bcTable">
+        <thead><tr><th>Nama</th><th>Template</th><th>Penerima</th><th>Status</th><th>Tanggal</th><th></th></tr></thead>
+        <tbody id="bcBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="bcModal">
+  <div class="modal">
+    <h3 id="bcModalTitle">Buat Broadcast</h3>
+    <label>Nama Broadcast<input type="text" id="bcName" placeholder="Contoh: Promo Akhir Tahun"></label>
+    <label>Template<select id="bcTpl"></select></label>
+    <label>Jumlah Penerima<input type="number" id="bcRecipients" min="1" value="100"></label>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeBcModal()">Batal</button>
+      <button class="btn primary" onclick="saveBc()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let bcFilter='all', bcEditId=null;
+
+function renderBcFilters(){
+  const el=document.getElementById('bcFilters');
+  const counts={all:DB.broadcasts.length,sent:0,scheduled:0,failed:0};
+  DB.broadcasts.forEach(b=>{if(counts[b.status]!==undefined)counts[b.status]++});
+  el.innerHTML=['all','sent','scheduled','failed'].map(s=>{
+    const label=s==='all'?'Semua':s.charAt(0).toUpperCase()+s.slice(1);
+    return `<span class="filter-chip ${bcFilter===s?'active':''}" onclick="setBcFilter('${s}')">${label} (${counts[s]})</span>`;
+  }).join('');
+}
+
+function setBcFilter(f){bcFilter=f;renderBcFilters();renderBcTable()}
+
+function renderBcTable(){
+  const rows=DB.broadcasts.filter(b=>bcFilter==='all'||b.status===bcFilter);
+  document.getElementById('bcBody').innerHTML=rows.map(b=>{
+    const tpl=DB.templates.find(t=>t.id===b.templateId);
+    const statusCls=b.status==='sent'?'resolved':b.status==='scheduled'?'pending':'open';
+    const date=b.sentAt?fmtDate(b.sentAt):b.scheduledAt?fmtDate(b.scheduledAt):'-';
+    return `<tr>
+      <td><b>${b.name}</b></td>
+      <td>${tpl?tpl.name:'-'}</td>
+      <td>${b.recipients.toLocaleString('id-ID')}</td>
+      <td><span class="status ${statusCls}">${b.status}</span></td>
+      <td>${date}</td>
+      <td><button class="btn" onclick="editBc('${b.id}')" style="font-size:11px">✏️</button> <button class="btn danger" onclick="delBc('${b.id}')" style="font-size:11px">🗑</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Belum ada broadcast</td></tr>';
+}
+
+function openBcModal(id){
+  bcEditId=id||null;
+  const m=document.getElementById('bcModal');
+  document.getElementById('bcModalTitle').textContent=id?'Edit Broadcast':'Buat Broadcast';
+  const sel=document.getElementById('bcTpl');
+  sel.innerHTML=DB.templates.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  if(id){
+    const b=dbFind('broadcasts',id);
+    document.getElementById('bcName').value=b.name;
+    sel.value=b.templateId;
+    document.getElementById('bcRecipients').value=b.recipients;
+  }else{
+    document.getElementById('bcName').value='';
+    document.getElementById('bcRecipients').value=100;
+  }
+  m.classList.add('open');
+}
+function closeBcModal(){document.getElementById('bcModal').classList.remove('open')}
+
+function saveBc(){
+  const name=document.getElementById('bcName').value.trim();
+  if(!name)return showToast('Nama wajib diisi');
+  const tplId=document.getElementById('bcTpl').value;
+  const rec=parseInt(document.getElementById('bcRecipients').value)||0;
+  if(bcEditId){
+    dbUpdate('broadcasts',bcEditId,{name,templateId:tplId,recipients:rec});
+    showToast('Broadcast diperbarui');
+  }else{
+    dbAdd('broadcasts',{id:genId('bc'),name,templateId:tplId,recipients:rec,status:'scheduled',scheduledAt:new Date().toISOString()});
+    showToast('Broadcast dibuat');
+  }
+  closeBcModal();renderBcTable();renderBcFilters();
+}
+
+function editBc(id){openBcModal(id)}
+function delBc(id){dbRemove('broadcasts',id);renderBcTable();renderBcFilters();showToast('Broadcast dihapus')}
+
+renderBcFilters();renderBcTable();
+</script>

@@ -19,7 +19,7 @@ Audit sistem SatuInbox memakai memory FE/BE sebagai patokan utama dengan branch 
 
 | Metrik | Jumlah |
 |--------|--------|
-| **Register kanonik** | **101 finding** — single source of truth; corpus bruto masih overlap dan dibaca via reading-list |
+| **Register kanonik** | **144 finding** (v2.2; Track K auth/register/onboard/subscription BE code-verified +AUTH-12) — single source of truth; corpus bruto masih overlap dan dibaca via reading-list |
 | **Blocker (Catastrophe)** | **2** — SLA 3-way conflict + reopen behavior undefined |
 | **Critical infra (harus fix minggu ini)** | **10** — committed secrets, zero alerting, SPOF gateway, CORS wildcard |
 | **Major / blocking teknis tambahan** | **22+** — termasuk CSN-01 sidebar RBAC, CLH-02/03 conversation-list, broadcast idempotency, PII leakage, error mapper, no load test |
@@ -56,6 +56,12 @@ Audit sistem SatuInbox memakai memory FE/BE sebagai patokan utama dengan branch 
 **Dampak:** Setiap perubahan FE = risiko regression yang tidak terdeteksi.  
 **Fix:** Tambah Vitest + critical-path tests. **1-2 hari.**
 
+### 🟡 6. Auth/Register/Onboarding/Subscription = Shadow Domain (Track K)
+**Apa:** 4 domain (login, signup, onboarding+approval, billing/wallet) **live di produksi tanpa 1 pun PRD, memory canonical, atau test**. **3 bug P0** (FE+BE code-verified): (1) onboarding status `REJECTED`/`APPROVED` → **halaman kosong** (user ter-stuck); (2) secret NextAuth pakai `NEXT_PUBLIC_SECRET` (**ter-expose ke browser**, FE-only — BE JWT aman); (3) **topup webhook TIDAK idempotent** → **double-credit saldo** saat gateway re-deliver "Paid" (money path, `AUTH-12`).  
+**Dampak:** Behavior tak terdokumentasi = tiap perubahan berisiko; user rejected dead-end; secret bocor ke bundle client; **saldo wallet bisa ter-kredit ganda** (integritas uang).  
+**Keputusan produk:** SatuInbox satu-satunya platform (vs Intercom/Zendesk/Freshchat/Qiscus/Crisp) dengan **manual approval + KYC upfront + tanpa trial** — semua kompetitor self-serve instan. Pertahankan model B2B-managed atau tambah jalur self-serve/trial?  
+**Fix:** 3 P0 = diff kecil (REJECTED/APPROVED UI branch, server-only secret, topup idempotency guard). Lalu PRD-isasi 4 domain. Detail: `detail-auth/`.
+
 ---
 
 ## 4. Apa yang Sudah Bagus (Jangan Disentuh)
@@ -63,7 +69,7 @@ Audit sistem SatuInbox memakai memory FE/BE sebagai patokan utama dengan branch 
 | Kontrol | Status |
 |---------|--------|
 | RBAC area context (Sales/Op/Admin) enforced di BE gateway | ✅ Verified |
-| Webhook signature HMAC enforced (Messenger, IG, WA) | ✅ Verified |
+| Webhook signature HMAC enforced (Messenger, IG, WA) | ✅ Verified (⚠️ **payment** webhook beda: static shared-secret, lihat AUTH-10) |
 | Broadcast DLQ + retry mechanism ada | ✅ Verified |
 | PII masking di export, contact list, broadcast | ✅ Verified |
 | Message edit/delete RBAC enforced server-side | ✅ Verified |

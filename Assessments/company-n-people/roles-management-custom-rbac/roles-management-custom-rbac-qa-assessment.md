@@ -4,18 +4,27 @@
 > **Owner:** Analyst  
 > **Source PRD / Source Input:** `PRD/Company n people/PRD Setting - Role management.md`  
 > **Assessment Artifact Path:** `Assessments/company-n-people/roles-management-custom-rbac/roles-management-custom-rbac-qa-assessment.md`  
-> **Version:** `v1.2`  
-> **Previous Version:** `Assessments/company-n-people/roles-management-custom-rbac/versions/roles-management-custom-rbac-qa-assessment-v1.1.md`  
-> **Rules Applied:** `Rules/qa-analysis-rule.md`, `Rules/impact-analysis-rule.md`, `Rules/workflow-rule.md`  
-> **Reference Context:** `Memory/global-memory.md`, `Assessments/reference/contact-context-visibility.md`, `Memory/CLAUDE-be.md`, `Memory/CLAUDE-fe.md`  
-> **Tanggal Analisa:** 2026-06-22  
+> **Version:** `v1.3`  
+> **Previous Version:** `Assessments/company-n-people/roles-management-custom-rbac/versions/roles-management-custom-rbac-qa-assessment-v1.2.md`  
+> **Rules Applied:** `Rules/core/analysis-and-risk.md`, `Rules/core/task-router.md`  
+> **Reference Context:** `Memory/global-memory.md`, `Assessments/reference/contact-context-visibility.md`, `Memory/Codex-be.md`, `Memory/Codex-fe.md`  
+> **Code Evidence:** FE `omnichannel-satuinbox-fe` branch `data-cy` commit `7632dd92`  
+> **Tanggal Analisa:** 2026-10-02  
 > **Status:** Draft
 
 ---
 
 ## 0. Ringkasan Perubahan Analisa
 
-- Revisi dari v1.1 dengan tambahan **owner-ceiling-aware role authoring** yang berasal dari governance superAdmin.
+### v1.3 (2026-10-02) — Implementation Reality Check
+- Tambahan **§3A Implementation Reality Check (code-verified)**: bandingkan PRD vs implementasi FE aktual vs prototype pen.dev (FE `data-cy`/`7632dd92`).
+- **Temuan inti:** FE RBAC saat ini **viewer-only** — hanya *list role (read-only)* + *privacy policy toggle* (`PUT /privacy/policy`). **Editor penuh PRD (grouped accordion, visibility radio, action checkbox, dependency validation, duplicate, owner ceiling, audit diff) BELUM ada** (±80% FR editor belum tereksekusi; tak ada `api.post/put/delete('/role')`).
+- Tambahan **§4A Prototype pen.dev vs PRD**: prototype pakai *matrix role×action + badge pricing-tier*; PRD pakai *grouped accordion per-role + visibility scope + owner ceiling* dan **tidak mengenal tier gating**. Prototype perlu rework.
+- Risk baru **R-12/R-13**; Open Question baru **OQ-11/12/13**; Rules/Memory reference diperbarui ke struktur modular.
+- Keputusan tetap: **REVISE_PRD / NO_GO (build penuh)**.
+- Isi lengkap v1.2 tetap di `versions/roles-management-custom-rbac-qa-assessment-v1.2.md`.
+
+### v1.2 (2026-06-22)
 - Menambahkan constraint bahwa tenant-side role editor hanya boleh menampilkan permission milik owner company dan save di atas owner ceiling wajib diblok.
 - Menandai bahwa perubahan role management sekarang bergantung pada **company permission governance** lintas PRD, bukan hanya role CRUD lokal.
 - Keputusan tetap: **REVISE_PRD**.
@@ -139,6 +148,61 @@ Current product sudah punya role-sensitive behavior di Conversation, Ticket, Con
 
 ---
 
+## 3A. Implementation Reality Check (code-verified) — BARU v1.3
+
+> Diverifikasi langsung dari kode FE (`omnichannel-satuinbox-fe` @ `data-cy` / `7632dd92`), bukan kutipan asumsi. BE tidak diinspeksi pada revisi ini (lihat OQ-11).
+
+### 3A.1 Sudah diimplementasi (FE)
+
+| Kapabilitas | Bukti kode | Catatan |
+|---|---|---|
+| List roles (read) | `settings/organization/roles/page.tsx`, `ManageRolePage.tsx`, `hooks/role/use-manage-role-api.ts` → `api.get('/role',{params:{limit,page}})` | Paginated, LIMIT=10. **Read-only.** |
+| Role card tampil | `components/.../role/RoleCard.tsx`, `SkeletonRoleList.tsx` | Tak ada tombol edit/delete/duplicate. |
+| Permission model (enum) | `types/rbac.ts` — `PermissionActionEnum` (±60 action: `*`,`read_own/team`,`close_own/team/all`,`reopen_*`,`view_full_email/phone`,`manage_*`,`pull`,`csat`,`approve/reject/check_in`), `ResourceTypeEnum` (±25) | Sumber truth action/resource lengkap — editor tinggal konsumsi. |
+| Role type | `types/setting/role/index.ts` → `RoleResponse{id,name,code,permission,description}`; `contactScope{areaScope,visibilityScope}` | Scope contact termodel; scope inbox/ticket/analytics belum di tipe. |
+| Privacy policy editor | `.../roles/privacy-settings/page.tsx`, `PrivacySettingsTable.tsx`, `hooks/privacy/use-manage-privacy-api.ts` → `api.put('/privacy/policy')` | Full/Masked per role. **Satu-satunya mutation editor yang ADA.** Memenuhi FR-035–038 sebagian. |
+| Masking runtime | `hooks/usePrivacyMasking.ts`, `hooks/useAnalyticsAccessMode.ts` | Masking phone/email aktif di consumption. |
+| Guard / conditional | `RolesGuard.tsx`, `hooks/useRolePermission.ts`, FE `proxy.ts` | Enforcement FE-side (bukan source of truth). |
+| Ganti role member | `member/ModalChangeRole.tsx`, `InputSelectRole.tsx`, `services/member/action-change-role.service.ts` | Assign role ke member sudah ada. |
+
+### 3A.2 Belum diimplementasi (FE) — gap vs PRD
+
+| PRD Req | Kapabilitas dituntut | Status FE | Bukti ketiadaan |
+|---|---|---|---|
+| FR-003/004, US-002 | Create / edit custom role | **BELUM** | Tak ada route create/edit; tak ada `api.post/put('/role')`. |
+| FR-007/008, US-011 | Delete custom role | **BELUM** | Tak ada `api.delete('/role')`. |
+| US-010, EC-004 | Duplicate role | **BELUM** | 0 referensi duplicate di komponen role. |
+| FR-014–017 | Grouped accordion per modul | **BELUM** | Tak ada komponen accordion permission editor. |
+| FR-018–023 | Visibility scope radio | **BELUM** (sebagian `contactScope` di type) | `contactScope` ada di type tapi UI editor radio kosong; inbox/ticket/analytics scope tak termodel. |
+| FR-024–029 | Action checkbox + "Pilih semua" | **BELUM** | Tak ada editor action checkbox. |
+| FR-030/035–038 | Data Privacy radio | **SEBAGIAN** | Privacy table (Full/Masked) ada tapi halaman terpisah, belum menyatu di grouped editor. |
+| FR-039–045 | Dependency validation (claim↔queue, assign↔scope, auto-disable) | **BELUM** | Tak ada validator dependency. |
+| FR-050–054 | Owner-ceiling filter + block-save | **BELUM** | Tak ada referensi owner ceiling di FE. |
+| FR-055–058 | Role-assignment safety | **BELUM** | Tak ada delete/propagation flow. |
+| FR-059–061 | Audit diff old/new matrix | **BELUM** (FE) | Tak terlihat emit audit dari FE; kemungkinan BE. |
+
+**Kesimpulan §3A:** FE RBAC = **viewer + privacy-policy toggle**, bukan editor. ±80% FR editor PRD belum tereksekusi. Build penuh ≈ greenfield editor + endpoint mutation BE baru, bukan penyempurnaan kecil.
+
+---
+
+## 4A. Prototype pen.dev vs PRD — Misalignment (BARU v1.3)
+
+> Prototype: `Documents/auth.pen` screen `RBAC · Roles & Permissions (desktop)` (`saLeI`) + mobile. Eksplorasi UI, **belum divalidasi ke PRD**.
+
+| Aspek | PRD (source of truth) | Prototype pen.dev | Verdict |
+|---|---|---|---|
+| Paradigma editor | Per-role, grouped **accordion** modul (visibility radio + action checkbox) | **Matrix** Permission × (Owner/Admin/Agent) | ❌ Matrix bukan model PRD |
+| Role default | Admin (locked), Supervisor, Agent | Owner/Admin/Agent/Supervisor/Viewer | ❌ "Owner"/"Viewer" tak ada di PRD |
+| Visibility scope | Radio per modul (All/Pull/Assigned-or-team/All-except-team, FR-018–023) | Tak ada (cuma check/dash) | ❌ Hilang |
+| Owner ceiling | Filter + block-save (FR-050–054) | Tak ada | ❌ Hilang |
+| Data privacy | Radio Full/Masked per modul | 1 baris di matrix | ⚠️ Disederhanakan |
+| Pricing-tier gating | **TIDAK ADA di PRD** | Badge Starter/Growth/Business + lock | ❌ **Invensi prototype** — tier gating = subscription layer, bukan RBAC authoring |
+| Dependency rules | FR-039–045 | Tak ada | ❌ Hilang |
+
+**Rekomendasi:** rework prototype ke model PRD (grouped accordion) **atau** posisikan eksplisit sebagai konsep subscription feature-gating terpisah. Jangan dipakai sebagai acuan desain RBAC apa adanya.
+
+---
+
 ## 4. Current State vs Proposed State
 
 ### 4.1 Current State (As-Is)
@@ -258,6 +322,8 @@ Current product sudah punya role-sensitive behavior di Conversation, Ticket, Con
 | R-09 | Role update sukses di People tetapi gagal propagate ke Auth/Gateway cache | High | Critical | Critical | Event-driven propagation + retry mechanism + observability per hop |
 | R-10 | Dependency rules diverge antara FE Settings dan backend validator | High | High | High | Backend-only source of truth; FE hanya refleksi/preview |
 | R-11 | Bug di authorization middleware / guard membuat request salah di-allow atau salah di-deny | Medium | Critical | Critical | Gateway contract tests + shadow validation + deny-by-default policy |
+| R-12 | Build mengacu prototype pen.dev (matrix+tier) yang tak match PRD → editor salah model, rework mahal | High | High | High | Validasi desain ke PRD/Figma dulu; prototype bukan acuan sampai di-rework |
+| R-13 | Editor dibangun fresh tanpa reuse `rbac.ts`/`useRolePermission`/privacy existing → duplikasi + drift | Medium | High | High | Reuse enum `PermissionActionEnum`/`ResourceTypeEnum` + privacy hooks existing sebagai fondasi |
 
 ### 7.2 Worst-Case Scenarios
 
@@ -342,6 +408,9 @@ Current product sudah punya role-sensitive behavior di Conversation, Ticket, Con
 | OQ-08 | Bagaimana role ini berinteraksi dengan Contact area scope (operational/sales) yang sudah punya rule sendiri? | Mencegah konflik model RBAC | Yes |
 | OQ-09 | Siapa owner final untuk team/team-inbox visibility dependency: People, Company, atau shared resolver? | Menentukan boundary service dan source of truth | Yes |
 | OQ-10 | Bagaimana middleware/gateway membaca permission: embedded snapshot, cache lookup, atau service call? | Menentukan latency, stale risk, dan failure mode | Yes |
+| OQ-11 | Apakah endpoint mutation role (`POST/PUT/DELETE /role`) sudah ada di BE meski FE belum memakainya? | Menentukan build = FE-only editor atau full-stack | Yes |
+| OQ-12 | Apakah privacy-settings existing (`PUT /privacy/policy`) di-fold ke grouped editor atau tetap halaman terpisah? | Menentukan IA Settings + konsistensi FR-030 | No |
+| OQ-13 | Apakah pricing-tier feature-gating concern terpisah dari RBAC atau menyatu? Jika menyatu butuh PRD/change-intake baru | Menentukan validitas prototype pen.dev + scope | Yes |
 
 ---
 
@@ -387,3 +456,5 @@ PRD Requirement → Analysis Finding → Impact Area → Test Case ID → Status
 |------|--------|--------|
 | 2026-06-22 | Initial assessment created (v1.0) | Hermes |
 | 2026-06-22 | Revised with service-level impact analysis, gateway/middleware choke-point analysis, and corrected team dependency framing (v1.1) | Hermes |
+| 2026-06-22 | Owner-ceiling-aware role authoring constraints (v1.2) | Hermes |
+| 2026-10-02 | Implementation Reality Check code-verified: FE viewer-only, ±80% FR editor belum dibangun (§3A); prototype pen.dev misalignment matrix+tier vs grouped-accordion PRD (§4A); R-12/R-13; OQ-11/12/13; updated Rules/Memory refs (v1.3) | Hermes |

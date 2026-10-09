@@ -2,9 +2,10 @@
 
 Companion TRD: [`trd/trd-advance-export-phase-4-sap-template-preset.md`](../trd/trd-advance-export-phase-4-sap-template-preset.md)
 
-Validation order matches the shipped `createReportJob` sequence
-(`apps/analytics-service/src/app/services/export-report-job.service.ts:86-128`);
-the two new gates (privacy-pair, entitlement) are inserted before job creation.
+The shipped `createReportJob` order is dateRange → duplicate → active-job → rate-limit
+(`apps/analytics-service/src/app/services/export-report-job.service.ts:86-128`); the two
+new gates (entitlement, privacy-pair) are authorization checks inserted **after param
+validation and before the resource-cost checks** (duplicate/rate/precount) to fail fast.
 
 ```mermaid
 flowchart TD
@@ -92,13 +93,13 @@ flowchart TD
     AS1 --> AS2
     AS2 -->|yes| AS3 --> AS4
     AS4 -->|yes| AS5
-    AS5 -->|yes| AS6
-    AS6 -->|no| AS7
-    AS7 -->|yes| AS8
-    AS8 -->|yes| AS10
+    AS5 -->|yes| AS10
     AS10 -->|yes| AS10b
     AS10b -->|yes| AS9
-    AS9 -->|yes| AS11
+    AS9 -->|yes| AS6
+    AS6 -->|no| AS7
+    AS7 -->|yes| AS8
+    AS8 -->|yes| AS11
     AS11 --> AS12
     AS12 --> AS13 --> MQ4
     AS12 --> AS14 --> MQ1
@@ -132,3 +133,6 @@ flowchart TD
 
 Legend: blue = new code in this phase, pink = new authorization gate,
 red = rejection path. Everything unshaded already ships today.
+
+---
+_Diagram supporting **PRD-D v2.1** (SAP Template Preset). Reviewed vs PRD-D + BE 2026-09-16: reordered validation gates so activity + sequence agree (authz entitlement/PII fail-fast after param validation, before duplicate/rate/precount); corrected header claim about shipped createReportJob order (:86-128 = dateRange→duplicate→active→rate, new gates are additive). BE-verified: privacy perms enums:96-97, media key {company}/export_reports/{mediaName} (app.service.ts:301-314), dispatchExportJob:360-390 (SAP branch new), GetAuxIntervals RPC new (OQ-D1a)._

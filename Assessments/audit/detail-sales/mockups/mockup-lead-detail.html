@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; width: 1200px; }
+  
+  .header { padding: 12px 24px; background: #1e293b; border-bottom: 1px solid #334155; }
+  .breadcrumb { font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: #60a5fa; text-decoration: none; }
+  .breadcrumb .current { color: #f8fafc; font-weight: 600; }
+  .breadcrumb .sep { color: #475569; }
+  
+  .main { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: 700px; }
+  
+  .left { padding: 20px 24px; }
+  
+  /* Summary card */
+  .summary-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .summary-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .summary-title { font-size: 20px; font-weight: 700; color: #f8fafc; }
+  .summary-subtitle { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .status-badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #1e3a5f; color: #60a5fa; }
+  
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .summary-item { }
+  .summary-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .summary-value { font-size: 14px; font-weight: 600; color: #f8fafc; }
+  .summary-value.amount { color: #34d399; }
+  .summary-value.next-action { color: #fbbf24; font-size: 13px; }
+  
+  /* Status transition guard */
+  .status-section { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .status-section h3 { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 12px; }
+  .transition-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stage-node { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #334155; color: #94a3b8; }
+  .stage-node.active { background: #1e3a5f; color: #60a5fa; border: 1px solid #3b82f6; }
+  .stage-node.done { background: #064e3b; color: #34d399; }
+  .stage-node.terminal { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+  .stage-arrow { color: #475569; font-size: 14px; }
+  .guard-note { font-size: 11px; color: #f97316; margin-top: 8px; padding: 8px; background: #451a03; border-radius: 6px; border-left: 3px solid #f97316; }
+  
+  /* Expandable sections */
+  .expandable { background: #1e293b; border: 1px solid #334155; border-radius: 10px; margin-bottom: 8px; }
+  .expandable-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .expandable-header h3 { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+  .expandable-header .chevron { color: #64748b; }
+  .expandable-content { padding: 0 16px 16px; }
+  .field-row { display: grid; grid-template-columns: 140px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid #334155; font-size: 13px; }
+  .field-row:last-child { border-bottom: none; }
+  .field-label { color: #64748b; }
+  .field-value { color: #e2e8f0; }
+  
+  /* Activity timeline */
+  .timeline { padding: 0; }
+  .timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #334155; }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .icon-status { background: #1e3a5f; }
+  .icon-comment { background: #312e81; }
+  .icon-visit { background: #064e3b; }
+  .icon-followup { background: #78350f; }
+  .icon-assignee { background: #1e293b; border: 1px solid #475569; }
+  .timeline-body { flex: 1; }
+  .timeline-title { font-size: 13px; color: #e2e8f0; }
+  .timeline-title strong { color: #f8fafc; }
+  .timeline-detail { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .timeline-time { font-size: 11px; color: #475569; margin-top: 2px; }
+  
+  /* Right sidebar */
+  .right { background: #1e293b; border-left: 1px solid #334155; padding: 20px; }
+  .sidebar-section { margin-bottom: 20px; }
+  .sidebar-section h3 { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  
+  .quick-actions { display: flex; flex-direction: column; gap: 6px; }
+  .quick-action { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; font-size: 13px; color: #e2e8f0; cursor: pointer; }
+  .quick-action:hover { border-color: #3b82f6; }
+  .quick-action .icon { font-size: 14px; }
+  
+  .comment-box { }
+  .comment-input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #e2e8f0; font-size: 13px; resize: none; height: 60px; }
+  .comment-submit { margin-top: 6px; background: #3b82f6; border: none; border-radius: 6px; padding: 6px 14px; color: white; font-size: 12px; float: right; }
+  
+  .footer-note { padding: 12px 24px; font-size: 11px; color: #475569; text-align: center; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="breadcrumb">
+    <a href="#">Sales</a> <span class="sep">/</span>
+    <a href="#">Leads</a> <span class="sep">/</span>
+    <span class="current">PT Sentosa Abadi</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left">
+    <!-- Summary Card (always visible) -->
+    <div class="summary-card">
+      <div class="summary-header">
+        <div>
+          <div class="summary-title">PT Sentosa Abadi</div>
+          <div class="summary-subtitle">Lim Chandra · 0821-xxxx · Team: Sales Utama</div>
+        </div>
+        <div class="status-badge">🟢 Qualified</div>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">Amount</div>
+          <div class="summary-value amount">Rp 120.000.000</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Assignee</div>
+          <div class="summary-value">Rina N. (Sales)</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Next Action</div>
+          <div class="summary-value next-action">🤝 Meeting · Jumat 14:00</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Dibuat</div>
+          <div class="summary-value">2 Sep 2026</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Status Transition -->
+    <div class="status-section">
+      <h3>📍 Status Pipeline</h3>
+      <div class="transition-flow">
+        <span class="stage-node done">✓ New</span>
+        <span class="stage-arrow">→</span>
+        <span class="stage-node done">✓ Contacted</span>
+        <span class="stage-arrow">→</span>
+        <span class="stage-node active">Qualified</span>
+        <span class="stage-arrow">→</span>
+        <span class="stage-node">Proposal</span>
+        <span class="stage-arrow">→</span>
+        <span class="stage-node">Negotiation</span>
+        <span class="stage-arrow">→</span>
+        <span class="stage-node terminal">Won</span>
+        <span class="stage-node terminal">Lost</span>
+      </div>
+      <div class="guard-note">
+        ⚠️ Transisi ke <b>Won/Lost</b> memerlukan alasan. Kembali dari terminal butuh approval Supervisor.
+      </div>
+    </div>
+    
+    <!-- Expandable: Contact Info -->
+    <div class="expandable">
+      <div class="expandable-header">
+        <h3>👤 Informasi Kontak</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="expandable-content">
+        <div class="field-row"><span class="field-label">Nama</span><span class="field-value">Lim Chandra</span></div>
+        <div class="field-row"><span class="field-label">Telepon</span><span class="field-value">0821-xxxx-xxxx</span></div>
+        <div class="field-row"><span class="field-label">Email</span><span class="field-value">lim@sentosa.co.id</span></div>
+        <div class="field-row"><span class="field-label">Perusahaan</span><span class="field-value">PT Sentosa Abadi</span></div>
+        <div class="field-row"><span class="field-label">Tipe Usaha</span><span class="field-value">Manufacturing</span></div>
+      </div>
+    </div>
+    
+    <!-- Expandable: Description -->
+    <div class="expandable">
+      <div class="expandable-header">
+        <h3>📝 Deskripsi</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="expandable-content">
+        <p style="font-size:13px; color:#cbd5e1; line-height:1.5;">Butuh solusi omnichannel untuk 50 agent. Deadline implementasi Q4 2026. Sudah demo via WhatsApp, tertarik integrasi WA Business API.</p>
+      </div>
+    </div>
+    
+    <!-- Activity Timeline -->
+    <div class="expandable">
+      <div class="expandable-header">
+        <h3>📋 Activity Timeline</h3>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="expandable-content timeline">
+        <div class="timeline-item">
+          <div class="timeline-icon icon-followup">📅</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>Rina N.</strong> menjadwalkan meeting</div>
+            <div class="timeline-detail">Jumat, 12 Sep 2026 · 14:00 · Kantor PT Sentosa</div>
+            <div class="timeline-time">10 Sep 2026 · 09:30</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon icon-status">🔄</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>Rina N.</strong> mengubah status: Contacted → <b>Qualified</b></div>
+            <div class="timeline-detail">Qualified: pain confirmed, budget OK, decision maker identified</div>
+            <div class="timeline-time">8 Sep 2026 · 15:20</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon icon-visit">📍</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>Rina N.</strong> visit disetujui oleh <strong>Supervisor</strong></div>
+            <div class="timeline-detail">Visit #V-0142 · Kantor PT Sentosa · Approved</div>
+            <div class="timeline-time">7 Sep 2026 · 11:00</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon icon-comment">💬</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>Rina N.</strong> menambahkan komentar</div>
+            <div class="timeline-detail">"Sudah WA langsung, responsif. Minta demo untuk tim IT."</div>
+            <div class="timeline-time">5 Sep 2026 · 14:10</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon icon-status">🔄</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>System</strong> mengubah status: New → <b>Contacted</b></div>
+            <div class="timeline-time">3 Sep 2026 · 10:00</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon icon-assignee">👤</div>
+          <div class="timeline-body">
+            <div class="timeline-title"><strong>System</strong> membuat lead</div>
+            <div class="timeline-detail">Assignee: Rina N. · Team: Sales Utama</div>
+            <div class="timeline-time">2 Sep 2026 · 09:15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Sidebar -->
+  <div class="right">
+    <div class="sidebar-section">
+      <h3>⚡ Quick Actions</h3>
+      <div class="quick-actions">
+        <div class="quick-action"><span class="icon">🔄</span> Ubah Status</div>
+        <div class="quick-action"><span class="icon">📅</span> Jadwalkan Aktivitas</div>
+        <div class="quick-action"><span class="icon">📍</span> Buat Visit</div>
+        <div class="quick-action"><span class="icon">👤</span> Ubah Assignee</div>
+        <div class="quick-action"><span class="icon">🏷️</span> Ubah Team</div>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <h3>💬 Komentar</h3>
+      <div class="comment-box">
+        <textarea class="comment-input" placeholder="Tulis komentar..."></textarea>
+        <button class="comment-submit">Kirim</button>
+      </div>
+    </div>
+    
+    <div class="sidebar-section" style="margin-top: 20px;">
+      <h3>📊 Ringkasan</h3>
+      <div style="font-size:13px; color:#94a3b8; line-height:1.8;">
+        <div>Visits: <strong style="color:#e2e8f0;">3 total</strong></div>
+        <div style="padding-left:12px;">✅ 1 approved · ⏳ 1 waiting · 📅 1 on plan</div>
+        <div style="margin-top:6px;">Days in stage: <strong style="color:#fbbf24;">5 hari</strong></div>
+        <div>Total days: <strong style="color:#e2e8f0;">10 hari</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  Rekomendasi UFG-002 (breadcrumb) + UFG-007 (progressive disclosure) + UFG-009 (activity timeline) + UFG-006 (transition guard). Ref: NNG Breadcrumbs, NNG Progressive Disclosure, Pipedrive Activities, HubSpot Pipeline Rules.
+</div>
+</body>
+</html>

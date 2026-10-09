@@ -1,0 +1,88 @@
+<!-- Settings: WhatsApp Web Channel -->
+<style>
+.st-wa2-status{display:flex;align-items:center;gap:12px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+.st-wa2-status .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.st-wa2-status .dot.on{background:var(--ok)}.st-wa2-status .dot.off{background:var(--danger)}
+.st-qr-box{width:220px;height:220px;border:2px dashed var(--border);border-radius:var(--radius);display:grid;place-items:center;margin:20px 0;font-size:16px;color:var(--muted);background:var(--card)}
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.badge.ok{background:#dcfce7;color:#15803d}.badge.err{background:#fef2f2;color:var(--danger)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item active" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">WhatsApp Web</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Koneksi WhatsApp Web via scan QR code. Cocok untuk nomor personal.</p>
+
+    <div class="st-wa2-status" id="waWebStatus">
+      <span class="dot" id="waWebDot"></span>
+      <span id="waWebBadge"></span>
+      <span style="margin-left:auto;font-size:13px" id="waWebNum"></span>
+    </div>
+
+    <div class="card" style="padding:16px;max-width:400px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Status: <strong id="waWebStatusText">-</strong></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Nomor: <strong id="waWebNumber">-</strong></div>
+    </div>
+
+    <div class="st-qr-box" id="qrBox">
+      📷 Scan QR
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn primary" id="waWebBtn" onclick="toggleWaWeb()">Putuskan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c=DB.settings.channels.whatsappWeb;
+  const connected=c.connected;
+  document.getElementById('waWebDot').className='dot '+(connected?'on':'off');
+  document.getElementById('waWebBadge').innerHTML=connected
+    ?'<span class="badge ok">Terhubung</span>'
+    :'<span class="badge err">Terputus</span>';
+  document.getElementById('waWebNum').textContent=c.number||'';
+  document.getElementById('waWebStatusText').textContent=connected?(c.status||'active'):'Terputus';
+  document.getElementById('waWebNumber').textContent=c.number||'-';
+  document.getElementById('waWebBtn').textContent=connected?'Putuskan':'Hubungkan';
+  document.getElementById('qrBox').style.display=connected?'none':'grid';
+})();
+
+function toggleWaWeb(){
+  const c=DB.settings.channels.whatsappWeb;
+  if(c.connected){
+    DB.settings.channels.whatsappWeb={...c,connected:false,status:'disconnected'};
+    showToast('WhatsApp Web berhasil diputuskan');
+  }else{
+    DB.settings.channels.whatsappWeb={...c,connected:true,status:'active',number:c.number||'+628****7778'};
+    showToast('WhatsApp Web berhasil terhubung');
+  }
+  saveStore();
+  go('settings/channels-whatsapp-web');
+}
+</script>

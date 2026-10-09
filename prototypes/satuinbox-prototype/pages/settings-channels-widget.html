@@ -1,0 +1,111 @@
+<!-- Settings: Widget Channel -->
+<style>
+.st-widget-toggle{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.toggle{width:44px;height:24px;border-radius:12px;background:#ccc;cursor:pointer;position:relative;transition:.2s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:22px}
+.st-embed{background:var(--nav);color:#a5b4fc;padding:16px;border-radius:var(--radius);font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow:auto;margin-top:12px}
+.st-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.st-form label input{display:block;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:14px;background:var(--bg)}
+.st-form label input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.st-color-row{display:flex;align-items:center;gap:10px}
+.st-color-row input[type=color]{width:48px;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:2px}
+.st-color-row .color-hex{font-size:13px;font-weight:600;font-family:monospace}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item active" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">Chat Widget</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Konfigurasi widget chat yang dipasang di website Anda.</p>
+
+    <div class="st-widget-toggle">
+      <span style="font-size:13px;font-weight:600">Widget Aktif</span>
+      <div class="toggle" id="widgetToggle" onclick="toggleWidget()"></div>
+      <span style="font-size:12px;color:var(--muted)" id="widgetStatusText">-</span>
+    </div>
+
+    <div class="st-form card" style="max-width:480px;padding:16px">
+      <label>Domain Website<input id="widgetDomain" placeholder="contoh.com"></label>
+      <label>
+        Warna Widget
+        <div class="st-color-row" style="margin-top:4px">
+          <input type="color" id="widgetColor" onchange="document.getElementById('colorHex').textContent=this.value">
+          <span class="color-hex" id="colorHex">#4f46e5</span>
+        </div>
+      </label>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="btn primary" onclick="saveWidget()">Simpan</button>
+      </div>
+    </div>
+
+    <h3 style="margin:24px 0 8px">Kode Embed</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Salin kode ini ke halaman website Anda:</p>
+    <div class="st-embed" id="embedCode"></div>
+    <button class="btn" style="margin-top:8px" onclick="copyEmbed()">📋 Salin Kode</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const w=DB.settings.channels.widget;
+  const tog=document.getElementById('widgetToggle');
+  tog.className='toggle '+(w.enabled?'on':'');
+  document.getElementById('widgetStatusText').textContent=w.enabled?'Aktif':'Nonaktif';
+  document.getElementById('widgetDomain').value=w.domain||'';
+  document.getElementById('widgetColor').value=w.color||'#4f46e5';
+  document.getElementById('colorHex').textContent=w.color||'#4f46e5';
+  updateEmbed(w.domain,w.color);
+})();
+
+function updateEmbed(domain,color){
+  const code='<script src="https://cdn.satuinbox.id/widget.js"><\/script>\n<script>\n  SatuInbox.init({\n    domain: "'+(domain||'contoh.com')+'",\n    color: "'+(color||'#4f46e5')+'"\n  });\n<\/script>';
+  document.getElementById('embedCode').textContent=code;
+}
+
+function toggleWidget(){
+  const w=DB.settings.channels.widget;
+  w.enabled=!w.enabled;
+  saveStore();
+  go('settings/channels-widget');
+}
+
+function saveWidget(){
+  const domain=document.getElementById('widgetDomain').value.trim();
+  const color=document.getElementById('widgetColor').value;
+  if(!domain){showToast('Domain wajib diisi');return}
+  DB.settings.channels.widget={...DB.settings.channels.widget,domain,color};
+  saveStore();
+  updateEmbed(domain,color);
+  showToast('Pengaturan widget berhasil disimpan');
+}
+
+function copyEmbed(){
+  navigator.clipboard.writeText(document.getElementById('embedCode').textContent);
+  showToast('Kode embed disalin');
+}
+</script>

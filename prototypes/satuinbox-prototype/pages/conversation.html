@@ -1,0 +1,1522 @@
+<!-- Conversation Page — ported from conversation-page-redesign.html with all custom features -->
+<style>
+/* Conversation layout — 4-col: sidenav | list | workspace | drawer */
+.conv-layout{display:flex;height:100%;overflow:hidden;position:relative;flex:1;min-height:0}
+
+/* ── Sidenav ── */
+.conv-sidenav{flex:0 0 200px;width:200px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:flex-basis .2s cubic-bezier(0.2,0,0,1),width .2s cubic-bezier(0.2,0,0,1)}
+.sn-head{display:flex;align-items:center;justify-content:space-between;padding:11px 12px}
+.sn-title{font-size:14px;font-weight:600}
+.sn-collapse{width:26px;height:26px;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:5px;font-size:15px}
+.sn-collapse:hover{background:var(--border)}
+.sn-group{padding:8px 0}
+.sn-glabel{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 12px 3px;font-weight:600}
+.sn-disc{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;width:100%;border:none;background:none;text-align:left;font-family:inherit}
+.sn-disc .chev{margin-left:auto;transition:transform .15s}
+.sn-disc.open .chev{transform:rotate(90deg)}
+.sn-disc .dotind{color:var(--accent);font-size:16px;line-height:1;display:none}
+.sn-group:has(.sn-item.active)>.sn-disc:not(.open) .dotind{display:inline;margin-left:auto}
+.sn-group:has(.sn-item.active)>.sn-disc:not(.open) .chev{margin-left:6px}
+.sn-item{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;font-size:13px;position:relative;color:var(--ink)}
+.sn-item:hover{background:var(--border)}
+.sn-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.sn-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.sn-item .ic{width:18px;flex:0 0 18px;text-align:center;font-size:14px}
+.sn-item .txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-item .cnt{font-size:11px;background:var(--border);color:var(--ink);border-radius:9px;padding:0 6px;min-width:18px;text-align:center}
+.sn-item.active .cnt{background:var(--accent);color:#fff}
+.sn-div{height:2px;margin:2px 0}
+.sn-add{margin-left:6px;color:var(--muted);font-size:14px;cursor:pointer;border-radius:4px;padding:0 3px}
+.sn-add:hover{background:var(--border);color:var(--accent)}
+
+/* ── Sidenav collapsed (1280) ── */
+.conv-layout.sidenavCollapsed .conv-sidenav{flex-basis:56px;width:56px}
+.conv-layout.sidenavCollapsed .sn-title,.conv-layout.sidenavCollapsed .txt,
+.conv-layout.sidenavCollapsed .sn-glabel,.conv-layout.sidenavCollapsed .sn-disc .chev,
+.conv-layout.sidenavCollapsed .sn-disc .dotind,.conv-layout.sidenavCollapsed .sn-add,
+.conv-layout.sidenavCollapsed .sn-disc span:not(.ic),.conv-layout.sidenavCollapsed .sn-div{display:none}
+.conv-layout.sidenavCollapsed .sn-sub{padding-left:0}
+.conv-layout.sidenavCollapsed .sn-sub .sn-item{padding-left:0}
+.conv-layout.sidenavCollapsed .sn-item,.conv-layout.sidenavCollapsed .sn-disc{justify-content:center;padding:9px 0}
+.conv-layout.sidenavCollapsed .sn-disc{cursor:default}
+.conv-layout.sidenavCollapsed .sn-group:has(.sn-item.active)>.sn-disc{color:var(--accent)}
+.conv-layout.sidenavCollapsed .sn-item{position:relative}
+.conv-layout.sidenavCollapsed .sn-item .cnt{position:absolute;top:2px;left:50%;margin-left:2px;min-width:14px;height:14px;font-size:9px;line-height:14px;padding:0 3px;box-shadow:0 0 0 1px var(--card)}
+.conv-layout.sidenavCollapsed .sn-item[data-cnt="0"] .cnt{display:none}
+/* Collapsed: only ACTIVE child visible as icon per section (proto lama); peek reveals all */
+.conv-layout.sidenavCollapsed .sn-sub .sn-item:not(.active){display:none}
+/* Peek: collapsed sidenav expands overlaying list */
+.conv-layout.sidenavCollapsed .conv-sidenav.peek{flex-basis:200px;width:200px;margin-right:-144px;box-shadow:2px 0 12px rgba(0,0,0,.18);z-index:30}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-title,.conv-layout.sidenavCollapsed .conv-sidenav.peek .txt,
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-disc .chev,.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-disc .dotind,
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-add,.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-disc span:not(.ic),
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-div{display:revert}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-sub .sn-item{display:flex}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-sub,.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-sub .sn-item{padding-left:8px}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-sub .sn-item{padding-left:20px}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-item,.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-disc{justify-content:flex-start;padding:7px 12px}
+.conv-layout.sidenavCollapsed .conv-sidenav.peek .sn-item .cnt{position:static;min-width:18px;height:auto;font-size:11px;line-height:normal;box-shadow:none;margin-left:0}
+
+/* ── Conversation list ── */
+.conv-list{flex:0 0 320px;width:320px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--card);overflow:hidden}
+.list-head{padding:10px 12px}
+.list-search{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:20px;font-size:12px;background:var(--bg)}
+/* Filter bar — full vs icon mode */
+.fbar{display:flex;align-items:center;gap:6px;padding:6px 12px;flex-wrap:wrap}
+/* Icon mode (1280) */
+.fbar-icon{display:none;align-items:center;gap:8px}
+.fbar-icon .fctrl{width:34px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+.fbar-icon .fctrl:hover{border-color:var(--accent)}
+.fbar-icon .fspacer{flex:1}
+.fbar-icon .fico2{width:28px;height:28px}
+/* Full mode (1440) */
+.fbar-exp{display:none;flex-direction:column;gap:8px;width:100%}
+.finbox{display:flex;align-items:center}
+.fsearchbar{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 0;font-size:14px;font-weight:600}
+.fsearchbar .si{font-size:14px}
+.frow2{display:flex;align-items:center;gap:8px}
+.seg-status{display:flex;gap:4px;padding:4px;border-radius:10px;background:#f1f5f9;border:1px solid var(--border)}
+.seg{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 12px;border:none;border-radius:8px;background:transparent;color:var(--ink);font-weight:500;font-size:12px;cursor:pointer}
+.seg.active{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.seg .segcnt{min-width:auto;height:16px;padding:0 5px;font-size:10px;border-radius:8px;background:var(--border);color:var(--ink);display:inline-flex;align-items:center}
+.seg.active .segcnt{background:var(--accent);color:#fff}
+.fctrl-lbl{height:28px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:4px}
+.fchips{display:flex;align-items:center;gap:4px}
+.fchip{border:1px solid var(--border);border-radius:999px;padding:0 12px;height:24px;font-size:12px;background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center}
+.fchip:hover:not(.on){border-color:var(--accent)}
+.fchip.on{background:#eaf1ff;border-color:#2563eb;color:#2563eb;font-weight:600}
+.fchip.ico{width:24px;height:24px;padding:0;border-radius:999px;justify-content:center}
+.fspacer{flex:1}
+.ficons{display:flex;gap:4px}
+/* Filter dropdown menus */
+.fmenu{position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:50;min-width:180px;padding:4px 0}
+.fmenu.hide{display:none}
+.fitem{display:flex;align-items:center;gap:8px;padding:8px 12px;width:100%;border:none;background:none;cursor:pointer;font-size:13px;text-align:left}
+.fitem:hover{background:var(--bg)}
+.fitem .fcheck{margin-left:auto;visibility:hidden}
+.fitem.active .fcheck{visibility:visible}
+.fitem .fcount{color:var(--muted);font-size:11px}
+/* Toggle classes */
+.conv-layout.filterIcon .fbar-exp{display:none!important}
+.conv-layout.filterIcon .fbar-icon{display:flex!important}
+.conv-layout.filterFull .fbar-icon{display:none!important}
+.conv-layout.filterFull .fbar-exp{display:flex!important}
+.list-body{flex:1;overflow-y:auto}
+.conv-row{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s}
+.conv-row:hover{background:var(--bg)}
+.conv-row.sel{background:rgba(79,70,229,.06);border-left:3px solid var(--accent)}
+.conv-row .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;flex:0 0 36px}
+.conv-row .body{flex:1;min-width:0}
+.conv-row .name-row{display:flex;align-items:center;gap:4px}
+.conv-row .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-row .prev{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.conv-row .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:0 0 auto}
+.conv-row .time{font-size:11px;color:var(--muted)}
+.conv-row .unread{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.conv-row .mention{font-size:10px;background:#dbeafe;color:#2563eb;padding:1px 5px;border-radius:8px;font-weight:600}
+.conv-row .expired-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.conv-row .disc-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;margin-left:2px;vertical-align:middle}
+.conv-row .av-wrap{position:relative;flex:0 0 36px;width:36px;height:36px}
+.conv-row .bchk{position:absolute;inset:0;margin:0;width:36px;height:36px;cursor:pointer;opacity:0;transition:.1s;-webkit-appearance:none;appearance:none;border-radius:50%}
+.conv-row .bchk:checked{opacity:1;background:var(--accent);border:2px solid var(--accent)}
+.conv-row .bchk:checked::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:16px;font-weight:700}
+.conv-row:hover .bchk{opacity:1;background:rgba(255,255,255,.85);border:2px solid var(--accent)}
+.conv-row:hover .bchk:checked{background:var(--accent)}
+.conv-row:hover .av,.conv-row .av-wrap:has(.bchk:checked) .av{opacity:.35}
+.bulk-bar{display:none;align-items:center;gap:8px;padding:8px 12px;background:rgba(79,70,229,.08);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.bulk-bar.on{display:flex}
+.bulk-bar .bcount{font-size:12px;font-weight:700;color:var(--accent)}
+.bulk-bar button{font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer}
+.bulk-bar button:hover{background:var(--bg)}
+.bulk-bar .bdel{color:#dc2626;border-color:#fecaca}
+.bulk-bar .bprimary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.bulk-bar .bprimary:hover{filter:brightness(1.08);background:var(--accent)}
+.bmore-wrap{position:relative}
+.bmore{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:30;flex-direction:column;gap:4px;min-width:180px;padding:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.bmore.on{display:flex}
+.bmore button,.bmore .bsel{width:100%;text-align:left;font-size:12px;padding:6px 8px;border:none;border-radius:6px;background:none;cursor:pointer}
+.bmore button:hover{background:var(--bg)}
+.bmore .bsel{border:1px solid var(--border);background:var(--card)}
+.bmore-sep{height:1px;background:var(--border);margin:2px 0}
+.bulk-bar .bx{margin-left:auto;border:none;background:none;font-size:14px}
+
+/* ── Workspace ── */
+.conv-ws{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{background:var(--card);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:10px}
+.ws-head .name{font-weight:600;font-size:14px}
+.ws-head .sub{color:var(--muted);font-size:12px}
+.ws-head .ws-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.thread{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.daysep{text-align:center;font-size:11px;color:var(--muted);padding:8px 0;position:relative}
+.daysep::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--border);z-index:0}
+.daysep span{position:relative;z-index:1;background:var(--bg);padding:0 10px}
+.bub{max-width:70%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;position:relative;word-wrap:break-word}
+.bub.in{background:var(--card);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.bub.out{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.bub .t{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+.bub.out .t{color:rgba(255,255,255,.6)}
+.bub .sender{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.bub .sender .av{width:20px;height:20px;border-radius:50%;font-size:8px;display:grid;place-items:center;color:#fff}
+.bub .sender .nm{font-size:11px;font-weight:600;color:var(--ink)}
+.bub .sender .ty{font-size:9px;color:var(--muted);background:var(--bg);padding:0 4px;border-radius:4px}
+.bub .at{color:#1d4ed8;font-weight:700}
+.bub .rcpt{margin-left:4px}
+.bub.out .rcpt{color:rgba(255,255,255,.55)}
+.bub.out .rcpt.read{color:#38bdf8}
+.reply-quote{border-left:3px solid var(--accent);background:rgba(0,0,0,.04);padding:4px 8px;border-radius:4px;margin-bottom:5px;font-size:12px}
+.bub.out .reply-quote{background:rgba(255,255,255,.15);border-left-color:#fff}
+.reply-quote .rq-name{display:block;font-weight:700;font-size:11px}
+.reply-quote .rq-text{opacity:.8}
+.msg-image{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.04);padding:14px;border-radius:8px;font-size:12px}
+.bub.out .msg-image{background:rgba(255,255,255,.15)}
+.msg-file{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.04);padding:10px 12px;border-radius:8px;font-size:12px}
+.bub.out .msg-file{background:rgba(255,255,255,.15)}
+.msg-file .fn{font-weight:600}
+.msg-file .fs{opacity:.7;font-size:11px}
+.date-sep{text-align:center;font-size:11px;color:var(--muted);padding:8px 0}
+.date-sep span{background:var(--border);padding:3px 12px;border-radius:12px}
+.sys-event{text-align:center;font-size:11px;color:var(--muted);font-style:italic;padding:5px 0}
+.chat-banner{margin:6px 12px;padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.5}
+.chat-banner.warn{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.chat-banner.err{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.new-sep{text-align:center;font-size:11px;color:#2563eb;padding:6px 0;font-weight:600;position:relative}
+.new-sep::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:1px solid #93c5fd;z-index:0}
+.new-sep span{position:relative;z-index:1;background:var(--bg);padding:0 10px;border-radius:8px}
+.composer{background:var(--card);border-top:1px solid var(--border);padding:9px 14px;display:flex;gap:8px;align-items:center}
+.composer input{flex:1;border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-size:13px;background:var(--card)}
+.composer input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.exp-banner,.disc-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border);background:var(--card)}
+.exp-banner .db-title,.disc-banner .db-title{font-size:13px;font-weight:700}
+.exp-banner .db-sub,.disc-banner .db-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.disc-banner.err{background:#fef2f2;border-color:#fecaca}
+.disc-banner.err .db-title{color:#dc2626}
+.disc-banner.err .db-sub{color:#b91c1c}
+#connBanner{margin:12px 14px;padding:14px;border-radius:10px;border:1px solid #fecaca;background:#fef2f2;display:flex;flex-direction:column;gap:8px}
+.ws-empty{flex:1;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;gap:8px}
+.ws-empty .glyph{font-size:40px;opacity:.4}
+
+/* ── Drawer — inline at 1440, floating at 1280 ── */
+.conv-drawer{width:320px;flex:0 0 320px;background:var(--card);border-left:1px solid var(--border);overflow-y:auto;display:none}
+.conv-drawer.open{display:block}
+/* At 1280 drawer floats over workspace */
+.conv-layout.drawerFloat .conv-drawer.open{position:absolute;right:0;top:0;bottom:0;z-index:20;box-shadow:-4px 0 16px rgba(0,0,0,.1)}
+.dsec{padding:14px;border-bottom:1px solid var(--border)}
+.dsec h4{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.dk{font-size:12px;color:var(--muted)}.dv{font-size:13px;font-weight:600}
+/* ── Detail drawer (accordion) ── */
+.drawer-head{position:sticky;top:0;background:var(--card);z-index:2;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between}
+.drawer-x{border:none;background:none;font-size:15px;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:6px}
+.drawer-x:hover{background:var(--bg);color:var(--foreground)}
+.drawer-scrim{display:none}
+/* close-conv button: inline mode = thread-header only; drawer(float) mode = in-drawer sticky-bottom only */
+#drawerCloseConv{display:none}
+/* button visibility toggled by JS detailOpen state */
+.conv-layout.drawerFloat .conv-drawer.open{position:absolute;right:0;top:0;bottom:0;z-index:20;box-shadow:-4px 0 16px rgba(0,0,0,.1)}
+.conv-layout.drawerFloat .drawer-scrim.on{display:block;position:absolute;inset:0;z-index:15;background:rgba(0,0,0,.25)}
+details.dsec{padding:0;border-bottom:1px solid var(--border)}
+details.dsec>summary{list-style:none;cursor:pointer;padding:12px 14px;font-size:12px;font-weight:700;color:var(--fg);display:flex;align-items:center;gap:6px}
+details.dsec>summary::-webkit-details-marker{display:none}
+details.dsec>summary .dbadge{background:var(--accent,#e0e7ff);color:#4f46e5;border-radius:10px;font-size:11px;padding:0 7px;font-weight:700}
+details.dsec>summary .chev{margin-left:auto;transition:transform .15s;color:var(--muted)}
+details.dsec[open]>summary .chev{transform:rotate(180deg)}
+.dsec-body{padding:0 14px 14px}
+.drow{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}
+.drow .dk{flex:0 0 42%}.drow .dv{text-align:right;flex:1;word-break:break-word}
+.dpill{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1px 9px;font-size:11px;font-weight:600;margin:2px 0 2px 4px}
+.dlink,.see-all{color:#4f46e5;font-weight:600;cursor:pointer;font-size:12px}
+.see-all{display:inline-block;margin-top:8px}
+.dcard{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:6px}
+.dcard-t{font-size:12px;font-weight:600}.dcard-s{font-size:11px;color:var(--muted);margin-top:2px}
+.dtags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.dadd{border:1px dashed var(--border);border-radius:12px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
+.dnote-in{width:100%;background:#fffbeb;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;margin-bottom:8px}
+.dnote{display:flex;gap:8px;padding:8px;border-radius:8px;font-size:12px;line-height:1.4}
+.dnote.hl{background:#fffbeb}.dnote .pin{color:#eab308}
+.dpin{display:flex;gap:8px;padding:8px 0;font-size:12px;border-top:1px solid var(--border)}
+.dpin:first-child{border-top:none}.dpin-b{color:var(--fg);margin:2px 0;line-height:1.4}
+.dpin-m{color:var(--muted);font-size:11px}
+.dhist{display:flex;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:12px}
+.dhist:first-child{border-top:none}
+.dhist .av{flex:0 0 30px;height:30px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.dhist-t{color:var(--muted);font-size:11px}.dhist-p{color:var(--muted);margin-top:2px}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.dthumb{aspect-ratio:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.dfile{display:flex;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:12px}
+.dfile:first-child{border-top:none}
+.fext{flex:0 0 34px;height:34px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
+.fext.xlsx{background:#16a34a}.fext.pdf{background:#dc2626}.fext.doc{background:#2563eb}
+.dfile-n{font-weight:600;word-break:break-all}.dfile-m{color:var(--muted);font-size:11px;margin-top:2px}
+.dtl{position:relative;padding-left:4px}
+.dtl-i{display:flex;gap:10px;padding:6px 0;position:relative}
+.dtl-i .dot{flex:0 0 9px;height:9px;border-radius:50%;background:var(--border);margin-top:4px;z-index:1}
+.dtl-i .dot.blue{background:#2563eb}
+.dtl-i:not(:last-child)::before{content:'';position:absolute;left:4px;top:14px;bottom:-6px;width:1px;background:var(--border)}
+.dtl-t{color:var(--muted);font-size:11px}.dtl-x{font-size:12px;margin-top:1px;line-height:1.4}
+
+/* ── Filter overlay + sheets ── */
+.filter-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;display:flex;justify-content:center;align-items:flex-start;padding-top:60px}
+.filter-overlay.hide{display:none}
+.filter-sheet{background:var(--card);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);width:90%;max-height:80vh;overflow-y:auto;padding:20px 24px}
+.fs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+/* Toggle card (visibilitas) */
+.toggle-card{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:10px}
+.toggle-card-left{display:flex;align-items:center;gap:12px}
+.toggle-card-img{width:48px;height:48px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;font-size:20px}
+/* Switch toggle */
+.switch{position:relative;width:40px;height:22px;display:inline-block}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;inset:0;background:#cbd5e1;border-radius:22px;cursor:pointer;transition:.2s}
+.switch .slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch.on .slider,.switch input:checked+.slider{background:var(--accent)}
+.switch.on .slider::before,.switch input:checked+.slider::before{transform:translateX(18px)}
+/* Badge pill */
+.badge-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:12px;background:var(--bg);border:1px solid var(--border);font-weight:500}
+.fs-btn{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:13px}
+.fs-btn:hover{border-color:var(--accent)}
+</style>
+
+<div class="conv-layout filterFull" id="convLayout">
+  <!-- SIDENAV -->
+  <aside class="conv-sidenav" id="convSidenav">
+    <div class="sn-head">
+      <span class="sn-title">Inbox</span>
+      <button class="sn-collapse" onclick="toggleSidenav()" title="Ciutkan/Lebarkan">☰</button>
+    </div>
+    <div class="sn-group" data-sec="personal">
+      <button class="sn-disc open" onclick="toggleSec(this)"><span class="ic">💬</span><span class="txt"> Pesan Langsung</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub" id="snSubPersonal">
+        <div class="sn-item active" data-filter="mine" onclick="pickSection(this,'mine')"><span class="ic">👤</span><span class="txt">Kotak Masuk Saya</span><span class="cnt" id="cntMine"></span></div>
+        <div class="sn-item spv-only" data-filter="unassigned" onclick="pickSection(this,'unassigned')"><span class="ic">📭</span><span class="txt">Belum Ditugaskan</span><span class="cnt" id="cntUnassigned"></span></div>
+        <div class="sn-item spv-only" data-filter="all" onclick="pickSection(this,'all')"><span class="ic">📥</span><span class="txt">Semua</span><span class="cnt" id="cntAll"></span></div>
+        <div class="sn-item" data-filter="starred" onclick="pickSection(this,'starred')"><span class="ic">⭐</span><span class="txt">Berbintang</span><span class="cnt" id="cntStarred"></span></div>
+      </div>
+    </div>
+    <div class="sn-div"></div>
+    <div class="sn-group" data-sec="group">
+      <button class="sn-disc open" onclick="toggleSec(this)"><span class="ic">👥</span><span class="txt"> Grup</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub" id="snSubGroup"></div>
+    </div>
+    <div class="sn-div"></div>
+    <div class="sn-group" data-sec="channel">
+      <button class="sn-disc" onclick="toggleSec(this)"><span class="ic">📡</span><span class="txt"> Channel</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub" id="snSubChannel" style="display:none"></div>
+    </div>
+    <div class="sn-div"></div>
+    <div class="sn-group" data-sec="team">
+      <button class="sn-disc" onclick="toggleSec(this)"><span class="ic">🗂</span><span class="txt"> Kotak Tim</span><span class="dotind">•</span><span class="chev">›</span><span class="sn-add spv-only" title="Buat Tim" onclick="event.stopPropagation();go('settings/inbox-team')">＋</span></button>
+      <div class="sn-sub" id="snSubTeam" style="display:none"></div>
+    </div>
+    <div class="sn-div"></div>
+    <div class="sn-group" data-sec="others">
+      <button class="sn-disc" onclick="toggleSec(this)"><span class="ic">🗃</span><span class="txt"> Lainnya</span><span class="dotind">•</span><span class="chev">›</span></button>
+      <div class="sn-sub" id="snSubOthers" style="display:none">
+        <div class="sn-item" data-filter="spam" onclick="pickSection(this,'spam')"><span class="ic">🚫</span><span class="txt">Spam</span><span class="cnt" id="cntSpam"></span></div>
+        <div class="sn-item" data-filter="junk" onclick="pickSection(this,'junk')"><span class="ic">🗑</span><span class="txt">Sampah</span><span class="cnt" id="cntJunk"></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- LIST -->
+  <aside class="conv-list">
+    <div class="list-head"><input class="list-search" type="text" placeholder="Kotak Pesan Anda" id="convSearch" oninput="filterConvList()"></div>
+    <!-- Filter bar — icon mode (1280) + full mode (1440) -->
+    <div class="fbar" style="position:relative">
+      <!-- ICON MODE -->
+      <div class="fbar-icon">
+        <div style="position:relative">
+          <button class="fctrl" id="dd-status-btn" onclick="toggleDD('status')" title="Terbuka / Tertutup"><span>🚪</span> <span style="font-size:9px">▾</span></button>
+          <div class="fmenu hide" id="menu-status">
+            <button class="fitem active" onclick="pickStatus('open',this)">🚪 Terbuka <span class="fcheck">✓</span></button>
+            <button class="fitem" onclick="pickStatus('closed',this)">🚪 Tertutup <span class="fcheck">✓</span></button>
+          </div>
+        </div>
+        <div style="position:relative">
+          <button class="fctrl" id="dd-read-btn" onclick="toggleDD('read')" title="Semua / Dibaca / Belum"><span>💬</span> <span style="font-size:9px">▾</span></button>
+          <div class="fmenu hide" id="menu-read">
+            <button class="fitem active" onclick="pickRead('all',this)">💬 Semua <span class="fcheck">✓</span></button>
+            <button class="fitem" onclick="pickRead('read',this)">☑ Sudah dibaca <span class="fcheck">✓</span></button>
+            <button class="fitem" onclick="pickRead('unread',this)">💬 Belum dibaca <span class="fcheck">✓</span></button>
+          </div>
+        </div>
+        <div style="position:relative">
+          <button class="fctrl" onclick="toggleDD('sort')" title="Urutkan"><span>⇅</span> <span style="font-size:9px">▾</span></button>
+          <div class="fmenu hide" id="menu-sort">
+            <button class="fitem active" onclick="pickSort('newest',this)">Terbaru <span class="fcheck">✓</span></button>
+            <button class="fitem" onclick="pickSort('oldest',this)">Terlama <span class="fcheck">✓</span></button>
+          </div>
+        </div>
+        <span class="fspacer"></span>
+        <button class="fctrl fico2" onclick="openModal('m-advanced')" title="Filter Lanjutan">⚗</button>
+        <button class="fctrl fico2" onclick="openModal('m-layout')" title="Visibilitas">⚙</button>
+      </div>
+
+      <!-- FULL MODE -->
+      <div class="fbar-exp">
+        <!-- Row 2: status segmented + sort -->
+        <div class="frow2">
+          <div class="seg-status">
+            <button class="seg active" onclick="setStatus('open',this)">Terbuka <span class="segcnt" id="cntOpen"></span></button>
+            <button class="seg" onclick="setStatus('closed',this)">Tertutup <span class="segcnt" id="cntClosed"></span></button>
+          </div>
+          <span class="fspacer"></span>
+          <button class="fctrl-lbl" onclick="toggleDD('sort')"><span>⇅</span> <span id="lbl-sort">Terbaru</span> <span style="font-size:9px">▾</span></button>
+        </div>
+        <!-- Row 3: read chips + icons -->
+        <div class="frow2">
+          <div class="fchips">
+            <button class="fchip on" onclick="pickReadChip('all',this)">Semua</button>
+            <button class="fchip" onclick="pickReadChip('read',this)">Sudah dibaca</button>
+            <button class="fchip" onclick="pickReadChip('unread',this)">Belum dibaca</button>
+          </div>
+          <span class="fspacer"></span>
+          <div class="ficons">
+            <button class="fchip ico" onclick="openModal('m-layout')" title="Visibilitas">⚙</button>
+            <button class="fchip ico" onclick="openModal('m-advanced')" title="Filter Lanjutan">⚗</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bcount" id="bulkCount">0 dipilih</span>
+      <button onclick="bulkSelectAll()" id="bulkAllBtn">Pilih semua</button>
+      <button class="bprimary" onclick="bulkStatus('closed')">✓ Selesai</button>
+      <div class="bmore-wrap">
+        <button class="bmore-btn" onclick="toggleBulkMore(event)">⋯ Aksi lain ▾</button>
+        <div class="bmore" id="bulkMore">
+          <button onclick="bulkTicket()">🎫 Buat Tiket</button>
+          <button onclick="bulkStatus('open')">↩ Buka Lagi</button>
+          <button onclick="bulkStatus('pending')">⏳ Tunda</button>
+          <div class="bmore-sep"></div>
+          <input class="bsel" id="bulkAgent" list="dlAgent" placeholder="👤 Cari & tugaskan agen…" onchange="bulkPickAgent(this)">
+          <datalist id="dlAgent"></datalist>
+          <input class="bsel" id="bulkTeam" list="dlTeam" placeholder="🗂 Cari & tugaskan tim…" onchange="bulkPickTeam(this)">
+          <datalist id="dlTeam"></datalist>
+          <input class="bsel" id="bulkLabel" list="dlLabel" placeholder="🏷 Cari / ketik label…" onchange="bulkLabel(this.value);this.value=''">
+          <datalist id="dlLabel"></datalist>
+          <div class="bmore-sep"></div>
+          <button onclick="bulkRead(true)">✓ Tandai Dibaca</button>
+          <button onclick="bulkRead(false)">● Tandai Belum Dibaca</button>
+          <button class="bdel" onclick="bulkDelete()">🗑 Hapus</button>
+        </div>
+      </div>
+      <button class="bx" onclick="bulkClear()" title="Batal">✕</button>
+    </div>
+    <div class="list-body" id="convListBody"></div>
+  </aside>
+
+  <!-- WORKSPACE -->
+  <section class="conv-ws" id="convWs">
+    <div class="ws-head" id="wsHead" style="display:none">
+      <div style="flex:1"><div class="name" id="wsName"></div><div class="sub" id="wsSub"></div></div>
+      <div class="ws-actions">
+        <button class="btn" id="btnCloseConv" onclick="closeConv()" style="font-size:12px">Tutup Percakapan</button>
+        <button class="btn" onclick="toggleDrawer()" style="font-size:12px">📋</button>
+      </div>
+    </div>
+    <div class="thread" id="thread" style="display:none"></div>
+    <div class="composer" id="composer" style="display:none"><input id="composeInput" placeholder="Ketik balasan…" onkeydown="if(event.key==='Enter')doSend()"><button class="btn primary" onclick="doSend()">Kirim</button></div>
+    <div class="disc-banner err" id="connBanner" style="display:none">
+      <div><div class="db-title">🔌 Channel Terputus</div><div class="db-sub">Akun channel ini tidak terhubung. Pesan tidak dapat dikirim sampai terhubung kembali.</div></div>
+      <button class="btn primary" style="margin-left:auto;white-space:nowrap" onclick="openReconnectModal()">⟳ Hubungkan Kembali</button>
+    </div>
+    <div class="exp-banner" id="expiredBanner" style="display:none">
+      <div><div class="db-title">Percakapan Tidak Aktif</div><div class="db-sub">Percakapan ini tidak aktif karena pelanggan tidak merespons dalam 24 jam. Untuk melanjutkan percakapan, silakan terlibat kembali dengan pelanggan.</div></div>
+      <button class="btn primary" onclick="openTemplateModal()" style="margin-left:auto;white-space:nowrap">Kirim Template Pesan</button>
+    </div>
+    <div class="disc-banner" id="discBanner" style="display:none">
+      <div><div class="db-title">Perlu Menyesuaikan Nomor WA Web</div><div class="db-sub">Anda tidak dapat mengirim pesan karena perlu menyesuaikan nomor di SatuInbox.</div></div>
+      <button class="btn" style="margin-left:auto;white-space:nowrap">⚙ Sesuaikan Akun</button>
+    </div>
+    <div class="ws-empty" id="wsEmpty"><div class="glyph">💬</div><div><b>Pilih percakapan</b><br>Pilih percakapan dari daftar untuk mulai bekerja.</div></div>
+  </section>
+
+  <!-- DRAWER -->
+  <div class="drawer-scrim" id="drawerScrim" onclick="toggleDrawer()"></div>
+  <aside class="conv-drawer" id="convDrawer">
+    <div class="drawer-head"><span>📋 Detail Percakapan</span><button class="drawer-x" onclick="toggleDrawer()" title="Tutup">✕</button></div>
+    <div id="drawerBody"></div>
+  </aside>
+
+  <!-- ASSIGN AGENT MODAL -->
+  <div class="modal-overlay" id="assignModal">
+    <div class="modal" style="max-width:400px">
+      <h3>Tetapkan Agen</h3>
+      <div id="assignAgentList" style="max-height:250px;overflow-y:auto"></div>
+      <div class="modal-actions"><button class="btn" onclick="closeModal('assignModal')">Batal</button></div>
+    </div>
+  </div>
+
+  <!-- CLOSE CONVERSATION CONFIRM MODAL (rule OD-03: single confirmation path) -->
+  <div class="modal-overlay" id="resolveModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:400px">
+      <h3>Selesaikan percakapan?</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Percakapan akan ditandai selesai dan pindah dari antrean aktif.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('resolveModal').classList.remove('open')">Batal</button>
+        <button class="btn danger" onclick="doCloseConv()">Selesaikan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECONNECT CHANNEL MODAL (2 conditions: select new account OR scan QR) -->
+  <div class="modal-overlay" id="reconnectModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:440px">
+      <h3 id="rcTitle">Hubungkan Kembali Channel</h3>
+      <div id="rcBody"></div>
+    </div>
+  </div>
+
+  <!-- ADD LABEL MODAL -->
+  <div class="modal-overlay" id="labelModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:360px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">Tambah Label</h3>
+        <button class="btn" style="padding:4px 8px" onclick="document.getElementById('labelModal').classList.remove('open')">✕</button>
+      </div>
+      <input id="labelSearch" placeholder="Cari atau buat label…" oninput="filterLabels(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:transparent;color:inherit">
+      <div id="labelList" style="max-height:200px;overflow-y:auto"></div>
+      <div id="labelCreate" style="display:none;margin-top:8px;padding:10px;border:1px dashed var(--border);border-radius:8px;cursor:pointer;color:var(--primary);font-size:13px" onclick="createLabel()">＋ Buat label baru</div>
+    </div>
+  </div>
+
+  <!-- ADD PROSPEK (LEAD) MODAL — fields from FE AddLeadModal.tsx -->
+  <div class="modal-overlay" id="prospekModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:500px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="margin:0">＋ Buat Prospek</h3>
+        <button class="btn" style="padding:4px 8px" onclick="document.getElementById('prospekModal').classList.remove('open')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Judul Prospek <span style="color:#ef4444">*</span></label>
+          <input id="pTitle" placeholder="Masukkan judul prospek" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Kotak Tim <span style="color:#ef4444">*</span></label>
+          <select id="pTeam" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:inherit"><option value="">Pilih kotak tim</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Penerima (Agen) <span style="color:#ef4444">*</span></label>
+          <select id="pAssignee" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:inherit"><option value="">Pilih agen</option></select>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:4px 0">
+        <div style="font-size:12px;font-weight:600;color:var(--muted)">Kontak</div>
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Sumber Channel</label>
+          <select id="pChannel" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:inherit"><option value="">Pilih channel</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">No. WhatsApp / Email</label>
+          <input id="pContactValue" placeholder="Nomor HP atau email kontak" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nama Kontak <span style="color:#ef4444">*</span></label>
+            <input id="pName" placeholder="Ketik untuk cari kontak…" list="dlContacts" oninput="onProspekContactSearch(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+            <datalist id="dlContacts"></datalist>
+            <div id="pContactMatch" style="font-size:10px;color:var(--muted);margin-top:2px"></div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Nama Kantor</label>
+            <input id="pOffice" placeholder="Nama perusahaan" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Jabatan</label>
+            <input id="pJobTitle" placeholder="Jabatan kontak" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Email</label>
+            <input id="pEmail" type="email" placeholder="email@contoh.com" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">No. Telp Kantor</label>
+            <input id="pOfficePhone" placeholder="021-xxxxxxx" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Tipe Bisnis</label>
+            <input id="pBusinessType" placeholder="Retail, F&B, dll" list="dlBusinessType" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+            <datalist id="dlBusinessType"><option value="Retail"><option value="F&B"><option value="Teknologi"><option value="Manufaktur"><option value="Jasa"><option value="Kesehatan"><option value="Pendidikan"><option value="Properti"></datalist>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Alamat</label>
+          <textarea id="pAddress" rows="2" placeholder="Alamat lengkap" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit;resize:vertical"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('prospekModal').classList.remove('open')">Batal</button>
+        <button class="btn primary" onclick="doCreateProspek()">Simpan Prospek</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE MESSAGE MODAL (WA API 24h expired) -->
+  <div class="modal-overlay" id="templateModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:520px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="margin:0">📋 Template Pesan WhatsApp</h3>
+        <button class="btn" style="padding:4px 8px" onclick="document.getElementById('templateModal').classList.remove('open')">✕</button>
+      </div>
+      <input id="tplSearch" placeholder="Cari template…" oninput="filterTemplates(this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;background:transparent;color:inherit">
+      <div id="tplList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE PREVIEW MODAL -->
+  <div class="modal-overlay" id="tplPreviewModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal" style="max-width:440px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="margin:0" id="tplPreviewTitle">Preview Template</h3>
+        <button class="btn" style="padding:4px 8px" onclick="document.getElementById('tplPreviewModal').classList.remove('open')">✕</button>
+      </div>
+      <div id="tplPreviewBody" style="font-size:13px;line-height:1.5;padding:14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);margin-bottom:12px"></div>
+      <div id="tplPreviewButtons" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn" onclick="document.getElementById('tplPreviewModal').classList.remove('open')">Batal</button>
+        <button class="btn primary" onclick="sendTemplate()">Kirim Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGE MAX CONVERSATION MODAL -->
+  <div class="modal-overlay" id="changeMaxModal">
+    <div class="modal" style="max-width:520px">
+      <h3>Ubah Maksimum Percakapan</h3>
+      <p id="cmAgentInfo" style="font-size:13px;color:var(--muted);margin-bottom:14px"></p>
+      <div style="display:flex;align-items:flex-end;gap:14px">
+        <div style="flex:1"><label style="font-size:12px;color:var(--muted)">Batas Saat Ini</label><input id="cmCurrent" type="number" readonly style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"></div>
+        <span style="font-size:18px;color:var(--muted);padding-bottom:9px">→</span>
+        <div style="flex:1"><label style="font-size:12px;color:var(--muted)">Batas Baru</label><input id="cmInput" type="number" min="1" placeholder="Masukkan batas baru" oninput="cmValidate()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal('changeMaxModal')">Batal</button>
+        <button class="btn primary" id="cmSubmit" onclick="saveMaxAndAssign()" disabled>Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISIBILITAS MODAL — Tata Letak dan Visibilitas -->
+  <div class="filter-overlay hide" id="m-layout">
+    <div class="filter-sheet" style="max-width:560px">
+      <div class="fs-head"><span style="font-weight:600;font-size:16px">Tata Letak dan Visibilitas</span>
+        <span onclick="closeModal('m-layout')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+      <h3 style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px">Visibilitas</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="toggle-card">
+          <div class="toggle-card-left">
+            <div class="toggle-card-img" style="background:#f0fdf4;border-color:#dcfce7">🟢</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">Tampilkan Lencana WhatsApp Web</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Tampilkan lencana yang menunjukkan akun WhatsApp Web asal setiap percakapan.</div>
+            </div>
+          </div>
+          <label class="switch on"><input type="checkbox" checked onchange="toggleVis('waBadge',this.checked)"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-card-left">
+            <div class="toggle-card-img" style="background:#eff6ff;border-color:#dbeafe">🏷️</div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">Tampilkan Tag</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Tampilkan tag yang ditetapkan dalam daftar percakapan Anda untuk memudahkan melihat kategori atau topik</div>
+            </div>
+          </div>
+          <label class="switch on"><input type="checkbox" checked onchange="toggleVis('tags',this.checked)"><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTER LANJUTAN MODAL — AdvanceFilterModal (Agents + Tags) -->
+  <div class="filter-overlay hide" id="m-advanced">
+    <div class="filter-sheet" style="max-width:480px">
+      <div class="fs-head"><span style="font-weight:600;font-size:16px">Filter Lanjutan</span>
+        <span onclick="closeModal('m-advanced')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+      <div style="display:flex;flex-direction:column;gap:24px;padding:16px 0">
+        <section>
+          <p style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px">Agen</p>
+          <div id="advAgentList" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:8px"></div>
+          <div id="selected-agents" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+        </section>
+        <section>
+          <p style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px">Tag</p>
+          <div id="advTagList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <div id="selected-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+        </section>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" onclick="resetAdvFilter()">Reset</button>
+          <button class="btn primary" onclick="applyAdvFilter();closeModal('m-advanced')">Terapkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let activeConvId=null, drawerOpen=false, detailOpen=true, sidenavCollapsed=false, filterMode='full', currentFilter='mine', activeChannel=null, activeTeam=null, activeGroupChannel=null;
+const bulkSel=new Set();
+const layout=()=>document.getElementById('convLayout');
+
+// ── Sidenav toggle (collapse/expand + peek) — behaviour = proto lama ──
+function toggleSidenav(){
+  sidenavCollapsed=!sidenavCollapsed;
+  layout().classList.toggle('sidenavCollapsed',sidenavCollapsed);
+  document.getElementById('convSidenav').classList.remove('peek');
+}
+// Peek: collapsed rail → klik expand overlay; klik child pilih+tutup; klik luar tutup (mode 'click' spt lama)
+let peekMode='click'; // 'click' | 'hover'
+function setPeekMode(m){peekMode=m;document.getElementById('convSidenav').classList.remove('peek');}
+(function(){
+  const sn=document.getElementById('convSidenav');
+  sn.addEventListener('mouseenter',()=>{if(peekMode==='hover'&&sidenavCollapsed)sn.classList.add('peek')});
+  sn.addEventListener('mouseleave',()=>{if(peekMode==='hover')sn.classList.remove('peek')});
+  sn.addEventListener('click',e=>{
+    if(peekMode!=='click'||!sidenavCollapsed)return;
+    if(e.target.closest('.sn-collapse'))return;
+    const open=sn.classList.contains('peek');
+    if(!open){e.stopPropagation();sn.classList.add('peek');return;} // rail tertutup → buka peek
+    if(e.target.closest('.sn-disc')){e.stopPropagation();return;} // header section → biarkan toggleSec, peek tetap
+    if(e.target.closest('.sn-item')){e.stopPropagation();sn.classList.remove('peek');return;} // child → onclick item jalan + tutup peek
+    e.stopPropagation();
+  });
+  document.addEventListener('click',e=>{if(peekMode==='click'&&!e.target.closest('.conv-sidenav'))sn.classList.remove('peek')});
+})();
+
+function toggleSec(btn){
+  btn.classList.toggle('open');
+  const sub=btn.nextElementSibling;
+  if(sub)sub.style.display=btn.classList.contains('open')?'':'none';
+}
+
+// ── Filter state ──
+let fStatus='open', fRead='all', fSort='newest';
+
+function toggleDD(name){
+  document.querySelectorAll('.fmenu').forEach(m=>{if(m.id!=='menu-'+name)m.classList.add('hide')});
+  const m=document.getElementById('menu-'+name);
+  if(m)m.classList.toggle('hide');
+}
+function closeAllDD(){document.querySelectorAll('.fmenu').forEach(m=>m.classList.add('hide'))}
+document.addEventListener('click',e=>{if(!e.target.closest('.fmenu,.fctrl,.fctrl-lbl'))closeAllDD()});
+document.addEventListener('click',e=>{if(!e.target.closest('.bmore-wrap')){const m=document.getElementById('bulkMore');if(m)m.classList.remove('on');}});
+
+function pickStatus(v,el){
+  fStatus=v;
+  el.closest('.fmenu').querySelectorAll('.fitem').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  closeAllDD();renderConvList();
+}
+function pickRead(v,el){
+  fRead=v;
+  el.closest('.fmenu').querySelectorAll('.fitem').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  closeAllDD();renderConvList();
+}
+function pickSort(v,el){
+  fSort=v;
+  el.closest('.fmenu').querySelectorAll('.fitem').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  const lbl=document.getElementById('lbl-sort');if(lbl)lbl.textContent=v==='newest'?'Terbaru':'Terlama';
+  closeAllDD();renderConvList();
+}
+function setStatus(v,el){
+  fStatus=v;
+  el.closest('.seg-status').querySelectorAll('.seg').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  renderConvList();
+}
+function pickReadChip(v,el){
+  fRead=v;
+  document.querySelectorAll('.fchips .fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderConvList();
+}
+
+function clearSelHighlight(){document.querySelectorAll('.conv-sidenav .sn-item.active').forEach(i=>i.classList.remove('active'))}
+
+// Accordion: buka section berisi item aktif, tutup lainnya
+function openParentSec(el){
+  const sec=el.closest('.sn-group').dataset.sec;
+  const chatPair=sec==='personal'||sec==='group';
+  document.querySelectorAll('.conv-sidenav .sn-group').forEach(g=>{
+    const disc=g.querySelector('.sn-disc'),sub=g.querySelector('.sn-sub');
+    const s=g.dataset.sec;
+    const open=chatPair?(s==='personal'||s==='group'):(s===sec);
+    if(disc)disc.classList.toggle('open',open);
+    if(sub)sub.style.display=open?'':'none';
+  });
+}
+
+function pickSection(el,filter){
+  clearSelHighlight();openParentSec(el);
+  el.classList.add('active');
+  currentFilter=filter;activeChannel=null;activeTeam=null;activeGroupChannel=null;
+  renderConvList();
+}
+function pickChannel(el,id){
+  clearSelHighlight();openParentSec(el);
+  el.classList.add('active');
+  activeChannel=id;activeTeam=null;activeGroupChannel=null;currentFilter='mine';
+  renderConvList();
+}
+function pickTeam(el,id){
+  clearSelHighlight();openParentSec(el);
+  el.classList.add('active');
+  activeTeam=id;activeChannel=null;activeGroupChannel=null;currentFilter='mine';
+  renderConvList();
+}
+function pickGroupChannel(el,ch){
+  clearSelHighlight();openParentSec(el);
+  el.classList.add('active');
+  activeGroupChannel=ch;activeChannel=null;activeTeam=null;currentFilter='group';
+  renderConvList();
+}
+
+// Render channel + team sidenav sections from seed
+function renderSideSections(){
+  const chEl=document.getElementById('snSubChannel');
+  if(chEl)chEl.innerHTML=(DB.channels||[]).map(c=>
+    `<div class="sn-item" data-cnt="${c.count}" onclick="pickChannel(this,'${c.id}')"><span class="ic">${c.icon}</span><span class="txt">${c.title}</span><span class="cnt">${c.count}</span></div>`).join('');
+  const tmEl=document.getElementById('snSubTeam');
+  if(tmEl)tmEl.innerHTML=(DB.teams||[]).map(t=>
+    `<div class="sn-item" data-cnt="${t.count}" onclick="pickTeam(this,'${t.id}')"><span class="ic" style="color:${t.color}">${t.icon}</span><span class="txt">${t.title}</span><span class="cnt">${t.count}</span></div>`).join('');
+  const gpEl=document.getElementById('snSubGroup');
+  if(gpEl){
+    const gc=ch=>DB.conversations.filter(c=>c.isGroup&&c.channel===ch);
+    const gitem=(ch,icon,label)=>{const u=gc(ch).reduce((s,c)=>s+(c.unread||0),0);
+      return`<div class="sn-item" onclick="pickGroupChannel(this,'${ch}')"><span class="ic">${icon}</span><span class="txt">${label}</span>${u?`<span class="cnt">${u}</span>`:''}</div>`;};
+    gpEl.innerHTML=gitem('whatsapp-web','💻','WhatsApp Web')+gitem('whatsapp-api','🟢','WhatsApp API');
+  }
+}
+
+// ── Viewport driver ──
+function setVp(w){
+  sidenavCollapsed=w<=1280;
+  layout().classList.toggle('sidenavCollapsed',sidenavCollapsed);
+  layout().classList.toggle('drawerFloat',w<=1280);
+  filterMode=w<=1280?'icon':'full';
+  layout().classList.toggle('filterIcon',filterMode==='icon');
+  layout().classList.toggle('filterFull',filterMode==='full');
+  if(sidenavCollapsed)document.getElementById('convSidenav').classList.remove('peek');
+}
+window.addEventListener('resize',()=>setVp(window.innerWidth));
+
+// ── Render conversation list ──
+function renderConvList(){
+  const body=document.getElementById('convListBody');
+  const q=(document.getElementById('convSearch')?.value||'').toLowerCase();
+  const isGroup=currentFilter==='group';
+  let convs=DB.conversations.filter(c=>{
+    if(isGroup)return c.isGroup&&(!activeGroupChannel||c.channel===activeGroupChannel);
+    if(c.isGroup)return false;
+    // Status filter
+    if(fStatus==='open'&&c.status==='closed')return false;
+    if(fStatus==='closed'&&c.status!=='closed')return false;
+    // Sidenav section filter
+    if(currentFilter==='mine'&&c.assignee!=='u1')return false;
+    if(currentFilter==='unassigned'&&c.assignee)return false;
+    if(currentFilter==='starred'&&!c.pinned)return false;
+    if(currentFilter==='spam'&&!c.spam)return false;
+    if(currentFilter==='junk'&&!c.junk)return false;
+    if(currentFilter!=='spam'&&c.spam)return false;
+    if(currentFilter!=='junk'&&c.junk)return false;
+    // Read filter
+    if(fRead==='unread'&&!c.unread)return false;
+    if(fRead==='read'&&c.unread)return false;
+    // Channel filter (from Channel section)
+    if(activeChannel&&c.channel!==activeChannel)return false;
+    // Team filter (from Team Inbox section)
+    if(activeTeam&&c.teamId!==activeTeam)return false;
+    // Advanced filter: agents
+    if(advAgents.length&&!advAgents.includes(c.assignee))return false;
+    // Advanced filter: tags
+    if(advTags.length){
+      const ct2=DB.contacts.find(x=>x.id===c.contactId);
+      if(!ct2||!advTags.some(t=>(ct2.tags||[]).includes(t)))return false;
+    }
+    // Search
+    if(q){
+      const ct=DB.contacts.find(x=>x.id===c.contactId);
+      const nm=ct?ct.name.toLowerCase():'';
+      const msg=(c.lastMsg||'').toLowerCase();
+      if(!nm.includes(q)&&!msg.includes(q))return false;
+    }
+    return true;
+  });
+  // Sort
+  convs.sort((a,b)=>{
+    if(fSort==='oldest')return new Date(a.lastTime)-new Date(b.lastTime);
+    return(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.lastTime)-new Date(a.lastTime);
+  });
+  body.innerHTML=convs.map(c=>{
+    const ct=DB.contacts.find(x=>x.id===c.contactId);
+    const name=c.isGroup?(c.groupName||'Group'):ct?ct.name:'Unknown';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2);
+    const chObj=DB.channels.find(x=>x.id===c.channel);
+    const ch=visState.waBadge?(chObj?.icon||'💬'):'';
+    const sel=c.id===activeConvId?'sel':'';
+    const expired=c.expired24h?'<span class="expired-tag">24h lewat</span>':'';
+    const disc=(chObj&&chObj.connected===false)?'<span class="disc-dot" title="Channel terputus"></span>':'';
+    const mention=c.mentionTo?'<span class="mention">@</span>':'';
+    const unread=c.unread?`<span class="unread">${c.unread}</span>`:'';
+    const tags=visState.tags?(ct?.tags||[]).map(t=>`<span class="expired-tag" style="background:#eff6ff;color:#2563eb;border-color:#dbeafe">${t}</span>`).join(''):'';
+    return`<div class="conv-row ${sel}" onclick="selectConv('${c.id}')">
+      <label class="av-wrap" onclick="event.stopPropagation()">
+        <div class="av" style="background:${randColor(name)}">${initials}</div>
+        <input type="checkbox" class="bchk" ${bulkSel.has(c.id)?'checked':''} onclick="event.stopPropagation();toggleBulk('${c.id}',this.checked)">
+      </label>
+      <div class="body"><div class="name-row">${ch}<span class="name">${name}</span>${expired}${disc}${tags}</div><div class="prev">${c.lastMsg||''}</div></div>
+      <div class="meta"><span class="time">${fmtTime(c.lastTime)}</span>${mention}${unread}</div>
+    </div>`;
+  }).join('');
+  // Counts
+  const allC=DB.conversations.filter(c=>!c.isGroup&&!c.spam);
+  const el=id=>document.getElementById(id);
+  if(el('cntAll'))el('cntAll').textContent=allC.length;
+  if(el('cntMine'))el('cntMine').textContent=allC.filter(c=>c.assignee==='u1').length;
+  if(el('cntUnassigned'))el('cntUnassigned').textContent=allC.filter(c=>!c.assignee).length;
+  if(el('cntStarred'))el('cntStarred').textContent=DB.conversations.filter(c=>!c.isGroup&&c.pinned).length;
+  if(el('cntSpam'))el('cntSpam').textContent=DB.conversations.filter(c=>c.spam).length;
+  if(el('cntJunk'))el('cntJunk').textContent=DB.conversations.filter(c=>c.junk).length;
+  // Status counts for segmented control
+  if(el('cntOpen'))el('cntOpen').textContent=DB.conversations.filter(c=>!c.isGroup&&c.status!=='closed').length;
+  if(el('cntClosed'))el('cntClosed').textContent=DB.conversations.filter(c=>!c.isGroup&&c.status==='closed').length;
+}
+
+// ── Select conversation ──
+// ── Bulk actions ──
+function toggleBulk(id,on){on?bulkSel.add(id):bulkSel.delete(id);syncBulkBar();}
+function syncBulkBar(){
+  const bar=document.getElementById('bulkBar');if(!bar)return;
+  bar.classList.toggle('on',bulkSel.size>0);
+  const c=document.getElementById('bulkCount');if(c)c.textContent=`${bulkSel.size} dipilih`;
+}
+function bulkClear(){bulkSel.clear();renderConvList();syncBulkBar();}
+function bulkApply(fn){bulkSel.forEach(id=>{const c=DB.conversations.find(x=>x.id===id);if(c)fn(c);});saveStore();bulkClear();if(typeof renderThread==='function'&&activeConvId)renderConvList();}
+function bulkStatus(s){bulkApply(c=>c.status=s);}
+function toggleBulkMore(e){e.stopPropagation();document.getElementById('bulkMore').classList.toggle('on');}
+function bulkTicket(){
+  const n=bulkSel.size;let made=0;
+  bulkSel.forEach(id=>{
+    const c=DB.conversations.find(x=>x.id===id);if(!c)return;
+    const nm=c.isGroup?(c.groupName||'Grup'):((DB.contacts.find(x=>x.id===c.contactId)||{}).name||'Pelanggan');
+    DB.tickets.push({id:'tk'+Date.now()+made,subject:`Tiket dari percakapan: ${nm}`,conversationId:c.id,contactId:c.contactId||null,status:'open',priority:'medium',assignee:c.assignee||'u1',teamId:c.teamId||'t1',createdAt:new Date().toISOString()});
+    made++;
+  });
+  saveStore();bulkClear();
+  alert(`${made} tiket dibuat dari ${n} percakapan.`);
+}
+function bulkAssignAgent(uid){if(uid)bulkApply(c=>c.assignee=uid);}
+function bulkAssignTeam(tid){if(tid)bulkApply(c=>c.teamId=tid);}
+function bulkPickAgent(inp){const u=DB.users.find(x=>x.name===inp.value);inp.value='';if(u)bulkAssignAgent(u.id);}
+function bulkPickTeam(inp){const t=DB.teams.find(x=>x.title===inp.value);inp.value='';if(t)bulkAssignTeam(t.id);}
+function bulkRead(read){bulkApply(c=>c.unread=read?0:(c.unread||1));}
+function bulkLabel(lb){if(!lb)return;bulkApply(c=>{c.labels=c.labels||[];if(!c.labels.includes(lb))c.labels.push(lb);});}
+function bulkSelectAll(){
+  document.querySelectorAll('#convListBody .conv-row .bchk').forEach(cb=>{
+    const id=cb.getAttribute('onclick').match(/toggleBulk\('([^']+)'/)[1];bulkSel.add(id);
+  });
+  renderConvList();syncBulkBar();
+}
+function fillBulkDropdowns(){
+  const opt=(dlId,vals)=>{const dl=document.getElementById(dlId);if(dl&&!dl.children.length)vals.forEach(v=>{const o=document.createElement('option');o.value=v;dl.appendChild(o);});};
+  opt('dlAgent',DB.users.map(u=>u.name));
+  opt('dlTeam',DB.teams.map(t=>t.title));
+  opt('dlLabel',['VIP','Prioritas','Follow-up','Komplain','Spam']);
+}
+function bulkDelete(){
+  if(!confirm(`Hapus ${bulkSel.size} percakapan? Tindakan tidak bisa dibatalkan.`))return;
+  bulkSel.forEach(id=>{DB.conversations=DB.conversations.filter(c=>c.id!==id);if(activeConvId===id)activeConvId=null;});
+  saveStore();bulkClear();
+}
+
+function selectConv(id){
+  activeConvId=id;
+  const c=DB.conversations.find(x=>x.id===id);if(!c)return;
+  renderConvList();
+  document.getElementById('wsEmpty').style.display='none';
+  document.getElementById('wsHead').style.display='';
+  document.getElementById('thread').style.display='';
+  const ct=c.contactId?DB.contacts.find(x=>x.id===c.contactId):null;
+  const name=c.isGroup?(c.groupName||'Group'):ct?ct.name:'Unknown';
+  const sub=c.isGroup?`${c.participants?.length||0} peserta · ${c.channel==='whatsapp-api'?'WhatsApp API':'WhatsApp'} · Grup`:
+    `${ct?.phone||''} · ${c.channel==='whatsapp-api'?'WhatsApp API':'WhatsApp Web'} · ${c.status||'open'}`;
+  document.getElementById('wsName').textContent=name;
+  document.getElementById('wsSub').textContent=sub;
+  // Close button: initial visibility based on mode + detail state
+  const isFloat=layout().classList.contains('drawerFloat');
+  if(c.isGroup){
+    document.getElementById('btnCloseConv').style.display='none';
+    const dcb=document.getElementById('drawerCloseConv');if(dcb)dcb.style.display='none';
+  } else {
+    drawerOpen=false;
+    detailOpen=!isFloat; // drawer default=closed, inline default=open
+    const drawer=document.getElementById('convDrawer');
+    if(isFloat){drawer.classList.remove('open');drawer.style.display='';}
+    else{drawer.style.display=detailOpen?'block':'none';}
+  }
+  // Banners
+  const exp=c.expired24h;
+  const chObj2=DB.channels.find(x=>x.id===c.channel);
+  const disc=chObj2&&chObj2.connected===false;
+  document.getElementById('expiredBanner').style.display=exp?'':'none';
+  document.getElementById('connBanner').style.display=disc?'':'none';
+  document.getElementById('composer').style.display=(exp||disc)?'none':'';
+  renderThread(id);
+  renderDrawer(c,ct);
+  // MUST run after renderDrawer — innerHTML rebuild destroys button inline styles
+  updateCloseBtn(isFloat?false:detailOpen);
+}
+
+// ── Render thread ──
+function renderThread(id){
+  const el=document.getElementById('thread');
+  const msgs=DB.threads[id]||[];
+  if(!msgs.length){el.innerHTML='<div class="ws-empty" style="padding:40px"><div class="glyph">💬</div><div>Belum ada pesan</div></div>';return}
+  const isGroup=DB.conversations.find(c=>c.id===id)?.isGroup;
+  el.innerHTML=msgs.map(m=>{
+    // Date separator
+    if(m.dateSep)return`<div class="date-sep"><span>${m.dateSep}</span></div>`;
+    // New-message separator
+    if(m.newSep)return`<div class="new-sep"><span>Pesan baru</span></div>`;
+    // System event (assigned / closed / reopened)
+    if(m.system)return`<div class="sys-event">${m.system}</div>`;
+    // 24h window expired banner
+    if(m.expiredBanner)return`<div class="chat-banner warn">⚠️ Sesi 24 jam WhatsApp telah berakhir. Anda hanya dapat mengirim template pesan.</div>`;
+    // Channel disconnected banner
+    if(m.disconnectedBanner)return`<div class="chat-banner err">🔌 Channel terputus. Pesan tidak dapat dikirim sampai terhubung kembali.</div>`;
+    const dir=m.dir||'in';
+    const sender=isGroup&&dir==='in'&&m.sender?`<div class="sender"><span class="av" style="background:${randColor(m.sender)}">${m.sender[0]}</span><span class="nm">${m.sender}</span><span class="ty">${m.senderType||''}</span></div>`:'';
+    const mention=m.mention?'<span class="at">@Dany</span> ':'';
+    // Reply quote
+    const quote=m.replyTo?`<div class="reply-quote"><span class="rq-name">${m.replyTo.name}</span><span class="rq-text">${m.replyTo.text}</span></div>`:'';
+    // Attachment: image / file
+    let body=m.text||'';
+    if(m.image)body=`<div class="msg-image">🖼️ <span>${m.image}</span></div>`+(m.text?`<div style="margin-top:4px">${m.text}</div>`:'');
+    else if(m.file)body=`<div class="msg-file">📎 <span class="fn">${m.file}</span><span class="fs">${m.fileSize||''}</span></div>`+(m.text?`<div style="margin-top:4px">${m.text}</div>`:'');
+    // Read receipt (out only)
+    const receipt=dir==='out'?`<span class="rcpt ${m.read?'read':''}">${m.read?'✓✓':'✓'}</span>`:'';
+    return`<div class="bub ${dir}">${sender}${quote}${mention}${body}<div class="t">${m.time}${receipt}</div></div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+  updCost(id);
+}
+
+// ── Send message ──
+function doSend(){
+  const inp=document.getElementById('composeInput');
+  const text=inp.value.trim();if(!text||!activeConvId)return;
+  const c=DB.conversations.find(x=>x.id===activeConvId);
+  // Cost guardrail (whatsapp-api only)
+  if(c&&c.channel==='whatsapp-api'){
+    const cfg=DB.costConfig||{};
+    const msgs=DB.threads[activeConvId]||[];
+    const totalBubbles=(msgs.filter(m=>m.dir==='out').length+msgs.filter(m=>m.dir==='in').length+1); // +1 for this message
+    const costEst=totalBubbles*358;
+    if(cfg.blockOnExceed&&cfg.capPerChat>0&&costEst>cfg.capPerChat){
+      showToast('🚫 Batas biaya percakapan tercapai. Pesan tidak dapat dikirim.');
+      return;
+    }
+  }
+  const time=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  if(!DB.threads[activeConvId])DB.threads[activeConvId]=[];
+  DB.threads[activeConvId].push({id:genId('m'),from:'u1',text,time,dir:'out'});
+  dbUpdate('conversations',activeConvId,{lastMsg:text,lastTime:new Date().toISOString()});
+  inp.value='';
+  renderThread(activeConvId);
+  renderConvList();
+}
+
+function closeConv(){
+  if(!activeConvId)return;
+  document.getElementById('resolveModal').classList.add('open');
+}
+function doCloseConv(){
+  document.getElementById('resolveModal').classList.remove('open');
+  if(!activeConvId)return;
+  dbUpdate('conversations',activeConvId,{status:'closed'});
+  showToast('Percakapan ditutup');
+  renderConvList();
+}
+
+// ── Reconnect channel modal (2 conditions) ──
+function openReconnectModal(){
+  if(!activeConvId)return;
+  const c=DB.conversations.find(x=>x.id===activeConvId);if(!c)return;
+  const ch=DB.channels.find(x=>x.id===c.channel);if(!ch)return;
+  const teamId=c.teamId;
+  // Find available (active) channels of same platform in this team
+  const available=(DB.teamChannels||[]).filter(tc=>tc.teamId===teamId&&tc.platform===c.channel&&tc.status==='active');
+  const title=document.getElementById('rcTitle');
+  const body=document.getElementById('rcBody');
+  title.textContent='⟳ Hubungkan Kembali — '+ch.title;
+  if(available.length>0){
+    // Condition 1: team has replacement channel → select dropdown
+    body.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tim sudah mengganti akun channel. Pilih akun baru untuk percakapan ini.</p>
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px">Akun Channel Tersedia</label>
+      <div id="rcChannelList">${available.map(tc=>`<label style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:6px" onclick="this.querySelector('input').checked=true;document.querySelectorAll('#rcChannelList label').forEach(l=>l.style.borderColor='var(--border)');this.style.borderColor='var(--accent)'"><input type="radio" name="rcChannel" value="${tc.id}" style="accent-color:var(--accent)"><div><div style="font-weight:600;font-size:13px">${tc.name}</div><div style="font-size:11px;color:var(--muted)">${tc.phone}</div></div></label>`).join('')}</div>
+      <div class="modal-actions" style="margin-top:14px"><button class="btn" onclick="document.getElementById('reconnectModal').classList.remove('open')">Batal</button><button class="btn primary" onclick="doReconnectSelect()">Hubungkan</button></div>`;
+  } else {
+    // Condition 2: no replacement → scan QR (WhatsApp Web) or redirect to settings
+    const isWA=c.channel.startsWith('whatsapp');
+    body.innerHTML=isWA
+      ?`<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tim belum mengganti akun. Scan QR untuk menghubungkan kembali nomor WhatsApp.</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg)">
+          <div style="width:200px;height:200px;border:2px dashed var(--border);border-radius:10px;display:grid;place-items:center;font-size:48px;color:var(--muted)">📷</div>
+          <p style="font-size:12px;color:var(--muted)">Buka WhatsApp di ponsel → Pengaturan → Perangkat tertaut → Pindai kode QR</p>
+        </div>
+        <div class="modal-actions" style="margin-top:14px"><button class="btn" onclick="document.getElementById('reconnectModal').classList.remove('open')">Batal</button><button class="btn primary" onclick="doReconnectQR()">⟳ Muat Ulang QR</button></div>`
+      :`<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tim belum mengganti akun. Silakan atur ulang akun channel di halaman pengaturan.</p>
+        <div class="modal-actions" style="margin-top:14px"><button class="btn" onclick="document.getElementById('reconnectModal').classList.remove('open')">Batal</button><button class="btn primary" onclick="showToast('Mengarahkan ke pengaturan…');document.getElementById('reconnectModal').classList.remove('open')">⚙ Buka Pengaturan</button></div>`;
+  }
+  document.getElementById('reconnectModal').classList.add('open');
+}
+function doReconnectSelect(){
+  const sel=document.querySelector('input[name=rcChannel]:checked');
+  if(!sel){showToast('Pilih akun channel terlebih dahulu');return;}
+  const tc=(DB.teamChannels||[]).find(x=>x.id===sel.value);
+  document.getElementById('reconnectModal').classList.remove('open');
+  showToast('Channel berhasil dihubungkan kembali melalui: '+(tc?tc.name:'akun baru'));
+  // ponytail: reconnect is prototype simulation — don't persist, reload resets to disconnected
+}
+function doReconnectQR(){
+  showToast('Memuat ulang QR code…');
+  setTimeout(()=>{
+    document.getElementById('reconnectModal').classList.remove('open');
+    showToast('QR berhasil discan — channel terhubung kembali');
+    // ponytail: prototype simulation — reload resets to disconnected
+  },2000);
+}
+
+// ── Drawer ──
+function toggleDrawer(){
+  const isFloat=layout().classList.contains('drawerFloat');
+  const drawer=document.getElementById('convDrawer');
+  if(isFloat){
+    drawerOpen=!drawerOpen;
+    drawer.style.display=''; // clear inline so CSS .open controls
+    drawer.classList.toggle('open',drawerOpen);
+    const sc=document.getElementById('drawerScrim');if(sc)sc.classList.toggle('on',drawerOpen);
+    updateCloseBtn(drawerOpen);
+  } else {
+    drawer.classList.remove('open'); // clear .open so inline style controls
+    detailOpen=!detailOpen;
+    drawer.style.display=detailOpen?'block':'none';
+    updateCloseBtn(detailOpen);
+  }
+}
+function updateCloseBtn(detailVisible){
+  const btnInline=document.getElementById('btnCloseConv');
+  const btnDrawer=document.getElementById('drawerCloseConv');
+  if(btnInline)btnInline.style.display=detailVisible?'none':'';
+  if(btnDrawer){
+    btnDrawer.style.display=detailVisible?'block':'none';
+    if(detailVisible){btnDrawer.style.position='sticky';btnDrawer.style.bottom='0';btnDrawer.style.margin='12px 15px';btnDrawer.style.width='calc(100% - 30px)';btnDrawer.style.zIndex='3';}
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drawerOpen||detailOpen)toggleDrawer();}});
+
+function dsec(title,badge,inner){
+  const b=badge!=null?`<span class="dbadge">${badge}</span>`:'';
+  return `<details class="dsec" open><summary>${title}${b}<span class="chev">▾</span></summary><div class="dsec-body">${inner}</div></details>`;
+}
+function seeAll(){return `<a class="see-all" onclick="showToast('Prototype: buka daftar lengkap')">Lihat semua ›</a>`;}
+
+function renderDrawer(c,ct){
+  const d=(DB.convDetail||{})[c.id]||{};
+  const team=DB.teams?DB.teams.find(t=>t.id===c.teamId):null;
+  const assignees=(c.assignees||[c.assignee].filter(Boolean)).map(aid=>{const a=DB.agents.find(x=>x.id===aid);return a?a.name:null}).filter(Boolean);
+  const msgs=DB.threads[c.id]||[];
+  const outCount=msgs.filter(m=>m.dir==='out').length;
+  const inCount=msgs.filter(m=>m.dir==='in').length;
+  const pill=t=>`<span class="dpill">${t}</span>`;
+  const row=(k,v)=>`<div class="drow"><span class="dk">${k}</span><span class="dv">${v}</span></div>`;
+  let h='';
+
+  // ── Section order: old proto ──
+  // 1. Customer
+  if(ct){
+    const ch=DB.channels.find(x=>x.id===c.channel);
+    const chPill=ch?`${ch.icon} ${ch.title}`:c.channel;
+    const statusPill=`<span class="dpill" style="background:#d1fae5;color:#065f46">${chPill} · Open</span>`;
+    const labels=(d.clientTags||[]).map(pill).join('')+'<span class="dadd" onclick="openLabelModal()">＋</span>';
+    h+=dsec('Customer',null,
+      `<div style="font-weight:600;font-size:14px">${ct.name}</div>`+
+      `<div class="drow"><span class="dv">${ct.phone} <button class="dlink" style="font-size:10px" onclick="showToast('Disalin')">⧉</button></span></div>`+
+      `<div style="margin:6px 0">${statusPill}</div>`+
+      `<div class="dtags">${labels}</div>`+
+      `<button class="dlink" style="margin:8px 0;font-size:11px;color:var(--primary)" onclick="openProspekModal()">＋ Buat Prospek</button>`);
+  }
+
+  // 2. Simulasi Biaya (whatsapp-api only)
+  if(c.channel==='whatsapp-api'){
+    const totalCount=inCount+outCount;
+    const costEst=totalCount*358;
+    const cfg=DB.costConfig||{};
+    h+=dsec('Simulasi Biaya',null,
+      row('Bubble masuk (inbound)',inCount)+row('Bubble keluar (outbound)',outCount)+row('Total bubble',totalCount)+row('Tarif / bubble','Rp 358')+
+      `<div class="drow"><span class="dk" style="font-weight:700">Total estimasi</span><span class="dv" style="font-weight:700">${fmtRupiah(costEst)}</span></div>`+
+      (cfg.capPerChat>0?`<div class="drow"><span class="dk">Cap bulanan</span><span class="dv">${fmtRupiah(cfg.capPerChat)}</span></div>`:''));
+    // Alert banner when exceeding cap
+    if(cfg.alertEnabled&&cfg.capPerChat>0&&costEst>cfg.capPerChat){
+      h+=`<div style="margin:8px 14px;padding:10px 14px;border-radius:8px;background:#fef3c7;border:1px solid #fde68a;font-size:12px;color:#92400e;font-weight:600">⚠️ Biaya percakapan (${fmtRupiah(costEst)}) melebihi batas (${fmtRupiah(cfg.capPerChat)})</div>`;
+    }
+    // Block banner when blockOnExceed
+    if(cfg.blockOnExceed&&cfg.capPerChat>0&&costEst>cfg.capPerChat){
+      h+=`<div style="margin:8px 14px;padding:10px 14px;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;font-size:12px;color:#991b1b;font-weight:600">🚫 Batas biaya tercapai. Pesan tidak dapat dikirim. Kirim template pesan untuk melanjutkan.</div>`;
+    }
+  }
+
+  // 3. Assignment
+  h+=dsec('Assignment',null,
+    row('Kotak Masuk (Tim)', team?`${team.icon} ${team.title}`:'<a class="dlink">＋ Tetapkan Tim</a>')+
+    row('Penerima (Agen)', assignees.length?assignees.join(', '):'<a class="dlink" onclick="openAssignModal()">＋ Tetapkan Agen</a>')+
+    row('Sumber',d.source||'self-pull'));
+
+  // 4. SLA
+  if(d.sla){
+    const s=d.sla;
+    const slaRow=(lbl,val,state,label,tip)=>`<div class="drow"><span class="dk">${lbl}</span><span class="dv" style="font-weight:600">${val}</span><span class="dpill" style="font-size:10px;${state==='warn'?'background:#fef3c7;color:#92400e':state==='breach'?'background:#fecaca;color:#991b1b':'background:#d1fae5;color:#065f46'}">${label}</span><span style="font-size:10px;color:var(--muted);cursor:help" title="${tip}">ⓘ</span></div>`;
+    h+=dsec('SLA',null,
+      slaRow('FRT',s.frt.val,s.frt.state,s.frt.label,'First Response Time — waktu agent pertama merespons. SLA: 15 menit.')+
+      slaRow('TTC',s.ttc.val,s.ttc.state,s.ttc.label,'Time To Close — hingga percakapan selesai. SLA: 4 jam.')+
+      slaRow('RLT',s.rlt.val,s.rlt.state,s.rlt.label,'Resolution Time — waktu penyelesaian. SLA: 2 jam.')+
+      slaRow('Wait',s.wait.val,s.wait.state,s.wait.label,'Wait time in queue (FE v2.8.0).'));
+  }
+
+  // 5. Tiket
+  const tks=DB.tickets.filter(t=>t.contactId===c.contactId);
+  h+=dsec('Tiket',tks.length||null,
+    tks.length?tks.map(t=>`<div class="dcard"><div class="dcard-t">🎫 ${t.subject}</div><div class="dcard-s">status: <span class="dpill">${t.status}</span></div></div>`).join('')+seeAll():row('Status','Belum ada tiket'));
+
+  // 6. Metadata
+  h+=dsec('Metadata',null,
+    row('Sumber',(DB.channels.find(x=>x.id===c.channel)||{}).title||c.channel)+
+    row('Akun',d.accountConnected||'-')+
+    row('Dibuat',new Date(c.lastTime||ct&&ct.lastActive||Date.now()).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+' WIB')+
+    row('OS',ct&&ct.os||'-')+row('Browser',ct&&ct.browser||'-'));
+
+  // 7. Custom Attributes (new proto extra)
+  if(d.customAttrs)h+=dsec('Atribut Kustom',null,
+    d.customAttrs.map(a=>row(a.k,a.v)).join('')+seeAll());
+
+  // 8. Histori
+  if(d.history)h+=dsec('Histori',d.historyTotal||d.history.length,
+    d.history.map(x=>`<div class="dhist"><span class="av">${x.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</span><div><b>${x.name}</b><div class="dhist-t">${x.time}</div><div class="dhist-p">${x.preview}</div></div></div>`).join('')+seeAll());
+
+  // 9. Catatan
+  if(d.notes)h+=dsec('Catatan',d.notesTotal||d.notes.length,
+    `<input class="dnote-in" placeholder="Tambah catatan…">`+
+    d.notes.map((n,i)=>`<div class="dnote ${i===0?'hl':''}"><span class="pin">📌</span><div><b>${n.by}</b> ${n.text}</div></div>`).join('')+seeAll());
+
+  // 10. Log (Events)
+  if(d.events)h+=dsec('Log',d.eventsTotal||d.events.length,
+    `<div class="dtl">${d.events.map(e=>`<div class="dtl-i"><span class="dot ${e.dot||''}"></span><div><div class="dtl-t">${e.t}</div><div class="dtl-x">${e.text}</div></div></div>`).join('')}</div>`+seeAll());
+
+  // ── Extra sections (new proto) ──
+  if(d.pinned)h+=dsec('Pesan Disematkan',d.pinnedTotal||d.pinned.length,
+    d.pinned.map(p=>`<div class="dpin"><span class="pin">📌</span><div><b>dari ${p.from}</b><div class="dpin-b">${p.text}</div><div class="dpin-m">disematkan oleh ${p.pinnedBy}</div></div></div>`).join('')+seeAll());
+  if(d.media)h+=dsec('Media',d.mediaTotal||d.media.length,
+    `<div class="dgrid">${d.media.map(m=>`<div class="dthumb">${m}</div>`).join('')}</div>`+seeAll());
+  if(d.files)h+=dsec('Berkas',d.filesTotal||d.files.length,
+    d.files.map(f=>`<div class="dfile"><span class="fext ${f.ext}">${f.ext.toUpperCase()}</span><div><div class="dfile-n">${f.name}</div><div class="dfile-m">${f.by} · ${f.size} · ${f.ext}</div></div></div>`).join('')+seeAll());
+
+  if(!c.isGroup) h+=`<button class="btn danger" id="drawerCloseConv" onclick="closeConv()">Tutup Percakapan</button>`;
+
+  document.getElementById('drawerBody').innerHTML=h;
+}
+
+function updCost(id){
+  const el=document.getElementById('drawerCost');
+  if(!el)return; // drawer belum ke-render
+  const count=(DB.threads[id]||[]).filter(m=>m.dir==='out').length;
+  el.textContent=`Bubble: ${count} × Rp 358 = ${fmtRupiah(count*358)}`;
+}
+
+function filterConvList(){renderConvList()}
+
+// ── Label modal ──
+const LABELS=['VIP','Prioritas','Follow-up','Komplain','Spam','Retur','Merchant','Pelanggan','Urgent'];
+function openLabelModal(){
+  if(!activeConvId)return;
+  const d=(DB.convDetail||{})[activeConvId]||{};
+  const cur=d.clientTags||[];
+  renderLabelList(cur,'');
+  document.getElementById('labelSearch').value='';
+  document.getElementById('labelCreate').style.display='none';
+  document.getElementById('labelModal').classList.add('open');
+}
+function renderLabelList(cur,filter){
+  const el=document.getElementById('labelList');
+  const q=filter.toLowerCase();
+  const all=[...new Set([...LABELS,...cur])];
+  const filtered=q?all.filter(l=>l.toLowerCase().includes(q)):all;
+  el.innerHTML=filtered.map(l=>{
+    const active=cur.includes(l);
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;border-radius:6px;${active?'background:var(--accent-light,#dbeafe)':''}" onclick="toggleLabel('${l}')">
+      <span style="font-size:16px">${active?'☑':'☐'}</span>
+      <span style="font-size:13px">${l}</span>
+      ${active?'<span style="margin-left:auto;font-size:10px;color:var(--primary)">✓</span>':''}
+    </div>`;
+  }).join('');
+  document.getElementById('labelCreate').style.display=q&&!all.includes(q)?'block':'none';
+}
+function filterLabels(q){
+  const d=(DB.convDetail||{})[activeConvId]||{};
+  renderLabelList(d.clientTags||[],q);
+}
+function toggleLabel(label){
+  if(!activeConvId)return;
+  if(!DB.convDetail)DB.convDetail={};
+  if(!DB.convDetail[activeConvId])DB.convDetail[activeConvId]={};
+  const d=DB.convDetail[activeConvId];
+  if(!d.clientTags)d.clientTags=[];
+  const i=d.clientTags.indexOf(label);
+  if(i>=0)d.clientTags.splice(i,1); else d.clientTags.push(label);
+  saveStore();
+  renderLabelList(d.clientTags,document.getElementById('labelSearch').value);
+  renderDrawer(DB.conversations.find(x=>x.id===activeConvId),DB.contacts.find(x=>x.id===(DB.conversations.find(x=>x.id===activeConvId)||{}).contactId));
+}
+function createLabel(){
+  const q=document.getElementById('labelSearch').value.trim();
+  if(!q)return;
+  LABELS.push(q);
+  toggleLabel(q);
+  document.getElementById('labelSearch').value='';
+  document.getElementById('labelCreate').style.display='none';
+}
+
+// ── Prospek (Lead) modal — fields from FE AddLeadModal.tsx ──
+function openProspekModal(){
+  if(!activeConvId)return;
+  const c=DB.conversations.find(x=>x.id===activeConvId);if(!c)return;
+  const ct=DB.contacts.find(x=>x.id===c.contactId)||{};
+  // Populate selects
+  const teamSel=document.getElementById('pTeam');
+  teamSel.innerHTML='<option value="">Pilih kotak tim</option>'+DB.teams.map(t=>`<option value="${t.id}" ${t.id===c.teamId?'selected':''}>${t.icon} ${t.title}</option>`).join('');
+  const agentSel=document.getElementById('pAssignee');
+  agentSel.innerHTML='<option value="">Pilih agen</option>'+DB.agents.map(a=>`<option value="${a.id}" ${a.id===c.assignee?'selected':''}>${a.name}</option>`).join('');
+  const chSel=document.getElementById('pChannel');
+  chSel.innerHTML='<option value="">Pilih channel</option>'+DB.channels.filter(ch=>ch.connected!==false).map(ch=>`<option value="${ch.id}" ${ch.id===c.channel?'selected':''}>${ch.icon} ${ch.title}</option>`).join('');
+  // Pre-fill from contact
+  document.getElementById('pTitle').value=ct.name?`Prospek — ${ct.name}`:'';
+  document.getElementById('pContactValue').value=ct.phone||'';
+  document.getElementById('pName').value=ct.name||'';
+  document.getElementById('pOffice').value='';
+  document.getElementById('pJobTitle').value='';
+  document.getElementById('pEmail').value=ct.email||'';
+  document.getElementById('pOfficePhone').value='';
+  document.getElementById('pBusinessType').value='';
+  document.getElementById('pAddress').value=ct.location||'';
+  document.getElementById('prospekModal').classList.add('open');
+}
+function doCreateProspek(){
+  const title=document.getElementById('pTitle').value.trim();
+  const team=document.getElementById('pTeam').value;
+  const name=document.getElementById('pName').value.trim();
+  if(!title||!team||!name){showToast('Lengkapi field wajib (*): Judul, Tim, Nama Kontak');return;}
+  document.getElementById('prospekModal').classList.remove('open');
+  showToast('Prospek berhasil dibuat: '+title);
+}
+
+// ponytail: contact search — filter DB.contacts by name prefix, auto-fill phone/email on match
+function onProspekContactSearch(q){
+  const dl=document.getElementById('dlContacts');
+  const matchEl=document.getElementById('pContactMatch');
+  dl.innerHTML='';
+  if(q.length<2){matchEl.textContent='';return;}
+  const hits=DB.contacts.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  hits.forEach(c=>{const o=document.createElement('option');o.value=c.name;dl.appendChild(o);});
+  // Auto-fill if exact match
+  const exact=hits.find(c=>c.name.toLowerCase()===q.toLowerCase());
+  if(exact){
+    document.getElementById('pContactValue').value=exact.phone||'';
+    document.getElementById('pEmail').value=exact.email||'';
+    document.getElementById('pAddress').value=exact.location||'';
+    matchEl.textContent='✓ Kontak ditemukan — '+exact.phone;
+  } else {
+    matchEl.textContent=hits.length?hits.length+' kontak ditemukan':'Tidak ada match';
+  }
+}
+
+// ── Template message modal (WA API 24h expired) ──
+let selectedTpl=null;
+function openTemplateModal(){
+  const tpls=(DB.templates||[]).filter(t=>t.status==='APPROVED');
+  renderTemplateList(tpls);
+  document.getElementById('tplSearch').value='';
+  document.getElementById('templateModal').classList.add('open');
+}
+function renderTemplateList(tpls){
+  const catColors={UTILITY:'#dbeafe',MARKETING:'#fce7f3',AUTHENTICATION:'#d1fae5'};
+  const el=document.getElementById('tplList');
+  el.innerHTML=tpls.map(t=>{
+    const bg=catColors[t.category]||'#f3f4f6';
+    const btns=t.buttons||[];
+    const btnCount=btns.length;
+    return`<div style="padding:12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" onclick="previewTemplate('${t.id}')" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:${bg};color:var(--fg)">${t.category}</span>
+        <span style="font-size:12px;font-weight:600">${t.name}</span>
+        <span style="font-size:10px;color:var(--muted);margin-left:auto">${t.language}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.4;max-height:40px;overflow:hidden">${t.body}</div>
+      ${btnCount?`<div style="margin-top:6px;font-size:10px;color:var(--muted)">🔘 ${btnCount} tombol</div>`:''}
+    </div>`;
+  }).join('')||'<div style="text-align:center;color:var(--muted);padding:20px">Tidak ada template aktif</div>';
+}
+function filterTemplates(q){
+  const tpls=(DB.templates||[]).filter(t=>t.status==='APPROVED');
+  const filtered=q?tpls.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())||t.body.toLowerCase().includes(q.toLowerCase())):tpls;
+  renderTemplateList(filtered);
+}
+function previewTemplate(id){
+  selectedTpl=(DB.templates||[]).find(t=>t.id===id);
+  if(!selectedTpl)return;
+  document.getElementById('templateModal').classList.remove('open');
+  document.getElementById('tplPreviewTitle').textContent='📋 '+selectedTpl.name;
+  // Render body with {{n}} as highlighted placeholders
+  let body=selectedTpl.body.replace(/\{\{(\d+)\}\}/g,'<span style="background:#fef3c7;padding:1px 4px;border-radius:4px;font-weight:600">{{$1}}</span>');
+  document.getElementById('tplPreviewBody').innerHTML=body;
+  const btns=selectedTpl.buttons||[];
+  document.getElementById('tplPreviewButtons').innerHTML=btns.map(b=>{
+    const style=b.type==='URL'?'background:var(--primary);color:#fff':'background:var(--bg);border:1px solid var(--border)';
+    return`<span style="padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;${style}">${b.text}</span>`;
+  }).join('');
+  document.getElementById('tplPreviewModal').classList.add('open');
+}
+function sendTemplate(){
+  if(!selectedTpl||!activeConvId)return;
+  // Simulate sending template as outgoing message
+  if(!DB.threads[activeConvId])DB.threads[activeConvId]=[];
+  const time=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  DB.threads[activeConvId].push({id:genId('m'),from:'u1',text:'[Template] '+selectedTpl.name+'\n'+selectedTpl.body,time,dir:'out'});
+  dbUpdate('conversations',activeConvId,{lastMsg:'[Template] '+selectedTpl.name,lastTime:new Date().toISOString()});
+  document.getElementById('tplPreviewModal').classList.remove('open');
+  renderThread(activeConvId);
+  renderConvList();
+  showToast('Template "'+selectedTpl.name+'" berhasil dikirim');
+  selectedTpl=null;
+}
+
+function randColor(s){const colors=['#4f46e5','#0891b2','#dc2626','#16a34a','#9333ea','#ea580c','#2563eb'];let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
+
+// ── Assign agent + max conversation guard ──
+let cmPendingAgentId=null;
+function closeModal(id){const e=document.getElementById(id);if(e){e.classList.remove('show');e.classList.remove('open');e.classList.add('hide')}}
+
+function openAssignModal(){
+  const list=document.getElementById('assignAgentList');
+  list.innerHTML=DB.agents.map(a=>{
+    const full=(a.currentConv||0)>=(a.maxConv||10);
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px;cursor:pointer;border-bottom:1px solid var(--border);${full?'opacity:0.6':''}" onclick="tryAssignAgent('${a.id}')">
+      <span style="width:32px;height:32px;border-radius:50%;background:${a.color||'#4f46e5'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">${a.initials||a.name[0]}</span>
+      <div style="flex:1"><div style="font-weight:500;font-size:13px">${a.name}</div><div style="font-size:11px;color:var(--muted)">${a.currentConv||0}/${a.maxConv||10} percakapan</div></div>
+      ${full?'<span style="font-size:11px;color:#ef4444;font-weight:600">PENUH</span>':'<span style="font-size:11px;color:var(--primary)">Pilih</span>'}
+    </div>`;
+  }).join('');
+  document.getElementById('assignModal').classList.add('open');
+}
+
+function tryAssignAgent(aid){
+  const a=DB.agents.find(x=>x.id===aid);
+  if(!a)return;
+  if((a.currentConv||0)>=(a.maxConv||10)){
+    cmPendingAgentId=aid;
+    document.getElementById('cmAgentInfo').textContent=`Agen ${a.name} sudah mencapai batas maksimum percakapan (${a.maxConv||10}). Silakan ubah batas untuk menetapkan.`;
+    document.getElementById('cmCurrent').value=a.maxConv||10;
+    document.getElementById('cmInput').value='';
+    document.getElementById('cmSubmit').disabled=true;
+    closeModal('assignModal');
+    document.getElementById('changeMaxModal').classList.add('open');
+  } else {
+    doAssign(aid);
+  }
+}
+
+function cmValidate(){
+  const v=document.getElementById('cmInput').value;
+  document.getElementById('cmSubmit').disabled=!(v!==''&&/^\d+$/.test(v)&&parseInt(v,10)>0);
+}
+
+function saveMaxAndAssign(){
+  const a=DB.agents.find(x=>x.id===cmPendingAgentId);
+  if(!a)return;
+  a.maxConv=parseInt(document.getElementById('cmInput').value,10);
+  dbUpdate('agents',a.id,a);
+  closeModal('changeMaxModal');
+  doAssign(cmPendingAgentId);
+  cmPendingAgentId=null;
+}
+
+function doAssign(aid){
+  if(!activeConvId)return;
+  const c=DB.conversations.find(x=>x.id===activeConvId);
+  if(!c)return;
+  if(!c.assignees)c.assignees=c.assignee?[c.assignee]:[];
+  if(!c.assignees.includes(aid)){
+    c.assignees.push(aid);
+    const a=DB.agents.find(x=>x.id===aid);
+    if(a){a.currentConv=(a.currentConv||0)+1;dbUpdate('agents',a.id,a)}
+    dbUpdate('conversations',c.id,c);
+  }
+  renderDrawer(c,DB.contacts.find(ct=>ct.id===c.contactId));
+  closeModal('assignModal');
+}
+
+// ── Modal helpers ──
+function openModal(id){
+  const m=document.getElementById(id);if(m)m.classList.remove('hide');
+  if(id==='m-advanced')initAdvFilter();
+}
+// closeModal already defined above
+
+// ── Visibilitas toggles ──
+const visState={waBadge:true,tags:true};
+function toggleVis(key,on){
+  visState[key]=on;
+  const sw=event?.target?.closest?.('.switch');
+  if(sw)sw.classList.toggle('on',on);
+  renderConvList();
+}
+
+// ── Advanced filter (agents + tags) ──
+let advAgents=[], advTags=[];
+function initAdvFilter(){
+  // Agent checkboxes
+  const al=document.getElementById('advAgentList');
+  if(al)al.innerHTML=DB.agents.map(a=>`<label style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px"><input type="checkbox" value="${a.id}" ${advAgents.includes(a.id)?'checked':''} onchange="toggleAdvAgent('${a.id}',this.checked)"> ${a.name}</label>`).join('');
+  // Tag pills
+  const allTags=[...new Set(DB.contacts.flatMap(c=>c.tags||[]))];
+  const tl=document.getElementById('advTagList');
+  if(tl)tl.innerHTML=allTags.map(t=>`<span class="badge-pill" style="cursor:pointer;${advTags.includes(t)?'background:var(--accent);color:#fff':''}" onclick="toggleAdvTag('${t}',this)">${t}</span>`).join('');
+  renderAdvBadges();
+}
+function toggleAdvAgent(id,on){
+  if(on&&!advAgents.includes(id))advAgents.push(id);
+  else if(!on)advAgents=advAgents.filter(a=>a!==id);
+}
+function toggleAdvTag(tag,el){
+  if(advTags.includes(tag)){advTags=advTags.filter(t=>t!==tag);el.style.background='';el.style.color=''}
+  else{advTags.push(tag);el.style.background='var(--accent)';el.style.color='#fff'}
+  renderAdvBadges();
+}
+function renderAdvBadges(){
+  const sa=document.getElementById('selected-agents');
+  if(sa)sa.innerHTML=advAgents.map(id=>{const a=DB.agents.find(x=>x.id===id);return a?`<span class="badge-pill">${a.name} <span onclick="advAgents=advAgents.filter(x=>x!=='${id}');initAdvFilter();renderConvList()" style="cursor:pointer;margin-left:4px">&times;</span></span>`:''}).join('');
+  const st=document.getElementById('selected-tags');
+  if(st)st.innerHTML=advTags.map(t=>`<span class="badge-pill">${t} <span onclick="advTags=advTags.filter(x=>x!=='${t}');initAdvFilter();renderConvList()" style="cursor:pointer;margin-left:4px">&times;</span></span>`).join('');
+}
+function resetAdvFilter(){advAgents=[];advTags=[];initAdvFilter();renderConvList()}
+function applyAdvFilter(){renderConvList()}
+
+// ── Init ──
+renderSideSections();
+setVp(window.innerWidth);
+renderConvList();
+fillBulkDropdowns();
+</script>

@@ -10,6 +10,7 @@ Folder ini menyimpan analisa **market/competitor/positioning strategis** untuk S
 - `satuinbox-usp-innovation-analysis.md` — USP SatuInbox (Proven Operation Engine lintas vertical, hybrid WA — **revisi 2026-08-26: SaaS-only, klaim self-hosted dibuang**) + gap inovasi + roadmap + positioning/pitch/tagline.
 - `satuinbox-logistics-vertical-positioning.md` — kompetitor lokal ID (Barantum, Qiscus, Cekat.AI, Halo AI) + vertical logistik + customer behavior data + kompetitor global post-purchase tracking (AfterShip, Narvar, Parcel Perform, Yalo).
 - `satuinbox-competitor-deep-dive-round3.md` — deep-dive fitur/pricing/client per platform (Qontak, Qiscus, Barantum, Cekat.AI, SleekFlow, Chatwoot) + 3 kandidat baru (Halo AI, Kata.ai, TapTalk OneTalk).
+- `onebox-competitive-deep-dive.md` — **Onebox (ciptadra, ID)**: product map, WhatsApp 1:1 (tanpa Group, tanpa bukti jalur API Meta), RBAC implisit dengan nol dokumentasi publik, celah vs SatuInbox (AI Suggested Reply, docs publik).
 
 ## Batasan
 

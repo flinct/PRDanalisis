@@ -1,0 +1,157 @@
+<!-- Settings: Webhooks -->
+<style>
+.wh-empty{text-align:center;padding:40px;color:var(--muted)}
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.badge.ok{background:#dcfce7;color:#15803d}.badge.err{background:#fef2f2;color:var(--danger)}
+.wh-events{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.wh-event-tag{padding:2px 8px;border-radius:8px;font-size:11px;background:var(--bg);border:1px solid var(--border)}
+.st-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.st-form label input{display:block;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:14px;background:var(--bg)}
+.st-form label input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.wh-ev-checks{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.wh-ev-checks label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item active" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <h2 style="flex:1">Webhook</h2>
+      <button class="btn primary" onclick="openWhForm()">+ Tambah Webhook</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Atur URL endpoint yang akan menerima notifikasi event dari SatuInbox.</p>
+
+    <table class="data-table" id="whTable">
+      <thead><tr><th>URL</th><th>Event</th><th>Status</th><th></th></tr></thead>
+      <tbody id="whBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="whModal">
+  <div class="modal" style="max-width:520px">
+    <h3 id="whModalTitle">Tambah Webhook</h3>
+    <div class="st-form">
+      <label>URL Endpoint<input id="whUrl" placeholder="https://example.com/webhook"></label>
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Event yang dipantau:</div>
+      <div class="wh-ev-checks" id="whEventChecks"></div>
+    </div>
+    <div class="modal-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn" onclick="closeModal('whModal')">Batal</button>
+      <button class="btn primary" onclick="saveWh()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" id="whDelModal">
+  <div class="modal" style="max-width:400px">
+    <h3>Hapus Webhook</h3>
+    <p style="font-size:13px;color:var(--muted);margin:12px 0">Yakin ingin menghapus webhook ini?</p>
+    <div class="modal-actions" style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('whDelModal')">Batal</button>
+      <button class="btn danger" onclick="confirmDelWh()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var WH_EVENTS=['message.incoming','message.sent','conversation.created','conversation.closed','ticket.created','ticket.resolved','lead.created'];
+var whEditId=null,whDelId=null;
+
+function renderWebhooks(){
+  const list=DB.settings.webhooks||[];
+  const tbody=document.getElementById('whBody');
+  if(!list.length){tbody.innerHTML='<tr><td colspan="4" class="wh-empty">Belum ada webhook</td></tr>';return}
+  tbody.innerHTML=list.map(w=>{
+    const evs=w.events.map(e=>'<span class="wh-event-tag">'+e+'</span>').join('');
+    return '<tr>'
+      +'<td style="font-size:13px;word-break:break-all;max-width:300px">'+w.url+'</td>'
+      +'<td><div class="wh-events">'+evs+'</div></td>'
+      +'<td>'+(w.active?'<span class="badge ok">Aktif</span>':'<span class="badge err">Nonaktif</span>')+'</td>'
+      +'<td style="white-space:nowrap">'
+        +'<button class="btn" style="padding:4px 10px;font-size:12px" onclick="toggleWhActive(\''+w.id+'\')">'+(w.active?'Nonaktif':'Aktif')+'</button> '
+        +'<button class="btn" style="padding:4px 10px;font-size:12px" onclick="editWh(\''+w.id+'\')">✏️</button> '
+        +'<button class="btn danger" style="padding:4px 10px;font-size:12px" onclick="delWh(\''+w.id+'\')">🗑️</button>'
+      +'</td></tr>';
+  }).join('');
+}
+
+function whCheckboxes(selected){
+  return WH_EVENTS.map(e=>{
+    const chk=(selected||[]).includes(e)?'checked':'';
+    return '<label><input type="checkbox" value="'+e+'" '+chk+'>'+e+'</label>';
+  }).join('');
+}
+
+function getCheckedEvents(){
+  return Array.from(document.querySelectorAll('#whEventChecks input:checked')).map(i=>i.value);
+}
+
+function openWhForm(id){
+  whEditId=id||null;
+  const w=id?(DB.settings.webhooks||[]).find(x=>x.id===id):null;
+  document.getElementById('whModalTitle').textContent=id?'Edit Webhook':'Tambah Webhook';
+  document.getElementById('whUrl').value=w?w.url:'';
+  document.getElementById('whEventChecks').innerHTML=whCheckboxes(w?w.events:[]);
+  document.getElementById('whModal').classList.add('open');
+}
+
+function editWh(id){openWhForm(id)}
+
+function saveWh(){
+  const url=document.getElementById('whUrl').value.trim();
+  const events=getCheckedEvents();
+  if(!url){showToast('URL wajib diisi');return}
+  if(!events.length){showToast('Pilih minimal satu event');return}
+  if(whEditId){
+    const i=DB.settings.webhooks.findIndex(w=>w.id===whEditId);
+    if(i>=0){DB.settings.webhooks[i]={...DB.settings.webhooks[i],url,events}}
+  }else{
+    DB.settings.webhooks.push({id:genId('wh'),url,events,active:true});
+  }
+  saveStore();
+  closeModal('whModal');
+  renderWebhooks();
+  showToast('Webhook berhasil disimpan');
+}
+
+function delWh(id){whDelId=id;document.getElementById('whDelModal').classList.add('open')}
+function confirmDelWh(){
+  DB.settings.webhooks=DB.settings.webhooks.filter(w=>w.id!==whDelId);
+  saveStore();closeModal('whDelModal');renderWebhooks();showToast('Webhook dihapus');
+}
+
+function toggleWhActive(id){
+  const w=DB.settings.webhooks.find(x=>x.id===id);
+  if(w){w.active=!w.active;saveStore();renderWebhooks()}
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+renderWebhooks();
+</script>

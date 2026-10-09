@@ -1,0 +1,51 @@
+<!-- Broadcast Draft — list of drafts -->
+<div class="broadcast-layout">
+  <aside class="broadcast-sidenav">
+    <div class="sn-title">Broadcast Massal</div>
+    <div class="sn-item" onclick="go('broadcast/messages')">📢 Pesan</div>
+    <div class="sn-item active" onclick="go('broadcast/draft')">📝 Draft</div>
+    <div class="sn-item" onclick="go('broadcast/templates')">📋 Template</div>
+  </aside>
+  <div class="broadcast-body">
+    <div class="page-header">
+      <h1>Draft Broadcast</h1>
+    </div>
+    <div class="page-body" id="draftList"></div>
+  </div>
+</div>
+
+<script>
+function renderDrafts(){
+  const el=document.getElementById('draftList');
+  const drafts=DB.broadcastDrafts;
+  if(!drafts.length){
+    el.innerHTML='<div style="text-align:center;color:var(--muted);padding:60px 0"><div style="font-size:40px;opacity:.4;margin-bottom:8px">📝</div><b>Belum ada draft</b><p style="font-size:13px;margin-top:4px">Buat broadcast baru dari halaman Pesan untuk memulai.</p></div>';
+    return;
+  }
+  el.innerHTML=drafts.map(d=>{
+    const tpl=DB.templates.find(t=>t.id===d.templateId);
+    return `<div class="card" style="display:flex;align-items:center;gap:16px">
+      <div style="flex:1;min-width:0">
+        <b>${d.name}</b>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Template: ${tpl?tpl.name:'-'} · Penerima: ${d.recipients||0}</div>
+      </div>
+      <button class="btn" onclick="editDraft('${d.id}')" style="font-size:12px">✏️ Edit</button>
+      <button class="btn danger" onclick="delDraft('${d.id}')" style="font-size:12px">🗑 Hapus</button>
+    </div>`;
+  }).join('');
+}
+
+function editDraft(id){
+  // ponytail: reuse broadcast modal on messages page
+  go('broadcast/messages');
+  showToast('Edit draft: buka dari halaman Pesan');
+}
+
+function delDraft(id){
+  dbRemove('broadcastDrafts',id);
+  renderDrafts();
+  showToast('Draft dihapus');
+}
+
+renderDrafts();
+</script>

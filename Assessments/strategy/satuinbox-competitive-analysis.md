@@ -20,7 +20,7 @@ Dokumen ini memetakan **landscape kompetitor SatuInbox** — platform omnichanne
 | Kategori | Platform | Overlap dengan SatuInbox |
 |---|---|---|
 | 🔴 **Direct Competitor** | Qontak (Mekari), Respond.io, WATI, SleekFlow | ~80-95% — omnichannel inbox + WhatsApp BSP + ticketing + broadcast |
-| 🟡 **Partial Competitor** | Freshchat (Freshworks), Zendesk, Intercom, Crisp | ~40-60% — strong CS platform tapi WhatsApp bukan core fokus |
+| 🟡 **Partial Competitor** | Freshchat (Freshworks), Zendesk, Intercom, Crisp, **Periskope** | ~40-60% — strong CS platform tapi WhatsApp bukan core fokus (Periskope: WhatsApp-only, no omnichannel, India-focused) |
 | 🟢 **Non-Competitor** | Hootsuite, Lark Suite | <10% — beda kategori (social media mgmt / internal collab) |
 
 ---
@@ -229,6 +229,38 @@ Dokumen ini memetakan **landscape kompetitor SatuInbox** — platform omnichanne
 
 ---
 
+### 3.9 🟡 Periskope — WhatsApp Group Management Specialist
+
+**Positioning:** WhatsApp shared inbox & group management at scale, no Business API required
+**Target:** India-centric (5,000+ businesses, 50+ countries), expanding to EU
+**Parent:** Hashlabs Holdings Inc. (binary.so/periskope)
+**Approach:** WhatsApp Web multi-device (no Business API needed)
+**Security:** ISO 27001, GDPR compliant
+**Pricing:** Not publicly available (pricing page blocked)
+**Deep Dive:** `Assessments/strategy/periskope-competitive-deep-dive-qa-assessment.md`
+
+**Strengths vs SatuInbox:**
+- Purpose-built WhatsApp group management (auto-create, analytics, scheduled messaging)
+- AI Agent (RAG-trained on customer docs, auto-responds, escalates to humans) — uses Google Gemini
+- Auto-ticketing from messages (AI flagging + right-click create)
+- Keyword/out-of-hours auto-reply (shipped)
+- Auto-assign chats by rules (shipped)
+- Number masking for privacy (shipped)
+- Private notes invisible to customer (shipped)
+- Audit logs and data exports (shipped)
+
+**Weaknesses vs SatuInbox:**
+- WhatsApp-only — no omnichannel (no IG, FB, Telegram, Email, Shopee)
+- No official WhatsApp Business API — WhatsApp Web dependency = platform risk + ToS risk
+- No conversation status lifecycle (open/snooze/hold/closed)
+- No SLA engine depth (basic notifications only vs SatuInbox's per-metric FRT/RLT/TTC)
+- No marketplace integration
+- India-focused — different geography from SatuInbox's SEA market
+- RBAC granularity undocumented (simple team model vs SatuInbox's Owner/Admin/Agent/Collaborator)
+- **Architecture fundamentally different**: single-tenant, single-channel, flat number pool vs SatuInbox's multi-tenant, multi-channel, per-account-channel model (see §8.8 in deep dive)
+
+---
+
 ## 4. Positioning Map
 
 ```
@@ -308,6 +340,7 @@ Dokumen ini memetakan **landscape kompetitor SatuInbox** — platform omnichanne
 | zendesk.com | Training knowledge | Industry leader |
 | hootsuite.com | Training knowledge + Worker B research | Social media mgmt |
 | larksuite.com | Worker A research (browser + search) | Collaboration suite |
+| periskope.app | Deep research 2026-09-29 (homepage + docs + security page) | WhatsApp group mgmt specialist |
 
 > **Disclaimer:** Pricing dan fitur berdasarkan data yang tersedia per Agustus 2026. Beberapa data pricing bersifat publik/structured, lainnya dari training knowledge dan bisa berubah.
 

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; width: 600px; padding: 24px; }
+  
+  .popover { background: #1e293b; border: 1px solid #334155; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
+  .popover-header { padding: 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+  .popover-header h2 { font-size: 15px; font-weight: 600; }
+  .popover-header .current-status { font-size: 12px; padding: 4px 10px; border-radius: 6px; background: #1e3a5f; color: #60a5fa; }
+  
+  .section { padding: 12px 16px; }
+  .section-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .section-label .divider { flex: 1; height: 1px; background: #334155; }
+  
+  .status-option { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; cursor: pointer; transition: background 0.1s; }
+  .status-option:hover { background: #334155; }
+  .status-option.forward { border-left: 3px solid #3b82f6; }
+  .status-option.forward:hover { background: #1e3a5f33; }
+  .status-option.terminal { border-left: 3px solid #ef4444; background: #1a0000; }
+  .status-option.terminal:hover { background: #2d0000; }
+  .status-option.locked { opacity: 0.4; cursor: not-allowed; border-left: 3px solid #475569; }
+  .status-option.locked:hover { background: transparent; }
+  .status-left { display: flex; align-items: center; gap: 10px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .status-name { font-size: 13px; font-weight: 500; }
+  .status-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+  .badge-forward { background: #1e3a5f; color: #60a5fa; }
+  .badge-terminal { background: #7f1d1d; color: #fca5a5; }
+  .badge-backward { background: #78350f; color: #fcd34d; }
+  .badge-locked { background: #334155; color: #64748b; }
+  .status-right { display: flex; align-items: center; gap: 6px; }
+  .lock-icon { font-size: 14px; }
+  .arrow-icon { font-size: 12px; color: #64748b; }
+  
+  .confirm-section { padding: 16px; background: #292524; border-top: 1px solid #44403c; }
+  .confirm-title { font-size: 13px; font-weight: 600; color: #fbbf24; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .reason-label { font-size: 12px; color: #a8a29e; margin-bottom: 6px; }
+  .reason-select { width: 100%; background: #1c1917; border: 1px solid #57534e; border-radius: 6px; padding: 8px; color: #e7e5e4; font-size: 13px; margin-bottom: 8px; }
+  .reason-textarea { width: 100%; background: #1c1917; border: 1px solid #57534e; border-radius: 6px; padding: 8px; color: #e7e5e4; font-size: 13px; height: 50px; resize: none; }
+  .confirm-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .btn-cancel { background: #334155; border: none; border-radius: 6px; padding: 8px 16px; color: #94a3b8; font-size: 13px; cursor: pointer; }
+  .btn-confirm { background: #dc2626; border: none; border-radius: 6px; padding: 8px 16px; color: white; font-size: 13px; font-weight: 600; cursor: pointer; }
+  
+  .legend { padding: 12px 16px; background: #0f172a; border-top: 1px solid #334155; }
+  .legend-items { display: flex; gap: 16px; font-size: 11px; color: #64748b; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  
+  .footer-note { margin-top: 16px; font-size: 11px; color: #475569; text-align: center; }
+</style>
+</head>
+<body>
+<div class="popover">
+  <div class="popover-header">
+    <h2>Ubah Status Pipeline</h2>
+    <span class="current-status">Saat ini: 🟢 Qualified</span>
+  </div>
+  
+  <!-- Forward transitions -->
+  <div class="section">
+    <div class="section-label">Maju <span class="divider"></span></div>
+    <div class="status-option forward">
+      <div class="status-left">
+        <div class="status-dot" style="background:#fbbf24;"></div>
+        <span class="status-name">Proposal</span>
+      </div>
+      <div class="status-right">
+        <span class="status-badge badge-forward">Next stage</span>
+        <span class="arrow-icon">→</span>
+      </div>
+    </div>
+    <div class="status-option forward">
+      <div class="status-left">
+        <div class="status-dot" style="background:#f97316;"></div>
+        <span class="status-name">Negotiation</span>
+      </div>
+      <div class="status-right">
+        <span class="status-badge badge-forward">Skip allowed</span>
+        <span class="arrow-icon">→</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Terminal states -->
+  <div class="section" style="padding-top:0;">
+    <div class="section-label">Terminal <span class="divider"></span> ⚠️ Butuh alasan</div>
+    <div class="status-option terminal">
+      <div class="status-left">
+        <div class="status-dot" style="background:#22c55e;"></div>
+        <span class="status-name">Won</span>
+      </div>
+      <div class="status-right">
+        <span class="status-badge badge-terminal">🔒 Terminal</span>
+      </div>
+    </div>
+    <div class="status-option terminal" style="background:#2d0000;">
+      <div class="status-left">
+        <div class="status-dot" style="background:#ef4444;"></div>
+        <span class="status-name">Lost</span>
+      </div>
+      <div class="status-right">
+        <span class="status-badge badge-terminal">🔒 Terminal</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Backward (locked) -->
+  <div class="section" style="padding-top:0;">
+    <div class="section-label">Mundur <span class="divider"></span> 🔒 Butuh approval</div>
+    <div class="status-option locked">
+      <div class="status-left">
+        <div class="status-dot" style="background:#a78bfa;"></div>
+        <span class="status-name">Contacted</span>
+      </div>
+      <div class="status-right">
+        <span class="lock-icon">🔒</span>
+        <span class="status-badge badge-locked">Supervisor only</span>
+      </div>
+    </div>
+    <div class="status-option locked">
+      <div class="status-left">
+        <div class="status-dot" style="background:#60a5fa;"></div>
+        <span class="status-name">New</span>
+      </div>
+      <div class="status-right">
+        <span class="lock-icon">🔒</span>
+        <span class="status-badge badge-locked">Supervisor only</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation for terminal -->
+  <div class="confirm-section">
+    <div class="confirm-title">⚠️ Konfirmasi: Pindah ke Lost</div>
+    <div class="reason-label">Alasan (wajib):</div>
+    <select class="reason-select">
+      <option>Pilih alasan...</option>
+      <option>Budget tidak tersedia</option>
+      <option>Memilih kompetitor</option>
+      <option>Tidak ada kebutuhan</option>
+      <option>Tidak ada respon</option>
+      <option>Lainnya</option>
+    </select>
+    <textarea class="reason-textarea" placeholder="Catatan tambahan (opsional)..."></textarea>
+    <div class="confirm-buttons">
+      <button class="btn-cancel">Batal</button>
+      <button class="btn-confirm">Konfirmasi Lost</button>
+    </div>
+  </div>
+  
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> Forward</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Terminal (reason wajib)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#475569;"></div> Backward (locked)</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  Rekomendasi UFG-006 / MBG-002 / MBG-003: Transition guard + terminal state protection + reason wajib. Ref: HubSpot Pipeline Rules, Pipedrive Lead Qualification.
+</div>
+</body>
+</html>

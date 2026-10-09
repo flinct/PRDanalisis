@@ -1,0 +1,108 @@
+<!-- Settings: CSAT -->
+<style>
+.csat-toggle-bar{display:flex;align-items:center;gap:12px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:20px}
+.csat-toggle-bar .label{flex:1;font-weight:700;font-size:14px}
+.csat-toggle-bar .sub{font-size:12px;color:var(--muted)}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:#ccc;border-radius:22px;transition:.2s}
+.toggle .slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.slider{background:var(--accent)}
+.toggle input:checked+.slider:before{transform:translateX(18px)}
+.csat-form{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:520px}
+.csat-form label{display:block;margin-bottom:14px;font-size:13px;font-weight:600}
+.csat-form input,.csat-form select{width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg)}
+.csat-preview{margin-top:20px;padding:20px;background:var(--bg);border-radius:8px;text-align:center}
+.csat-preview .q{font-size:15px;font-weight:600;margin-bottom:12px}
+.csat-preview .scale{display:flex;justify-content:center;gap:8px}
+.csat-preview .dot{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:default}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">🏢 Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">👥 Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">🔐 Peran</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">🏷️ Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">🕐 Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">🔄 Auto-Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">📥 Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">⏱️ SLA</div>
+    <div class="sn-item active" onclick="go('settings/inbox-csat')">⭐ CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">⚡ Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">🎫 Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">🟢 WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">🔵 WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">💬 Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">🔗 Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin:0 0 4px">⭐ CSAT (Customer Satisfaction)</h2>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Konfigurasi survei kepuasan pelanggan setelah percakapan selesai.</p>
+
+    <div class="csat-toggle-bar">
+      <div>
+        <div class="label">Aktifkan CSAT</div>
+        <div class="sub">Kirim survei otomatis saat percakapan ditutup</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="csatEnabled" onchange="updatePreview();saveCsat()"><span class="slider"></span></label>
+    </div>
+
+    <div class="csat-form" id="csatForm">
+      <label>Pertanyaan survei
+        <input id="csatQuestion" placeholder="Bagaimana pengalaman layanan kami?" oninput="updatePreview();saveCsat()">
+      </label>
+      <label>Skala penilaian
+        <select id="csatScale" onchange="updatePreview();saveCsat()">
+          <option value="1-5">1 - 5 (Bintang)</option>
+          <option value="1-3">1 - 3 (Buruk/Netral/Baik)</option>
+          <option value="1-10">1 - 10 (NPS)</option>
+        </select>
+      </label>
+    </div>
+
+    <h3 style="margin:20px 0 8px;font-size:14px">Preview Survei</h3>
+    <div class="csat-preview" id="csatPreview">
+      <div class="q" id="prevQ">-</div>
+      <div class="scale" id="prevScale"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const csat = DB.settings.csat;
+  document.getElementById('csatEnabled').checked = csat.enabled;
+  document.getElementById('csatQuestion').value = csat.question;
+  document.getElementById('csatScale').value = csat.scale;
+  updatePreview();
+})();
+
+function updatePreview(){
+  const q = document.getElementById('csatQuestion').value || 'Bagaimana pengalaman layanan kami?';
+  const scale = document.getElementById('csatScale').value;
+  document.getElementById('prevQ').textContent = q;
+  const [lo,hi] = scale.split('-').map(Number);
+  let html = '';
+  for(let i=lo;i<=hi;i++) html += `<div class="dot">${i}</div>`;
+  document.getElementById('prevScale').innerHTML = html;
+  document.getElementById('csatForm').style.opacity = document.getElementById('csatEnabled').checked ? 1 : 0.4;
+}
+
+function saveCsat(){
+  DB.settings.csat = {
+    enabled: document.getElementById('csatEnabled').checked,
+    question: document.getElementById('csatQuestion').value,
+    scale: document.getElementById('csatScale').value,
+  };
+  saveStore();
+  showToast('Pengaturan CSAT disimpan');
+}
+</script>

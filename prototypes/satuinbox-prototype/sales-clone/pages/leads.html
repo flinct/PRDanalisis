@@ -1,0 +1,917 @@
+<!-- Leads (Prospek) — Sales Module with Dynamic Pipeline Config -->
+<style>
+.leads-toolbar{display:flex;align-items:center;gap:12px;padding:18px 24px 0;flex-wrap:wrap}
+.leads-toolbar h1{font-size:20px;font-weight:700;flex:1}
+.view-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.view-toggle button{padding:6px 16px;font-size:13px;border:none;background:var(--card);cursor:pointer;color:var(--muted);border-right:1px solid var(--border)}
+.view-toggle button:last-child{border-right:none}
+.view-toggle button.active{background:var(--accent);color:#fff}
+.board-container{display:flex;gap:12px;padding:16px 24px;overflow-x:auto;flex:1;align-items:flex-start}
+.board-col{min-width:230px;max-width:230px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;max-height:calc(100vh - 220px)}
+.board-col-header{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;background:var(--card);z-index:1;border-radius:var(--radius) var(--radius) 0 0}
+.board-col-header .stage-name{font-size:13px;font-weight:600}
+.board-col-header .count{background:var(--bg);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--muted)}
+.board-col-body{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px;overflow-y:auto;flex:1}
+.board-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:grab;transition:.15s;border-left:3px solid var(--accent);user-select:none}
+.board-card:active{cursor:grabbing}
+.board-card.dragging{opacity:.4;transform:scale(.96)}
+.board-col-body.drag-target{background:rgba(79,70,229,.04);border-radius:6px}
+.board-card:hover{box-shadow:var(--shadow);border-color:var(--accent)}
+.board-card .bc-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.board-card .bc-contact{font-size:11px;color:var(--muted);margin-bottom:6px}
+.board-card .bc-meta{display:flex;justify-content:space-between;align-items:center}
+.board-card .bc-amount{font-size:12px;font-weight:600;color:var(--ok);background:#dcfce7;padding:1px 6px;border-radius:4px}
+.board-card .bc-avatar{width:22px;height:22px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff}
+.board-card .bc-tag{font-size:10px;padding:1px 5px;border-radius:3px;display:inline-block;margin-top:4px}
+.tag-hot{background:#fef2f2;color:#dc2626}.tag-warm{background:#fef9c3;color:#a16207}.tag-cold{background:#eff6ff;color:#2563eb}.tag-enterprise{background:#f5f3ff;color:#7c3aed}
+.board-card .bc-seg{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--bg);border:1px solid var(--border);display:inline-block;margin-top:4px;margin-left:3px}
+.board-card .bc-next{font-size:10px;color:var(--warn);margin-top:3px}
+.board-card .bc-visit{font-size:10px;color:var(--ok);margin-top:3px}
+.board-card.no-contact{border-left-color:var(--muted)}
+.leads-table-wrap{padding:0 24px 24px;overflow-x:auto}
+.leads-summary{display:flex;flex-wrap:wrap;gap:16px;padding:12px 24px}
+.leads-summary .stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px}
+.leads-summary .stat .val{font-size:22px;font-weight:700;color:var(--ink)}
+.leads-summary .stat .lbl{font-size:11px;color:var(--muted)}
+.leads-summary .stat.clickable{cursor:pointer}
+.leads-summary .stat.clickable:hover{border-color:var(--accent)}
+.leads-summary .stat.active{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 8%,var(--card))}
+.leads-summary .stat .caret{font-size:10px;color:var(--muted);margin-left:4px}
+.pv-breakdown{width:100%;margin-top:10px}
+.pv-bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--border)}
+.pv-bar .seg{cursor:pointer;transition:opacity .1s}
+.pv-bar .seg:hover{opacity:.75}
+.pv-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px}
+.pv-legend .item{cursor:pointer;font-size:11px;display:flex;align-items:center;gap:5px}
+.pv-legend .dot{width:8px;height:8px;border-radius:2px;flex:0 0 8px}
+.pv-legend .item .v{color:var(--muted)}
+.lead-detail-modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:start center;z-index:100;padding:40px 0;overflow-y:auto}
+.lead-detail-modal.open{display:grid}
+.lead-detail{background:var(--card);border-radius:14px;width:900px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}
+.ld-header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
+.ld-header .back{font-size:18px;cursor:pointer;color:var(--muted);padding:4px}.ld-header .back:hover{color:var(--ink)}
+.ld-breadcrumb{font-size:12px;color:var(--muted)}.ld-breadcrumb span{color:var(--accent);font-weight:500}
+.ld-body{display:grid;grid-template-columns:1fr 280px;min-height:500px}
+.ld-main{padding:20px;overflow-y:auto;max-height:70vh}
+.ld-sidebar{background:var(--bg);border-left:1px solid var(--border);padding:16px;overflow-y:auto;max-height:70vh}
+.ld-summary{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.ld-summary-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.ld-summary-title{font-size:18px;font-weight:700}
+.ld-summary-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ld-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.ld-summary-item .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.ld-summary-item .val{font-size:13px;font-weight:600;margin-top:2px;display:flex;min-width:0}
+.ld-summary-item .val .field-input{width:100%;text-align:left}
+.ld-summary-item .val.green{color:var(--ok)}.ld-summary-item .val.yellow{color:var(--warn)}
+.ld-pipeline{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.ld-pipeline-track{display:flex;gap:3px;margin:8px 0}
+.ld-pipeline-step{flex:1;height:6px;border-radius:3px;background:var(--border)}
+.ld-pipeline-step.done{background:var(--accent)}
+.ld-pipeline-step.current{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.ld-pipeline-labels{display:flex;justify-content:space-between}
+.ld-pipeline-labels span{font-size:9px;color:var(--muted)}
+.ld-pipeline-labels span.active{color:var(--accent);font-weight:700}
+.ld-guard-note{font-size:11px;color:var(--warn);margin-top:8px;padding:6px 10px;background:#fef9c3;border-radius:6px;border-left:3px solid var(--warn)}
+.ld-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.ld-section-header{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:13px;font-weight:600}
+.ld-section-header:hover{background:var(--bg)}
+.ld-section-body{padding:0 14px 12px}
+.field-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.field-row .lbl{color:var(--muted);flex:0 0 90px;font-size:12px}
+.field-row .val{color:var(--ink);text-align:right}
+.field-row .field-cell{flex:1;justify-content:stretch}
+.field-row .field-input{width:100%;text-align:left;background:var(--bg);border-color:var(--border)}
+.contact-new{font-size:12px;color:var(--muted);padding:4px 0 6px}
+.contact-new .link-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;text-decoration:underline;padding:0}
+.cl-title{font-size:18px;font-weight:700;color:var(--ink);border:1px solid transparent;border-radius:6px;padding:2px 6px;width:100%;background:var(--bg)}
+.cl-title:focus{border-color:var(--accent);outline:none}
+.cl-in{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--ink);font-size:13px}
+.cl-in:focus{border-color:var(--accent);outline:none}
+.cl-error{color:var(--danger);font-size:12px;margin:8px 0}
+.cl-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.cl-variant{margin-left:auto;display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px}
+.cl-variant button{width:26px;height:24px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:700;border-radius:4px;cursor:pointer}
+.cl-variant button.active{background:var(--accent);color:#fff}
+.cl-lbl{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.cl-2col{display:flex;gap:10px}
+.cl-2col .cl-lbl{flex:1}
+.cl-stepper-wrap{margin-top:4px}
+.cl-stepper-wrap .ld-pipeline-track{gap:4px;margin:4px 0 6px}
+.cl-step{flex:1;height:20px;border-radius:5px;background:var(--border);cursor:pointer;transition:background .12s}
+.cl-step:hover{opacity:.85}
+.cl-step.done,.cl-step.current{background:var(--accent)}
+.cl-step.current{box-shadow:0 0 6px var(--accent)}
+.cl-step-hint{font-size:10px;color:var(--muted);margin-top:2px}
+.ld-header{display:flex;align-items:center;gap:10px}
+.ld-delete{margin-left:auto;color:var(--danger);border-color:var(--danger)}
+.field-input{border:1px solid transparent;border-radius:4px;padding:2px 6px;font-size:13px;text-align:right;background:transparent;color:var(--ink);flex:1;min-width:0;transition:.15s;cursor:default}
+.field-input[readonly]{pointer-events:none}
+.field-cell{position:relative;display:inline-flex;align-items:center;justify-content:flex-end;flex:1;min-width:0;cursor:pointer;gap:4px}
+.field-cell:hover .field-input:not(.editing){border-color:var(--border);background:var(--card)}
+.field-cell:hover .edit-hint{opacity:1}
+.field-input.editing{pointer-events:auto;cursor:text;border-color:var(--accent);background:var(--card);box-shadow:0 0 0 2px rgba(79,70,229,.1)}
+.field-input:focus{border-color:var(--accent);outline:none;background:var(--card);box-shadow:0 0 0 2px rgba(79,70,229,.1)}
+.edit-hint{position:absolute;bottom:100%;right:0;margin-bottom:4px;background:var(--ink);color:var(--card);font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none;z-index:5}
+.edit-hint::after{content:'';position:absolute;top:100%;right:12px;border:4px solid transparent;border-top-color:var(--ink)}
+textarea.field-input{text-align:left;width:100%;min-height:60px;resize:vertical}
+select.field-input{text-align:left;cursor:pointer;appearance:auto;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;padding-right:20px}
+.tl-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg)}
+.tl-item:last-child{border-bottom:none}
+.tl-icon{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;flex-shrink:0}
+.tl-icon.status{background:#dbeafe}.tl-icon.comment{background:#ede9fe}.tl-icon.visit{background:#dcfce7}.tl-icon.activity{background:#fef3c7}.tl-icon.created{background:var(--bg);border:1px solid var(--border)}
+.tl-body{flex:1}.tl-title{font-size:12px;line-height:1.4}.tl-title strong{font-weight:600}
+.tl-detail{font-size:11px;color:var(--muted);margin-top:2px}.tl-time{font-size:10px;color:#9ca3af;margin-top:2px}
+.qa-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:6px;width:100%}
+.qa-btn:hover{border-color:var(--accent);background:var(--bg)}
+.qa-form{border:1px solid var(--border);border-radius:8px;padding:10px;margin:0 0 6px;background:var(--card);display:none}
+.qa-form.open{display:block}
+.qa-form label{display:block;font-size:11px;color:var(--muted);margin:6px 0 3px}
+.qa-form label:first-child{margin-top:0}
+.qa-form input,.qa-form select,.qa-form textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;box-sizing:border-box}
+.qa-form textarea{height:44px;resize:none}
+.qa-form .row{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+.qa-form .row button{font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg)}
+.qa-form .row button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.transition-popover{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:200}
+.transition-popover.open{display:grid}
+.transition-panel{background:var(--card);border-radius:14px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+.tp-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.tp-header h3{font-size:15px;font-weight:600}
+.tp-section{padding:10px 18px}
+.tp-section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.tp-section-label .line{flex:1;height:1px;background:var(--border)}
+.tp-option{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;margin-bottom:4px;cursor:pointer;border:1px solid var(--border);transition:.1s}
+.tp-option:hover{background:var(--bg)}
+.tp-option.forward{border-left:3px solid var(--accent)}
+.tp-option.terminal{border-left:3px solid var(--danger);background:#fef2f2}
+.tp-option.terminal:hover{background:#fee2e2}
+.tp-option.locked{opacity:.35;cursor:not-allowed;border-left:3px solid var(--border)}
+.tp-opt-left{display:flex;align-items:center;gap:8px}
+.tp-opt-dot{width:10px;height:10px;border-radius:50%}
+.tp-opt-name{font-size:13px;font-weight:500}
+.tp-opt-badge{font-size:10px;padding:2px 6px;border-radius:4px}
+.badge-next{background:#dbeafe;color:#2563eb}.badge-terminal{background:#fef2f2;color:#dc2626}.badge-locked{background:var(--bg);color:var(--muted)}
+.tp-confirm{padding:14px 18px;background:#fefce8;border-top:1px solid var(--border)}
+.tp-confirm-title{font-size:13px;font-weight:600;color:var(--warn);margin-bottom:8px}
+.tp-confirm label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.tp-confirm select,.tp-confirm textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);margin-bottom:8px}
+.tp-confirm textarea{height:50px;resize:none}
+.tp-actions{display:flex;gap:8px;justify-content:flex-end;padding:0 18px 16px}
+.visit-pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer;transition:.15s}
+.visit-pill:hover{border-color:var(--accent);background:var(--bg)}
+.visit-count{background:var(--danger);color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+.visit-count.zero{background:var(--muted)}
+.vm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:120}
+.vm-overlay.open{display:grid}
+.vm-panel{background:var(--card);border-radius:14px;width:75vw;height:75vh;max-width:1100px;box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+.vm-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.vm-head h2{font-size:17px;font-weight:700}
+.vm-close{cursor:pointer;font-size:20px;color:var(--muted);background:none;border:none;line-height:1}
+.vm-close:hover{color:var(--ink)}
+.vm-body{flex:1;overflow-y:auto}
+
+/* ============================================================
+   4 LAYOUT VARIAN — switch dari main nav (rail 🎨). Class di #app.
+   Semua reuse elemen toolbar/summary/filter yg sama; hanya reflow CSS.
+   ponytail: tanpa render JS baru — cukup body-class + CSS + 1 FAB markup.
+   ============================================================ */
+/* FAB (dipakai varian B & D) — default sembunyi */
+#leadsFab{display:none;position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:28px;border:none;box-shadow:0 6px 20px rgba(79,70,229,.45);
+  cursor:pointer;z-index:50;align-items:center;justify-content:center}
+#leadsFab:hover{background:var(--accent-hover)}
+
+/* ---------- A · Grouped + Quiet State ---------- */
+/* active filter jadi tint lembut (bukan solid), create tetap CTA solid; grup dipisah spacing */
+#app.layout-a .filter-chip.active{background:var(--accent-soft,#eef2ff);color:var(--accent);border-color:var(--accent)}
+#app.layout-a .leads-toolbar{padding-bottom:6px}
+#app.layout-a #leadsFilterBar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:4px;order:9;flex-basis:100%}
+#app.layout-a #leadsFilterBar::-webkit-scrollbar{display:none}
+
+/* ---------- B · FAB + KPI Carousel ---------- */
+/* create inline → FAB; view-toggle hidden (paksa board); KPI 1-baris scroll semua width */
+#app.layout-b .view-toggle{display:none}
+#app.layout-b .leads-toolbar > .btn.primary{display:none}
+#app.layout-b #leadsFab{display:flex}
+#app.layout-b .leads-summary{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+#app.layout-b .leads-summary::-webkit-scrollbar{display:none}
+#app.layout-b .leads-summary .stat{flex:0 0 200px}
+#app.layout-b #leadsFilterBar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;flex-basis:100%;order:9;margin-top:4px}
+#app.layout-b #leadsFilterBar::-webkit-scrollbar{display:none}
+#app.layout-b .filter-chip.active{background:var(--accent-soft,#eef2ff);color:var(--accent);border-color:var(--accent)}
+
+/* ---------- C · Tab Underline ---------- */
+/* filter chip → tab underline (beda bentuk dari tombol → hierarki jelas); view-toggle hidden */
+#app.layout-c .view-toggle{display:none}
+#app.layout-c .leads-summary .stat .val{font-size:18px}
+#app.layout-c #leadsFilterBar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:2px;flex-basis:100%;order:9;
+  border-bottom:1px solid var(--border);padding-bottom:0;margin-top:6px}
+#app.layout-c #leadsFilterBar::-webkit-scrollbar{display:none}
+#app.layout-c .filter-chip{border:none!important;border-radius:0!important;background:none!important;color:var(--muted)!important;
+  padding:9px 12px!important;border-bottom:2px solid transparent!important;white-space:nowrap;font-weight:600}
+#app.layout-c .filter-chip.active{color:var(--accent)!important;border-bottom-color:var(--accent)!important}
+
+/* ---------- D · Compact + FAB ---------- */
+/* rapetin toolbar, KPI ringkas, create → FAB, view-toggle hidden, board card padat */
+#app.layout-d .view-toggle{display:none}
+#app.layout-d .board-card{padding:7px 9px}
+#app.layout-d .board-card .bc-contact{margin-bottom:3px}
+#app.layout-d .leads-toolbar{padding-top:12px;padding-bottom:4px;gap:8px}
+#app.layout-d .leads-toolbar h1{font-size:18px}
+#app.layout-d .leads-toolbar > .btn.primary{display:none}
+#app.layout-d #leadsFab{display:flex}
+#app.layout-d .leads-summary{gap:8px;padding-top:6px;padding-bottom:6px}
+#app.layout-d .leads-summary .stat{padding:8px 12px}
+#app.layout-d .leads-summary .stat .val{font-size:17px}
+#app.layout-d #leadsFilterBar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;flex-basis:100%;order:9;margin-top:2px}
+#app.layout-d #leadsFilterBar::-webkit-scrollbar{display:none}
+#app.layout-d .filter-chip.active{background:var(--accent-soft,#eef2ff);color:var(--accent);border-color:var(--accent)}
+</style>
+
+<div class="leads-toolbar">
+  <h1>💰 Prospek</h1>
+  <button class="visit-pill" onclick="openVisitModal()" title="Kunjungan menunggu approval">
+    📍 Kunjungan<span class="visit-count" id="visitApprovalCount">0</span>
+  </button>
+  <div class="view-toggle">
+    <button id="vtBoard" class="active" onclick="setLeadsView('board')">📊 Board</button>
+    <button id="vtTable" onclick="setLeadsView('table')">📋 Table</button>
+  </div>
+  <div class="page-filters" style="padding:0;border:none" id="leadsFilterBar"></div>
+  <button class="btn" id="sortBtn" onclick="toggleSortDir()">↕ Tanggal</button>
+  <button class="btn primary" onclick="openCreateLead()">＋ Prospek Baru</button>
+</div>
+<div class="leads-summary" id="leadsSummary"></div>
+<div class="vm-overlay" id="visitModal" onclick="if(event.target===this)closeVisitModal()">
+  <div class="vm-panel">
+    <div class="vm-head"><h2>📍 Kunjungan — Approval</h2><button class="vm-close" onclick="closeVisitModal()">✕</button></div>
+    <div class="vm-body" id="visitModalBody"></div>
+  </div>
+</div>
+<div class="lead-detail-modal" id="createLeadModal" onclick="if(event.target===this)closeCreateLead()">
+  <div class="lead-detail" style="width:640px">
+    <div class="ld-header">
+      <span class="back" onclick="closeCreateLead()">←</span>
+      <div class="ld-breadcrumb">Sales / <a onclick="closeCreateLead()">Leads</a> / <span>Prospek Baru</span></div>
+      <div class="cl-variant" id="clVariant">
+        <button data-v="a" onclick="setCreateVariant('a')" title="Tampilan detail">A</button>
+        <button data-v="b" onclick="setCreateVariant('b')" title="Tampilan ringkas">B</button>
+        <button data-v="c" onclick="setCreateVariant('c')" title="Form sederhana">C</button>
+      </div>
+    </div>
+    <div id="clBody"></div>
+  </div>
+</div>
+<div class="board-container" id="leadsBoard"></div>
+<button id="leadsFab" onclick="openCreateLead()" title="Prospek Baru" aria-label="Prospek Baru">＋</button>
+<div class="leads-table-wrap hide" id="leadsTableWrap">
+  <table class="data-table" id="leadsTable">
+    <thead><tr><th>Judul Lead</th><th>Nama PIC</th><th>Segment</th><th>Status</th><th>Nilai</th><th>Assignee</th><th>Next Action</th></tr></thead>
+    <tbody id="leadsTableBody"></tbody>
+  </table>
+</div>
+<div class="lead-detail-modal" id="leadDetailModal" onclick="if(event.target===this)closeLeadDetail()">
+  <div class="lead-detail" id="leadDetailContent"></div>
+</div>
+<div class="transition-popover" id="transitionPopover" onclick="if(event.target===this)closeTransition()">
+  <div class="transition-panel" id="transitionPanel"></div>
+</div>
+
+<script>
+// === DYNAMIC STAGES FROM SETTINGS ===
+function getStages(){ return DB.settings?.leadStages||[]; }
+function getSegments(){ return DB.settings?.leadSegments||[]; }
+function getTerminal(){ return getStages().filter(s=>s.isTerminal).map(s=>s.key); }
+function getForwardMap(){
+  const stages=getStages();
+  const terminal=getTerminal();
+  const map={};
+  stages.forEach((s,i)=>{
+    if(terminal.includes(s.key)){map[s.key]=[];return}
+    map[s.key]=stages.slice(i+1).map(x=>x.key);
+  });
+  return map;
+}
+function stageByKey(key){ return getStages().find(s=>s.key===key); }
+function stageIndex(key){ return getStages().findIndex(s=>s.key===key); }
+
+var LOST_REASONS=['Budget tidak tersedia','Memilih kompetitor','Tidak ada kebutuhan','Tidak ada respon','Lainnya'];
+var leadsView='board',leadFilter='all',editLeadId=null,detailLeadId=null,sortDir='desc',pvOpen=false;
+
+// === INLINE-EDIT FIELD BUILDERS ===
+// Field terkunci; hover kasih tooltip, double-click buka edit + fokus.
+var _hint='<span class="edit-hint">Klik 2x untuk edit</span>';
+function _cell(inner){return `<span class="field-cell" ondblclick="unlockField(this)">${inner}${_hint}</span>`;}
+function editInput(id,field,value,type){
+  type=type||'text';
+  return _cell(`<input class="field-input" type="${type}" value="${(value==null?'':String(value)).replace(/"/g,'&quot;')}" readonly onchange="saveLeadField('${id}','${field}',this.value)" onblur="lockField(this)">`);
+}
+function editSelect(id,field,value,options){
+  var opts=options.map(o=>`<option${o.v===value?' selected':''} value="${o.v}">${o.t}</option>`).join('');
+  return `<span class="field-cell"><select class="field-input" onchange="saveLeadField('${id}','${field}',this.value);lockField(this)" onblur="lockField(this)">${opts}</select><span class="edit-hint">Klik untuk ganti</span></span>`;
+}
+function editTextarea(id,field,value){
+  return `<span class="field-cell" style="width:100%" ondblclick="unlockField(this)"><textarea class="field-input" readonly onchange="saveLeadField('${id}','${field}',this.value)" onblur="lockField(this)">${value||''}</textarea>${_hint}</span>`;
+}
+// ponytail: input pakai 100ms delay biar single-click (buka detail) tidak nge-fokus;
+// select unlock sinkron biar dblclick yang sama langsung buka list (native select
+// tak bisa di-open programatik, jadi harus interaktif saat mousedown ke-2 mendarat)
+function unlockField(cell){
+  var f=cell.querySelector('.field-input');
+  if(f.tagName==='SELECT'){f.classList.add('editing');f.focus();return;}
+  setTimeout(function(){
+    f.classList.add('editing');
+    f.removeAttribute('readonly');
+    f.focus();
+    if(f.select)f.select();
+  },100);
+}
+function lockField(f){
+  f.classList.remove('editing');
+  if(f.tagName!=='SELECT')f.setAttribute('readonly','');
+}
+
+// === FILTER CHIPS (dynamic) ===
+function renderFilterBar(){
+  const stages=getStages();
+  const bar=document.getElementById('leadsFilterBar');
+  bar.innerHTML=`<span class="filter-chip ${leadFilter==='all'?'active':''}" onclick="filterLeads(this,'all')">Semua</span>`+
+    (leadFilter==='__followup'?`<span class="filter-chip active" onclick="toggleFollowupFilter()" style="border-color:var(--warn)">📅 Butuh Follow-up ✕</span>`:'')+
+    stages.map(s=>`<span class="filter-chip ${leadFilter===s.key?'active':''}" onclick="filterLeads(this,'${s.key}')">${s.icon} ${s.label}</span>`).join('');
+}
+
+// === RENDER ===
+// ponytail: satu ambang follow-up dipakai KPI + filter (hindari 2 angka yang bisa beda).
+var FOLLOWUP_DAYS=3;
+function isFollowup(l){return l.nextActionAt&&new Date(l.nextActionAt)<=new Date(Date.now()+FOLLOWUP_DAYS*864e5)}
+function matchLeadFilter(l){
+  if(leadFilter==='all')return true;
+  if(leadFilter==='__followup')return isFollowup(l);
+  return l.status===leadFilter;
+}
+function renderLeads(){
+  renderFilterBar();
+  renderSummary();
+  var n=(DB.visits||[]).filter(v=>v.status==='waiting_review').length;
+  var el=document.getElementById('visitApprovalCount');
+  if(el){el.textContent=n;el.classList.toggle('zero',n===0);}
+  if(leadsView==='board')renderBoard();else renderTable();
+}
+
+function renderSummary(){
+  const leads=DB.leads||[];
+  const terminal=getTerminal();
+  const stages=getStages();
+  const pipeline=leads.filter(l=>!terminal.includes(l.status)).reduce((s,l)=>s+(l.value||0),0);
+  const followup=leads.filter(isFollowup).length;
+  // ponytail: satu kartu clickable per stage terminal (Won/Lost/Closed) — preset-agnostic.
+  var termCards=stages.filter(s=>terminal.includes(s.key)).map(function(s){
+    var col=leads.filter(l=>l.status===s.key);
+    return {key:s.key,label:s.label,color:s.color,icon:s.icon,
+            val:col.reduce((t,l)=>t+(l.value||0),0),count:col.length};
+  });
+  // ponytail: pipeline value split by active (non-terminal) stage. data already here, no new field.
+  var pvStages=stages.filter(s=>!terminal.includes(s.key)).map(function(s){
+    var col=leads.filter(l=>l.status===s.key);
+    return {key:s.key,label:s.label,color:s.color,icon:s.icon,
+            val:col.reduce((t,l)=>t+(l.value||0),0),count:col.length};
+  });
+  var bd='';
+  if(pvOpen){
+    var bar=pvStages.map(s=>s.val<=0?'':`<div class="seg" title="${s.label}: ${fmtRupiah(s.val)} (${s.count} lead)" onclick="filterStage('${s.key}')" style="flex:${s.val};background:${s.color}"></div>`).join('');
+    var legend=pvStages.map(s=>`<div class="item" onclick="filterStage('${s.key}')"><span class="dot" style="background:${s.color}"></span>${s.icon} ${s.label} <span class="v">${fmtRupiah(s.val)} · ${s.count}</span></div>`).join('');
+    bd=`<div class="pv-breakdown"><div class="pv-bar">${bar||'<div class="seg" style="flex:1;background:var(--border)"></div>'}</div><div class="pv-legend">${legend}</div></div>`;
+  }
+  document.getElementById('leadsSummary').innerHTML=`
+    <div class="stat"><div class="val">${leads.length}</div><div class="lbl">Total Leads</div></div>
+    <div class="stat clickable" onclick="togglePvBreakdown()"><div class="val" style="color:var(--ok)">${fmtRupiah(pipeline)}<span class="caret">${pvOpen?'▲':'▼'}</span></div><div class="lbl">Pipeline Value</div></div>
+    <div class="stat clickable${leadFilter==='__followup'?' active':''}" onclick="toggleFollowupFilter()"><div class="val" style="color:var(--warn)">${followup}</div><div class="lbl">Butuh Follow-up${leadFilter==='__followup'?' · aktif ✕':''}</div></div>
+    ${termCards.map(s=>`<div class="stat clickable${leadFilter===s.key?' active':''}" onclick="filterStage('${s.key}')"><div class="val" style="color:${s.color}">${fmtRupiah(s.val)}</div><div class="lbl">${s.icon} ${s.label} · ${s.count}${leadFilter===s.key?' ✕':''}</div></div>`).join('')}
+    ${bd}
+  `;
+}
+function togglePvBreakdown(){pvOpen=!pvOpen;renderSummary()}
+function filterStage(key){leadFilter=(leadFilter===key)?'all':key;renderLeads()}
+function toggleFollowupFilter(){leadFilter=(leadFilter==='__followup')?'all':'__followup';renderLeads()}
+
+function renderBoard(){
+  const wrap=document.getElementById('leadsBoard');
+  wrap.classList.remove('hide');
+  document.getElementById('leadsTableWrap').classList.add('hide');
+  const stages=getStages();
+  const leads=(DB.leads||[]).filter(matchLeadFilter).sort((a,b)=>sortDir==='desc'?new Date(b.createdAt)-new Date(a.createdAt):new Date(a.createdAt)-new Date(b.createdAt));
+  wrap.innerHTML=stages.map(s=>{
+    const col=leads.filter(l=>l.status===s.key);
+    return `<div class="board-col">
+      <div class="board-col-header">
+        <span class="stage-name" style="color:${s.color}">${s.icon} ${s.label}</span>
+        <span class="count">${col.length}</span>
+      </div>
+      <div class="board-col-body" data-stage="${s.key}" ondragover="boardDragOver(event)" ondragleave="boardDragLeave(event)" ondrop="boardDrop(event,'${s.key}')">${col.map(l=>renderBoardCard(l,s)).join('')||'<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">Kosong</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBoardCard(l,stageObj){
+  const a=DB.agents.find(x=>x.id===l.assignee);
+  const seg=l.segment?`<span class="bc-seg">${l.segment}</span>`:'';
+  const nextHtml=l.nextAction?`<div class="bc-next">📅 ${l.nextAction}${l.nextActionAt?' · '+fmtDate(l.nextActionAt):''}</div>`:'';
+  // ponytail: visit belum-selesai (on_plan/waiting_review) -> badge di card. data dari DB.visits.
+  const vs=(DB.visits||[]).find(v=>v.leadId===l.id&&(v.status==='on_plan'||v.status==='waiting_review'));
+  const visitHtml=vs?`<div class="bc-visit">📍 Visit ${vs.status==='waiting_review'?'menunggu review':fmtDate(vs.plannedAt)}</div>`:'';
+  return `<div class="board-card${l.contact?'':' no-contact'}" style="border-left-color:${stageObj?.color||'var(--accent)'}" draggable="true" data-id="${l.id}" ondragstart="boardDragStart(event,'${l.id}')" ondragend="boardDragEnd(event)" onclick="openLeadDetail('${l.id}')">
+    <div class="bc-title">${l.company}</div>
+    <div class="bc-contact">${l.contact?'👤 '+l.contact:'⚠️ Tanpa kontak'}</div>
+    <div class="bc-meta">
+      <span class="bc-amount">${fmtRupiah(l.value||0)}</span>
+      <div class="bc-avatar">${a?a.initials:'?'}</div>
+    </div>
+    ${seg}${nextHtml}${visitHtml}
+  </div>`;
+}
+
+function renderTable(){
+  document.getElementById('leadsBoard').classList.add('hide');
+  document.getElementById('leadsTableWrap').classList.remove('hide');
+  const stages=getStages();
+  const leads=(DB.leads||[]).filter(matchLeadFilter).sort((a,b)=>sortDir==='desc'?new Date(b.createdAt)-new Date(a.createdAt):new Date(a.createdAt)-new Date(b.createdAt));
+  document.getElementById('leadsTableBody').innerHTML=leads.map(l=>{
+    const a=DB.agents.find(x=>x.id===l.assignee);
+    const sObj=stageByKey(l.status);
+    return `<tr onclick="openLeadDetail('${l.id}')" style="cursor:pointer">
+      <td><strong>${l.company}</strong></td>
+      <td>${l.contact||'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${l.segment?`<span class="bc-seg">${l.segment}</span>`:'—'}</td>
+      <td><span class="status" style="background:${sObj?.color||'#888'}22;color:${sObj?.color||'#888'}">${sObj?.label||l.status}</span></td>
+      <td style="font-weight:600">${fmtRupiah(l.value||0)}</td>
+      <td>${a?a.name:'-'}</td>
+      <td style="font-size:12px;color:var(--warn)">${l.nextAction||'—'}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">Belum ada prospek</td></tr>';
+}
+
+function setLeadsView(v){leadsView=v;document.getElementById('vtBoard').classList.toggle('active',v==='board');document.getElementById('vtTable').classList.toggle('active',v==='table');renderLeads()}
+function filterLeads(el,status){document.querySelectorAll('#leadsFilterBar .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');leadFilter=status;renderLeads()}
+function toggleSortDir(){sortDir=sortDir==='desc'?'asc':'desc';document.getElementById('sortBtn').textContent=sortDir==='desc'?'↓ Terbaru':'↑ Terlama';renderLeads()}
+
+// === DRAG & DROP ===
+var dragLeadId=null;
+function boardDragStart(e,leadId){dragLeadId=leadId;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',leadId);e.target.classList.add('dragging')}
+function boardDragEnd(e){e.target.classList.remove('dragging');document.querySelectorAll('.drag-target').forEach(el=>el.classList.remove('drag-target'));dragLeadId=null}
+function boardDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-target')}
+function boardDragLeave(e){e.currentTarget.classList.remove('drag-target')}
+function boardDrop(e,newStatus){
+  e.preventDefault();e.currentTarget.classList.remove('drag-target');
+  const leadId=e.dataTransfer.getData('text/plain')||dragLeadId;if(!leadId)return;
+  const l=dbFind('leads',leadId);if(!l||l.status===newStatus)return;
+  const terminal=getTerminal();
+  if(terminal.includes(newStatus)){openTransition(leadId);return}
+  const oldLabel=stageByKey(l.status)?.label;const newLabel=stageByKey(newStatus)?.label;
+  dbUpdate('leads',leadId,{status:newStatus});
+  dbAdd('leadActivities',{id:genId('la'),leadId,type:'status',actor:DB.currentUser?.id||'u1',text:`Status: ${oldLabel} → ${newLabel}`,detail:'Drag & drop',at:new Date().toISOString()});
+  renderLeads();showToast(`Status: ${l.company} → ${newLabel}`);
+}
+
+// === LEAD DETAIL ===
+function openLeadDetail(id){
+  detailLeadId=id;
+  const l=dbFind('leads',id);if(!l)return;
+  const a=DB.agents.find(x=>x.id===l.assignee);
+  const activities=(DB.leadActivities||[]).filter(ac=>ac.leadId===id).sort((a,b)=>new Date(b.at)-new Date(a.at));
+  const stages=getStages();
+  const sObj=stageByKey(l.status);
+  const sIdx=stageIndex(l.status);
+  const stageLabels=stages.map((s,i)=>`<span class="${i<sIdx?'active':''}">${s.label}</span>`).join('');
+  const stageTrack=stages.map((s,i)=>`<div class="ld-pipeline-step ${i<sIdx?'done':i===sIdx?'current':''}"></div>`).join('');
+  const terminal=getTerminal();
+  const terminalLabels=terminal.map(k=>stageByKey(k)?.label).join('/');
+  const tlIcon={status:'🔄',comment:'💬',visit:'📍',activity:'📅',created:'👤'};
+
+  document.getElementById('leadDetailContent').innerHTML=`
+    <div class="ld-header">
+      <span class="back" onclick="closeLeadDetail()">←</span>
+      <div class="ld-breadcrumb">Sales / <a onclick="closeLeadDetail()">Leads</a> / <span>${l.company}</span></div>
+      ${canDelete()?`<button class="btn ld-delete" onclick="deleteLead('${l.id}')" title="Hapus prospek">🗑 Hapus</button>`:''}
+    </div>
+    <div class="ld-body">
+      <div class="ld-main">
+        <div class="ld-summary">
+          <div class="ld-summary-top">
+            <div>
+              <div class="ld-summary-title">${l.company}</div>
+              <div class="ld-summary-sub">${l.contact||'Tanpa kontak'}${l.phone?' · '+l.phone:''} · Sumber: ${l.source}${l.segment?' · Segment: '+l.segment:''}</div>
+            </div>
+            <span class="status" style="background:${sObj?.color||'#888'}22;color:${sObj?.color||'#888'};font-size:13px;padding:4px 12px">${sObj?.icon||'•'} ${sObj?.label||l.status}</span>
+          </div>
+          <div class="ld-summary-grid">
+            <div class="ld-summary-item"><div class="lbl">Amount</div><div class="val green">${editInput(l.id,'value',l.value||0,'number')}</div></div>
+            <div class="ld-summary-item"><div class="lbl">Assignee</div><div class="val">${editSelect(l.id,'assignee',l.assignee,DB.agents.map(ag=>({v:ag.id,t:ag.name})))}</div></div>
+            <div class="ld-summary-item"><div class="lbl">Next Action</div><div class="val yellow">${editInput(l.id,'nextAction',l.nextAction||'','text')}</div></div>
+            <div class="ld-summary-item"><div class="lbl">Next Date</div><div class="val">${editInput(l.id,'nextActionAt',l.nextActionAt?l.nextActionAt.substring(0,10):'','date')}</div></div>
+          </div>
+        </div>
+        <div class="ld-pipeline">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">📍 Status Pipeline</div>
+          <div class="ld-pipeline-track">${stageTrack}</div>
+          <div class="ld-pipeline-labels">${stageLabels}</div>
+          <div class="ld-guard-note">⚠️ Transisi ke <b>${terminalLabels}</b> memerlukan alasan. Kembali dari terminal butuh approval Supervisor.</div>
+        </div>
+        <div class="ld-section">
+          <div class="ld-section-header" onclick="this.nextElementSibling.classList.toggle('hide')">👤 Informasi Kontak <span style="color:var(--muted)">▼</span></div>
+          <div class="ld-section-body">
+            <div class="field-row"><span class="lbl">Nama PIC</span>${contactField(l.id,'contact',l.contact||'')}</div>
+            <div class="field-row"><span class="lbl">Telepon</span>${contactField(l.id,'phone',l.phone||'')}</div>
+            <div class="field-row"><span class="lbl">Email</span>${contactField(l.id,'email',l.email||'')}</div>
+            <div class="field-row"><span class="lbl">Judul Lead</span>${editInput(l.id,'company',l.company,'text')}</div>
+            <div id="ldContactSuggest"></div>
+            ${contactDatalist()}
+            <div class="field-row"><span class="lbl">Sumber</span>${editSelect(l.id,'source',l.source,['WhatsApp','Widget','Broadcast','Referral'].map(s=>({v:s,t:s})))}</div>
+            <div class="field-row"><span class="lbl">Segment</span>${editSelect(l.id,'segment',l.segment||'',[{v:'',t:'— Tanpa segment —'}].concat(getSegments().map(s=>({v:s,t:s}))))}</div>
+          </div>
+        </div>
+        <div class="ld-section">
+          <div class="ld-section-header" onclick="this.nextElementSibling.classList.toggle('hide')">📝 Deskripsi <span style="color:var(--muted)">▼</span></div>
+          <div class="ld-section-body">${editTextarea(l.id,'description',l.description||'')}</div>
+        </div>
+        <div class="ld-section">
+          <div class="ld-section-header" onclick="this.nextElementSibling.classList.toggle('hide')">📋 Activity Timeline (${activities.length}) <span style="color:var(--muted)">▼</span></div>
+          <div class="ld-section-body">
+            ${activities.length?activities.map(ac=>{const actor=DB.agents.find(x=>x.id===ac.actor);return `<div class="tl-item"><div class="tl-icon ${ac.type}">${tlIcon[ac.type]||'•'}</div><div class="tl-body"><div class="tl-title"><strong>${ac.actor==='system'?'System':actor?actor.name:'Unknown'}</strong> ${ac.text}</div>${ac.detail?`<div class="tl-detail">${ac.detail}</div>`:''}<div class="tl-time">${fmtDate(ac.at)} · ${fmtTime(ac.at)}</div></div></div>`}).join(''):'<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">Belum ada aktivitas</div>'}
+          </div>
+        </div>
+      </div>
+      <div class="ld-sidebar">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:10px">⚡ Quick Actions</div>
+        <button class="qa-btn" onclick="openTransition('${l.id}')">🔄 Ubah Status</button>
+        <button class="qa-btn" onclick="toggleQaForm('qaActivity')">📅 Jadwalkan Aktivitas</button>
+        <div class="qa-form" id="qaActivity">
+          <label>Jenis</label>
+          <select id="qaActType"><option value="Telepon">📞 Telepon</option><option value="Meeting">🤝 Meeting</option><option value="WhatsApp">💬 WhatsApp</option><option value="Email">✉️ Email</option></select>
+          <label>Tanggal</label>
+          <input type="date" id="qaActDate" value="${new Date().toISOString().slice(0,10)}">
+          <label>Catatan</label>
+          <textarea id="qaActNote" placeholder="Opsional..."></textarea>
+          <div class="row"><button onclick="toggleQaForm('qaActivity')">Batal</button><button class="primary" onclick="saveActivity('${l.id}')">Simpan</button></div>
+        </div>
+        <button class="qa-btn" onclick="toggleQaForm('qaVisit')">📍 Buat Visit</button>
+        <div class="qa-form" id="qaVisit">
+          <label>Tanggal &amp; jam</label>
+          <input type="datetime-local" id="qaVisDate" value="${new Date(Date.now()+864e5).toISOString().slice(0,16)}">
+          <label>Lokasi</label>
+          <input type="text" id="qaVisLoc" placeholder="Kantor / alamat kunjungan">
+          <label>Tujuan</label>
+          <textarea id="qaVisNote" placeholder="Mis. presentasi proposal"></textarea>
+          <div class="row"><button onclick="toggleQaForm('qaVisit')">Batal</button><button class="primary" onclick="saveVisit('${l.id}')">Buat</button></div>
+        </div>
+        <div style="border-top:1px solid var(--border);margin:16px 0"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">💬 Komentar</div>
+        <textarea id="ldCommentInput" placeholder="Tulis komentar..." style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:13px;height:60px;resize:none"></textarea>
+        <button class="btn primary" style="margin-top:6px;float:right;font-size:12px" onclick="addLeadComment('${l.id}')">Kirim</button>
+        <div style="clear:both;border-top:1px solid var(--border);margin:16px 0"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">📊 Ringkasan</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          <div>Days in stage: <strong style="color:var(--ink)">${Math.max(1,Math.floor((Date.now()-new Date(l.createdAt))/864e5))} hari</strong></div>
+          ${terminal.includes(l.status)?`<div style="color:var(--ok);margin-top:4px">🏆 ${sObj?.label||'Closed'} · ${fmtDate(l.wonAt||l.lostAt||l.closedAt)}</div>`:''}
+          ${l.lostReason?`<div style="color:var(--danger);margin-top:4px">❌ ${l.lostReason}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('leadDetailModal').classList.add('open');
+  renderContactSuggest(id);
+}
+function closeLeadDetail(){document.getElementById('leadDetailModal').classList.remove('open');detailLeadId=null}
+function addLeadComment(id){const input=document.getElementById('ldCommentInput');const text=input.value.trim();if(!text)return;dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'comment',actor:DB.currentUser?.id||'u1',text:'Menambahkan komentar',detail:'"'+text+'"',at:new Date().toISOString()});input.value='';openLeadDetail(id);showToast('Komentar ditambahkan')}
+function toggleQaForm(fid){var f=document.getElementById(fid);if(!f)return;document.querySelectorAll('.qa-form.open').forEach(o=>{if(o!==f)o.classList.remove('open')});f.classList.toggle('open')}
+function saveActivity(id){
+  var type=document.getElementById('qaActType').value;
+  var date=document.getElementById('qaActDate').value;
+  var note=document.getElementById('qaActNote').value.trim();
+  if(!date){showToast('Tanggal wajib diisi');return}
+  var at=new Date(date+'T09:00:00').toISOString();
+  dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'activity',actor:DB.currentUser?.id||'u1',text:'Dijadwalkan: '+type,detail:note||null,at:at});
+  // next action drives "Butuh Follow-up" metric + sorting
+  dbUpdate('leads',id,{nextAction:type+(note?' — '+note:''),nextActionAt:at});
+  openLeadDetail(id);renderLeads();showToast('Aktivitas dijadwalkan');
+}
+function saveVisit(id){
+  var l=dbFind('leads',id);if(!l)return;
+  var dt=document.getElementById('qaVisDate').value;
+  var loc=document.getElementById('qaVisLoc').value.trim();
+  var note=document.getElementById('qaVisNote').value.trim();
+  if(!dt){showToast('Tanggal & jam wajib diisi');return}
+  if(!loc){showToast('Lokasi wajib diisi');return}
+  var at=new Date(dt).toISOString();
+  dbAdd('visits',{id:genId('vs'),leadId:id,assignee:l.assignee,status:'on_plan',outcome:null,plannedAt:at,checkedInAt:null,closedAt:null,location:loc,note:note||null,approval:null});
+  dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'visit',actor:DB.currentUser?.id||'u1',text:'Visit dijadwalkan',detail:loc,at:at});
+  openLeadDetail(id);renderLeads();showToast('Visit dibuat (menunggu kunjungan)');
+}
+
+// === TRANSITION GUARD ===
+function openTransition(id){
+  const l=dbFind('leads',id);if(!l)return;
+  const stages=getStages();const terminal=getTerminal();const fwdMap=getForwardMap();
+  const sObj=stageByKey(l.status);
+  const forwards=fwdMap[l.status]||[];
+  const curIdx=stageIndex(l.status);
+  const backward=stages.filter((s,i)=>i<curIdx&&!terminal.includes(s.key));
+  const isTerminal=terminal.includes(l.status);
+
+  let html=`<div class="tp-header"><h3>Ubah Status</h3><span style="font-size:12px;padding:4px 10px;border-radius:6px;background:${sObj?.color||'#888'}22;color:${sObj?.color||'#888'}">${sObj?.icon||'•'} ${sObj?.label||l.status}</span></div>`;
+
+  if(forwards.length){
+    html+=`<div class="tp-section"><div class="tp-section-label">Maju <span class="line"></span></div>`;
+    forwards.forEach(sk=>{
+      const fs=stageByKey(sk);if(!fs)return;
+      const isTerm=terminal.includes(sk);
+      html+=`<div class="tp-option ${isTerm?'terminal':'forward'}" onclick="${isTerm?`selectTerminal('${id}','${sk}')`:`doTransition('${id}','${sk}')`}">
+        <div class="tp-opt-left"><div class="tp-opt-dot" style="background:${fs.color}"></div><span class="tp-opt-name">${fs.label}</span></div>
+        <span class="tp-opt-badge ${isTerm?'badge-terminal':'badge-next'}">${isTerm?'🔒 Terminal':'→ Next'}</span>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(backward.length){
+    html+=`<div class="tp-section"><div class="tp-section-label">Mundur <span class="line"></span> 🔒 Butuh approval</div>`;
+    backward.forEach(bs=>{
+      html+=`<div class="tp-option locked"><div class="tp-opt-left"><div class="tp-opt-dot" style="background:${bs.color}"></div><span class="tp-opt-name">${bs.label}</span></div><span class="tp-opt-badge badge-locked">Supervisor</span></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  html+=`<div id="tpConfirmArea"></div>`;
+  document.getElementById('transitionPanel').innerHTML=html;
+  document.getElementById('transitionPopover').classList.add('open');
+}
+
+function selectTerminal(id,newStatus){
+  const reasonOpts=LOST_REASONS.map(r=>`<option>${r}</option>`).join('');
+  const label=stageByKey(newStatus)?.label||newStatus;
+  document.getElementById('tpConfirmArea').innerHTML=`<div class="tp-confirm">
+    <div class="tp-confirm-title">⚠️ Konfirmasi: ${label}</div>
+    <label>Alasan (wajib):</label>
+    <select id="tpReason"><option value="">Pilih alasan...</option>${reasonOpts}</select>
+    <textarea id="tpNote" placeholder="Catatan tambahan (opsional)..."></textarea>
+  </div>
+  <div class="tp-actions"><button class="btn" onclick="closeTransition()">Batal</button><button class="btn danger" onclick="confirmTerminal('${id}','${newStatus}')">Konfirmasi ${label}</button></div>`;
+}
+
+function confirmTerminal(id,newStatus){
+  const reason=document.getElementById('tpReason').value;
+  if(!reason){showToast('Alasan wajib diisi');return}
+  const oldStatus=dbFind('leads',id)?.status;
+  const patch_={status:newStatus};
+  if(newStatus==='won'){patch_.wonReason=reason;patch_.wonAt=new Date().toISOString()}
+  if(newStatus==='lost'){patch_.lostReason=reason;patch_.lostAt=new Date().toISOString()}
+  dbUpdate('leads',id,patch_);
+  dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'status',actor:DB.currentUser?.id||'u1',text:`Status: ${stageByKey(oldStatus)?.label||oldStatus} → ${stageByKey(newStatus)?.label||newStatus}`,detail:reason,at:new Date().toISOString()});
+  closeTransition();closeLeadDetail();renderLeads();showToast('Status diperbarui');
+}
+
+function doTransition(id,newStatus){
+  const oldStatus=dbFind('leads',id)?.status;
+  dbUpdate('leads',id,{status:newStatus});
+  dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'status',actor:DB.currentUser?.id||'u1',text:`Status: ${stageByKey(oldStatus)?.label||oldStatus} → ${stageByKey(newStatus)?.label||newStatus}`,detail:null,at:new Date().toISOString()});
+  closeTransition();closeLeadDetail();renderLeads();showToast(`Status: ${stageByKey(newStatus)?.label||newStatus}`);
+}
+
+function closeTransition(){document.getElementById('transitionPopover').classList.remove('open')}
+
+// === CONTACT AUTOCOMPLETE ===
+// Satu datalist berisi tiap contact per field queryable (name/phone/email).
+// User ketik di field mana pun; onchange cari match lintas field lalu autofill.
+// ponytail: linear scan DB.contacts. Ratusan kontak masih instan; index kalau ribuan.
+function _esc(s){return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function contactDatalist(){
+  var opts=(DB.contacts||[]).map(function(c){
+    var extra=[c.phone,c.email].filter(Boolean).join(' · ');
+    // option per field agar ketik nomor/email tetap memunculkan kontak (label=nama)
+    var rows=[c.name,c.phone,c.email].filter(Boolean).map(function(v){
+      return '<option value="'+_esc(v)+'" label="'+_esc(c.name+(extra?' — '+extra:''))+'"></option>';
+    });
+    return rows.join('');
+  }).join('');
+  return '<datalist id="contactSuggest">'+opts+'</datalist>';
+}
+function contactField(id,field,value){
+  return _cell('<input class="field-input" list="contactSuggest" type="text" value="'+_esc(value)+'" readonly'+
+    ' onchange="saveContactField(\''+id+'\',\''+field+'\',this.value)" onblur="lockField(this)">');
+}
+// cari kontak yang salah satu field-nya sama persis (case-insensitive) dengan query
+function findContact(q){
+  if(!q)return null;
+  var k=q.trim().toLowerCase();
+  return (DB.contacts||[]).find(function(c){
+    return [c.name,c.phone,c.email].some(function(v){return v&&String(v).toLowerCase()===k;});
+  })||null;
+}
+function saveContactField(id,field,value){
+  saveLeadField(id,field,value); // simpan apa adanya dulu (boleh kosong, boleh kontak baru)
+  var c=findContact(value);
+  if(c){
+    // autofill field lain yang masih kosong / berbeda + tautkan contactId
+    var patch={contactId:c.id};
+    if(c.name)patch.contact=c.name;
+    if(c.phone)patch.phone=c.phone;
+    if(c.email)patch.email=c.email;
+    dbUpdate('leads',id,patch);
+    openLeadDetail(id);
+    showToast('Kontak "'+c.name+'" ditautkan');
+  }else if(value&&value.trim()){
+    renderContactSuggest(id);
+  }
+}
+// tawarkan simpan kontak baru saat nama diisi tapi tak ada di collection
+function renderContactSuggest(id){
+  var box=document.getElementById('ldContactSuggest');
+  if(!box)return;
+  var l=dbFind('leads',id);
+  if(!l||l.contactId||!l.contact){box.innerHTML='';return;}
+  if(findContact(l.contact)){box.innerHTML='';return;}
+  box.innerHTML='<div class="contact-new">Kontak baru — '+
+    '<button class="link-btn" onclick="saveNewContact(\''+id+'\')">Simpan ke daftar kontak</button></div>';
+}
+function saveNewContact(id){
+  var l=dbFind('leads',id);
+  if(!l||!l.contact)return;
+  var c={id:genId('c'),name:l.contact,phone:l.phone||null,email:l.email||null,channel:'manual',tags:[],lastActive:new Date().toISOString()};
+  dbAdd('contacts',c);
+  dbUpdate('leads',id,{contactId:c.id});
+  openLeadDetail(id);
+  showToast('Kontak "'+c.name+'" disimpan ke daftar');
+}
+
+// === INLINE EDIT ===
+function saveLeadField(id,field,value){
+  if(field==='value')value=+value||0;
+  if(value==='')value=null;
+  var patch_={};
+  patch_[field]=value;
+  dbUpdate('leads',id,patch_);
+  dbAdd('leadActivities',{id:genId('la'),leadId:id,type:'activity',actor:DB.currentUser?.id||'u1',text:`${field} diperbarui`,detail:String(value).substring(0,80),at:new Date().toISOString()});
+  showToast('Tersimpan');
+  // Refresh board/table behind modal
+  renderLeads();
+}
+
+// === VISIT MODAL (inject visits fragment, run its script in-page) ===
+function openVisitModal(){
+  var body=document.getElementById('visitModalBody');
+  var frag=(window.__PAGES&&window.__PAGES['pages/visits.html'])||'<div style="padding:40px">Bundle visits.html hilang — jalankan build.py</div>';
+  body.innerHTML=frag;
+  // run inline scripts (visits.html defines renderVisits + handlers on window)
+  body.querySelectorAll('script').forEach(function(s){
+    var ns=document.createElement('script');ns.textContent=s.textContent;document.body.appendChild(ns);s.remove();
+  });
+  document.getElementById('visitModal').classList.add('open');
+}
+function closeVisitModal(){
+  document.getElementById('visitModal').classList.remove('open');
+  renderLeads(); // refresh counter after approve/reject
+}
+
+// === CREATE LEAD (form + validasi) ===
+var CL_FIELDS=['clCompany','clContact','clPhone','clEmail','clValue','clAssignee','clSource','clSegment','clStatus'];
+var clVariant='a';
+// ponytail: create hanya boleh stage non-terminal — won/lost butuh reason+approval, jalur itu di detail modal (confirmTerminal). getTerminal() sudah ada.
+function clStages(){var t=getTerminal();return getStages().filter(s=>!t.includes(s.key));}
+function clFirstStage(){return clStages()[0]?.key||'new';}
+// tiga varian tampilan form create. field id sama di ketiganya → save/validasi tak berubah.
+function clSelectsHTML(){
+  var seg='<option value="">— Tanpa segment —</option>'+getSegments().map(s=>'<option value="'+_esc(s)+'">'+_esc(s)+'</option>').join('');
+  var asg=DB.agents.map(a=>'<option value="'+a.id+'"'+(a.id===(DB.currentUser?.id)?' selected':'')+'>'+_esc(a.name)+'</option>').join('');
+  var src='<option>WhatsApp</option><option>Widget</option><option>Broadcast</option><option>Referral</option>';
+  var sts=clStages().map(s=>'<option value="'+s.key+'">'+_esc(s.icon+' '+s.label)+'</option>').join('');
+  return {seg:seg,asg:asg,src:src,sts:sts};
+}
+function clBodyHTML(v){
+  var o=clSelectsHTML();
+  var contact='<input id="clContact" class="cl-in" list="contactSuggest" type="text" placeholder="Ketik nama / telepon / email" oninput="clFillContact()">';
+  var phone='<input id="clPhone" class="cl-in" type="text" placeholder="+62…">';
+  var email='<input id="clEmail" class="cl-in" type="email" placeholder="email@…">';
+  var val='<input id="clValue" class="cl-in" type="number" min="0" placeholder="0">';
+  var asg='<select id="clAssignee" class="cl-in">'+o.asg+'</select>';
+  var src='<select id="clSource" class="cl-in">'+o.src+'</select>';
+  var seg='<select id="clSegment" class="cl-in">'+o.seg+'</select>';
+  var sts='<select id="clStatus" class="cl-in">'+o.sts+'</select>';
+  var actions='<div id="clError" class="cl-error hide"></div><div class="cl-actions"><button class="btn" onclick="closeCreateLead()">Batal</button><button class="btn primary" onclick="saveCreateLead()">Simpan Prospek</button></div>';
+  var host='<div id="clDatalistHost"></div>';
+  if(v==='a'){ // detail-style: summary card + section akordeon
+    return '<div style="padding:20px">'+
+      '<div class="ld-summary"><div class="ld-summary-top"><div style="flex:1">'+
+      '<input id="clCompany" class="cl-title" type="text" placeholder="Judul Lead (perusahaan / perorangan) *" oninput="clError(\'\')">'+
+      '<div class="ld-summary-sub">Prospek baru · isi detail di bawah</div></div></div>'+
+      '<div class="cl-stepper-wrap" id="clStepperWrap"></div>'+
+      '<input type="hidden" id="clStatus">'+
+      '<div class="ld-summary-grid">'+
+      '<div class="ld-summary-item"><div class="lbl">Nilai</div><div class="val green">'+val+'</div></div>'+
+      '<div class="ld-summary-item"><div class="lbl">Assignee</div><div class="val">'+asg+'</div></div>'+
+      '<div class="ld-summary-item"><div class="lbl">Sumber</div><div class="val">'+src+'</div></div>'+
+      '<div class="ld-summary-item"><div class="lbl">Segment</div><div class="val">'+seg+'</div></div>'+
+      '</div></div>'+
+      '<div class="ld-section"><div class="ld-section-header">👤 Informasi Kontak</div><div class="ld-section-body">'+
+      '<div class="field-row"><span class="lbl">Nama PIC</span>'+contact+'</div>'+
+      '<div class="field-row"><span class="lbl">Telepon</span>'+phone+'</div>'+
+      '<div class="field-row"><span class="lbl">Email</span>'+email+'</div>'+host+'</div></div>'+actions+'</div>';
+  }
+  if(v==='b'){ // ringkas: satu kolom label-atas, tanpa akordeon/grid
+    return '<div style="padding:20px;display:flex;flex-direction:column;gap:12px">'+
+      '<label class="cl-lbl">Judul Lead *<input id="clCompany" class="cl-in" type="text" placeholder="Perusahaan / perorangan" oninput="clError(\'\')"></label>'+
+      '<label class="cl-lbl">Status'+sts+'</label>'+
+      '<label class="cl-lbl">Nama PIC'+contact+'</label>'+
+      '<label class="cl-lbl">Telepon'+phone+'</label>'+
+      '<label class="cl-lbl">Email'+email+'</label>'+
+      '<label class="cl-lbl">Nilai'+val+'</label>'+
+      '<label class="cl-lbl">Assignee'+asg+'</label>'+
+      '<label class="cl-lbl">Sumber'+src+'</label>'+
+      '<label class="cl-lbl">Segment'+seg+'</label>'+host+actions+'</div>';
+  }
+  // v==='c' — form sederhana padat: 2 kolom
+  return '<div style="padding:20px;display:flex;flex-direction:column;gap:8px">'+
+    '<label class="cl-lbl">Judul Lead *<input id="clCompany" class="cl-in" type="text" placeholder="Perusahaan / perorangan" oninput="clError(\'\')"></label>'+
+    '<label class="cl-lbl">Nama PIC'+contact+'</label>'+
+    '<div class="cl-2col"><label class="cl-lbl">Telepon'+phone+'</label><label class="cl-lbl">Email'+email+'</label></div>'+
+    '<div class="cl-2col"><label class="cl-lbl">Nilai'+val+'</label><label class="cl-lbl">Sumber'+src+'</label></div>'+
+    '<div class="cl-2col"><label class="cl-lbl">Assignee'+asg+'</label><label class="cl-lbl">Segment'+seg+'</label></div>'+
+    '<div class="cl-2col"><label class="cl-lbl">Status'+sts+'</label><span style="flex:1"></span></div>'+host+actions+'</div>';
+}
+function clReadFields(){var d={};CL_FIELDS.forEach(id=>{var e=document.getElementById(id);if(e)d[id]=e.value;});return d;}
+function clWriteFields(d){CL_FIELDS.forEach(id=>{var e=document.getElementById(id);if(e&&d[id]!=null)e.value=d[id];});}
+// stepper klik (varian A): fill semua segmen sampai stage yang diklik, mirip pipeline detail
+function clRenderStepper(){
+  var wrap=document.getElementById('clStepperWrap');if(!wrap)return;
+  var stages=clStages(),cur=document.getElementById('clStatus').value,ci=stages.findIndex(s=>s.key===cur);
+  if(ci<0)ci=0;
+  wrap.innerHTML='<div class="ld-pipeline-track">'+stages.map((s,i)=>'<div class="cl-step'+(i<ci?' done':i===ci?' current':'')+'" onclick="clSetStatus(\''+s.key+'\')"></div>').join('')+'</div>'+
+    '<div class="ld-pipeline-labels">'+stages.map((s,i)=>'<span'+(i===ci?' class="active"':'')+'>'+_esc(s.label)+'</span>').join('')+'</div>'+
+    '<div class="cl-step-hint">Won / Lost diset setelah lead dibuat (butuh alasan).</div>';
+}
+function clSetStatus(key){if(getTerminal().includes(key))return;document.getElementById('clStatus').value=key;clRenderStepper();}
+function clRenderBody(keep){
+  document.getElementById('clBody').innerHTML=clBodyHTML(clVariant);
+  var host=document.getElementById('clDatalistHost');if(host)host.innerHTML=contactDatalist();
+  var so=document.getElementById('clSource');if(so&&!(keep&&keep.clSource))so.value='WhatsApp';
+  var st=document.getElementById('clStatus');if(st&&!(keep&&keep.clStatus))st.value=clFirstStage();
+  if(keep)clWriteFields(keep);
+  clRenderStepper();
+  document.querySelectorAll('#clVariant button').forEach(b=>b.classList.toggle('active',b.dataset.v===clVariant));
+  clError('');
+}
+function setCreateVariant(v){var keep=clReadFields();clVariant=v;clRenderBody(keep);}
+function openCreateLead(){
+  clRenderBody(null);
+  document.getElementById('createLeadModal').classList.add('open');
+  document.getElementById('clCompany').focus();
+}
+function closeCreateLead(){document.getElementById('createLeadModal').classList.remove('open')}
+function clError(msg){var e=document.getElementById('clError');if(!e)return;e.textContent=msg;e.classList.toggle('hide',!msg);}
+// autofill telepon/email saat nama kontak cocok kontak existing
+function clFillContact(){
+  var c=findContact(document.getElementById('clContact').value);
+  if(!c)return;
+  document.getElementById('clContact').value=c.name||'';
+  if(c.phone)document.getElementById('clPhone').value=c.phone;
+  if(c.email)document.getElementById('clEmail').value=c.email;
+}
+function saveCreateLead(){
+  var company=document.getElementById('clCompany').value.trim();
+  if(company.length<3){clError('Judul Lead minimal 3 karakter');document.getElementById('clCompany').focus();return;}
+  var contact=document.getElementById('clContact').value.trim()||null;
+  var phone=document.getElementById('clPhone').value.trim()||null;
+  var email=document.getElementById('clEmail').value.trim()||null;
+  if(email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){clError('Format email tidak valid');document.getElementById('clEmail').focus();return;}
+  var value=Math.max(0,+document.getElementById('clValue').value||0);
+  var source=document.getElementById('clSource').value;
+  var segment=document.getElementById('clSegment').value||null;
+  var agentId=document.getElementById('clAssignee').value||DB.currentUser?.id||'u1';
+  var status=document.getElementById('clStatus').value;
+  if(!status||getTerminal().includes(status))status=clFirstStage(); // guard: lead baru tak boleh lahir terminal (won/lost butuh reason di detail)
+  var c=contact?findContact(contact):null; // tautkan bila kontak sudah ada
+  var newId=genId('ld');
+  dbAdd('leads',{id:newId,company:company,contact:contact,phone:phone,email:email,contactId:c?c.id:null,value:value,source:source,description:'',assignee:agentId,teamId:'t2',tags:[],segment:segment,status:status,nextAction:null,nextActionAt:null,createdAt:new Date().toISOString()});
+  dbAdd('leadActivities',{id:genId('la'),leadId:newId,type:'created',actor:'system',text:'Lead dibuat',detail:'Assignee: '+(DB.agents.find(a=>a.id===agentId)?.name||'-'),at:new Date().toISOString()});
+  closeCreateLead();
+  renderLeads();
+  openLeadDetail(newId);
+  showToast('Prospek "'+company+'" dibuat');
+}
+
+// === DELETE LEAD (spv + admin) ===
+// ponytail: effective role dari class #app (role switcher), sama seperti gating lain.
+function currentRole(){return (document.getElementById('app')?.className.match(/role-(\w+)/)||[])[1]||'agent';}
+function canDelete(){return currentRole()==='admin'||currentRole()==='spv';}
+function deleteLead(id){
+  if(!canDelete()){showToast('Hanya Supervisor/Admin yang bisa hapus prospek');return;}
+  var l=dbFind('leads',id);if(!l)return;
+  if(!confirm('Hapus prospek "'+l.company+'"? Tindakan ini tidak bisa dibatalkan.'))return;
+  dbRemove('leads',id);
+  (DB.leadActivities||[]).filter(a=>a.leadId===id).forEach(a=>dbRemove('leadActivities',a.id));
+  (DB.visits||[]).filter(v=>v.leadId===id).forEach(v=>dbRemove('visits',v.id));
+  closeLeadDetail();
+  renderLeads();
+  showToast('Prospek "'+l.company+'" dihapus');
+}
+
+// Init
+renderLeads();
+</script>

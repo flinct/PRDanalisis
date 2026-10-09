@@ -1,0 +1,333 @@
+<!-- Settings: Lead Pipeline Config -->
+<style>
+.lp-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.lp-section h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.lp-stage-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card);cursor:grab;transition:background .15s}
+.lp-stage-row:active{cursor:grabbing;opacity:.7}
+.lp-stage-row .drag-handle{color:var(--muted);font-size:14px;cursor:grab;width:20px;text-align:center}
+.lp-stage-row .stage-icon{font-size:18px;width:28px;text-align:center}
+.lp-stage-row .stage-label{flex:1;font-size:13px;font-weight:500}
+.lp-stage-row .stage-key{font-size:11px;color:var(--muted);font-family:monospace;background:var(--bg);padding:2px 6px;border-radius:4px}
+.lp-stage-row .stage-color{width:28px;height:28px;border-radius:6px;border:2px solid var(--border);cursor:pointer}
+.lp-stage-row .stage-terminal{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.lp-stage-row .stage-terminal input{width:14px;height:14px}
+.lp-stage-row .btn-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px}
+.lp-stage-row .btn-del:hover{background:rgba(239,68,68,.1)}
+.lp-add-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+.lp-add-row input,.lp-add-row select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.lp-add-row input{flex:1}
+.lp-seg-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.lp-seg{display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:16px;font-size:13px}
+.lp-seg .btn-del-seg{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:0 2px}
+.lp-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.lp-preset-btns{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.lp-preset-btns button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:12px;cursor:pointer}
+.lp-preset-btns button:hover{border-color:var(--accent);color:var(--accent)}
+.lp-preview{background:var(--bg);border-radius:var(--radius);padding:16px;margin-top:16px}
+.lp-preview-board{display:flex;gap:8px;overflow-x:auto}
+.lp-preview-col{min-width:100px;padding:8px;border-radius:8px;text-align:center;font-size:11px;font-weight:600}
+.emoji-pick-btn{width:36px;height:34px;font-size:18px;cursor:pointer;background:var(--card);border:1px solid var(--border);border-radius:6px;display:grid;place-items:center}
+.emoji-pick-btn:hover{border-color:var(--accent)}
+.emoji-popup{position:fixed;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:none;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.15);width:240px;max-height:200px;overflow-y:auto}
+.emoji-popup.open{display:block}
+.emoji-popup .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.emoji-popup .emoji-grid span{font-size:18px;padding:4px;cursor:pointer;border-radius:4px;text-align:center}
+.emoji-popup .emoji-grid span:hover{background:var(--bg)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">🏢 Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">👥 Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">🔐 Peran</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">🏷️ Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">🕐 Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">🔄 Auto-Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">📥 Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">⏱ SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">⭐ CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">⚡ Macros</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">🎫 Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">💬 WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">📱 WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">🧩 Widget</div>
+    <div class="sn-title">Prospek</div>
+    <div class="sn-item active" onclick="go('settings/lead-pipeline')">💰 Pipeline Leads</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">🔗 Webhook</div>
+  </aside>
+  <div class="settings-content">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">💰 Pipeline Leads</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Konfigurasi stage pipeline dan segment leads. Perubahan langsung diterapkan ke halaman Prospuk.</p>
+
+    <!-- Presets -->
+    <div class="lp-section">
+      <h3>🎨 Preset</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Preset mengganti semua stage dan segment. Lead data yang sudah ada tetap tersimpan — status yang tidak cocok ditampilkan sebagai "Unknown".</p>
+      <div class="lp-preset-btns" id="presetBtns">
+        <button onclick="applyPreset('default')">📋 Default (New→Won/Lost)</button>
+        <button onclick="applyPreset('clientA')">🏢 Client A (Pending→Closed + Segments)</button>
+        <button onclick="applyPreset('simple')">🎯 Simple (Cold→Hot→Won/Lost)</button>
+      </div>
+    </div>
+
+    <!-- Stages -->
+    <div class="lp-section">
+      <h3>📊 Stage Pipeline</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Drag untuk mengubah urutan. Kolom board di halaman Prospuk dirender sesuai urutan ini.</p>
+      <div id="stagesContainer"></div>
+      <div class="lp-add-row">
+        <input id="newStageLabel" placeholder="Label stage baru...">
+        <button class="emoji-pick-btn" id="newStageIcon" onclick="openEmojiPicker(this,'newStageIcon')" type="button">📌</button>
+        <input type="hidden" id="newStageIconVal" value="📌">
+        <input type="color" id="newStageColor" value="#6b7280" style="width:40px;height:34px;border:none;cursor:pointer">
+        <label style="font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="newStageTerminal"> Terminal</label>
+        <button class="btn primary" onclick="addStage()" style="padding:6px 12px">+ Tambah</button>
+      </div>
+    </div>
+
+    <!-- Segments -->
+    <div class="lp-section">
+      <h3>🏷 Segment Leads</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Label untuk menggolongkan tipe lead (bukan stage pipeline). Lead bisa punya satu segment.</p>
+      <div class="lp-seg-wrap" id="segmentsContainer"></div>
+      <div class="lp-add-row">
+        <input id="newSegment" placeholder="Segment baru...">
+        <button class="btn primary" onclick="addSegment()" style="padding:6px 12px">+ Tambah</button>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="lp-section">
+      <h3>👁 Preview</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Seperti ini tampilan board di halaman Prospuk:</p>
+      <div class="lp-preview">
+        <div class="lp-preview-board" id="previewBoard"></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="lp-actions">
+      <button class="btn danger" onclick="resetToDefault()">🔄 Reset ke Default</button>
+      <button class="btn primary" onclick="saveAndApply()">💾 Simpan & Terapkan</button>
+    </div>
+  </div>
+  <div class="emoji-popup" id="emojiPopup" style="position:fixed"></div>
+</div>
+
+<script>
+// ponytail: in-memory draft; only committed to DB.settings on save
+var draftStages = [];
+var draftSegments = [];
+
+// Presets
+var PRESETS = {
+  default: {
+    stages: [
+      {key:'new',label:'New',color:'#3b82f6',icon:'🔵'},
+      {key:'contacted',label:'Contacted',color:'#8b5cf6',icon:'🟣'},
+      {key:'qualified',label:'Qualified',color:'#22c55e',icon:'🟢'},
+      {key:'proposal',label:'Proposal',color:'#eab308',icon:'🟡'},
+      {key:'negotiation',label:'Negotiation',color:'#f97316',icon:'🟠'},
+      {key:'won',label:'Won',color:'#16a34a',icon:'✅',isTerminal:true},
+      {key:'lost',label:'Lost',color:'#ef4444',icon:'❌',isTerminal:true},
+    ],
+    segments: ['Enterprise','SMB','Startup','VIP'],
+  },
+  clientA: {
+    stages: [
+      {key:'pending',label:'Pending',color:'#6b7280',icon:'⏳'},
+      {key:'cold',label:'Cold',color:'#3b82f6',icon:'🧊'},
+      {key:'hot',label:'Hot',color:'#ef4444',icon:'🔥'},
+      {key:'closed',label:'Closed',color:'#22c55e',icon:'✅',isTerminal:true},
+    ],
+    segments: ['Akuisisi','Scale up','Reaktivasi'],
+  },
+  simple: {
+    stages: [
+      {key:'cold',label:'Cold',color:'#3b82f6',icon:'🧊'},
+      {key:'hot',label:'Hot',color:'#ef4444',icon:'🔥'},
+      {key:'won',label:'Won',color:'#16a34a',icon:'✅',isTerminal:true},
+      {key:'lost',label:'Lost',color:'#ef4444',icon:'❌',isTerminal:true},
+    ],
+    segments: ['Baru','Repeat','VIP'],
+  },
+};
+
+function makeKey(label){
+  return label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+}
+
+function renderStages(){
+  const c=document.getElementById('stagesContainer');
+  c.innerHTML=draftStages.map((s,i)=>`
+    <div class="lp-stage-row" draggable="true" data-idx="${i}"
+         ondragstart="lpDragStart(event,${i})" ondragover="lpDragOver(event)" ondrop="lpDrop(event,${i})">
+      <span class="drag-handle">⠿</span>
+      <span class="stage-icon" style="cursor:pointer" onclick="openEmojiPicker(this,'stage',${i})">${s.icon}</span>
+      <input class="stage-label" value="${s.label}" style="border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:13px;width:120px" onchange="updateStage(${i},'label',this.value)">
+      <span class="stage-key">${s.key}</span>
+      <input type="color" class="stage-color" value="${s.color}" onchange="updateStage(${i},'color',this.value)">
+      <label class="stage-terminal"><input type="checkbox" ${s.isTerminal?'checked':''} onchange="updateStage(${i},'isTerminal',this.checked)"> Terminal</label>
+      <button class="btn-del" onclick="removeStage(${i})" title="Hapus">✕</button>
+    </div>
+  `).join('');
+  renderPreview();
+}
+
+function renderSegments(){
+  const c=document.getElementById('segmentsContainer');
+  c.innerHTML=draftSegments.map((s,i)=>`
+    <span class="lp-seg">${s} <button class="btn-del-seg" onclick="removeSegment(${i})">✕</button></span>
+  `).join('')||'<span style="color:var(--muted);font-size:13px">Belum ada segment</span>';
+}
+
+function renderPreview(){
+  const b=document.getElementById('previewBoard');
+  b.innerHTML=draftStages.map(s=>`
+    <div class="lp-preview-col" style="background:${s.color}22;color:${s.color};border:1px solid ${s.color}44">${s.icon} ${s.label}</div>
+  `).join('');
+}
+
+// Stage CRUD
+function addStage(){
+  const lbl=document.getElementById('newStageLabel').value.trim();
+  if(!lbl)return;
+  const icon=document.getElementById('newStageIconVal').value||'📌';
+  const color=document.getElementById('newStageColor').value;
+  const isTerminal=document.getElementById('newStageTerminal').checked;
+  const key=makeKey(lbl);
+  if(draftStages.some(s=>s.key===key)){showToast('Key "'+key+'" sudah ada');return}
+  draftStages.push({key,label:lbl,color,icon,isTerminal});
+  document.getElementById('newStageLabel').value='';
+  document.getElementById('newStageTerminal').checked=false;
+  renderStages();
+}
+function updateStage(i,field,val){
+  draftStages[i][field]=val;
+  if(field==='label')draftStages[i].key=makeKey(val);
+  renderStages();
+}
+function removeStage(i){
+  const s=draftStages[i];
+  const count=(DB.leads||[]).filter(l=>l.status===s.key).length;
+  if(count>0&&!confirm(`${count} lead berstatus "${s.label}". Tetap hapus? Lead akan jadi "Unknown".`))return;
+  draftStages.splice(i,1);
+  renderStages();
+}
+
+// Segment CRUD
+function addSegment(){
+  const v=document.getElementById('newSegment').value.trim();
+  if(!v||draftSegments.includes(v))return;
+  draftSegments.push(v);
+  document.getElementById('newSegment').value='';
+  renderSegments();
+}
+function removeSegment(i){
+  draftSegments.splice(i,1);
+  renderSegments();
+}
+
+// Drag-drop reorder
+var lpDragIdx=-1;
+function lpDragStart(e,i){lpDragIdx=i;e.dataTransfer.effectAllowed='move'}
+function lpDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move'}
+function lpDrop(e,i){
+  e.preventDefault();
+  if(lpDragIdx<0||lpDragIdx===i)return;
+  const item=draftStages.splice(lpDragIdx,1)[0];
+  draftStages.splice(i,0,item);
+  lpDragIdx=-1;
+  renderStages();
+}
+
+// Presets
+function applyPreset(name){
+  const p=PRESETS[name];
+  if(!p)return;
+  if(!confirm('Ganti semua stage & segment dengan preset "'+name+'"?'))return;
+  draftStages=JSON.parse(JSON.stringify(p.stages));
+  draftSegments=[...p.segments];
+  renderStages();
+  renderSegments();
+  showToast('Preset "'+name+'" diterapkan (belum disimpan)');
+}
+
+function resetToDefault(){
+  if(!confirm('Reset ke default? Semua perubahan hilang.'))return;
+  draftStages=JSON.parse(JSON.stringify(PRESETS.default.stages));
+  draftSegments=[...PRESETS.default.segments];
+  renderStages();
+  renderSegments();
+  saveAndApply();
+}
+
+function saveAndApply(){
+  // ponytail: remap lead.status by stage POSITION so leads never orphan when keys change.
+  // old stage#i -> new stage#i; overflow clamps to last new stage.
+  var oldKeys=(DB.settings.leadStages||[]).map(s=>s.key);
+  var newKeys=draftStages.map(s=>s.key);
+  if(oldKeys.length && newKeys.length && oldKeys.join()!==newKeys.join()){
+    (DB.leads||[]).forEach(function(l){
+      var i=oldKeys.indexOf(l.status);
+      if(i<0)i=0; // unknown status -> first stage
+      l.status=newKeys[Math.min(i,newKeys.length-1)];
+    });
+  }
+  DB.settings.leadStages=draftStages;
+  DB.settings.leadSegments=draftSegments;
+  saveDB();
+  showToast('Pipeline leads disimpan! Halaman Prospek akan menggunakan konfigurasi baru.');
+}
+
+// Init
+function renderSettingsLeadPipeline(){
+  draftStages=JSON.parse(JSON.stringify(DB.settings.leadStages||PRESETS.default.stages));
+  draftSegments=[...(DB.settings.leadSegments||PRESETS.default.segments)];
+  renderStages();
+  renderSegments();
+}
+
+// === EMOJI PICKER ===
+var EMOJI_LIST=['🔵','🟣','🟢','🟡','🟠','✅','❌','📌','💰','🔥','🧊','⏳','⭐','🎯','💎','📊','🏷','🚀','💼','📈','🔔','📌','⚡','🎪','🏆','💜','🔴','🟤','🩷','🩵','🖤','🩶'];
+var _emojiTarget=null; // {type:'new'|'stage', idx:N}
+
+function openEmojiPicker(el,type,idx){
+  closeEmojiPicker();
+  _emojiTarget={type,idx};
+  var popup=document.getElementById('emojiPopup');
+  popup.innerHTML='<div class="emoji-grid">'+EMOJI_LIST.map(e=>'<span onclick="pickEmoji(\''+e+'\')">'+e+'</span>').join('')+'</div>';
+  var rect=el.getBoundingClientRect();
+  var left=rect.left;
+  if(left+240>window.innerWidth)left=window.innerWidth-248;
+  popup.style.top=(rect.bottom+4)+'px';
+  popup.style.left=Math.max(0,left)+'px';
+  popup.classList.add('open');
+  setTimeout(()=>document.addEventListener('click',_emojiOutsideClick),0);
+}
+function _emojiOutsideClick(e){
+  if(!document.getElementById('emojiPopup').contains(e.target))closeEmojiPicker();
+}
+function closeEmojiPicker(){
+  document.getElementById('emojiPopup').classList.remove('open');
+  document.removeEventListener('click',_emojiOutsideClick);
+  _emojiTarget=null;
+}
+function pickEmoji(emoji){
+  if(!_emojiTarget){closeEmojiPicker();return}
+  if(_emojiTarget.type==='new'){
+    document.getElementById('newStageIcon').textContent=emoji;
+    document.getElementById('newStageIconVal').value=emoji;
+  }else{
+    draftStages[_emojiTarget.idx].icon=emoji;
+    renderStages();
+  }
+  closeEmojiPicker();
+}
+
+renderSettingsLeadPipeline();
+</script>

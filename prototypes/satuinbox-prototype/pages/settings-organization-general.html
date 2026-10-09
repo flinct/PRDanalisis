@@ -1,0 +1,79 @@
+<!-- Settings: Organisasi — Umum -->
+<style>
+.st-org-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.st-org-form label input,.st-org-form label select{display:block;width:100%;max-width:400px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:13px;background:var(--bg)}
+.st-org-form label input:focus,.st-org-form label select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+.st-org-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.st-org-row:last-child{border:none}
+.st-org-k{font-size:13px;color:var(--muted);min-width:160px}
+.st-org-v{font-size:14px;font-weight:600}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav" id="stNav"></aside>
+  <div class="settings-body">
+    <h2 style="margin-bottom:6px">Pengaturan Umum</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Informasi dasar organisasi Anda.</p>
+
+    <!-- View mode -->
+    <div class="card" id="orgView">
+      <div class="st-org-row"><span class="st-org-k">Nama Organisasi</span><span class="st-org-v" id="ovName"></span></div>
+      <div class="st-org-row"><span class="st-org-k">Industri</span><span class="st-org-v" id="ovIndustry"></span></div>
+      <div class="st-org-row"><span class="st-org-k">Zona Waktu</span><span class="st-org-v" id="ovTz"></span></div>
+      <div class="st-org-row"><span class="st-org-k">Bahasa</span><span class="st-org-v" id="ovLang"></span></div>
+      <div style="margin-top:14px"><button class="btn primary" onclick="toggleOrgEdit(true)">✏ Edit</button></div>
+    </div>
+
+    <!-- Edit mode -->
+    <div class="card hide" id="orgEdit">
+      <div class="st-org-form">
+        <label>Nama Organisasi<input type="text" id="oeName"></label>
+        <label>Industri<select id="oeIndustry"><option>E-commerce</option><option>FinTech</option><option>Healthcare</option><option>Education</option><option>Lainnya</option></select></label>
+        <label>Zona Waktu<select id="oeTz"><option>Asia/Jakarta</option><option>Asia/Makassar</option><option>Asia/Jayapura</option></select></label>
+        <label>Bahasa<select id="oeLang"><option value="id">Indonesia</option><option value="en">English</option></select></label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn primary" onclick="saveOrg()">💾 Simpan</button>
+          <button class="btn" onclick="toggleOrgEdit(false)">Batal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Settings sidenav
+  document.getElementById('stNav').innerHTML=renderSettingsNav('organization-general');
+
+  const o=DB.settings.org;
+  function renderView(){
+    document.getElementById('ovName').textContent=o.name;
+    document.getElementById('ovIndustry').textContent=o.industry;
+    document.getElementById('ovTz').textContent=o.timezone;
+    document.getElementById('ovLang').textContent=o.lang==='id'?'Indonesia':'English';
+  }
+  renderView();
+
+  window.toggleOrgEdit=function(on){
+    document.getElementById('orgView').classList.toggle('hide',on);
+    document.getElementById('orgEdit').classList.toggle('hide',!on);
+    if(on){
+      document.getElementById('oeName').value=o.name;
+      document.getElementById('oeIndustry').value=o.industry;
+      document.getElementById('oeTz').value=o.timezone;
+      document.getElementById('oeLang').value=o.lang;
+    }
+  };
+
+  window.saveOrg=function(){
+    o.name=document.getElementById('oeName').value.trim()||o.name;
+    o.industry=document.getElementById('oeIndustry').value;
+    o.timezone=document.getElementById('oeTz').value;
+    o.lang=document.getElementById('oeLang').value;
+    saveStore();
+    renderView();
+    toggleOrgEdit(false);
+    showToast('Pengaturan organisasi disimpan');
+  };
+})();
+</script>

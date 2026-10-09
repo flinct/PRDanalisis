@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "document": {
+    "type": "frame",
+    "name": "Document",
+    "children": []
+  }
+}

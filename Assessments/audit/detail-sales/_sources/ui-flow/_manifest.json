@@ -1,0 +1,110 @@
+{
+  "hubspot_manage_leads": {
+    "ok": true,
+    "url": "https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\hubspot_manage_leads.txt",
+    "chars": 11287
+  },
+  "hubspot_object_pipelines": {
+    "ok": true,
+    "url": "https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\hubspot_object_pipelines.txt",
+    "chars": 16615
+  },
+  "hubspot_board_view": {
+    "ok": true,
+    "url": "https://knowledge.hubspot.com/records/use-board-view",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\hubspot_board_view.txt",
+    "chars": 54956
+  },
+  "hubspot_tasks": {
+    "ok": true,
+    "url": "https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\hubspot_tasks.txt",
+    "chars": 56264
+  },
+  "pipedrive_leads_inbox": {
+    "ok": true,
+    "url": "https://support.pipedrive.com/en/article/leads-inbox",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\pipedrive_leads_inbox.txt",
+    "chars": 7640
+  },
+  "pipedrive_lead_qualification": {
+    "ok": true,
+    "url": "https://www.pipedrive.com/en/blog/sales-lead-qualification",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\pipedrive_lead_qualification.txt",
+    "chars": 19618
+  },
+  "pipedrive_activities": {
+    "ok": true,
+    "url": "https://support.pipedrive.com/en/article/activities",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\pipedrive_activities.txt",
+    "chars": 7375
+  },
+  "nng_progressive_disclosure": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/progressive-disclosure/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_progressive_disclosure.txt",
+    "chars": 12744
+  },
+  "nng_ten_heuristics": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/ten-usability-heuristics/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_ten_heuristics.txt",
+    "chars": 15063
+  },
+  "nng_kanban_boards": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/kanban-boards/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_kanban_boards.txt",
+    "chars": 7469
+  },
+  "nng_drag_drop": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/drag-drop/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_drag_drop.txt",
+    "chars": 17981
+  },
+  "nng_form_validation": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/errors-forms-design-guidelines/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_form_validation.txt",
+    "chars": 10608
+  },
+  "nng_breadcrumbs": {
+    "ok": true,
+    "url": "https://www.nngroup.com/articles/breadcrumbs/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\nng_breadcrumbs.txt",
+    "chars": 11594
+  },
+  "hubspot_sales_blog": {
+    "ok": true,
+    "url": "https://blog.hubspot.com/sales/sales-pipeline",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\hubspot_sales_blog.txt",
+    "chars": 50287
+  },
+  "pipedrive_pipeline_mgmt": {
+    "ok": true,
+    "url": "https://support.pipedrive.com/en/article/pipeline-management",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\pipedrive_pipeline_mgmt.txt",
+    "chars": 14878
+  },
+  "miro_sales_pipeline": {
+    "ok": true,
+    "url": "https://miro.com/templates/sales-pipeline/",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\miro_sales_pipeline.txt",
+    "chars": 4283
+  },
+  "smashing_crm_ux": {
+    "ok": true,
+    "url": "https://www.smashingmagazine.com/?s=CRM+UX+design",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\smashing_crm_ux.txt",
+    "chars": 8360
+  },
+  "uxplanet_crm": {
+    "ok": true,
+    "url": "https://uxplanet.org/?s=CRM+design",
+    "path": "C:\\Users\\MyBook SAGA 12\\Desktop\\PRDanalisis\\Assessments\\sales\\sales-module\\_sources\\ui-flow\\uxplanet_crm.txt",
+    "chars": 14380
+  }
+}

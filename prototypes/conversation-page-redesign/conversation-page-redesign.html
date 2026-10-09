@@ -65,7 +65,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 #app.sidenavCollapsed .sidenav.peek .sn-disc .chev,#app.sidenavCollapsed .sidenav.peek .sn-disc .dotind,
 #app.sidenavCollapsed .sidenav.peek .sn-add,#app.sidenavCollapsed .sidenav.peek .sn-disc span:not(.ic),
 #app.sidenavCollapsed .sidenav.peek .sn-div{display:revert}
-#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{display:flex}
+#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item:not(.role-spv):not(.role-admin){display:flex}
+#app.role-spv.sidenavCollapsed .sidenav.peek .sn-sub .role-spv,#app.role-admin.sidenavCollapsed .sidenav.peek .sn-sub .role-spv,#app.role-admin.sidenavCollapsed .sidenav.peek .sn-sub .role-admin{display:flex}
 #app.sidenavCollapsed .sidenav.peek .sn-sub,#app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{padding-left:8px}
 #app.sidenavCollapsed .sidenav.peek .sn-sub .sn-item{padding-left:20px}
 #app.sidenavCollapsed .sidenav.peek .sn-item,#app.sidenavCollapsed .sidenav.peek .sn-disc{justify-content:flex-start;padding:7px 12px}
@@ -179,11 +180,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 .fchip.ico{padding:0;width:34px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;position:relative}
 /* List width option B — Figma 400px (menang atas default 280) */
 #app.list400 .list{flex-basis:400px;width:400px}
-/* Full-mode inbox header row (matches reference image row 1) */
-.finbox{display:flex;align-items:center;gap:9px;padding-bottom:9px;border-bottom:1px solid var(--border);margin-bottom:2px}
+/* Full-mode inbox header row (search-bar style per reference image) */
+.finbox{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:2px}
 .ftoggle,.ficonbtn{width:30px;height:30px;flex:0 0 30px;border:none;background:none;border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;display:grid;place-items:center}
 .ftoggle:hover,.ficonbtn:hover{background:var(--border);color:var(--ink)}
-.ftitle{font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* search-bar look: ikon search kiri + label, rounded-full border */
+.fsearchbar{flex:1;min-width:0;display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;
+  border:1px solid var(--border);border-radius:999px;background:var(--card);cursor:text;color:var(--muted)}
+.fsearchbar .si{flex:0 0 auto;font-size:16px}
+.ftitle{font-size:15px;font-weight:400;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* search row belongs to the mode that owns it */
 #app.filterFull #fsearch-icon{display:none}
 #app.filterIcon #fsearch-icon{display:flex}
@@ -294,6 +299,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 .avatar .dot-corner{position:absolute;top:-1px;left:-1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--card)}
 /* row inline indicators (FE ConversationCard) */
 .li .name-row{display:flex;align-items:center;gap:4px;min-width:0}
+.li.filter-hide{display:none!important}
 .li .ch-ic{font-size:12px;flex:0 0 auto}
 .i-star{color:#facc15;font-size:12px}
 .i-pin{color:var(--muted);font-size:12px;transform:rotate(45deg)}
@@ -306,6 +312,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 /* single Close: room-header button only when detail closed; when open it lives in drawer footer as icon */
 #app.drawerOpen #closeBtnRoom{display:none}
 .assign-row{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;flex-wrap:wrap}
+.assignees{display:flex;flex-wrap:wrap;gap:4px}
+.assignees .rchip{max-width:none;font-size:11px;padding:2px 8px;color:var(--ink)}
 .assign-row .k{color:var(--muted);flex:0 0 110px}
 .assign-row .v{font-weight:600}
 .assign-btn{margin-left:auto;font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--accent);cursor:pointer}
@@ -316,6 +324,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 .pick.sel{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .pick .pchk{margin-left:auto;color:var(--accent);font-weight:800}
 .pav{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--border);flex:0 0 26px}
+.pick .cap{margin-left:auto;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pick .cap.full{color:var(--danger);font-weight:600}
+.pick.sel .cap{margin-left:auto}
+.pick.sel .cap+.pchk{margin-left:8px}
 .dfoot .closeIcon{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .ci-ic{font-weight:800}
 .i-mention{background:#dbeafe;color:#2563eb;border-radius:9px;min-width:16px;height:16px;padding:0 4px;font-size:10px;font-weight:700;display:grid;place-items:center}
@@ -327,6 +339,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 .li.disc .name{color:var(--ink)}
 /* disconnected banner replacing composer (FE DisconnectedAccountBanner) */
 .disc-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border);background:var(--card)}
+/* WA API 24h expired tag on list row */
+.expired-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#b45309;border:1px solid #fde68a;white-space:nowrap}
+/* Broadcast page overlay — mirror FE broadcast/layout (sidenav 15% + content) */
+.broadcast-page{flex:1;display:flex;min-width:0;background:var(--bg)}
+.broadcast-page.hide{display:none}
+.bc-sidenav{width:220px;flex:0 0 220px;background:var(--card);border-right:1px solid var(--border);padding:16px 12px}
+.bc-title{font-weight:600;font-size:15px;margin:4px 8px 14px}
+.bc-nav{display:flex;flex-direction:column;gap:4px}
+.bc-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:none;cursor:pointer;text-align:left;width:100%}
+.bc-item:hover{background:var(--bg)}
+.bc-item.active{background:var(--accent);color:#fff}
+.bc-content{flex:1;min-width:0;overflow:auto;padding:24px}
+/* broadcast open → sembunyikan panel percakapan (sidenav/list/workspace/drawer) */
+#app.broadcastOpen .sidenav,#app.broadcastOpen .list,#app.broadcastOpen .ws,#app.broadcastOpen .drawer{display:none}
 .disc-banner .db-title{font-size:13px;font-weight:700;color:var(--ink)}
 .disc-banner .db-sub{font-size:11px;color:var(--muted);margin-top:2px}
 .disc-banner .btn{margin-left:auto;white-space:nowrap}
@@ -409,6 +435,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 .bub.out{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:3px}
 .wire .bub.out{background:#ccc;color:#333}
 .bub .t{font-size:10px;opacity:.6;margin-top:4px}
+.bub .sender{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.bub .sender .av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;flex:0 0 auto}
+.bub .sender .nm{font-size:11px;font-weight:600;line-height:1}
+.bub .sender .ty{font-size:9px;color:var(--muted);margin-left:4px}
+.bub .at{color:#1d4ed8;font-weight:600;cursor:pointer}
+.bub .new-sep{font-size:11px;color:#2563eb;font-weight:600;background:#eff6ff;border-radius:8px;padding:3px 10px;align-self:center;margin:6px 0}
 .daysep{align-self:center;font-size:11px;color:var(--muted);background:var(--bg);padding:2px 10px;border-radius:10px;margin:4px 0}
 .newmsg{position:sticky;bottom:6px;align-self:center;background:var(--accent);color:#fff;font-size:12px;
   padding:5px 12px;border-radius:14px;cursor:pointer;box-shadow:var(--shadow)}
@@ -496,14 +528,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
     <button id="v-1280" class="on" onclick="setVp(1280)">1280</button>
     <button id="v-1440" onclick="setVp(1440)">1440</button></div>
   <div class="row"><span class="lab">List width</span>
-    <button id="lw-a" class="on" onclick="setListW('a')">A: sekarang</button>
-    <button id="lw-b" onclick="setListW('b')">B: 400px</button></div>
+    <button id="lw-a" onclick="setListW('a')">A: sekarang</button>
+    <button id="lw-b" class="on" onclick="setListW('b')">B: 400px</button></div>
   <div class="row"><span class="lab">Filter</span>
     <button id="fs-full" onclick="setFilterStyle('full')">Full</button>
     <button id="fs-icon" class="on" onclick="setFilterStyle('icon')">Icon only</button></div>
   <div class="row"><span class="lab">Sidenav peek</span>
-    <button id="pk-hover" class="on" onclick="setPeekMode('hover')">Hover</button>
-    <button id="pk-click" onclick="setPeekMode('click')">Click</button></div>
+    <button id="pk-hover" onclick="setPeekMode('hover')">Hover</button>
+    <button id="pk-click" class="on" onclick="setPeekMode('click')">Click</button></div>
   <div class="row"><span class="lab">Drawer</span>
     <button id="d-toggle" onclick="toggleDrawer()">Closed</button>
     <button id="d-pin" onclick="togglePin()">Pin off</button></div>
@@ -539,16 +571,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 </div>
 
 <div id="stage"><div>
-<div id="app" class="role-agent filterIcon">
+<div id="app" class="role-agent filterIcon list400">
   <!-- APP NAV RAIL -->
   <nav class="nav">
     <div class="logo">S</div>
-    <div class="ico active" title="Percakapan">💬</div>
+    <div class="ico active" title="Percakapan" onclick="closeBroadcast()">💬</div>
     <div class="ico" title="Kontak">👥</div>
-    <div class="ico" title="Broadcast">📣</div>
+    <div class="ico" title="Broadcast" onclick="openBroadcast('messages')">📣</div>
     <div class="ico" title="Laporan">📊</div>
-    <div class="ico" title="Pengaturan" style="margin-top:auto">⚙</div>
+    <div class="ico" title="Notifikasi" style="margin-top:auto">🔔</div>
+    <div class="ico" title="FAQ">❓</div>
+    <div class="ico" title="Pengaturan">⚙</div>
   </nav>
+
+  <!-- BROADCAST PAGE overlay — mirror FE broadcast/layout + BroadcastSideNav (Pesan/Draft/Template). Rail 📣 → buka, 💬 → tutup -->
+  <section class="broadcast-page hide" id="broadcastPage">
+    <aside class="bc-sidenav">
+      <div class="bc-title">Broadcast Massal</div>
+      <nav class="bc-nav">
+        <button class="bc-item active" data-bc="messages" onclick="openBroadcast('messages')"><span class="ic">📢</span>Pesan</button>
+        <button class="bc-item" data-bc="draft" onclick="openBroadcast('draft')"><span class="ic">📝</span>Draft</button>
+        <button class="bc-item" data-bc="templates" onclick="openBroadcast('templates')"><span class="ic">📋</span>Template</button>
+      </nav>
+    </aside>
+    <div class="bc-content" id="bcContent"></div>
+  </section>
 
   <!-- CONVERSATION SIDENAV (restored) -->
   <aside class="sidenav panel">
@@ -557,7 +604,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
       <button class="sn-collapse" title="Collapse (sidenav)" onclick="toggleSidenav()">⟨</button>
     </div>
     <!-- PRIMARY (default expanded) -->
-    <div class="sn-group">
+    <div class="sn-group" data-sec="personal">
       <button class="sn-disc open" aria-expanded="true" onclick="toggleSec(this)"><span class="ic">💬</span><span>Personal Chat</span><span class="dotind">•</span><span class="chev">›</span></button>
       <div class="sn-sub">
         <div class="sn-item active" data-cnt="26" title="Kotak Pesan Anda"><span class="ic">📥</span><span class="txt">Kotak Pesan Anda</span><span class="cnt">26</span></div>
@@ -566,7 +613,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
         <div class="sn-item" data-cnt="0" title="Berbintang"><span class="ic">⭐</span><span class="txt">Berbintang</span><span class="cnt">0</span></div>
       </div>
     </div>
-    <div class="sn-group" title="Group chat = isGroup=true. Section terpisah dari Saluran: group = tipe percakapan, Saluran = sumber channel.">
+    <div class="sn-group" data-sec="group" title="Group chat = isGroup=true. Section terpisah dari Saluran: group = tipe percakapan, Saluran = sumber channel.">
       <button class="sn-disc open" aria-expanded="true" onclick="toggleSec(this)"><span class="ic">👥</span><span>Group Chat</span><span class="dotind">•</span><span class="chev">›</span></button>
       <div class="sn-sub">
         <div class="sn-item" data-cnt="32" title="Group dari WhatsApp Web"><span class="ic">🟢</span><span class="txt">WhatsApp Web Grup</span><span class="cnt">32</span></div>
@@ -640,12 +687,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
 
         <!-- FULL VERSION (matches reference image exactly) -->
         <div class="fbar-exp">
-          <!-- Row 1: sidebar-toggle · title · search icon -->
+          <!-- Row 1: search-bar (icon + label) per reference image -->
           <div class="finbox">
-            <button class="ftoggle" onclick="toggleSidenav()" title="Sidebar">▤</button>
-            <span class="ftitle">Kotak Pesan Anda</span>
-            <span class="fspacer"></span>
-            <button class="ficonbtn" id="fsearch-open" onclick="toggleFullSearch()" title="Cari">🔍</button>
+            <div class="fsearchbar" id="fsearch-open" onclick="toggleFullSearch()" title="Cari">
+              <span class="si">🔍</span>
+              <span class="ftitle">Kotak Pesan Anda</span>
+            </div>
           </div>
           <!-- inline search (revealed by the icon, hidden by default per image) -->
           <div class="fsearch hide" id="fsearch-full">
@@ -730,7 +777,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
         <div class="meta">
           <span class="time">15:10</span>
           <div style="display:flex;align-items:center;gap:3px">
-            <span class="i-mention" title="Anda disebut">@</span>
             <span class="unread">9</span>
             <span class="qa" title="Aksi cepat" onclick="event.stopPropagation();openQuickAction(this)">⋯</span>
           </div>
@@ -754,8 +800,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
           <span class="time">14:52</span>
           <div style="display:flex;align-items:center;gap:3px">
             <span class="i-pin" title="Disematkan">📌</span>
-            <span class="i-mention" title="Anda disebut">@</span>
-            <span class="unread">3</span>
+            <span class="unread">2</span>
             <span class="qa" title="Aksi cepat" onclick="event.stopPropagation();openQuickAction(this)">⋯</span>
           </div>
         </div>
@@ -806,8 +851,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
         </div>
         <div class="meta"><span class="time">12:03</span><div style="display:flex;align-items:center;gap:3px"><span class="unread">2</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div></div>
       </div>
-      <!-- Row 5: Live Chat / Widget · group avatar -->
-      <div class="li" onclick="selectConv(this)">
+      <div class="li" data-conv="group" onclick="selectConv(this)">
         <span class="chk" onclick="toggleChk(event,this)"></span>
         <div class="avatar" style="background:#e0e7ff;color:#4338ca">👥<span class="dot-corner sla-dot ok"></span></div>
         <div class="body">
@@ -817,7 +861,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
           </div>
           <div class="prev">Halo, ada yang bisa dibantu?</div>
         </div>
-        <div class="meta"><span class="time">11:20</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+        <div class="meta"><span class="time">11:20</span><div style="display:flex;align-items:center;gap:3px"><span class="i-mention" title="Anda disebut">@</span><span class="unread">1</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div></div>
+      </div>
+      <div class="li" data-conv="group" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#dcfce7;color:#166534">👥<span class="dot-corner sla-dot ok"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp API Group">🟢</span>
+            <span class="name">Tim Dev SatuInbox</span>
+          </div>
+          <div class="prev">deploy udah selesai ya?</div>
+        </div>
+        <div class="meta"><span class="time">09:45</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
       </div>
       <!-- Row 6: WA API · waiting (PENDING) outgoing status -->
       <div class="li" onclick="selectConv(this)">
@@ -831,6 +887,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
           <div class="prev"><span class="read-rcpt waiting" title="Menunggu (PENDING)">🕒</span>Pesanan sedang diproses ya…</div>
         </div>
         <div class="meta"><span class="time">11:02</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
+      </div>
+      <!-- Row: WA API · 24h window LEWAT (click → expired banner, kirim ulang via template broadcast) -->
+      <div class="li" data-conv="waexpired" onclick="selectConv(this)">
+        <span class="chk" onclick="toggleChk(event,this)"></span>
+        <div class="avatar" style="background:#fef3c7;color:#b45309">RN<span class="dot-corner sla-dot" style="background:#94a3b8"></span></div>
+        <div class="body">
+          <div class="name-row">
+            <span class="ch-ic" title="WhatsApp API">🟢</span>
+            <span class="name">Rina Marlina</span>
+            <span class="expired-tag" title="Di luar jendela 24 jam Meta">24h lewat</span>
+          </div>
+          <div class="prev">Terima kasih infonya kak 🙏 (kemarin, 10:14)</div>
+        </div>
+        <div class="meta"><span class="time">Kemarin</span><span class="qa" onclick="event.stopPropagation();openQuickAction(this)">⋯</span></div>
       </div>
       <!-- Row 7: WA Web · account channel DISCONNECTED (click → banner replaces composer) -->
       <div class="li disc" data-conn="off" onclick="selectConv(this)">
@@ -875,8 +945,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
         <div class="vgroup" style="position:relative">
           <button class="iconbtn" title="Aksi lainnya" onclick="toggleMenu(event)">⋯</button>
           <div class="menu" id="overflow">
-            <div class="mi" onclick="closeMenu();alert('Reassign account channel (existing FE)')">Ganti akun channel <span class="ph">FE</span></div>
-            <div class="mi" onclick="closeMenu();alert('Room CRUD — rename/edit (existing FE)')">Ubah room <span class="ph">FE</span></div>
             <div class="mi" onclick="closeMenu();alert('Relation label — apply/unlink (FE #2836)')">Label relasi <span class="ph">FE</span></div>
             <div class="mi" onclick="closeMenu();alert('Screenshot capture — SnippingOverlay (existing FE)')">Tangkap layar <span class="ph">FE</span></div>
           </div>
@@ -910,6 +978,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
       <button class="btn" onclick="openModal('m-adjust-account')">⚙ Sesuaikan Akun</button>
     </div>
 
+    <!-- WA API 24h window expired banner — mirror FE ExpiredConversationWindow.tsx (showSendTemplate=true) -->
+    <div class="disc-banner hide" id="expiredBanner">
+      <div class="db-text">
+        <div class="db-title">Percakapan Tidak Aktif</div>
+        <div class="db-sub">Percakapan ini tidak aktif karena pelanggan tidak merespons dalam 24 jam. Untuk melanjutkan percakapan, silakan terlibat kembali dengan pelanggan.</div>
+      </div>
+      <button class="btn primary" onclick="openBroadcast('messages')">Kirim Template Pesan</button>
+    </div>
+
     <!-- ws alt states -->
     <div class="ws-empty hide" id="ws-none"><div class="glyph">💬</div><div><b>Pilih percakapan</b><br>Pilih percakapan dari daftar untuk mulai bekerja.</div></div>
     <div class="ws-loading hide" id="ws-loading"><div class="skel" style="width:180px"></div><div class="skel" style="width:120px"></div><div style="color:var(--muted)">Memuat percakapan…</div></div>
@@ -933,6 +1010,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
         <div class="cust-line">+62 896 5505 7778 <button class="copybtn" onclick="copied(this)">⧉</button></div>
         <span class="pill">🟢 WhatsApp · Open</span>
         <div class="rlabel-chips"><span class="rchip">VIP <span class="x" onclick="this.parentElement.remove()">✕</span></span><span class="rchip">Retur <span class="x" onclick="this.parentElement.remove()">✕</span></span><button class="rchip-add" title="Tambah label" onclick="openModal('m-add-label')">+</button></div>
+        <button class="assign-btn" style="margin-top:10px" title="Buat data prospek dari kontak ini" onclick="alert('Buat Prospek — buat data prospek dari client contact (FE baru)')">＋ Buat Prospek</button>
+      </div>
+      <div class="sec" id="cost-sec">
+        <h4>Simulasi Biaya <span class="ph" style="margin-left:6px">WhatsApp API</span></h4>
+        <div class="kv"><span class="k">Bubble terkirim</span><span class="v" id="cost-count">0</span></div>
+        <div class="kv"><span class="k">Tarif / bubble</span><span class="v">Rp 358</span></div>
+        <div class="kv" style="font-weight:700"><span class="k">Total estimasi</span><span class="v" id="cost-total">Rp 0</span></div>
+        <span class="ph-note">count(.bub) × 358 — hanya channel WhatsApp API</span>
       </div>
       <div class="sec">
         <h4>SLA</h4>
@@ -944,7 +1029,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13p
       <div class="sec">
         <h4>Assignment</h4>
         <div class="assign-row"><span class="k">Kotak Masuk (Tim)</span><span class="v">Tim Support A</span><button class="assign-btn" title="Alihkan tim" onclick="openModal('m-assign-team')">⇄ Ubah tim</button></div>
-        <div class="assign-row"><span class="k">Penerima (Agen)</span><span class="v">Dany Christian</span><button class="rchip-add" style="margin-left:auto" title="Tambah agen (add more)" onclick="openModal('m-assign-agent')">+</button></div>
+        <div class="assign-row"><span class="k">Penerima (Agen)</span>
+          <span class="assignees" id="assigneeList"><span class="rchip">Dany Christian</span></span>
+          <button class="rchip-add" style="margin-left:auto" title="Tambah agen (add more)" onclick="openModal('m-assign-agent')">+</button></div>
         <div class="kv"><span class="k">Sumber</span><span class="v">self-pull</span></div>
         <span class="ph-note">assignment source: manual / self-pull / system / bulk (FE)</span>
       </div>
@@ -1055,6 +1142,49 @@ function openModal(id){document.getElementById(id).classList.remove('hide');}
 function closeModal(id){document.getElementById(id).classList.add('hide');}
 function openQuickAction(el){openModal('m-quickaction');}
 
+// admin/SPV assign: agent full (cur>=max) → block + open change-max modal; else assign
+let pendingAgent=null;
+function tryAssign(el){
+  const cur=+el.dataset.cur, max=+el.dataset.max;
+  if(cur>=max){ // penuh → wajib naikkan max dulu
+    pendingAgent=el;
+    document.getElementById('cm-agent').textContent=el.dataset.agent;
+    document.getElementById('cm-cur').textContent=cur;
+    document.getElementById('cm-max').textContent=max;
+    document.getElementById('cm-current').value=max;       // Batas Saat Ini (readOnly) = max FE
+    const inp=document.getElementById('cm-input');inp.value='';inp.min=1; // FE: kosong, min 1
+    cmValidate();
+    closeModal('m-assign-agent');openModal('m-change-max');return;
+  }
+  doAssign(el); // masih ada slot → assign langsung
+}
+function cmValidate(){ // FE ModalChangeMaxConversation: hanya angka positif, submit aktif saat >0
+  const inp=document.getElementById('cm-input');
+  if(inp.value!==''&&!/^\d+$/.test(inp.value))inp.value=inp.value.replace(/\D/g,'');
+  const ok=inp.value!==''&&parseInt(inp.value,10)>0;
+  document.getElementById('cm-submit').disabled=!ok;
+}
+function doAssign(el){
+  // multi-assignee: tandai pilihan + tambahkan agen ke list assignee (dedupe)
+  el.classList.add('sel');
+  if(!el.querySelector('.pchk')){const c=document.createElement('span');c.className='pchk';c.textContent='✓';el.appendChild(c);}
+  const list=document.getElementById('assigneeList'), name=el.dataset.agent;
+  if(list&&![...list.children].some(ch=>ch.textContent===name)){
+    const chip=document.createElement('span');chip.className='rchip';chip.textContent=name;list.appendChild(chip);
+  }
+  closeModal('m-assign-agent');
+}
+function saveMaxAndAssign(){
+  const el=pendingAgent;if(!el)return;
+  const cur=+el.dataset.cur, newMax=parseInt(document.getElementById('cm-input').value,10);
+  if(!(newMax>0)){cmValidate();return;} // FE validasi: batas baru > 0
+  el.dataset.max=newMax;
+  const cap=el.querySelector('.cap');cap.textContent=cur+'/'+newMax;cap.classList.toggle('full',cur>=newMax);
+  closeModal('m-change-max');
+  if(cur>=newMax){pendingAgent=null;return;} // batas baru masih ≤ cur → tetap penuh, tak di-assign
+  doAssign(el);pendingAgent=null;
+}
+
 function refreshCompact(){
   const open=app.classList.contains('drawerOpen');
   updVpLabel();
@@ -1072,7 +1202,7 @@ function syncD(){const o=app.classList.contains('drawerOpen');
   const b=document.getElementById('d-toggle');b.classList.toggle('on',o);b.textContent=o?'Open':'Closed';}
 function toggleSidenav(){app.classList.toggle('sidenavCollapsed');document.querySelector('.sidenav').classList.remove('peek');updVpLabel();}
 /* peek expand mode: 'hover' (mouseenter) or 'click' (toggle on sidenav click) */
-let peekMode='hover';
+let peekMode='click';
 const sidenavEl=()=>document.querySelector('.sidenav');
 function setPeekMode(m){peekMode=m;sidenavEl().classList.remove('peek');tw('pk-hover',m==='hover');tw('pk-click',m==='click');}
 function setDrawerMode(m){const app=document.getElementById('app');app.classList.toggle('drawerInline',m==='inline');tw('dm-float',m==='float');tw('dm-inline',m==='inline');if(typeof updVpLabel==='function')updVpLabel();}
@@ -1080,19 +1210,42 @@ document.addEventListener('DOMContentLoaded',()=>{
   const sn=sidenavEl();
   sn.addEventListener('mouseenter',()=>{if(peekMode==='hover'&&app.classList.contains('sidenavCollapsed'))sn.classList.add('peek');});
   sn.addEventListener('mouseleave',()=>{if(peekMode==='hover')sn.classList.remove('peek');});
-  sn.addEventListener('click',e=>{ // click-mode: any click on the collapsed rail (except the collapse button) toggles peek
+  sn.addEventListener('click',e=>{
     if(peekMode!=='click'||!app.classList.contains('sidenavCollapsed'))return;
     if(e.target.closest('.sn-collapse'))return;
-    e.stopPropagation();sn.classList.toggle('peek');
+    const open=sn.classList.contains('peek');
+    if(!open){e.stopPropagation();sn.classList.add('peek');return;} // closed rail → open peek
+    // peek open:
+    if(e.target.closest('.sn-disc')){e.stopPropagation();return;} // parent → let toggleSec run, keep peek
+    const item=e.target.closest('.sn-item');
+    if(item){e.stopPropagation();pickInbox(item);sn.classList.remove('peek');return;} // child → select + close
+    e.stopPropagation(); // click elsewhere inside peek → keep open
   });
+  // hover-mode child selection
+  sn.addEventListener('click',e=>{if(peekMode==='click'&&app.classList.contains('sidenavCollapsed'))return;const item=e.target.closest('.sn-item');if(item)pickInbox(item);});
   document.addEventListener('click',e=>{if(peekMode==='click'&&!e.target.closest('.sidenav'))sn.classList.remove('peek');});
 });
+function pickInbox(item){
+  document.querySelectorAll('.sn-item.active').forEach(i=>i.classList.remove('active'));
+  item.classList.add('active');
+  // filter list by section: personal → hide group rows, group → show only group rows
+  const sec=item.closest('[data-sec]')?.dataset.sec;
+  document.querySelectorAll('.li').forEach(li=>{
+    const isG=li.dataset.conv==='group';
+    li.classList.toggle('filter-hide',sec==='group'?!isG:isG);
+  });
+}
 function toggleSec(btn){const open=btn.classList.toggle('open');btn.setAttribute('aria-expanded',open);btn.parentElement.querySelector('.sn-sub').classList.toggle('hide',!open);}
 
 let filterManual=false;
 function setVp(w){vp=w;app.classList.toggle('vp1440',w===1440);tw('v-1280',w===1280);tw('v-1440',w===1440);
+  // 1280: sidenav collapsed (icon) + filter icon + drawer float. 1440: sidenav expanded + filter full + drawer inline.
+  app.classList.toggle('sidenavCollapsed',w===1280);
+  document.querySelector('.sidenav').classList.remove('peek');
+  setDrawerMode(w===1440?'inline':'float');
+  closeDrawer(); // drawer default closed both viewports
   if(!filterManual)setFilterStyle(w===1440?'full':'icon',true); // responsive default: 1280→icon, 1440→full
-  refreshCompact();}
+  refreshCompact();updVpLabel();}
 function setFilterStyle(s,auto){if(!auto)filterManual=true; // explicit click pins the choice
   app.classList.toggle('filterIcon',s==='icon');app.classList.toggle('filterFull',s==='full');
   tw('fs-full',s==='full');tw('fs-icon',s==='icon');}
@@ -1153,21 +1306,106 @@ function doResolve(){closeDialog();alert(bulkResolve?'Bulk resolve → processin
 
 /* composer */
 function setCompose(s){const i=document.getElementById('composeInput'),b=document.getElementById('sendBtn'),st=document.getElementById('composeStatus');
-  const disc=s==='disconnected';
-  document.getElementById('composer').classList.toggle('hide',disc);      // disconnected → banner replaces composer
+  const disc=s==='disconnected', exp=s==='expired';
+  document.getElementById('composer').classList.toggle('hide',disc||exp);   // disconnected/expired → banner ganti composer
   document.getElementById('discBanner').classList.toggle('hide',!disc);
-  if(disc){['idle','sending','error','offline'].forEach(k=>tw('c-'+k,false));return;}
+  document.getElementById('expiredBanner').classList.toggle('hide',!exp);
+  if(disc||exp){['idle','sending','error','offline'].forEach(k=>tw('c-'+k,false));return;}
   ['idle','sending','error','offline'].forEach(k=>tw('c-'+k,k===s));
   i.disabled=s==='sending';b.disabled=s==='sending';
   st.textContent={idle:'',sending:'Mengirim…',error:'Gagal · coba lagi',offline:'Offline · tersimpan'}[s];
   st.style.color=s==='error'?'var(--danger)':s==='offline'?'var(--warn)':'var(--muted)';}
-function doSend(){if(!document.getElementById('composeInput').value.trim())return;setCompose('sending');
+function doSend(){const i=document.getElementById('composeInput');if(!i.value.trim())return;setCompose('sending');
+  const b=document.createElement('div');b.className='bub out';
+  b.textContent=i.value.trim();
+  const t=document.createElement('div');t.className='t';
+  t.textContent=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  b.appendChild(t);
+  document.getElementById('newmsg').insertAdjacentElement('beforebegin',b);
+  i.value='';updCost();
+  const th=document.getElementById('thread');th.scrollTop=th.scrollHeight;
   setTimeout(()=>setCompose('idle'),900);}
+const COST_PER_BUBBLE=358;
+function updCost(){const n=document.querySelectorAll('#thread .bub').length;
+  document.getElementById('cost-count').textContent=n;
+  document.getElementById('cost-total').textContent='Rp '+(n*COST_PER_BUBBLE).toLocaleString('id-ID');}
+updCost();
 
 function copied(el){const t=el.textContent;el.textContent='✓ tersalin';setTimeout(()=>el.textContent=t,1000);}
+
+// Broadcast page — mirror FE broadcast/layout. Tab: messages/draft/templates. Kirim Template Pesan (expired banner) → messages
+const BC_CONTENT={
+  messages:`<h2 style="margin:0 0 4px">Pesan Broadcast</h2><p style="color:var(--muted);font-size:13px;margin:0 0 16px">Kirim pesan massal via template WhatsApp API ke banyak kontak sekaligus.</p>
+    <button class="btn primary" onclick="alert('Buat broadcast baru → /broadcast/messages/create (FE ManageBroadcastFormPage)')">＋ Buat Broadcast</button>
+    <div style="margin-top:18px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <div style="display:flex;padding:10px 14px;font-size:12px;font-weight:600;background:var(--card);border-bottom:1px solid var(--border)"><span style="flex:2">Nama</span><span style="flex:1">Template</span><span style="flex:1">Penerima</span><span style="flex:1">Status</span></div>
+      <div style="display:flex;padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border)"><span style="flex:2">Promo Lebaran</span><span style="flex:1">promo_ramadan</span><span style="flex:1">1.204</span><span style="flex:1;color:#15803d">Terkirim</span></div>
+      <div style="display:flex;padding:11px 14px;font-size:13px"><span style="flex:2">Follow-up Order</span><span style="flex:1">order_followup</span><span style="flex:1">88</span><span style="flex:1;color:#b45309">Terjadwal</span></div>
+    </div>`,
+  draft:`<h2 style="margin:0 0 4px">Draft</h2><p style="color:var(--muted);font-size:13px;margin:0 0 16px">Broadcast tersimpan yang belum dikirim.</p>
+    <div style="border:1px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--muted);font-size:13px">Belum ada draft. Buat broadcast lalu simpan sebagai draft.</div>`,
+  templates:`<h2 style="margin:0 0 4px">Template</h2><p style="color:var(--muted);font-size:13px;margin:0 0 16px">Template pesan WhatsApp yang sudah disetujui Meta — dipakai untuk kirim ulang di luar jendela 24 jam.</p>
+    <button class="btn primary" onclick="alert('Buat template → /broadcast/templates/create (FE CreateBroadcastTemplatePage)')">＋ Buat Template</button>
+    <div style="margin-top:18px;display:grid;gap:10px">
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-weight:600;font-size:13px">order_followup <span style="font-size:10px;color:#15803d;border:1px solid #86efac;border-radius:6px;padding:1px 6px;margin-left:6px">Disetujui</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px">Halo {{1}}, pesanan {{2}} Anda sudah kami proses. Ada yang bisa kami bantu lagi?</div></div>
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-weight:600;font-size:13px">promo_ramadan <span style="font-size:10px;color:#15803d;border:1px solid #86efac;border-radius:6px;padding:1px 6px;margin-left:6px">Disetujui</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px">Spesial Ramadan untuk {{1}}! Diskon 30% berlaku hingga akhir bulan.</div></div>
+    </div>`
+};
+function openBroadcast(tab){
+  tab=tab||'messages';
+  app.classList.add('broadcastOpen');
+  document.getElementById('broadcastPage').classList.remove('hide');
+  document.querySelectorAll('.bc-item').forEach(b=>b.classList.toggle('active',b.dataset.bc===tab));
+  document.getElementById('bcContent').innerHTML=BC_CONTENT[tab];
+  document.querySelectorAll('.nav .ico').forEach(i=>i.classList.remove('active'));
+  document.querySelector('.nav .ico[title="Broadcast"]').classList.add('active');
+}
+function closeBroadcast(){
+  app.classList.remove('broadcastOpen');
+  document.getElementById('broadcastPage').classList.add('hide');
+  document.querySelectorAll('.nav .ico').forEach(i=>i.classList.remove('active'));
+  document.querySelector('.nav .ico[title="Percakapan"]').classList.add('active');
+}
+
 function selectConv(el){
   document.querySelectorAll('.li.sel').forEach(l=>l.classList.remove('sel'));el.classList.add('sel');
-  setCompose(el.dataset.conn==='off'?'disconnected':'idle');   // disconnected row → banner
+  const conv=el.dataset.conv;
+  if(conv==='waexpired')setCompose('expired');            // WA API 24h lewat → banner kirim template
+  else setCompose(el.dataset.conn==='off'?'disconnected':'idle');
+  renderThread(conv==='group'?'group':conv==='waexpired'?'waexpired':'default');
+}
+// ponytail: dua thread statis hardcode; jadikan data-driven kalau conversation > 2 tipe
+const THREADS={
+  default:`<div class="daysep">Hari ini</div>
+    <div class="bub in">Halo kak, pesanan saya sudah dikirim belum ya?<div class="t">14:48</div></div>
+    <div class="bub out">Halo kak Yosep, saya cek dulu ya 🙏<div class="t">14:49</div></div>
+    <div class="bub out">Pesanan sudah diproses, estimasi kirim hari ini.<div class="t">14:50</div></div>
+    <div class="bub in">Baik kak, ditunggu ya. Kalau sudah kirim tolong infokan resinya.<div class="t">14:52</div></div>`,
+  // group: incoming bubble punya SenderInfo (avatar+nama+tipe) — pola FE TicketChatRoomBubble/SenderInfo (!isSender only)
+  group:`<div class="daysep">Grup Support Web · 4 peserta</div>
+    <div class="bub in"><div class="sender"><span class="av" style="background:#4338ca">R</span><span class="nm">Rani</span><span class="ty">Pelanggan</span></div>Tim, order #8842 belum masuk sistem ya?<div class="t">11:10</div></div>
+    <div class="bub in"><div class="sender"><span class="av" style="background:#0891b2">B</span><span class="nm">Budi</span><span class="ty">Agen</span></div>Saya cek dulu di dashboard.<div class="t">11:12</div></div>
+    <div class="bub out">Sudah ketemu, order-nya pending pembayaran.<div class="t">11:15</div></div>
+    <div class="bub in"><div class="sender"><span class="av" style="background:#4338ca">R</span><span class="nm">Rani</span><span class="ty">Pelanggan</span></div><span class="at">@Dany</span> tolong cek lagi ya, soalnya customer sudah tunggu 2 hari.<div class="t">11:18</div></div>
+    <div class="bub out">Oke saya follow up sekarang.<div class="t">11:20</div></div>
+    <div class="new-sep">Pesan baru</div>
+    <div class="bub in"><div class="sender"><span class="av" style="background:#16a34a">S</span><span class="nm">Siti</span><span class="ty">Pelanggan</span></div><span class="at">@Dany</span> halo kak, saya juga ada kendala di order #8901. Bisa dibantu?<div class="t">11:25</div></div>`,
+  // WA API 24h window lewat: pesan terakhir customer > 24 jam → composer diganti expiredBanner (FE ExpiredConversationWindow)
+  waexpired:`<div class="daysep">Kemarin</div>
+    <div class="bub out">Halo kak Rina, pesanan sudah dikirim ya via JNE, resi 1234567890.<div class="t">10:12</div></div>
+    <div class="bub in">Terima kasih infonya kak 🙏<div class="t">10:14</div></div>
+    <div class="new-sep">Jendela 24 jam Meta telah berakhir</div>`
+};
+function renderThread(kind){
+  const th=document.getElementById('thread');
+  th.innerHTML=THREADS[kind]+'<div class="newmsg hide" id="newmsg" onclick="this.classList.add(\'hide\')">↓ Pesan baru</div>';
+  updCost();th.scrollTop=th.scrollHeight;
+  // update header + toggle close button (group chat = no close)
+  const isG=kind==='group', isX=kind==='waexpired';
+  const nm=isG?'Grup Support Web':isX?'Rina Marlina':'Yosep Danny';
+  document.querySelector('#ws-head .name').innerHTML=nm+' <span class="room-pin" id="roomPin" title="Sematkan percakapan" onclick="toggleRoomPin()">📌</span>';
+  document.querySelector('#ws-head .sub').textContent=isG?'4 peserta · WhatsApp · Grup':isX?'+62 812 3456 7890 · WhatsApp API · 24h lewat':'+62 896 5505 7778 · WhatsApp · Open';
+  document.getElementById('closeBtnRoom').style.display=isG?'none':'';
 }
 
 function updVpLabel(){
@@ -1189,6 +1427,10 @@ document.addEventListener('keydown',e=>{
 });
 
 syncD();updVpLabel();
+setVp(1280); // init default viewport state (sidenav collapsed, filter icon, drawer float+closed)
+// init: apply filter so group rows hidden when personal section is active
+(function(){const sec=document.querySelector('.sn-item.active')?.closest('[data-sec]')?.dataset.sec;
+  if(sec!=='group')document.querySelectorAll('.li[data-conv="group"]').forEach(li=>li.classList.add('filter-hide'));})()
 </script>
 
 <!-- Status modal (FE FilterPopover — Open/Closed conversation state) -->
@@ -1350,12 +1592,38 @@ syncD();updVpLabel();
       <span onclick="closeModal('m-assign-agent')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
     <input class="srch" placeholder="Cari agen…" style="width:100%;margin:8px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
     <div class="pick-list">
-      <div class="pick sel" onclick="closeModal('m-assign-agent')"><span class="pav">DC</span> Dany Christian <span class="pchk">✓</span></div>
-      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">NY</span> Naftal Yunior</div>
-      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">AR</span> Agung Rahmat</div>
-      <div class="pick" onclick="closeModal('m-assign-agent')"><span class="pav">SW</span> Sari Wulandari</div>
+      <div class="pick sel" data-agent="Dany Christian" data-cur="18" data-max="25" onclick="tryAssign(this)"><span class="pav">DC</span> Dany Christian <span class="cap">18/25</span> <span class="pchk">✓</span></div>
+      <div class="pick" data-agent="Naftal Yunior" data-cur="30" data-max="30" onclick="tryAssign(this)"><span class="pav">NY</span> Naftal Yunior <span class="cap full">30/30 · Penuh</span></div>
+      <div class="pick" data-agent="Agung Rahmat" data-cur="12" data-max="20" onclick="tryAssign(this)"><span class="pav">AR</span> Agung Rahmat <span class="cap">12/20</span></div>
+      <div class="pick" data-agent="Sari Wulandari" data-cur="25" data-max="25" onclick="tryAssign(this)"><span class="pav">SW</span> Sari Wulandari <span class="cap full">25/25 · Penuh</span></div>
     </div>
-    <p class="ph-note">Sumber: <code>AssignConversationModal.tsx</code> — daftar agen. "＋ Tetapkan agen" = tambah penerima (multi-assignee).</p>
+    <p class="ph-note">Sumber: <code>AssignConversationModal.tsx</code> — daftar agen. "＋ Tetapkan agen" = tambah penerima (multi-assignee). Agen yang <b>Penuh</b> (cur ≥ max) tak bisa di-assign sampai max dinaikkan.</p>
+  </div>
+</div>
+
+<!-- Ubah Maksimum Percakapan — mirror FE ModalChangeMaxConversation.tsx (title/label/action dari i18n members.modalChangeMaxConversation) -->
+<div id="m-change-max" class="filter-overlay hide">
+  <div class="filter-sheet" style="max-width:520px">
+    <div class="fs-head"><span style="font-weight:600;font-size:18px">Ubah Maksimum Percakapan</span>
+      <span onclick="closeModal('m-change-max')" style="cursor:pointer;font-size:18px;color:var(--muted)">&times;</span></div>
+    <p style="font-size:13px;color:var(--muted);margin:6px 0 14px">
+      <b id="cm-agent">Agen</b> sudah mencapai batas (<span id="cm-cur">0</span>/<span id="cm-max">0</span>). Naikkan batas untuk menetapkan percakapan baru.</p>
+    <div style="display:flex;align-items:flex-end;gap:14px">
+      <div style="display:grid;gap:4px;flex:1">
+        <label style="font-size:12px;color:var(--muted)">Batas Saat Ini</label>
+        <input id="cm-current" type="number" readonly style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:inherit">
+      </div>
+      <span style="font-size:18px;color:var(--muted);padding-bottom:9px">→</span>
+      <div style="display:grid;gap:4px;flex:1">
+        <label style="font-size:12px;color:var(--muted)">Batas Baru</label>
+        <input id="cm-input" type="number" min="1" placeholder="Masukkan batas baru" oninput="cmValidate()" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:inherit">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('m-change-max')">Batal</button>
+      <button class="btn primary" id="cm-submit" onclick="saveMaxAndAssign()" disabled>Simpan Perubahan</button>
+    </div>
+    <p class="ph-note">Sumber: <code>ModalChangeMaxConversation.tsx</code> — dua input (readOnly current → Batas Baru), submit aktif saat batas baru &gt; 0.</p>
   </div>
 </div>
 

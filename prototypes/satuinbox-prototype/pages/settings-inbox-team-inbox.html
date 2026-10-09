@@ -1,0 +1,204 @@
+<!-- Settings: Team Inboxes -->
+<style>
+.ti-empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.ti-expand-row td{background:var(--bg);padding:0 !important}
+.ti-expand-body{padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px}
+.ti-agent-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:16px;font-size:12px}
+.ti-agent-chip .dot{width:8px;height:8px;border-radius:50%}
+.ti-agent-chip .dot.online{background:#22c55e}.ti-agent-chip .dot.busy{background:#eab308}.ti-agent-chip .dot.offline{background:#94a3b8}
+.ti-agents-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ti-agent-check{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s}
+.ti-agent-check.selected{border-color:var(--accent);background:rgba(79,70,229,.05)}
+.ti-agent-check input{margin:0}
+.ti-del-confirm{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin:10px 0;font-size:13px;color:var(--danger)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">🏢 Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">👥 Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">🔐 Peran</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">🏷️ Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">🕐 Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">🔄 Auto-Assignment</div>
+    <div class="sn-item active" onclick="go('settings/inbox-team-inbox')">📥 Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">⏱️ SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">⭐ CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">⚡ Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">🎫 Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">🟢 WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">🔵 WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">💬 Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">🔗 Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <h2 style="margin:0 0 4px">📥 Tim Inbox</h2>
+        <p style="color:var(--muted);font-size:13px;margin:0">Kelola inbox per tim dengan agen dan SLA masing-masing.</p>
+      </div>
+      <button class="btn primary" onclick="openTIModal()">+ Buat Tim Inbox</button>
+    </div>
+
+    <table class="data-table" id="tiTable">
+      <thead><tr><th>Nama</th><th>Deskripsi</th><th>Agen</th><th>SLA (jam)</th><th></th></tr></thead>
+      <tbody id="tiBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal-overlay" id="tiModal">
+  <div class="modal" style="max-width:520px">
+    <h3 id="tiTitle">Buat Tim Inbox</h3>
+    <label>Nama Tim<input id="tiName" placeholder="Tim Support A"></label>
+    <label>Deskripsi<input id="tiDesc" placeholder="Support umum"></label>
+    <label>SLA (jam)<input type="number" id="tiSla" min="1" value="4" style="width:100px"></label>
+    <label style="margin-top:8px">Pilih Agen</label>
+    <div class="ti-agents-list" id="tiAgentList"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('tiModal')">Batal</button>
+      <button class="btn primary" onclick="saveTI()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="tiDelModal">
+  <div class="modal">
+    <h3>Hapus Tim Inbox</h3>
+    <div class="ti-del-confirm" id="tiDelMsg"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('tiDelModal')">Batal</button>
+      <button class="btn danger" onclick="doDeleteTI()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var _editTI = null;
+var _delTI = null;
+var _expandedTI = null;
+
+function renderTI(){
+  const list = DB.settings.teamInboxes || [];
+  const tbody = document.getElementById('tiBody');
+  if(!list.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="ti-empty">Belum ada tim inbox.</td></tr>';
+    return;
+  }
+  let html = '';
+  list.forEach(ti => {
+    const agentNames = (ti.agents||[]).map(uid => {
+      const a = DB.agents.find(x=>x.id===uid);
+      return a ? a.name : uid;
+    });
+    html += `<tr style="cursor:pointer" onclick="toggleExpand('${ti.id}')">
+      <td><strong>${ti.name}</strong></td>
+      <td style="font-size:12px;color:var(--muted)">${ti.description||'-'}</td>
+      <td>${ti.agents.length} agen</td>
+      <td>${ti.sla} jam</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn" onclick="event.stopPropagation();openEditTI('${ti.id}')">✏️</button>
+        <button class="btn danger" onclick="event.stopPropagation();openDelTI('${ti.id}')">🗑️</button>
+      </td>
+    </tr>`;
+    if(_expandedTI === ti.id){
+      const chips = (ti.agents||[]).map(uid => {
+        const a = DB.agents.find(x=>x.id===uid);
+        if(!a) return '';
+        return `<span class="ti-agent-chip"><span class="dot ${a.status}"></span>${a.name}</span>`;
+      }).join('');
+      html += `<tr class="ti-expand-row"><td colspan="5"><div class="ti-expand-body">${chips||'<span style="color:var(--muted);font-size:12px">Belum ada agen</span>'}</div></td></tr>`;
+    }
+  });
+  tbody.innerHTML = html;
+}
+
+function toggleExpand(id){
+  _expandedTI = _expandedTI === id ? null : id;
+  renderTI();
+}
+
+function renderAgentChecks(selected){
+  const agents = DB.agents || [];
+  document.getElementById('tiAgentList').innerHTML = agents.map(a => `
+    <label class="ti-agent-check ${selected.includes(a.id)?'selected':''}">
+      <input type="checkbox" value="${a.id}" ${selected.includes(a.id)?'checked':''} onchange="this.parentElement.classList.toggle('selected',this.checked)">
+      ${a.name}
+    </label>
+  `).join('');
+}
+
+function getSelectedAgents(){
+  return [...document.querySelectorAll('#tiAgentList input:checked')].map(c=>c.value);
+}
+
+function openTIModal(){
+  _editTI = null;
+  document.getElementById('tiTitle').textContent = 'Buat Tim Inbox';
+  document.getElementById('tiName').value = '';
+  document.getElementById('tiDesc').value = '';
+  document.getElementById('tiSla').value = 4;
+  renderAgentChecks([]);
+  document.getElementById('tiModal').classList.add('open');
+}
+
+function openEditTI(id){
+  const ti = DB.settings.teamInboxes.find(x=>x.id===id);
+  if(!ti) return;
+  _editTI = id;
+  document.getElementById('tiTitle').textContent = 'Edit Tim Inbox';
+  document.getElementById('tiName').value = ti.name;
+  document.getElementById('tiDesc').value = ti.description || '';
+  document.getElementById('tiSla').value = ti.sla;
+  renderAgentChecks(ti.agents||[]);
+  document.getElementById('tiModal').classList.add('open');
+}
+
+function saveTI(){
+  const name = document.getElementById('tiName').value.trim();
+  if(!name){ showToast('Nama tim wajib diisi'); return; }
+  const data = {
+    name,
+    description: document.getElementById('tiDesc').value.trim(),
+    agents: getSelectedAgents(),
+    sla: parseInt(document.getElementById('tiSla').value)||4,
+  };
+  if(_editTI){
+    const i = DB.settings.teamInboxes.findIndex(x=>x.id===_editTI);
+    if(i>=0) DB.settings.teamInboxes[i] = {...DB.settings.teamInboxes[i], ...data};
+  } else {
+    DB.settings.teamInboxes.push({id:genId('ti'), ...data});
+  }
+  saveStore();
+  closeModal('tiModal');
+  renderTI();
+  showToast(_editTI ? 'Tim inbox diperbarui' : 'Tim inbox dibuat');
+}
+
+function openDelTI(id){
+  const ti = DB.settings.teamInboxes.find(x=>x.id===id);
+  if(!ti) return;
+  _delTI = id;
+  document.getElementById('tiDelMsg').textContent = `Yakin ingin menghapus tim inbox "${ti.name}"?`;
+  document.getElementById('tiDelModal').classList.add('open');
+}
+
+function doDeleteTI(){
+  DB.settings.teamInboxes = DB.settings.teamInboxes.filter(x=>x.id!==_delTI);
+  saveStore();
+  closeModal('tiDelModal');
+  renderTI();
+  showToast('Tim inbox dihapus');
+}
+
+renderTI();
+</script>

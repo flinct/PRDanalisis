@@ -1,0 +1,50 @@
+{
+ "cmc/deepseek/deepseek-v4.1-flash": {
+  "analysis": {
+   "ok": true,
+   "dt": 6.7,
+   "usage": {
+    "prompt_tokens": 7657,
+    "completion_tokens": 513,
+    "total_tokens": 8170
+   },
+   "text": "Ranked by prior probability:\n\n1. N+1 query or dropped index from the new code path.\n2. New synchronous dependency on the hot path (auth, logging, external API).\n3. Cache busted \u2014 key/serialization change causing a miss storm.\n4. Connection pool exhaustion or connection leak (config/pool change).\n5. Topology/resource shift \u2014 fewer instances, cold containers, CPU throttle.\n\nDiscriminating check: replay one request at concurrency=1. Still 10x \u2192 code/path change (1\u20133); only degrades under load \u2192 contention (4\u20135)."
+  }
+ },
+ "cmc/deepseek/deepseek-v4-pro": {
+  "analysis": {
+   "ok": true,
+   "dt": 8.4,
+   "usage": {
+    "prompt_tokens": 7710,
+    "completion_tokens": 502,
+    "total_tokens": 8212
+   },
+   "text": "1. **DB connection pool exhaustion** \u2014 new code leaks/overholds connections, requests queue waiting for a slot.\n2. **N+1 queries** \u2014 new code issues per-row queries instead of batch/eager load.\n3. **Missing index** \u2014 new query/filter on an unindexed column forces table scans.\n4. **New blocking upstream call** \u2014 synchronous external API/RPC added on the hot path.\n5. **Cache bust/disabled** \u2014 deploy invalidated cache, shifting load to origin/DB and cold start.\n\n**Discriminating check:** Trace one slow request and see which span grew 10x \u2014 DB query time vs. connection-wait time vs. external call vs. CPU/GC \u2014 it points directly to one root cause."
+  }
+ },
+ "cmc/xiaomi/mimo-v2.5-pro": {
+  "analysis": {
+   "ok": true,
+   "dt": 9.1,
+   "usage": {
+    "prompt_tokens": 7465,
+    "completion_tokens": 191,
+    "total_tokens": 7656
+   },
+   "text": "1. **Missing or broken database index/cache** introduced by migration or query change\n2. **N+1 or unbounded query** in a new or modified code path\n3. **Upstream dependency timeout cascade** \u2014 a slower service now called synchronously\n4. **Resource contention** \u2014 connection pool, thread pool, or memory exhaustion from new allocation pattern\n5. **Misconfigured or missing CDN/proxy/reverse-proxy** \u2014 requests now hitting origin directly\n\n**Discriminating check:** `EXPLAIN ANALYZE` the slowest endpoint's SQL against a production-replica dataset \u2014 if query plans are fine, the bottleneck is upstream or infra (check APM flame graph); if queries are slow, it's cause 1 or 2."
+  }
+ },
+ "cmc/xiaomi/mimo-v2.6-flash": {
+  "analysis": {
+   "ok": true,
+   "dt": 11.1,
+   "usage": {
+    "prompt_tokens": 7465,
+    "completion_tokens": 230,
+    "total_tokens": 7695
+   },
+   "text": "- **Cold start / cache flush** \u2014 JIT, connection pools, CDN/DB query cache empty after restart\n- **New DB query or N+1 introduced** \u2014 deploy shipped code with missing index or a chatty endpoint\n- **Dependency/regression on critical path** \u2014 new synchronous call (feature flag, analytics, external API) blocking responses\n- **Misconfigured env/routing** \u2014 wrong config \u2192 fallback path (e.g., mock/remote service, TLS handshake per request, connection pool exhaustion)\n- **Resource starvation** \u2014 reduced CPU/memory limits, wrong instance count, or CPU throttling in new deployment\n\n**Discriminating check:** Compare p50 vs p95/p96 latency post-deploy against the previous version \u2014 uniform shift (all percentiles up) points to a per-request blocking dependency or config issue; tail-only blowup points to pool exhaustion/queuing; and if latency decays over the first minutes, it's cold-start/cache warmup rather than a code regression."
+  }
+ }
+}

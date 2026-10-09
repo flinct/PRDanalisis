@@ -1,0 +1,207 @@
+<!-- Visit Management — Bulk Approve/Reject -->
+<style>
+.visit-toolbar{display:flex;align-items:center;gap:12px;padding:18px 24px 0;flex-wrap:wrap}
+.visit-toolbar h1{font-size:20px;font-weight:700;flex:1}
+.visit-summary{display:flex;gap:12px;padding:12px 24px}
+.visit-summary .vs{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;flex:1;text-align:center}
+.visit-summary .vs .num{font-size:22px;font-weight:700}.visit-summary .vs .lbl{font-size:11px;color:var(--muted)}
+.visit-table-wrap{padding:0 24px 24px;overflow-x:auto}
+.visit-status{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;display:inline-block}
+.vs-on_plan{background:#dbeafe;color:#2563eb}.vs-waiting_review{background:#fef3c7;color:#b45309}.vs-approved{background:#dcfce7;color:#15803d}.vs-rejected{background:#fef2f2;color:#dc2626}
+/* Bulk bar */
+.bulk-bar{position:sticky;bottom:0;background:var(--card);border-top:2px solid var(--accent);padding:12px 24px;display:none;align-items:center;gap:12px;z-index:10;box-shadow:0 -4px 12px rgba(0,0,0,.1)}
+.bulk-bar.show{display:flex}
+.bulk-bar .bulk-count{font-size:14px;font-weight:600;color:var(--accent)}
+.bulk-bar .bulk-reason{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+/* Detail modal */
+.visit-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:130}
+.visit-detail-overlay.open{display:grid}
+.visit-detail{background:var(--card);border-radius:14px;width:500px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}
+.vd-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.vd-header h3{font-size:16px;font-weight:600}
+.vd-body{padding:20px}
+.vd-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bg);font-size:13px}
+.vd-row .lbl{color:var(--muted)}.vd-row .val{font-weight:500}
+.vd-actions{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.check-col{width:36px;text-align:center}
+.check-col input{width:16px;height:16px;cursor:pointer}
+</style>
+
+<div class="visit-toolbar">
+  <h1>📍 Kunjungan</h1>
+  <div class="page-filters" style="padding:0;border:none" id="visitFilterBar">
+    <span class="filter-chip active" onclick="filterVisits(this,'all')">Semua</span>
+    <span class="filter-chip" onclick="filterVisits(this,'waiting_review')">⏳ Menunggu Review</span>
+    <span class="filter-chip" onclick="filterVisits(this,'on_plan')">📅 Dijadwalkan</span>
+    <span class="filter-chip" onclick="filterVisits(this,'approved')">✅ Disetujui</span>
+    <span class="filter-chip" onclick="filterVisits(this,'rejected')">❌ Ditolak</span>
+  </div>
+</div>
+
+<div class="visit-summary" id="visitSummary"></div>
+
+<div class="visit-table-wrap">
+  <table class="data-table" id="visitTable">
+    <thead><tr>
+      <th class="check-col"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+      <th>Lead / Perusahaan</th><th>Sales</th><th>Tanggal Visit</th><th>Lokasi</th><th>Status</th><th>Catatan</th><th>Aksi</th>
+    </tr></thead>
+    <tbody id="visitTableBody"></tbody>
+  </table>
+</div>
+
+<!-- Bulk action bar -->
+<div class="bulk-bar" id="bulkBar">
+  <span class="bulk-count" id="bulkCount">0 dipilih</span>
+  <button class="btn primary" onclick="bulkApprove()">✅ Approve Terpilih</button>
+  <input class="bulk-reason" id="bulkRejectReason" placeholder="Alasan reject (opsional untuk approve, wajib untuk reject)...">
+  <button class="btn danger" onclick="bulkReject()">❌ Reject Terpilih</button>
+  <button class="btn" onclick="clearSelection()">Batal</button>
+</div>
+
+<!-- Visit detail modal -->
+<div class="visit-detail-overlay" id="visitDetailOverlay" onclick="if(event.target===this)closeVisitDetail()">
+  <div class="visit-detail" id="visitDetailContent"></div>
+</div>
+
+<script>
+var visitFilter='all';
+var VISIT_STATUS={on_plan:'📅 Dijadwalkan',waiting_review:'⏳ Menunggu Review',approved:'✅ Disetujui',rejected:'❌ Ditolak'};
+
+function renderVisits(){
+  renderVisitSummary();
+  renderVisitTable();
+}
+
+function renderVisitSummary(){
+  const vs=DB.visits||[];
+  document.getElementById('visitSummary').innerHTML=`
+    <div class="vs"><div class="num">${vs.length}</div><div class="lbl">Total</div></div>
+    <div class="vs"><div class="num" style="color:var(--warn)">${vs.filter(v=>v.status==='waiting_review').length}</div><div class="lbl">Menunggu Review</div></div>
+    <div class="vs"><div class="num" style="color:var(--accent)">${vs.filter(v=>v.status==='on_plan').length}</div><div class="lbl">Dijadwalkan</div></div>
+    <div class="vs"><div class="num" style="color:var(--ok)">${vs.filter(v=>v.status==='approved').length}</div><div class="lbl">Disetujui</div></div>
+    <div class="vs"><div class="num" style="color:var(--danger)">${vs.filter(v=>v.status==='rejected').length}</div><div class="lbl">Ditolak</div></div>
+  `;
+}
+
+function renderVisitTable(){
+  const visits=(DB.visits||[]).filter(v=>visitFilter==='all'||v.status===visitFilter).sort((a,b)=>new Date(b.plannedAt)-new Date(a.plannedAt));
+  const tbody=document.getElementById('visitTableBody');
+  tbody.innerHTML=visits.map(v=>{
+    const lead=dbFind('leads',v.leadId);
+    const agent=DB.agents.find(a=>a.id===v.assignee);
+    const canSelect=v.status==='waiting_review';
+    return `<tr data-id="${v.id}" class="${canSelect?'selectable':''}">
+      <td class="check-col">${canSelect?`<input type="checkbox" class="visit-cb" data-id="${v.id}" onchange="updateBulkBar()">`:'—'}</td>
+      <td><strong>${lead?lead.company:'?'}</strong><br><span style="font-size:11px;color:var(--muted)">${lead?lead.contact||'Tanpa kontak':''}</span></td>
+      <td>${agent?agent.name:'—'}</td>
+      <td>${fmtDate(v.plannedAt)}</td>
+      <td style="font-size:12px">${v.location||'—'}</td>
+      <td><span class="visit-status vs-${v.status}">${VISIT_STATUS[v.status]||v.status}</span></td>
+      <td style="font-size:12px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.note||'—'}</td>
+      <td><button class="btn" style="font-size:12px;padding:3px 8px" onclick="openVisitDetail('${v.id}')">Detail</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">Tidak ada kunjungan</td></tr>';
+}
+
+function filterVisits(el,status){
+  document.querySelectorAll('#visitFilterBar .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');visitFilter=status;renderVisitTable();
+}
+
+// === SELECTION ===
+function getSelectedIds(){
+  return [...document.querySelectorAll('.visit-cb:checked')].map(cb=>cb.dataset.id);
+}
+function updateBulkBar(){
+  const ids=getSelectedIds();
+  const bar=document.getElementById('bulkBar');
+  bar.classList.toggle('show',ids.length>0);
+  document.getElementById('bulkCount').textContent=ids.length+' dipilih';
+}
+function toggleSelectAll(el){
+  document.querySelectorAll('.visit-cb').forEach(cb=>cb.checked=el.checked);
+  updateBulkBar();
+}
+function clearSelection(){
+  document.querySelectorAll('.visit-cb').forEach(cb=>cb.checked=false);
+  document.getElementById('selectAll').checked=false;
+  updateBulkBar();
+}
+
+// === BULK ACTIONS ===
+function bulkApprove(){
+  const ids=getSelectedIds();if(!ids.length)return;
+  ids.forEach(id=>{
+    dbUpdate('visits',id,{status:'approved',closedAt:new Date().toISOString(),approval:{by:DB.currentUser?.id||'u3',at:new Date().toISOString(),note:'Bulk approve'}});
+  });
+  clearSelection();renderVisits();showToast(ids.length+' kunjungan disetujui');
+}
+function bulkReject(){
+  const ids=getSelectedIds();if(!ids.length)return;
+  const reason=document.getElementById('bulkRejectReason').value.trim();
+  if(!reason){showToast('Alasan reject wajib diisi');return}
+  ids.forEach(id=>{
+    dbUpdate('visits',id,{status:'rejected',closedAt:new Date().toISOString(),approval:{by:DB.currentUser?.id||'u3',at:new Date().toISOString(),rejected:true,note:reason}});
+  });
+  document.getElementById('bulkRejectReason').value='';
+  clearSelection();renderVisits();showToast(ids.length+' kunjungan ditolak');
+}
+
+// === SINGLE DETAIL ===
+function openVisitDetail(id){
+  const v=dbFind('visits',id);if(!v)return;
+  const lead=dbFind('leads',v.leadId);
+  const agent=DB.agents.find(a=>a.id===v.assignee);
+  const approver=v.approval?DB.agents.find(a=>a.id===v.approval.by):null;
+  document.getElementById('visitDetailContent').innerHTML=`
+    <div class="vd-header">
+      <h3>📍 Detail Kunjungan</h3>
+      <span class="visit-status vs-${v.status}">${VISIT_STATUS[v.status]}</span>
+    </div>
+    <div class="vd-body">
+      <div class="vd-row"><span class="lbl">Lead</span><span class="val">${lead?lead.company:'—'}</span></div>
+      <div class="vd-row"><span class="lbl">Kontak</span><span class="val">${lead?(lead.contact||'—'):'—'}</span></div>
+      <div class="vd-row"><span class="lbl">Sales</span><span class="val">${agent?agent.name:'—'}</span></div>
+      <div class="vd-row"><span class="lbl">Tanggal Visit</span><span class="val">${fmtDate(v.plannedAt)}</span></div>
+      <div class="vd-row"><span class="lbl">Lokasi</span><span class="val">${v.location||'—'}</span></div>
+      <div class="vd-row"><span class="lbl">Catatan</span><span class="val">${v.note||'—'}</span></div>
+      ${v.checkedInAt?`<div class="vd-row"><span class="lbl">Check-in</span><span class="val">${fmtDate(v.checkedInAt)} ${fmtTime(v.checkedInAt)}</span></div>`:''}
+      ${v.outcome?`<div class="vd-row"><span class="lbl">Outcome</span><span class="val">${v.outcome}</span></div>`:''}
+      ${v.approval?`<div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px">
+        <div class="vd-row"><span class="lbl">${v.approval.rejected?'Ditolak':'Disetujui'} oleh</span><span class="val">${approver?approver.name:'—'}</span></div>
+        <div class="vd-row"><span class="lbl">Waktu</span><span class="val">${fmtDate(v.approval.at)}</span></div>
+        ${v.approval.note?`<div class="vd-row"><span class="lbl">Catatan</span><span class="val">${v.approval.note}</span></div>`:''}
+      </div>`:''}
+    </div>
+    <div class="vd-actions">
+      ${v.status==='on_plan'?`
+        <button class="btn primary" onclick="singleCheckin('${v.id}')">📍 Check-in (selesai kunjungan)</button>
+      `:''}
+      ${v.status==='waiting_review'?`
+        <button class="btn danger" onclick="singleReject('${v.id}')">❌ Reject</button>
+        <button class="btn primary" onclick="singleApprove('${v.id}')">✅ Approve</button>
+      `:''}
+      <button class="btn" onclick="closeVisitDetail()">Tutup</button>
+    </div>
+  `;
+  document.getElementById('visitDetailOverlay').classList.add('open');
+}
+function closeVisitDetail(){document.getElementById('visitDetailOverlay').classList.remove('open')}
+function singleCheckin(id){
+  // on_plan -> waiting_review: kunjungan selesai, kirim untuk approval
+  dbUpdate('visits',id,{status:'waiting_review',checkedInAt:new Date().toISOString(),outcome:'visited'});
+  closeVisitDetail();renderVisits();showToast('Check-in tercatat — menunggu review');
+}
+function singleApprove(id){
+  dbUpdate('visits',id,{status:'approved',closedAt:new Date().toISOString(),approval:{by:DB.currentUser?.id||'u3',at:new Date().toISOString(),note:'Approved'}});
+  closeVisitDetail();renderVisits();showToast('Kunjungan disetujui');
+}
+function singleReject(id){
+  const reason=prompt('Alasan reject:');if(!reason)return;
+  dbUpdate('visits',id,{status:'rejected',closedAt:new Date().toISOString(),approval:{by:DB.currentUser?.id||'u3',at:new Date().toISOString(),rejected:true,note:reason}});
+  closeVisitDetail();renderVisits();showToast('Kunjungan ditolak');
+}
+
+renderVisits();
+</script>

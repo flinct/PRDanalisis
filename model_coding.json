@@ -1,0 +1,42 @@
+{
+ "cmc/deepseek/deepseek-v4.1-flash": {
+  "ok": true,
+  "dt": 47.5,
+  "usage": {
+   "prompt_tokens": 7776,
+   "completion_tokens": 1200,
+   "total_tokens": 8976
+  },
+  "text": "**Bug:** The inner loop uses `range(n - mid)`, which stops one short \u2014 the substring starting at `n - mid` (the final valid window) is never added/checked, and when `mid == 0` it can falsely match the empty string. It must be `range(n - mid + 1)`.\n\n```python\ndef longest_repeat(s):\n    n = len(s)\n    best = 0\n    lo, hi = 0, n\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if mid == 0:\n            lo = mid + 1\n            continue\n        seen = set()\n        ok = False\n        for i in range(n - mid + 1):\n            sub = s[i:i + mid]\n            if sub in seen:\n                ok = True\n                break\n            seen.add(sub)\n        if ok:\n            best = mid\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return best\n```\n\nThe `mid == 0` guard avoids"
+ },
+ "cmc/deepseek/deepseek-v4-pro": {
+  "ok": true,
+  "dt": 14.8,
+  "usage": {
+   "prompt_tokens": 7829,
+   "completion_tokens": 1106,
+   "total_tokens": 8935
+  },
+  "text": "The bug: `range(n - mid)` only checks start indices `0..n-mid-1`, skipping the last substring starting at index `n - mid`. This misses overlapping repeats for longer lengths. Use `range(n - mid + 1)` to check every substring.\n\n```python\ndef longest_repeat(s):\n    n = len(s)\n    best = 0\n    lo, hi = 0, n\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        seen = set()\n        ok = False\n        for i in range(n - mid + 1):\n            sub = s[i:i+mid]\n            if sub in seen:\n                ok = True\n                break\n            seen.add(sub)\n        if ok:\n            best = mid\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return best\n```"
+ },
+ "cmc/xiaomi/mimo-v2.5-pro": {
+  "ok": true,
+  "dt": 10.7,
+  "usage": {
+   "prompt_tokens": 7583,
+   "completion_tokens": 537,
+   "total_tokens": 8120
+  },
+  "text": "**Bug:** `range(n - mid)` should be `range(n - mid + 1)` \u2014 the current code misses the last possible starting position, so it fails when the repeated substring ends at the string's end.\n\n```python\ndef longest_repeat(s):\n    n = len(s)\n    best = 0\n    lo, hi = 0, n\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        seen = set()\n        ok = False\n        for i in range(n - mid + 1):\n            if s[i:i+mid] in seen:\n                ok = True\n                break\n            seen.add(s[i:i+mid])\n        if ok:\n            best = mid\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return best\n```"
+ },
+ "cmc/xiaomi/mimo-v2.6-flash": {
+  "ok": true,
+  "dt": 11.7,
+  "usage": {
+   "prompt_tokens": 7583,
+   "completion_tokens": 274,
+   "total_tokens": 7857
+  },
+  "text": "Bug: the loop only checks windows starting at `0..n-mid-1`, skipping the final window starting at index `n-mid`, so repeats ending at the last character are missed (e.g. `\"abca\"` \u2014 `\"a\"` at both ends is seen only because... actually `\"aa\"` at end of `\"baa\"` is missed).\n\n```python\ndef longest_repeat(s):\n    n = len(s)\n    best = 0\n    lo, hi = 0, n\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        seen = set()\n        ok = False\n        for i in range(n - mid + 1):\n            if s[i:i+mid] in seen:\n                ok = True\n                break\n            seen.add(s[i:i+mid])\n        if ok:\n            best = mid\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return best\n```"
+ }
+}

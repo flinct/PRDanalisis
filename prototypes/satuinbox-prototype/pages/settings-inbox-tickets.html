@@ -1,0 +1,125 @@
+<!-- Settings: Ticket Configuration -->
+<style>
+.tk-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.tk-row:last-child{border:none}
+.tk-cat{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--border)}
+.tk-cat .x{cursor:pointer;font-size:13px;color:var(--muted);font-weight:700}.tk-cat .x:hover{color:var(--danger)}
+.st-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.st-form label input,.st-form label select{display:block;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:14px;background:var(--bg)}
+.st-form label input:focus,.st-form label select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.tk-cat-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item active" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">Pengaturan Tiket</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Konfigurasi kategori dan prioritas default untuk tiket.</p>
+
+    <!-- Kategori -->
+    <div class="card" style="padding:16px;margin-bottom:20px;max-width:520px">
+      <h3 style="margin-bottom:12px">Kategori Tiket</h3>
+      <div class="tk-cat-bar" id="tkCatBar"></div>
+      <div style="display:flex;gap:8px">
+        <input id="tkNewCat" placeholder="Tambah kategori…" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg)">
+        <button class="btn primary" onclick="addTkCat()">Tambah</button>
+      </div>
+    </div>
+
+    <!-- Config Form -->
+    <div class="card st-form" style="padding:16px;max-width:520px">
+      <h3 style="margin-bottom:12px">Konfigurasi Default</h3>
+      <label>Prioritas Default
+        <select id="tkDefaultPriority">
+          <option value="low">Rendah</option>
+          <option value="medium">Sedang</option>
+          <option value="high">Tinggi</option>
+        </select>
+      </label>
+      <label>Auto-assign Tiket
+        <select id="tkAutoAssign">
+          <option value="true">Ya</option>
+          <option value="false">Tidak</option>
+        </select>
+      </label>
+      <label>SLA Penyelesaian (jam)
+        <input type="number" id="tkSlaHours" min="1" placeholder="24">
+      </label>
+      <div style="display:flex;justify-content:flex-end;margin-top:4px">
+        <button class="btn primary" onclick="saveTkConfig()">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ponytail: store ticket config in DB.settings.ticketConfig, create if missing
+if(!DB.settings.ticketConfig){
+  DB.settings.ticketConfig={
+    categories:['Order','Refund','Pengiriman','Teknis','Umum'],
+    defaultPriority:'medium',
+    autoAssign:true,
+    slaHours:24
+  };
+  saveStore();
+}
+
+var cfg=DB.settings.ticketConfig;
+
+function renderCats(){
+  document.getElementById('tkCatBar').innerHTML=(cfg.categories||[]).map((c,i)=>
+    '<span class="tk-cat">'+c+' <span class="x" onclick="removeCat('+i+')">×</span></span>'
+  ).join('');
+}
+
+function addTkCat(){
+  const inp=document.getElementById('tkNewCat');
+  const v=inp.value.trim();
+  if(!v)return;
+  if(cfg.categories.includes(v)){showToast('Kategori sudah ada');return}
+  cfg.categories.push(v);
+  saveStore();inp.value='';renderCats();
+}
+
+function removeCat(i){
+  cfg.categories.splice(i,1);
+  saveStore();renderCats();
+}
+
+function saveTkConfig(){
+  cfg.defaultPriority=document.getElementById('tkDefaultPriority').value;
+  cfg.autoAssign=document.getElementById('tkAutoAssign').value==='true';
+  cfg.slaHours=parseInt(document.getElementById('tkSlaHours').value)||24;
+  saveStore();
+  showToast('Pengaturan tiket berhasil disimpan');
+}
+
+// Init form values
+document.getElementById('tkDefaultPriority').value=cfg.defaultPriority;
+document.getElementById('tkAutoAssign').value=String(cfg.autoAssign);
+document.getElementById('tkSlaHours').value=cfg.slaHours;
+renderCats();
+</script>

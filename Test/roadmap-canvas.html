@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap Canvas — Split Pane</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0B0F15;--card:#111827;--card2:#0f172a;--border:#1e293b;
+  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+  --blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--purple:#a78bfa;--teal:#14b8a6;
+}
+body{background:var(--bg);color:var(--t1);font-family:'Roboto',system-ui,sans-serif;font-size:13px;overflow:hidden;height:100vh}
+
+/* ── Layout ── */
+.app{display:flex;flex-direction:column;height:100vh}
+.nav{display:flex;align-items:center;gap:20px;padding:12px 24px;background:var(--card2)}
+.nav a{color:var(--t3);text-decoration:none;font-size:12px}
+.nav a.active{color:var(--blue);font-weight:700}
+.subtabs{display:flex;gap:0;padding:0 24px;background:var(--bg)}
+.subtab{padding:10px 20px;border-radius:8px 8px 0 0;color:var(--t3);cursor:pointer;font-size:13px}
+.subtab.active{background:var(--card);color:var(--blue);font-weight:700}
+.toolbar{display:flex;align-items:center;gap:8px;padding:8px 24px;background:var(--bg)}
+.view-toggle{display:flex;gap:0}
+.view-btn{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;border:none}
+.view-btn.active{background:var(--card);color:var(--blue);font-weight:700}
+.view-btn:not(.active){background:transparent;color:var(--t3)}
+.add-btns{margin-left:auto;display:flex;gap:6px}
+.add-btn{padding:4px 12px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--border)}
+.add-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.add-btn.secondary{background:var(--card2);color:var(--t2)}
+
+/* ── Split Pane Container ── */
+.split-wrap{display:flex;flex:1;overflow:hidden;position:relative}
+.pane-left{width:520px;min-width:520px;overflow-y:auto;overflow-x:hidden;border-right:2px solid var(--border)}
+.pane-right{flex:1;overflow:auto}
+
+/* ── Table ── */
+.tbl{border-collapse:collapse;width:100%}
+.tbl th{position:sticky;top:0;z-index:10;background:var(--card);padding:8px 12px;text-align:left;font-size:10px;color:var(--t3);font-weight:700;white-space:nowrap}
+.tbl td{padding:6px 12px;white-space:nowrap;border-bottom:1px solid var(--border)10}
+.tbl tr:nth-child(even) td{background:var(--card2)}
+.tbl tr:hover td{background:#1a2332}
+
+/* Left pane table widths */
+.tbl .w-num{width:28px}
+.tbl .w-task{width:220px}
+.tbl .w-area{width:120px}
+.tbl .w-prio{width:56px}
+.tbl .w-status{width:100px}
+
+/* Right pane table widths */
+.tbl .w-metric{width:56px}
+.tbl .w-bar{width:46px}
+
+/* ── Badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700}
+.badge-p0{background:var(--red)20;color:var(--red)}
+.badge-p1{background:var(--orange)20;color:var(--orange)}
+.badge-p2{background:var(--purple)20;color:var(--purple)}
+.badge-p3{background:var(--t3)20;color:var(--t3)}
+.badge-h{background:var(--red)18;color:var(--red)}
+.badge-m{background:var(--orange)18;color:var(--orange)}
+.badge-l{background:var(--green)18;color:var(--green)}
+
+/* ── Timeline bars ── */
+.bar{display:inline-block;width:42px;height:10px;border-radius:5px}
+.bar-fill{background:var(--blue)50}
+.bar-empty{background:#1e293b}
+
+/* ── Status ── */
+.st-active{color:var(--blue)}
+.st-progress{color:var(--green)}
+.st-new{color:var(--t3)}
+
+/* ── Section headers ── */
+.section-hdr td{padding:10px 12px 6px;font-weight:700;font-size:13px;border-bottom:none}
+.section-hdr .sec-line{display:inline-block;width:4px;height:18px;border-radius:2px;vertical-align:middle;margin-right:8px}
+
+/* ── Q header ── */
+.q-header{display:flex;gap:0;align-items:stretch}
+.q-section{flex:1;padding:4px 8px;border-right:1px solid var(--border)30}
+.q-section:last-child{border-right:none}
+.q-label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);font-weight:700}
+.q-dot{width:6px;height:6px;border-radius:50%}
+.q-months{display:flex;gap:2;margin-top:2px}
+.q-months span{font-size:9px;color:var(--t3);flex:1;text-align:center}
+
+/* ── Expand row ── */
+.expand-btn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 4px}
+.expand-btn:hover{color:var(--t1)}
+.detail-row td{padding:0;border-bottom:1px solid var(--border)}
+.detail-panel{display:flex;gap:24px;padding:12px 16px;background:var(--card2);font-size:12px}
+.detail-col{flex:1}
+.detail-col h5{font-size:11px;color:var(--t2);margin-bottom:6px;font-weight:700}
+.detail-desc{color:var(--t2);margin-bottom:10px;line-height:1.5}
+.detail-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.detail-meta dt{color:var(--t3);font-size:11px}
+.detail-meta dd{color:var(--t1);font-size:11px}
+.dep-tag{display:inline-block;padding:2px 8px;border-radius:4px;background:var(--blue)15;color:var(--teal);font-size:10px;margin:2px 4px 2px 0}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Nav -->
+  <div class="nav">
+    <a href="#">Dashboard</a><a href="#">Workspace</a>
+    <a href="#" class="active">Project</a><a href="#">Memory</a><a href="#">Settings</a>
+  </div>
+  <div class="subtabs">
+    <div class="subtab">Overview</div>
+    <div class="subtab active">Roadmap</div>
+    <div class="subtab">Tracker</div>
+    <div class="subtab">Cost</div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="view-toggle">
+      <button class="view-btn active">All</button>
+      <button class="view-btn">Month</button>
+    </div>
+    <div class="add-btns">
+      <button class="add-btn primary">+ Current</button>
+      <button class="add-btn secondary">+ Next</button>
+      <button class="add-btn secondary">+ Backlog</button>
+    </div>
+  </div>
+
+  <!-- Split Pane -->
+  <div class="split-wrap">
+    <!-- LEFT: Task section (fixed, vertical scroll only) -->
+    <div class="pane-left" id="paneLeft">
+      <table class="tbl">
+        <thead>
+          <tr><th class="w-num">#</th><th class="w-task">Task</th><th class="w-area">Area</th><th class="w-prio">Prio</th><th class="w-status">Status</th></tr>
+        </thead>
+        <tbody id="leftBody"></tbody>
+      </table>
+    </div>
+
+    <!-- RIGHT: Timeline section (vertical + horizontal scroll) -->
+    <div class="pane-right" id="paneRight">
+      <table class="tbl">
+        <thead>
+          <tr id="rightHeader"></tr>
+        </thead>
+        <tbody id="rightBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──
+const TASKS = [
+  {id:'t1',name:'UI Conversation Redesign',area:'Omnichannel',prio:'P0',status:'Active',eff:'H',imp:'H',test:'H',sched:[0,4],dep:['notification-service','ticket-v2-widget'],desc:'Redesign the entire conversation UI with new layout, embedded side-panels, and inline actions. Blocks ticket widget v2 and notification service improvements.',opId:2697,section:'now'},
+  {id:'t2',name:'Notification Service',area:'Notification',prio:'P1',status:'In Progress',eff:'M',imp:'H',test:'H',sched:[0,3],dep:['conversation-v2'],desc:'Unified notification pipeline: in-app bell, email digest, WhatsApp alerts. Depends on Conversation v2 event bus.',opId:2332,section:'now'},
+  {id:'t3',name:'Sales Module PRD+P0',area:'Sales',prio:'P1',status:'In Progress',eff:'M',imp:'H',test:'M',sched:[0,3],dep:[],desc:'PRD completion for sales pipeline module. P0 features: lead capture, deal stages, basic reporting.',opId:2366,section:'now'},
+  {id:'t4',name:'Advance Exporting',area:'Tools',prio:'P1',status:'In Progress',eff:'M',imp:'M',test:'L',sched:[0,2],dep:['analytics-dashboard'],desc:'Multi-format export (PDF, XLSX, CSV) for reports and conversation logs. Requires analytics dashboard to be defined first.',opId:2909,section:'now'},
+  {id:'t5',name:'Infra Stability Slice 1',area:'Growth',prio:'P1',status:'Active',eff:'M',imp:'H',test:'M',sched:[0,2],dep:[],desc:'First slice of infrastructure hardening: connection pooling, circuit breakers, graceful degradation for WA gateway.',opId:null,section:'now'},
+
+  {id:'t6',name:'Widget Module',area:'Tools',prio:'P1',status:'New',eff:'M',imp:'M',test:'M',sched:[2,5],dep:['ui-conversation-redesign'],desc:'Embeddable chat widget for customer websites. Depends on conversation UI redesign being stable.',opId:null,section:'next'},
+  {id:'t7',name:'Cost Simulation WA',area:'Omnichannel',prio:'P2',status:'New',eff:'L',imp:'M',test:'L',sched:[2,4],dep:[],desc:'WhatsApp cost calculator: per-template, per-session, per-media pricing preview before sending broadcast.',opId:null,section:'next'},
+  {id:'t8',name:'Ticketing KPI Card',area:'Ticket',prio:'P2',status:'New',eff:'L',imp:'M',test:'L',sched:[3,5],dep:['ticket-v2-widget'],desc:'KPI summary cards on ticket dashboard: avg resolution time, first response SLA, reopen rate.',opId:168,section:'next'},
+  {id:'t9',name:'Broadcast v2',area:'Broadcast',prio:'P2',status:'New',eff:'M',imp:'M',test:'M',sched:[3,5],dep:['cost-simulation-wa'],desc:'Broadcast v2 with audience segmentation, scheduled sends, A/B testing. Needs WA cost simulation for budget control.',opId:null,section:'next'},
+
+  {id:'t10',name:'Chat Bot Auto Response',area:'AI',prio:'P2',status:'New',eff:'H',imp:'H',test:'H',sched:[5,9],dep:['conversation-v2','notification-service'],desc:'AI-powered auto-response with context window, fallback to human handoff, training pipeline. Major dependency on conversation v2.',opId:null,section:'backlog'},
+  {id:'t11',name:'Analytics Dashboard',area:'Analytics',prio:'P2',status:'New',eff:'M',imp:'M',test:'M',sched:[6,9],dep:['advance-exporting'],desc:'Unified analytics dashboard: conversation volume, agent performance, CSAT trends. Depends on export infra.',opId:null,section:'backlog'},
+  {id:'t12',name:'Fraud Dashboard',area:'Tools',prio:'P3',status:'New',eff:'M',imp:'H',test:'M',sched:[7,11],dep:['analytics-dashboard'],desc:'Fraud detection dashboard: suspicious patterns, bulk send anomalies, rate-limit violations.',opId:null,section:'backlog'},
+  {id:'t13',name:'Telegram Channel',area:'Omnichannel',prio:'P3',status:'New',eff:'L',imp:'L',test:'L',sched:[9,11],dep:[],desc:'Telegram as a messaging channel: webhook setup, message routing, media handling. Low effort standalone.',opId:null,section:'backlog'},
+];
+
+const MONTHS = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
+const QUARTERS = [
+  {q:'Q4 2026',months:[0,1,2],color:'var(--orange)'},
+  {q:'Q1 2027',months:[3,4,5],color:'var(--blue)'},
+  {q:'Q2 2027',months:[6,7,8],color:'var(--purple)'},
+  {q:'Q3 2027',months:[9,10,11],color:'var(--t3)'},
+];
+
+const SECTIONS = [
+  {key:'now',label:'NOW',color:'var(--orange)'},
+  {key:'next',label:'NEXT',color:'var(--blue)'},
+  {key:'backlog',label:'BACKLOG',color:'var(--t3)'},
+];
+
+// ── State ──
+let expandedId = null;
+
+// ── Render ──
+function prioBadge(p) {
+  const cls = p==='P0'?'badge-p0':p==='P1'?'badge-p1':p==='P2'?'badge-p2':'badge-p3';
+  return `<span class="badge ${cls}">${p}</span>`;
+}
+function metricBadge(v) {
+  const cls = v==='H'?'badge-h':v==='M'?'badge-m':'badge-l';
+  return `<span class="badge ${cls}">${v}</span>`;
+}
+function statusHtml(s) {
+  const cls = s==='Active'?'st-active':s==='In Progress'?'st-progress':'st-new';
+  return `<span class="${cls}">${s}</span>`;
+}
+
+// Right header with Q sections
+function renderRightHeader() {
+  const hdr = document.getElementById('rightHeader');
+  hdr.innerHTML = '<th class="w-metric">Effort</th><th class="w-metric">Impact</th><th class="w-metric">Test</th>' +
+    MONTHS.map((m,i) => `<th class="w-bar" style="text-align:center">${m}</th>`).join('') +
+    '<th style="width:60px">OP</th>';
+}
+
+// Expand detail panel
+function detailPanel(t) {
+  const depTags = t.dep.map(d => `<span class="dep-tag">${d}</span>`).join('') || '<span style="color:var(--t3)">— none —</span>';
+  return `<tr class="detail-row" data-for="${t.id}" style="display:${expandedId===t.id?'table-row':'none'}">
+    <td colspan="100"><div class="detail-panel">
+      <div class="detail-col">
+        <h5>Description</h5>
+        <div class="detail-desc">${t.desc || '— no description —'}</div>
+        <dl class="detail-meta">
+          <dt>Dependency</dt><dd>${depTags}</dd>
+          <dt>Schedule</dt><dd>${t.sched ? MONTHS[t.sched[0]]+' → '+MONTHS[t.sched[1]-1]||MONTHS[11] : 'not scheduled'}</dd>
+          <dt>OP ID</dt><dd>${t.opId ? '<a href="https://project.ordo.co.id/work_packages/'+t.opId+'" target="_blank" style="color:var(--teal)">#'+t.opId+' ↗</a>' : '—'}</dd>
+        </dl>
+      </div>
+      <div class="detail-col">
+        <h5>Metrics</h5>
+        <dl class="detail-meta">
+          <dt>Impact</dt><dd>${metricBadge(t.imp)} ${t.imp==='H'?'High — critical path':t.imp==='M'?'Medium — important':'Low — nice to have'}</dd>
+          <dt>Effort</dt><dd>${metricBadge(t.eff)} ${t.eff==='H'?'High — 3+ sprint points':t.eff==='M'?'Medium — 1-2 sprint points':'Low — < 1 sprint point'}</dd>
+          <dt>Testing</dt><dd>${metricBadge(t.test)} ${t.test==='H'?'High — E2E + integration':t.test==='M'?'Medium — unit + integration':'Low — unit only'}</dd>
+        </dl>
+      </div>
+    </div></td></tr>`;
+}
+
+function render() {
+  const leftBody = document.getElementById('leftBody');
+  const rightBody = document.getElementById('rightBody');
+  let leftHtml = '', rightHtml = '';
+
+  SECTIONS.forEach(sec => {
+    const tasks = TASKS.filter(t => t.section === sec.key);
+    // Section header (both panes)
+    const secHdr = `<tr class="section-hdr"><td colspan="5"><span class="sec-line" style="background:${sec.color}"></span>${sec.label}</td></tr>`;
+    leftHtml += secHdr;
+    rightHtml += `<tr class="section-hdr"><td colspan="${3+12+1}"></td></tr>`;
+
+    tasks.forEach((t, i) => {
+      const isOpen = expandedId === t.id;
+      // Left pane row
+      leftHtml += `<tr class="task-row" data-id="${t.id}" onclick="toggleExpand('${t.id}')">
+        <td class="w-num"><button class="expand-btn">${isOpen?'▾':'▸'}</button> ${i+1}</td>
+        <td class="w-task"><strong>${t.name}</strong></td>
+        <td class="w-area" style="color:var(--t2)">${t.area}</td>
+        <td class="w-prio">${prioBadge(t.prio)}</td>
+        <td class="w-status">${statusHtml(t.status)}</td>
+      </tr>`;
+      leftHtml += detailPanel(t);
+
+      // Right pane row
+      const bars = MONTHS.map((m,mi) => {
+        const active = t.sched && mi >= t.sched[0] && mi < t.sched[1];
+        const isQSep = [3,6,9].includes(mi);
+        const sepStyle = isQSep ? 'border-left:1px solid #334155' : '';
+        return `<td class="w-bar" style="text-align:center;${sepStyle}"><span class="bar ${active?'bar-fill':'bar-empty'}"></span></td>`;
+      }).join('');
+      rightHtml += `<tr class="task-row" data-id="${t.id}" onclick="toggleExpand('${t.id}')">
+        <td class="w-metric">${metricBadge(t.eff)}</td>
+        <td class="w-metric">${metricBadge(t.imp)}</td>
+        <td class="w-metric">${metricBadge(t.test)}</td>
+        ${bars}
+        <td style="color:${t.opId?'var(--teal)':'var(--t3)'}">${t.opId||'—'}</td>
+      </tr>`;
+      rightHtml += `<tr class="detail-row" data-for="${t.id}" style="display:${isOpen?'table-row':'none'}"><td colspan="${3+12+1}"></td></tr>`;
+    });
+  });
+
+  leftBody.innerHTML = leftHtml;
+  rightBody.innerHTML = rightHtml;
+}
+
+function toggleExpand(id) {
+  expandedId = expandedId === id ? null : id;
+  render();
+  syncScroll();
+}
+
+// ── Sync vertical scroll ──
+const paneL = document.getElementById('paneLeft');
+const paneR = document.getElementById('paneRight');
+let syncing = false;
+
+function syncScroll() {
+  if (syncing) return;
+  syncing = true;
+  // Match row heights between panes
+  const leftRows = paneL.querySelectorAll('tr');
+  const rightRows = paneR.querySelectorAll('tr');
+  const len = Math.min(leftRows.length, rightRows.length);
+  for (let i = 0; i < len; i++) {
+    const lh = leftRows[i].offsetHeight;
+    const rh = rightRows[i].offsetHeight;
+    const maxH = Math.max(lh, rh);
+    leftRows[i].style.minHeight = maxH + 'px';
+    rightRows[i].style.minHeight = maxH + 'px';
+  }
+  syncing = false;
+}
+
+paneL.addEventListener('scroll', () => { paneR.scrollTop = paneL.scrollTop; });
+paneR.addEventListener('scroll', () => { paneL.scrollTop = paneR.scrollTop; });
+
+// ── Init ──
+renderRightHeader();
+render();
+requestAnimationFrame(syncScroll);
+window.addEventListener('resize', syncScroll);
+</script>
+</body>
+</html>

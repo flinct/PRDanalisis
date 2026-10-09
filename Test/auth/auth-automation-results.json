@@ -1,0 +1,193 @@
+{
+  "ran_at": "2026-09-24T09:42:10.626468",
+  "env": "DEV",
+  "stats": {
+    "startTime": "2026-09-24T02:38:30.220Z",
+    "duration": 96964.12199999999,
+    "expected": 34,
+    "skipped": 39,
+    "unexpected": 7,
+    "flaky": 0
+  },
+  "results": {
+    "login.spec.js::check exist element on login page": {
+      "status": "Passed",
+      "err": ""
+    },
+    "login.spec.js::check login error state": {
+      "status": "Failed",
+      "err": "Error: expect(received).toBeGreaterThanOrEqual(expected)"
+    },
+    "login.spec.js::valid login with admin credentials": {
+      "status": "Passed",
+      "err": ""
+    },
+    "login.spec.js::invalid login with wrong password": {
+      "status": "Failed",
+      "err": "Error: expect(received).toBeGreaterThanOrEqual(expected)"
+    },
+    "login.spec.js::login with empty fields": {
+      "status": "Passed",
+      "err": ""
+    },
+    "login.spec.js::try login with ROLE SUPERVISOR": {
+      "status": "Passed",
+      "err": ""
+    },
+    "login.spec.js::try login with ROLE AGENT": {
+      "status": "Passed",
+      "err": ""
+    },
+    "member-toggle-active.spec.js::Member page loads with title, tabs, and search": {
+      "status": "Passed",
+      "err": ""
+    },
+    "member-toggle-active.spec.js::Member settings page shows member table": {
+      "status": "Passed",
+      "err": ""
+    },
+    "member-toggle-active.spec.js::Row menu button (three dots) is visible for first member": {
+      "status": "Passed",
+      "err": ""
+    },
+    "member-toggle-active.spec.js::Search filters member list by name": {
+      "status": "Passed",
+      "err": ""
+    },
+    "member-toggle-active.spec.js::API: Fetch member list requires auth": {
+      "status": "Failed",
+      "err": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    },
+    "member-toggle-active.spec.js::TC-005: Unauthenticated request returns 401": {
+      "status": "Failed",
+      "err": "Error: expect(received).toBe(expected) // Object.is equality"
+    },
+    "onboarding.spec.js::should complete successful onboarding": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject organization name less than minimum": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject organization name exceeding maximum": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject NIB less than minimum": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should accept NIB, NPWP and ID number with valid length": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject NIB with alphabet characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject NPWP less than minimum": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject NPWP with alphabet characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "onboarding.spec.js::should reject ID number less than minimum": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should show all required fields on register page": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should show validation errors for empty fields": {
+      "status": "Failed",
+      "err": "Error: expect(locator).toBeVisible() failed"
+    },
+    "register.spec.js::should reject duplicate email registration": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject email with invalid format": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should normalize email to lowercase": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject fullname less than 3 characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject fullname exceeding maximum length": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject username less than 6 characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject username with space": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject username with special characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should handle username with uppercase": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject phone with less than minimum digits": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should handle phone with special characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject password less than 8 characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should handle password without special characters": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should reject password same as username": {
+      "status": "Passed",
+      "err": ""
+    },
+    "register.spec.js::should complete full register flow with mail.tm, email verification, and onboarding": {
+      "status": "Failed",
+      "err": "Error: Failed to create account (rate limited): 429"
+    },
+    "sap-batch-login.spec.js::should validate all SAP login accounts": {
+      "status": "Failed",
+      "err": "Error: SAP login failures:"
+    },
+    "storm-subscribers-login.spec.js::should validate all loginTypes from the storm subscriber file": {
+      "status": "Passed",
+      "err": ""
+    }
+  },
+  "diff": {
+    "regressions": [],
+    "fixed": [],
+    "new_fail": [],
+    "new_pass": [],
+    "still_fail": [
+      "login.spec.js::check login error state",
+      "login.spec.js::invalid login with wrong password",
+      "member-toggle-active.spec.js::API: Fetch member list requires auth",
+      "member-toggle-active.spec.js::TC-005: Unauthenticated request returns 401",
+      "register.spec.js::should show validation errors for empty fields",
+      "register.spec.js::should complete full register flow with mail.tm, email verification, and onboarding",
+      "sap-batch-login.spec.js::should validate all SAP login accounts"
+    ]
+  }
+}

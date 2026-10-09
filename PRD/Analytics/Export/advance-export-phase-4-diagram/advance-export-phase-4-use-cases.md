@@ -78,3 +78,6 @@ flowchart LR
     X4 -.deferred to.-> B4
     X5 -.deferred to.-> B5
 ```
+
+---
+_Diagram supporting **PRD-D v2.1** (SAP Template Preset). Verified vs PRD-D + BE 2026-09-16: no change (privacy perms enums:96-97, four-way gate statistic:export_sap + both privacy + features.sapExportEnabled, OQ-D1b/D15 out-of-scope blockers all match PRD)._

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; width: 390px; min-height: 844px; }
+  
+  /* Top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #1e293b; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-left .back { font-size: 18px; color: #60a5fa; }
+  .topbar-left h1 { font-size: 16px; font-weight: 600; }
+  .topbar-right { display: flex; gap: 12px; font-size: 16px; }
+  
+  /* View toggle */
+  .view-toggle { display: flex; margin: 12px 16px 0; gap: 0; }
+  .view-toggle button { flex: 1; padding: 8px; font-size: 13px; border: 1px solid #475569; background: #1e293b; color: #94a3b8; cursor: pointer; }
+  .view-toggle button:first-child { border-radius: 6px 0 0 6px; }
+  .view-toggle button:last-child { border-radius: 0 6px 6px 0; background: #3b82f6; color: white; border-color: #3b82f6; }
+  
+  /* Horizontal stage tabs (scrollable) */
+  .stage-tabs { display: flex; gap: 0; overflow-x: auto; padding: 12px 16px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .stage-tabs::-webkit-scrollbar { display: none; }
+  .stage-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: 20px 20px 0 0; white-space: nowrap; background: #1e293b; color: #94a3b8; border-bottom: 2px solid transparent; }
+  .stage-tab.active { background: #334155; color: #f8fafc; border-bottom-color: #3b82f6; }
+  
+  /* Summary bar */
+  .summary-bar { display: flex; justify-content: space-around; padding: 10px 16px; background: #1e293b; margin: 0 16px; border-radius: 0 0 8px 8px; }
+  .summary-stat { text-align: center; }
+  .summary-stat .num { font-size: 18px; font-weight: 700; color: #f8fafc; }
+  .summary-stat .label { font-size: 10px; color: #64748b; }
+  
+  /* Card list (vertical scroll) */
+  .card-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 14px; border-left: 3px solid #3b82f6; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #f8fafc; }
+  .card-amount { font-size: 13px; font-weight: 600; color: #34d399; background: #064e3b; padding: 2px 8px; border-radius: 4px; }
+  .card-contact { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; }
+  .card-assignee { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #cbd5e1; }
+  .card-avatar { width: 22px; height: 22px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; }
+  .card-next { font-size: 11px; color: #fbbf24; }
+  .card-tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-top: 6px; display: inline-block; }
+  .tag-hot { background: #7f1d1d; color: #fca5a5; }
+  .tag-warm { background: #78350f; color: #fcd34d; }
+  .card-swipe-hint { display: flex; justify-content: center; padding: 4px; }
+  .swipe-dot { width: 6px; height: 6px; border-radius: 50%; background: #334155; margin: 0 3px; }
+  .swipe-dot.active { background: #3b82f6; }
+  
+  /* FAB */
+  .fab { position: fixed; bottom: 24px; right: 24px; width: 52px; height: 52px; border-radius: 50%; background: #3b82f6; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(59,130,246,0.4); border: none; }
+  
+  /* Bottom nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; background: #1e293b; border-top: 1px solid #334155; padding: 8px 0 12px; width: 390px; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #64748b; }
+  .nav-item.active { color: #3b82f6; }
+  .nav-item .icon { font-size: 18px; }
+  
+  .footer-note { padding: 80px 16px 16px; font-size: 10px; color: #334155; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="back">‹</span>
+    <h1>Lead Pipeline</h1>
+  </div>
+  <div class="topbar-right">
+    <span>🔍</span>
+    <span>⚙️</span>
+  </div>
+</div>
+
+<div class="view-toggle">
+  <button>📋 Table</button>
+  <button>📊 Board</button>
+</div>
+
+<div class="stage-tabs">
+  <div class="stage-tab active">🔵 New (3)</div>
+  <div class="stage-tab">🟣 Contacted (2)</div>
+  <div class="stage-tab">🟢 Qualified (2)</div>
+  <div class="stage-tab">🟡 Proposal (1)</div>
+  <div class="stage-tab">🟠 Negotiation (1)</div>
+  <div class="stage-tab">✅ Won (1)</div>
+  <div class="stage-tab">❌ Lost (1)</div>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-stat"><div class="num">11</div><div class="label">Total Leads</div></div>
+  <div class="summary-stat"><div class="num" style="color:#34d399;">Rp 1.4jt</div><div class="label">Pipeline Value</div></div>
+  <div class="summary-stat"><div class="num" style="color:#fbbf24;">3</div><div class="label">Butuh Follow-up</div></div>
+</div>
+
+<div class="card-list">
+  <!-- Card 1 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">PT Maju Bersama</div>
+      <div class="card-amount">Rp 45jt</div>
+    </div>
+    <div class="card-contact">👤 Budi Santoso · 0812-xxxx</div>
+    <div class="card-tag tag-hot">🔥 Hot Lead</div>
+    <div class="card-meta">
+      <div class="card-assignee">
+        <div class="card-avatar">AS</div>
+        Andi S.
+      </div>
+      <div class="card-next">📞 Follow-up: Besok 10:00</div>
+    </div>
+  </div>
+  
+  <!-- Card 2 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">CV Teknologi Nusantara</div>
+      <div class="card-amount">Rp 12jt</div>
+    </div>
+    <div class="card-contact">👤 Andi Wijaya · 0856-xxxx</div>
+    <div class="card-tag tag-warm">🟡 Warm</div>
+    <div class="card-meta">
+      <div class="card-assignee">
+        <div class="card-avatar">RN</div>
+        Rina N.
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card 3 -->
+  <div class="card" style="border-left-color: #94a3b8;">
+    <div class="card-header">
+      <div class="card-title">UD Sumber Rejeki</div>
+      <div class="card-amount">Rp 5jt</div>
+    </div>
+    <div class="card-contact" style="color:#f97316;">⚠️ Tanpa kontak</div>
+    <div class="card-meta">
+      <div class="card-assignee">
+        <div class="card-avatar">AS</div>
+        Andi S.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Swipe hint -->
+<div style="display:flex; justify-content:center; padding:8px; gap:4px;">
+  <span style="font-size:11px; color:#475569;">← Geser stage tab untuk lihat stage lain →</span>
+</div>
+
+<button class="fab">+</button>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="icon">💬</span>Chat</div>
+  <div class="nav-item"><span class="icon">🎫</span>Ticket</div>
+  <div class="nav-item active"><span class="icon">📊</span>Sales</div>
+  <div class="nav-item"><span class="icon">👥</span>Kontak</div>
+  <div class="nav-item"><span class="icon">⚙️</span>Setting</div>
+</div>
+
+<div class="footer-note">Mobile: Board view → stage tab horizontal + card list vertikal (1 kolom)</div>
+</body>
+</html>

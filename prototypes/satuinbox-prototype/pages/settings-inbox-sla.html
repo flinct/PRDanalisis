@@ -1,0 +1,96 @@
+<!-- Settings: SLA -->
+<style>
+.sla-form{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:24px;max-width:480px}
+.sla-form label{display:block;margin-bottom:16px;font-size:13px;font-weight:600}
+.sla-form input[type=number]{width:120px;margin-left:12px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);text-align:center}
+.sla-form .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.sla-visual{margin-top:24px;display:flex;gap:16px}
+.sla-visual .card{flex:1;padding:20px;text-align:center}
+.sla-visual .big{font-size:28px;font-weight:800;color:var(--accent)}
+.sla-visual .lbl{font-size:12px;color:var(--muted);margin-top:4px}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">🏢 Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">👥 Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">🔐 Peran</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">🏷️ Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">🕐 Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">🔄 Auto-Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">📥 Tim Inbox</div>
+    <div class="sn-item active" onclick="go('settings/inbox-sla')">⏱️ SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">⭐ CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">⚡ Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">🎫 Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">🟢 WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">🔵 WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">💬 Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">🔗 Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin:0 0 4px">⏱️ SLA (Service Level Agreement)</h2>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Atur target waktu respon pertama dan waktu penyelesaian percakapan.</p>
+
+    <div class="sla-form">
+      <label>Respon Pertama (menit)
+        <input type="number" id="slaFirst" min="1" value="60" onchange="saveSla()">
+        <div class="hint">Target waktu agen membalas pesan pertama pelanggan</div>
+      </label>
+      <label>Waktu Penyelesaian (menit)
+        <input type="number" id="slaResolve" min="1" value="240" onchange="saveSla()">
+        <div class="hint">Target waktu menyelesaikan percakapan dari awal hingga tutup</div>
+      </label>
+    </div>
+
+    <div class="sla-visual">
+      <div class="card">
+        <div class="big" id="slaFirstFmt">1 jam</div>
+        <div class="lbl">Respon Pertama</div>
+      </div>
+      <div class="card">
+        <div class="big" id="slaResolveFmt">4 jam</div>
+        <div class="lbl">Penyelesaian</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const sla = DB.settings.sla;
+  document.getElementById('slaFirst').value = sla.firstResponse;
+  document.getElementById('slaResolve').value = sla.resolveTime;
+  updateVisual();
+})();
+
+function fmtMinutes(mins){
+  if(mins < 60) return mins + ' mnt';
+  const h = Math.floor(mins/60);
+  const m = mins % 60;
+  return m ? h+' jam '+m+' mnt' : h+' jam';
+}
+
+function updateVisual(){
+  const fr = parseInt(document.getElementById('slaFirst').value)||0;
+  const rt = parseInt(document.getElementById('slaResolve').value)||0;
+  document.getElementById('slaFirstFmt').textContent = fmtMinutes(fr);
+  document.getElementById('slaResolveFmt').textContent = fmtMinutes(rt);
+}
+
+function saveSla(){
+  const fr = parseInt(document.getElementById('slaFirst').value)||60;
+  const rt = parseInt(document.getElementById('slaResolve').value)||240;
+  DB.settings.sla = {firstResponse:fr, resolveTime:rt};
+  saveStore();
+  updateVisual();
+  showToast('Pengaturan SLA disimpan');
+}
+</script>

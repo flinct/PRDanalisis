@@ -1,0 +1,96 @@
+<!-- Settings: WhatsApp API Channel -->
+<style>
+.st-wa-status{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.st-wa-status .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.st-wa-status .dot.on{background:var(--ok)}.st-wa-status .dot.off{background:var(--danger)}
+.st-wa-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.st-wa-info .card{padding:14px}.st-wa-info .card .label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.st-wa-info .card .value{font-size:15px;font-weight:600}
+.st-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.st-form label input,.st-form label select{display:block;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:14px;background:var(--bg)}
+.st-form label input:focus,.st-form label select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.badge.ok{background:#dcfce7;color:#15803d}.badge.err{background:#fef2f2;color:var(--danger)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">Role & Izin</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-assignments')">Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item active" onclick="go('settings/channels-whatsapp-api')">WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">WhatsApp API</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Konfigurasi koneksi WhatsApp Business API (Meta Cloud API).</p>
+
+    <div class="st-wa-status" id="waApiStatus">
+      <span class="dot" id="waApiDot"></span>
+      <span id="waApiBadge"></span>
+      <span style="margin-left:auto;font-size:13px;color:var(--muted)" id="waApiNumber"></span>
+    </div>
+
+    <div class="st-wa-info">
+      <div class="card"><div class="label">Provider</div><div class="value" id="waApiProvider">-</div></div>
+      <div class="card"><div class="label">Nomor Terdaftar</div><div class="value" id="waApiNum">-</div></div>
+    </div>
+
+    <h3 style="margin-bottom:12px">Edit Konfigurasi</h3>
+    <div class="st-form card" style="max-width:480px">
+      <label>Nomor Telepon<input id="waApiEditNum" placeholder="+628xxxx"></label>
+      <label>Provider<select id="waApiEditProv">
+        <option value="Meta Cloud API">Meta Cloud API</option>
+        <option value="Wablas">Wablas</option>
+        <option value="Zenziva">Zenziva</option>
+        <option value="Qontak">Qontak</option>
+      </select></label>
+      <label>API Token<input id="waApiEditToken" type="password" placeholder="Token API"></label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button class="btn primary" onclick="saveWaApi()">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c=DB.settings.channels.whatsappApi;
+  document.getElementById('waApiDot').className='dot '+(c.connected?'on':'off');
+  document.getElementById('waApiBadge').innerHTML=c.connected
+    ?'<span class="badge ok">Terhubung</span>'
+    :'<span class="badge err">Terputus</span>';
+  document.getElementById('waApiNumber').textContent=c.number||'-';
+  document.getElementById('waApiProvider').textContent=c.provider||'-';
+  document.getElementById('waApiNum').textContent=c.number||'-';
+  document.getElementById('waApiEditNum').value=c.number||'';
+  document.getElementById('waApiEditProv').value=c.provider||'Meta Cloud API';
+})();
+
+function saveWaApi(){
+  const num=document.getElementById('waApiEditNum').value.trim();
+  const prov=document.getElementById('waApiEditProv').value;
+  if(!num){showToast('Nomor telepon wajib diisi');return}
+  DB.settings.channels.whatsappApi={...DB.settings.channels.whatsappApi,number:num,provider:prov,connected:true};
+  saveStore();
+  showToast('Konfigurasi WhatsApp API berhasil disimpan');
+  go('settings/channels-whatsapp-api');
+}
+</script>

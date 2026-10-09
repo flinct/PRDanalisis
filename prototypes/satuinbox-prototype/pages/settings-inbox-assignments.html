@@ -1,0 +1,117 @@
+<!-- Settings: Auto-Assignment Rules -->
+<style>
+.asg-method{display:flex;gap:12px;margin-bottom:20px}
+.asg-method .card{flex:1;padding:16px;cursor:pointer;transition:all .15s}
+.asg-method .card.selected{border-color:var(--accent);background:rgba(79,70,229,.05)}
+.asg-method .card .emoji{font-size:24px;margin-bottom:6px}
+.asg-method .card .title{font-weight:700;font-size:14px}
+.asg-method .card .desc{font-size:12px;color:var(--muted);margin-top:4px}
+.asg-rule{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card)}
+.asg-rule .label{flex:1;font-size:13px;font-weight:600}
+.asg-rule .sub{font-size:12px;color:var(--muted)}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:#ccc;border-radius:22px;transition:.2s}
+.toggle .slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.slider{background:var(--accent)}
+.toggle input:checked+.slider:before{transform:translateX(18px)}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav">
+    <div class="sn-title">Organisasi</div>
+    <div class="sn-item" onclick="go('settings/organization-general')">🏢 Umum</div>
+    <div class="sn-item" onclick="go('settings/organization-members')">👥 Anggota</div>
+    <div class="sn-item" onclick="go('settings/organization-roles')">🔐 Peran</div>
+    <div class="sn-item" onclick="go('settings/organization-tags')">🏷️ Tag</div>
+    <div class="sn-item" onclick="go('settings/organization-shift-hours')">🕐 Jam Shift</div>
+    <div class="sn-title">Inbox</div>
+    <div class="sn-item active" onclick="go('settings/inbox-assignments')">🔄 Auto-Assignment</div>
+    <div class="sn-item" onclick="go('settings/inbox-team-inbox')">📥 Tim Inbox</div>
+    <div class="sn-item" onclick="go('settings/inbox-sla')">⏱️ SLA</div>
+    <div class="sn-item" onclick="go('settings/inbox-csat')">⭐ CSAT</div>
+    <div class="sn-item" onclick="go('settings/inbox-macros')">⚡ Makro</div>
+    <div class="sn-item" onclick="go('settings/inbox-tickets')">🎫 Tiket</div>
+    <div class="sn-title">Channel</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-api')">🟢 WhatsApp API</div>
+    <div class="sn-item" onclick="go('settings/channels-whatsapp-web')">🔵 WhatsApp Web</div>
+    <div class="sn-item" onclick="go('settings/channels-widget')">💬 Widget</div>
+    <div class="sn-title">Billing</div>
+    <div class="sn-item" onclick="go('settings/billing-cost')">Kontrol Biaya</div>
+    <div class="sn-title">Developer</div>
+    <div class="sn-item" onclick="go('settings/developer-webhook')">🔗 Webhook</div>
+  </aside>
+
+  <div class="settings-body">
+    <h2 style="margin:0 0 4px">🔄 Auto-Assignment</h2>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Atur metode penugasan otomatis percakapan ke agen.</p>
+
+    <div class="asg-method" id="asgMethod">
+      <div class="card selected" data-method="round-robin" onclick="setMethod('round-robin')">
+        <div class="emoji">🔄</div>
+        <div class="title">Round Robin</div>
+        <div class="desc">Distribusi merata ke agen secara bergiliran.</div>
+      </div>
+      <div class="card" data-method="manual" onclick="setMethod('manual')">
+        <div class="emoji">🖐️</div>
+        <div class="title">Manual</div>
+        <div class="desc">Supervisor menugaskan agen secara manual.</div>
+      </div>
+    </div>
+
+    <h3 style="margin:16px 0 8px;font-size:14px">Aturan Tambahan</h3>
+
+    <div class="asg-rule">
+      <div>
+        <div class="label">Skip agen offline</div>
+        <div class="sub">Lewati agen yang sedang offline</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="skipOffline" checked onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+    <div class="asg-rule">
+      <div>
+        <div class="label">Batas kapasitas agen</div>
+        <div class="sub">Jangan tugaskan jika agen sudah penuh</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="capacityLimit" checked onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+    <div class="asg-rule">
+      <div>
+        <div class="label">Re-assign saat shift berubah</div>
+        <div class="sub">Pindahkan percakapan saat agen ganti shift</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="shiftReassign" onchange="saveSettings()"><span class="slider"></span></label>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cfg = DB.settings._assignment || {method:'round-robin',skipOffline:true,capacityLimit:true,shiftReassign:false};
+  renderMethod(cfg.method);
+  document.getElementById('skipOffline').checked = cfg.skipOffline;
+  document.getElementById('capacityLimit').checked = cfg.capacityLimit;
+  document.getElementById('shiftReassign').checked = cfg.shiftReassign;
+})();
+
+function renderMethod(m){
+  document.querySelectorAll('.asg-method .card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.method===m);
+  });
+}
+function setMethod(m){
+  renderMethod(m);
+  saveSettings();
+}
+function saveSettings(){
+  const active = document.querySelector('.asg-method .card.selected');
+  DB.settings._assignment = {
+    method: active ? active.dataset.method : 'round-robin',
+    skipOffline: document.getElementById('skipOffline').checked,
+    capacityLimit: document.getElementById('capacityLimit').checked,
+    shiftReassign: document.getElementById('shiftReassign').checked,
+  };
+  saveStore();
+  showToast('Pengaturan auto-assignment disimpan');
+}
+</script>

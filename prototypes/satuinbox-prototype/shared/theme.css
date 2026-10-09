@@ -1,0 +1,231 @@
+/* === SatuInbox Prototype Theme — shared across all pages === */
+/* ponytail: CSS vars + base; no framework, no build step */
+
+:root{
+  --bg:#f8f9fa;--card:#fff;--nav:#1e1e2e;--nav-hover:#2a2a3e;
+  --ink:#1a1a2e;--muted:#6b7280;--border:#e5e7eb;
+  --accent:#4f46e5;--accent-hover:#4338ca;
+  --danger:#ef4444;--warn:#f59e0b;--ok:#22c55e;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+input,select,textarea,button{font:inherit;color:inherit}
+a{color:var(--accent);cursor:pointer;text-decoration:none}
+.hide{display:none!important}
+.full{width:100%}
+
+/* Buttons */
+.btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:13px;font-weight:500;transition:.15s}
+.btn:hover{background:var(--bg)}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.primary:hover{background:var(--accent-hover)}
+.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+
+/* === AUTH === */
+.auth-screen{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+.auth-card{background:var(--card);border-radius:16px;padding:40px 36px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.auth-logo{font-size:32px;font-weight:800;color:var(--accent);text-align:center;margin-bottom:28px}
+.auth-logo span{font-weight:400;font-size:22px;margin-left:2px}
+.auth-form h2{font-size:20px;margin-bottom:18px}
+.auth-form label{display:block;font-size:13px;font-weight:500;margin-bottom:14px}
+.auth-form label input,.auth-form label select{display:block;width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:14px;background:var(--bg)}
+.auth-form label input:focus,.auth-form label select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+.auth-err{background:#fef2f2;color:var(--danger);padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:12px;border:1px solid #fecaca}
+.auth-ok{background:#f0fdf4;color:var(--ok);padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:12px;border:1px solid #bbf7d0}
+.auth-link{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.auth-link a{font-weight:600}
+
+/* === SIDENAV RAIL — mirror FE SideNav (w-16, py-5, bg-background-navbar) === */
+.app{display:none;height:100vh;overflow:hidden}
+.app:not(.hide){display:block}
+.app-flex{display:flex;height:100%;overflow:hidden}
+.sidenav-rail{width:64px;flex:0 0 64px;background:var(--nav);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:2px;overflow:hidden}
+.rail-logo{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:16px;margin-bottom:12px}
+.rail-nav{flex:1;display:flex;flex-direction:column;gap:2px;align-items:center}
+.rail-footer{display:flex;flex-direction:column;gap:2px;align-items:center;margin-top:auto;padding-bottom:8px}
+.rail-btn{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;color:#9ca3af;font-size:17px;cursor:pointer;transition:.15s;position:relative}
+.rail-btn:hover{background:var(--nav-hover);color:#fff}
+.rail-btn.active{box-shadow:0 0 0 2px var(--border);border:2px solid var(--border);color:#3b82f6;background:rgba(255,255,255,.05)}
+.rail-user-av{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+.notif-badge{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:0 4px;border-radius:8px;min-width:14px;height:14px;display:grid;place-items:center}
+.notif-badge.hide{display:none}
+
+/* User popover — mirror FE UserPopoverContent */
+.user-popover{position:fixed;bottom:60px;left:72px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:12px 16px;min-width:200px;z-index:100}
+.user-popover.hide{display:none}
+.up-name{font-weight:700;font-size:14px}.up-role{font-size:12px;color:var(--muted)}
+.up-item{padding:8px 0;font-size:13px;cursor:pointer}.up-item:hover{color:var(--accent)}
+
+/* Page content */
+.page-content{flex:1;min-width:0;height:100%;overflow:auto;display:flex;flex-direction:column}
+
+/* === PAGE STUBS (tables, cards, filters) === */
+.page-header{padding:18px 24px 0;display:flex;align-items:center;gap:12px}
+.page-header h1{font-size:20px;font-weight:700;flex:1}
+.page-filters{display:flex;gap:8px;padding:12px 24px;flex-wrap:wrap;align-items:center}
+.filter-chip{padding:5px 12px;border-radius:16px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--card)}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-body{padding:0 24px 24px}
+
+/* Data table */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:10px 12px;font-weight:600;color:var(--muted);border-bottom:2px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:hover{background:var(--bg)}
+.data-table .status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.status.open{background:#dbeafe;color:#2563eb}.status.pending{background:#fef3c7;color:#b45309}
+.status.resolved{background:#dcfce7;color:#15803d}.status.closed{background:#f3f4f6;color:#6b7280}
+
+/* Avatar */
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;flex:0 0 32px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transform:translateY(10px);transition:.3s}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Role-based visibility — gated by .role-agent/.role-spv/.role-admin on #app */
+.role-agent .spv-only{display:none!important}
+.role-agent .admin-only{display:none!important}
+.role-spv .admin-only{display:none!important}
+
+/* Settings layout */
+.settings-layout{display:flex;height:100%}
+.settings-sidenav{width:240px;flex:0 0 240px;background:var(--card);border-right:1px solid var(--border);overflow:auto;padding:16px 0}
+.settings-sidenav .sn-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 16px 4px}
+.settings-sidenav .sn-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;cursor:pointer;color:var(--ink)}
+.settings-sidenav .sn-item:hover{background:var(--bg)}
+.settings-sidenav .sn-item.active{background:rgba(79,70,229,.08);color:var(--accent);font-weight:600}
+.settings-body{flex:1;padding:24px;overflow:auto}
+
+/* Broadcast layout */
+.broadcast-layout{display:flex;height:100%}
+.broadcast-sidenav{width:220px;flex:0 0 220px;background:var(--card);border-right:1px solid var(--border);padding:16px 0}
+.broadcast-sidenav .sn-title{font-size:15px;font-weight:600;padding:4px 16px 14px}
+.broadcast-sidenav .sn-item{display:flex;align-items:center;gap:8px;padding:9px 16px;font-size:13px;cursor:pointer;color:var(--ink)}
+.broadcast-sidenav .sn-item:hover{background:var(--bg)}
+.broadcast-sidenav .sn-item.active{background:var(--accent);color:#fff;border-radius:8px;margin:0 8px}
+.broadcast-body{flex:1;padding:24px;overflow:auto}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-row{display:flex;align-items:center;gap:12px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-card .val{font-size:28px;font-weight:700;color:var(--ink)}
+.stat-card .lbl{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Chart placeholder */
+.chart-placeholder{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);height:300px;display:grid;place-items:center;color:var(--muted);font-size:14px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:100}
+.modal-overlay.open{display:grid}
+.role-opt{text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+.role-opt:hover{border-color:var(--accent);background:var(--bg)}
+.role-opt.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.modal{background:var(--card);border-radius:12px;padding:24px;min-width:380px;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h3{margin-bottom:14px;font-size:17px}
+.modal label{display:block;font-size:13px;font-weight:500;margin-bottom:12px}
+.modal label input,.modal label select,.modal label textarea{display:block;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-top:4px;font-size:13px;background:var(--bg)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* Responsive 1280 / 1440 */
+@media(max-width:1360px){
+  .sidenav-rail{width:48px;flex-basis:48px}
+  .settings-sidenav{width:200px;flex-basis:200px}
+  .broadcast-sidenav{width:180px;flex-basis:180px}
+}
+
+/* === MOBILE (≤768px) — rail jadi bottom-nav, layout 1 kolom, modal full-screen === */
+/* ponytail: override mobile terpusat di sini; scope utama halaman leads/visit + shell umum. */
+@media(max-width:768px){
+  /* app: kolom, rail pindah ke bawah sbg bottom-nav horizontal (12 ikon → scroll-x) */
+  .app-flex{flex-direction:column}
+  .sidenav-rail{
+    width:100%!important;flex:0 0 auto!important;flex-basis:auto!important;
+    flex-direction:row;order:2;padding:4px 8px;height:56px;gap:4px;
+    justify-content:flex-start;overflow-x:auto;overflow-y:hidden;
+    border-top:1px solid var(--nav-hover);
+  }
+  .rail-logo{display:none}
+  .rail-nav{flex-direction:row;flex:0 0 auto;gap:4px}
+  .rail-footer{flex-direction:row;margin-top:0;padding-bottom:0;gap:4px;flex:0 0 auto}
+  .rail-btn{flex:0 0 auto}
+  .page-content{order:1;flex:1;min-height:0}
+  .user-popover{bottom:64px;left:12px;right:12px;min-width:0}
+
+  /* sub-sidenav (settings/broadcast) → strip horizontal di atas konten */
+  .settings-sidenav,.broadcast-sidenav{
+    width:100%!important;flex:0 0 auto!important;flex-basis:auto!important;
+    display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px;gap:6px;
+  }
+
+  /* padding lebih rapat */
+  .page-header,.leads-toolbar{padding:12px 14px 0}
+  .page-filters,.page-body,.leads-summary{padding-left:14px;padding-right:14px}
+
+  /* summary cards → KPI carousel horizontal (nowrap + snap), tak wrap 2 baris */
+  .leads-summary{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px}
+  .leads-summary .stat{flex:0 0 62%;min-width:0;scroll-snap-align:start}
+  .leads-summary .pv-breakdown{flex:0 0 100%}
+
+  /* view-toggle Board/Table disembunyikan — mobile = single-stage list */
+  .view-toggle{display:none}
+
+  /* board: kolom stack VERTIKAL full-width (single-stage list, bukan kanban horizontal).
+     ponytail: stage chip (renderFilterBar) yg jadi selector; kolom kosong disembunyikan. */
+  .board-container{flex-direction:column;padding:8px 14px;overflow-x:hidden}
+  .board-col{min-width:0!important;max-width:none!important;width:100%;max-height:none;border:none;background:transparent}
+  .board-col-header{position:sticky;top:0;background:var(--bg);padding:10px 4px;border-radius:0;z-index:5}
+  .board-col-body{padding:0;gap:10px}
+  .board-card{padding:14px;border-radius:12px}
+  /* sembunyikan kolom yg body-nya kosong (single-stage: hanya stage terpilih terisi) */
+  .board-col:has(.board-col-body > div[style*="text-align"]){display:none}
+
+  /* detail modal: full-screen, panel jadi 1 kolom */
+  .lead-detail-modal{padding:0}
+  .lead-detail{width:100vw!important;max-width:100vw!important;height:100vh;border-radius:0;display:flex;flex-direction:column}
+  .ld-body{grid-template-columns:1fr!important;min-height:0;flex:1;overflow-y:auto}
+  .ld-main{max-height:none}
+  .ld-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .cl-2col{flex-direction:column}
+
+  /* visit modal: full-screen */
+  .vm-panel{width:100vw!important;height:100vh!important;max-width:100vw;border-radius:0}
+
+  /* generic modal */
+  .modal{width:100vw!important;max-width:100vw!important;min-height:100vh;border-radius:0}
+  .modal-overlay{padding:0}
+}
+
+/* === MOBILE per-layout distinct (≤768px) — menang atas base @media di atas ===
+   ponytail: di mobile base @media menyeragamkan toggle/board/summary, jadi pembeda
+   layout HARUS di-restate di sini biar A/B/C/D terlihat beda saat viewport kecil. */
+@media(max-width:768px){
+  /* A — KPI grid 2-kolom (bukan carousel), create tetap tombol full-width */
+  #app.layout-a .leads-summary{flex-wrap:wrap;overflow:visible}
+  #app.layout-a .leads-summary .stat{flex:1 1 calc(50% - 5px)}
+  #app.layout-a .leads-toolbar > .btn.primary{flex-basis:100%;order:20}
+
+  /* B — KPI carousel + FAB (create inline hilang) */
+  #app.layout-b .leads-summary{flex-wrap:nowrap;overflow-x:auto}
+  #app.layout-b .leads-summary .stat{flex:0 0 62%}
+  #app.layout-b .leads-toolbar > .btn.primary{display:none}
+  #app.layout-b #leadsFab{display:flex}
+
+  /* C — tab underline + KPI ringkas 1-baris kecil + FAB */
+  #app.layout-c .leads-summary{flex-wrap:nowrap;overflow-x:auto;gap:8px}
+  #app.layout-c .leads-summary .stat{flex:0 0 auto;padding:6px 12px}
+  #app.layout-c .leads-summary .stat .val{font-size:15px}
+  #app.layout-c .leads-toolbar > .btn.primary{display:none}
+  #app.layout-c #leadsFab{display:flex}
+
+  /* D — super compact: KPI mini strip + card padat + FAB */
+  #app.layout-d .leads-summary{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-top:4px;padding-bottom:4px}
+  #app.layout-d .leads-summary .stat{flex:0 0 auto;padding:5px 10px}
+  #app.layout-d .leads-summary .stat .val{font-size:14px}
+  #app.layout-d .leads-summary .stat .lbl{font-size:9px}
+  #app.layout-d .board-card{padding:8px}
+  #app.layout-d .board-card .bc-title{font-size:12px}
+  #app.layout-d .leads-toolbar > .btn.primary{display:none}
+  #app.layout-d #leadsFab{display:flex}
+}

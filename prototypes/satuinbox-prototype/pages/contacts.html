@@ -1,0 +1,269 @@
+<!-- Contacts Page — CRUD table with search, tag/channel filters, detail modal -->
+<style>
+.ct-actions{display:flex;gap:8px;align-items:center;margin-left:auto}
+.ct-search{padding:7px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;background:var(--bg);width:260px}
+.ct-search:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.ct-tag-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ct-channel-filter{margin-left:auto;display:flex;gap:6px}
+.ch-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#dbeafe;color:#2563eb}
+.ch-badge.web{background:#f3e8ff;color:#7c3aed}
+.ch-badge.api{background:#dbeafe;color:#2563eb}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--bg);border:1px solid var(--border)}
+.tag-pill .x{cursor:pointer;font-size:13px;line-height:1;color:var(--muted);font-weight:700}
+.tag-pill .x:hover{color:var(--danger)}
+.empty-row td{text-align:center;padding:40px;color:var(--muted)}
+.ct-detail-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.ct-detail-row:last-child{border:none}
+.ct-detail-k{font-size:12px;color:var(--muted)}.ct-detail-v{font-size:13px;font-weight:600}
+.ct-tag-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ct-conv-count{margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:13px;text-align:center}
+.ct-del-confirm{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin:10px 0;font-size:13px;color:var(--danger)}
+</style>
+
+<div class="page-header">
+  <h1>📇 Kontak</h1>
+  <div class="ct-actions">
+    <input class="ct-search" id="ctSearch" placeholder="Cari kontak…" oninput="renderContacts()">
+    <button class="btn primary" onclick="openAddModal()">+ Tambah Kontak</button>
+  </div>
+</div>
+
+<div class="page-filters">
+  <div class="ct-tag-bar" id="ctTagBar"></div>
+  <div class="ct-channel-filter">
+    <span class="filter-chip active" data-ch="all" onclick="setChannel(this)">Semua</span>
+    <span class="filter-chip" data-ch="whatsapp-api" onclick="setChannel(this)">🟢 WhatsApp API</span>
+    <span class="filter-chip" data-ch="whatsapp-web" onclick="setChannel(this)">🔵 WhatsApp Web</span>
+  </div>
+</div>
+
+<div class="page-body">
+  <table class="data-table" id="ctTable">
+    <thead><tr><th>Nama</th><th>Telepon</th><th>Channel</th><th>Tag</th><th>Terakhir Aktif</th><th></th></tr></thead>
+    <tbody id="ctBody"></tbody>
+  </table>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" style="max-width:480px">
+    <h3 id="dmName">-</h3>
+    <div id="dmBody"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="openEditFromDetail()">✏️ Edit</button>
+      <button class="btn danger" onclick="confirmDelete()">🗑️ Hapus</button>
+      <button class="btn" onclick="closeModal('detailModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <h3 id="fmTitle">Tambah Kontak</h3>
+    <label>Nama<input id="fmName" placeholder="Nama lengkap"></label>
+    <label>Telepon<input id="fmPhone" placeholder="+628xxxx"></label>
+    <label>Channel<select id="fmChannel"><option value="whatsapp-api">WhatsApp API</option><option value="whatsapp-web">WhatsApp Web</option></select></label>
+    <label>Tag (pisahkan koma)<input id="fmTags" placeholder="VIP, Pelanggan"></label>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('formModal')">Batal</button>
+      <button class="btn primary" id="fmSave" onclick="saveContact()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="delModal">
+  <div class="modal">
+    <h3>Hapus Kontak</h3>
+    <div class="ct-del-confirm" id="delMsg"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('delModal')">Batal</button>
+      <button class="btn danger" onclick="doDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tag Edit Modal -->
+<div class="modal-overlay" id="tagModal">
+  <div class="modal" style="min-width:320px">
+    <h3>Kelola Tag</h3>
+    <div id="tagList" style="margin:8px 0"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input id="tagInput" placeholder="Tag baru" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg)" onkeydown="if(event.key==='Enter')addTag()">
+      <button class="btn primary" onclick="addTag()">Tambah</button>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('tagModal')">Tutup</button></div>
+  </div>
+</div>
+
+<script>
+let activeChannel='all', activeTag='', editId=null, detailId=null;
+
+// Auto-populate from global search
+const gs=window._globalSearch;
+if(gs){document.getElementById('ctSearch').value=gs}
+
+function renderTagBar(){
+  const allTags=[...new Set(DB.contacts.flatMap(c=>c.tags||[]))];
+  const bar=document.getElementById('ctTagBar');
+  bar.innerHTML='<span class="filter-chip'+(activeTag===''?' active':'')+'" onclick="filterTag(\'\')">Semua Tag</span>'+
+    allTags.map(t=>'<span class="filter-chip'+(activeTag===t?' active':'')+'" onclick="filterTag(\''+t+'\')">'+t+'</span>').join('');
+}
+
+function filterTag(t){activeTag=t;renderContacts()}
+function setChannel(el){
+  activeChannel=el.dataset.ch;
+  document.querySelectorAll('.ct-channel-filter .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderContacts();
+}
+
+function renderContacts(){
+  const q=document.getElementById('ctSearch').value.toLowerCase();
+  let rows=DB.contacts.filter(c=>{
+    if(activeChannel!=='all'&&c.channel!==activeChannel)return false;
+    if(activeTag&&!((c.tags||[]).includes(activeTag)))return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.phone.includes(q))return false;
+    return true;
+  });
+  rows.sort((a,b)=>new Date(b.lastActive||0)-new Date(a.lastActive||0));
+  const tbody=document.getElementById('ctBody');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">Tidak ada kontak ditemukan</td></tr>';return}
+  tbody.innerHTML=rows.map(c=>{
+    const ch=c.channel==='whatsapp-api'?'<span class="ch-badge api">API</span>':'<span class="ch-badge web">Web</span>';
+    const tags=(c.tags||[]).map(t=>'<span class="tag-pill">'+t+'</span>').join(' ');
+    return '<tr style="cursor:pointer" onclick="showDetail(\''+c.id+'\')">'+
+      '<td><strong>'+esc(c.name)+'</strong></td>'+
+      '<td>'+esc(c.phone)+'</td>'+
+      '<td>'+ch+'</td>'+
+      '<td>'+(tags||'<span style="color:var(--muted)">-</span>')+'</td>'+
+      '<td>'+fmtTime(c.lastActive)+' '+fmtDate(c.lastActive)+'</td>'+
+      '<td><button class="btn" onclick="event.stopPropagation();openEditModal(\''+c.id+'\')" style="font-size:11px">✏️</button></td>'+
+    '</tr>';
+  }).join('');
+  renderTagBar();
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function showDetail(id){
+  detailId=id;
+  const c=dbFind('contacts',id);if(!c)return;
+  document.getElementById('dmName').textContent=c.name;
+  const convCount=DB.conversations.filter(cv=>cv.contactId===id).length;
+  const tagsHtml=(c.tags||[]).map(t=>'<span class="tag-pill">'+esc(t)+'<span class="x" onclick="event.stopPropagation();removeTag(\''+esc(t)+'\')">×</span></span>').join(' ');
+  document.getElementById('dmBody').innerHTML=
+    '<div class="ct-detail-row"><span class="ct-detail-k">Telepon</span><span class="ct-detail-v">'+esc(c.phone)+'</span></div>'+
+    '<div class="ct-detail-row"><span class="ct-detail-k">Channel</span><span class="ct-detail-v">'+(c.channel==='whatsapp-api'?'WhatsApp API':'WhatsApp Web')+'</span></div>'+
+    '<div class="ct-detail-row"><span class="ct-detail-k">Terakhir Aktif</span><span class="ct-detail-v">'+fmtTime(c.lastActive)+' '+fmtDate(c.lastActive)+'</span></div>'+
+    '<div class="ct-detail-row"><span class="ct-detail-k">Tag</span><span class="ct-detail-v">'+(tagsHtml||'<span style="color:var(--muted)">-</span>')+
+    ' <button class="btn" style="font-size:10px;padding:2px 8px;margin-left:6px" onclick="openTagModal()">+ Tag</button></span></div>'+
+    '<div class="ct-conv-count">💬 '+convCount+' percakapan tercatat</div>';
+  openModal('detailModal');
+}
+
+function openAddModal(){
+  editId=null;
+  document.getElementById('fmTitle').textContent='Tambah Kontak';
+  document.getElementById('fmName').value='';
+  document.getElementById('fmPhone').value='';
+  document.getElementById('fmChannel').value='whatsapp-api';
+  document.getElementById('fmTags').value='';
+  openModal('formModal');
+}
+
+function openEditModal(id){
+  editId=id;
+  const c=dbFind('contacts',id);if(!c)return;
+  document.getElementById('fmTitle').textContent='Edit Kontak';
+  document.getElementById('fmName').value=c.name;
+  document.getElementById('fmPhone').value=c.phone;
+  document.getElementById('fmChannel').value=c.channel;
+  document.getElementById('fmTags').value=(c.tags||[]).join(', ');
+  openModal('formModal');
+}
+
+function openEditFromDetail(){
+  closeModal('detailModal');
+  if(detailId)openEditModal(detailId);
+}
+
+function saveContact(){
+  const name=document.getElementById('fmName').value.trim();
+  const phone=document.getElementById('fmPhone').value.trim();
+  const channel=document.getElementById('fmChannel').value;
+  const tags=document.getElementById('fmTags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!name||!phone){showToast('Nama dan telepon wajib diisi');return}
+  if(editId){
+    dbUpdate('contacts',editId,{name,phone,channel,tags});
+    showToast('Kontak diperbarui');
+  }else{
+    dbAdd('contacts',{id:genId('c'),name,phone,channel,tags,lastActive:new Date().toISOString()});
+    showToast('Kontak ditambahkan');
+  }
+  closeModal('formModal');
+  renderContacts();
+}
+
+function confirmDelete(){
+  if(!detailId)return;
+  const c=dbFind('contacts',detailId);
+  document.getElementById('delMsg').textContent='Yakin ingin menghapus kontak "'+c?.name+'"? Tindakan ini tidak dapat dibatalkan.';
+  closeModal('detailModal');
+  openModal('delModal');
+}
+
+function doDelete(){
+  if(!detailId)return;
+  dbRemove('contacts',detailId);
+  showToast('Kontak dihapus');
+  closeModal('delModal');
+  detailId=null;
+  renderContacts();
+}
+
+// Tag management
+function openTagModal(){
+  if(!detailId)return;
+  const c=dbFind('contacts',detailId);if(!c)return;
+  renderTagList(c);
+  document.getElementById('tagInput').value='';
+  openModal('tagModal');
+}
+
+function renderTagList(c){
+  const el=document.getElementById('tagList');
+  if(!c.tags||!c.tags.length){el.innerHTML='<span style="color:var(--muted);font-size:13px">Belum ada tag</span>';return}
+  el.innerHTML=c.tags.map(t=>'<span class="tag-pill">'+esc(t)+'<span class="x" onclick="removeTag(\''+esc(t)+'\')">×</span></span>').join(' ');
+}
+
+function addTag(){
+  if(!detailId)return;
+  const v=document.getElementById('tagInput').value.trim();
+  if(!v)return;
+  const c=dbFind('contacts',detailId);if(!c)return;
+  const tags=[...new Set([...(c.tags||[]),v])];
+  dbUpdate('contacts',detailId,{tags});
+  document.getElementById('tagInput').value='';
+  renderTagList(dbFind('contacts',detailId));
+  showToast('Tag ditambahkan');
+}
+
+function removeTag(tag){
+  if(!detailId)return;
+  const c=dbFind('contacts',detailId);if(!c)return;
+  const tags=(c.tags||[]).filter(t=>t!==tag);
+  dbUpdate('contacts',detailId,{tags});
+  renderTagList(dbFind('contacts',detailId));
+  showDetail(detailId); // refresh detail
+  renderContacts();
+  showToast('Tag dihapus');
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+// Init
+renderContacts();
+</script>

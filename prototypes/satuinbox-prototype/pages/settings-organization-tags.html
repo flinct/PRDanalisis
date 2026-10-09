@@ -1,0 +1,53 @@
+<!-- Settings: Organisasi — Tag -->
+<style>
+.st-tag-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.st-tag-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;font-size:13px;font-weight:500;background:var(--accent);color:#fff}
+.st-tag-chip .x{cursor:pointer;font-size:15px;font-weight:700;opacity:.7}
+.st-tag-chip .x:hover{opacity:1}
+.st-tag-add{display:flex;gap:8px;max-width:400px}
+.st-tag-add input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg)}
+.st-tag-add input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+</style>
+
+<div class="settings-layout">
+  <aside class="settings-sidenav" id="stNav"></aside>
+  <div class="settings-body">
+    <h2 style="margin-bottom:4px">Tag</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Tag digunakan untuk mengelompokkan kontak dan percakapan.</p>
+
+    <div class="card">
+      <div class="st-tag-bar" id="tagBar"></div>
+      <div class="st-tag-add">
+        <input type="text" id="tagInput" placeholder="Tambah tag baru…" onkeydown="if(event.key==='Enter')addTag()">
+        <button class="btn primary" onclick="addTag()">+ Tambah</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.getElementById('stNav').innerHTML=renderSettingsNav('organization-tags');
+
+  function render(){
+    const bar=document.getElementById('tagBar');
+    if(!DB.settings.tags.length){bar.innerHTML='<span style="color:var(--muted);font-size:13px">Belum ada tag.</span>';return}
+    bar.innerHTML=DB.settings.tags.map((t,i)=>`<span class="st-tag-chip">${t} <span class="x" onclick="removeTag(${i})">×</span></span>`).join('');
+  }
+  render();
+
+  window.addTag=function(){
+    const v=document.getElementById('tagInput').value.trim();
+    if(!v)return;
+    if(DB.settings.tags.includes(v)){showToast('Tag sudah ada');return}
+    DB.settings.tags.push(v);saveStore();render();
+    document.getElementById('tagInput').value='';
+    showToast('Tag ditambahkan');
+  };
+
+  window.removeTag=function(i){
+    DB.settings.tags.splice(i,1);saveStore();render();
+    showToast('Tag dihapus');
+  };
+})();
+</script>

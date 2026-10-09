@@ -1,0 +1,492 @@
+{
+  "stats": {
+    "startTime": "2026-09-24T02:38:30.220Z",
+    "duration": 96964.12199999999,
+    "expected": 34,
+    "skipped": 39,
+    "unexpected": 7,
+    "flaky": 0
+  },
+  "rows": [
+    {
+      "file": "login.spec.js",
+      "title": "check exist element on login page",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "login.spec.js",
+      "title": "check login error state",
+      "result": "failed",
+      "err": "Error: expect(received).toBeGreaterThanOrEqual(expected)"
+    },
+    {
+      "file": "login.spec.js",
+      "title": "valid login with admin credentials",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "login.spec.js",
+      "title": "invalid login with wrong password",
+      "result": "failed",
+      "err": "Error: expect(received).toBeGreaterThanOrEqual(expected)"
+    },
+    {
+      "file": "login.spec.js",
+      "title": "login with empty fields",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "login.spec.js",
+      "title": "try login with ROLE SUPERVISOR",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "login.spec.js",
+      "title": "try login with ROLE AGENT",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-001: Deactivate active member via PATCH",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-002: Reactivate deactivated member",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-003: Toggle to same state (idempotent)",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-004: Toggle non-existent user returns 404",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-005: Unauthenticated request returns 401",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-006: Unauthorized request returns 403",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-007: Deactivated login returns \"Akun dinonaktifkan\"",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-008: Reactivated user can login",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-009: Refresh token blocked for deactivated",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-010: Force logout old token returns 401",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-011: Open AUX interval preserved",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-012: AUX analytics preserved",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-013: Round Robin excludes deactivated",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-014: Reactivated eligible for Round Robin",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-015: Conversations remain assigned",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-016: maxConversation unchanged",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-017: Member list without isActive filter shows all",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-018: Soft-deleted hidden from member list",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-019: Assignable list excludes deactivated",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-020: findMembersByIds returns deactivated",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-021: Search shows deactivated in settings",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-022: Search excludes deactivated in assignment",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-023: Status badge Aktif/Nonaktif visible",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-024: Row menu shows deactivate/activate",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-025: Confirmation modal on toggle",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-026: Success toast on confirm toggle",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-027: Error toast on failed toggle",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-028: Deactivation shows preservation note",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-029: Admin can deactivate own account",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-030: Last Admin deactivation allowed",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-031: Concurrent toggle requests",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-032: Mobile self-deactivation",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-033: Mobile invalid token returns 401",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "TC-034: Mobile re-registration after reactivation",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "EH-003: Network error toast on toggle",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "EH-004: Server error toast on toggle",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "FR-033: Member page GET without isActive",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "FR-034: Assignable adds isActive=true",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active-scaffold.spec.js",
+      "title": "FR-035: Conversation assign excludes deactivated",
+      "result": "skipped",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "Member page loads with title, tabs, and search",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "Member settings page shows member table",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "Row menu button (three dots) is visible for first member",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "Search filters member list by name",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "API: Fetch member list requires auth",
+      "result": "failed",
+      "err": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    },
+    {
+      "file": "member-toggle-active.spec.js",
+      "title": "TC-005: Unauthenticated request returns 401",
+      "result": "failed",
+      "err": "Error: expect(received).toBe(expected) // Object.is equality"
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should complete successful onboarding",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject organization name less than minimum",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject organization name exceeding maximum",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject NIB less than minimum",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should accept NIB, NPWP and ID number with valid length",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject NIB with alphabet characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject NPWP less than minimum",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject NPWP with alphabet characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "onboarding.spec.js",
+      "title": "should reject ID number less than minimum",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should show all required fields on register page",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should show validation errors for empty fields",
+      "result": "failed",
+      "err": "Error: expect(locator).toBeVisible() failed"
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject duplicate email registration",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject email with invalid format",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should normalize email to lowercase",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject fullname less than 3 characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject fullname exceeding maximum length",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject username less than 6 characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject username with space",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject username with special characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should handle username with uppercase",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject phone with less than minimum digits",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should handle phone with special characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject password less than 8 characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should handle password without special characters",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should reject password same as username",
+      "result": "passed",
+      "err": ""
+    },
+    {
+      "file": "register.spec.js",
+      "title": "should complete full register flow with mail.tm, email verification, and onboarding",
+      "result": "failed",
+      "err": "Error: Failed to create account (rate limited): 429"
+    },
+    {
+      "file": "sap-batch-login.spec.js",
+      "title": "should validate all SAP login accounts",
+      "result": "failed",
+      "err": "Error: SAP login failures:"
+    },
+    {
+      "file": "storm-subscribers-login.spec.js",
+      "title": "should validate all loginTypes from the storm subscriber file",
+      "result": "passed",
+      "err": ""
+    }
+  ]
+}

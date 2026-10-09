@@ -1,0 +1,747 @@
+{
+  "hubspot_board_view": {
+    "url_src": "URL: https://knowledge.hubspot.com/records/use-board-view",
+    "hits": {
+      "ui_pattern": [
+        "[Customize the board view for objects with pipelines](https://knowledge.hubspot.com/object-settings/select-properties-to-show-on-records-in-board-view?hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=smart404-Customize%2520the%2520board%2520view%2520for%2520objects%2520with%2520pipelines)",
+        "* [Free Website Builder Free Website Builder](https://www.hubspot.com/products/cms/drag-and-drop-website-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-website&url=/records/use-board-view&domain=knowledge.hubspot.com)"
+      ],
+      "lead_flow": [
+        "* ### [Generate leads](https://www.hubspot.com/use-case/generate-leads?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-leads&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "Convert visitors into contacts for your database.",
+        "* ### [Build pipeline](https://www.hubspot.com/use-case/build-sales-pipeline?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-pipeline&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "Generate a pipeline of high-quality prospects.",
+        "* ### [Close deals](https://www.hubspot.com/use-case/close-more-deals?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-deals&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "Streamline your process and close more deals faster.",
+        "Generate leads through content, AI, and automation.",
+        "* ### [Automate sales prospecting](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-prospectagent&url=/records/use-board-view&domain=knowledge.hubspot.com)"
+      ],
+      "activity": [
+        "* [Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Frecords%2Fuse-board-view&domain=knowledge.hubspot.com&uuid=anon98437b599f131d0accb6930ae556)",
+        "* [Technology Partner Program](https://www.hubspot.com/partners/app?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-tech&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [HubSpot Blogs](https://blog.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-blogs&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "[Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Frecords%2Fuse-board-view&domain=knowledge.hubspot.com&uuid=anon98437b599f131d0accb6930ae556)",
+        "* Stay ahead of the curve with the latest tips, trends, and news on the [HubSpot blog](https://blog.hubspot.com/?hubs_content-cta=404-blog&hubs_content=knowledge.hubspot.com/404&url=/records/use-board-view&domain=knowledge.hubspot.com).",
+        "* [Free Meeting Scheduler App Free Meeting Scheduler App](https://www.hubspot.com/products/sales/schedule-meeting?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-meetings&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [Email Tracking Software Email Tracking Software](https://www.hubspot.com/products/sales/email-tracking?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailtracking&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [Email Marketing Software Email Marketing Software](https://www.hubspot.com/products/marketing/email?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailmarketing&url=/records/use-board-view&domain=knowledge.hubspot.com)"
+      ],
+      "ux_principle": [
+        "* [![Image 8: 195140668528](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/marketing-hub.svg) ### Marketing Hub Marketing automation software](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 9: 195146645596](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/sales-hub.svg) ### Sales Hub Sales software](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 10: 195140668527](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/service-hub.svg) ### Service Hub Customer service software](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 11: 195140649745](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/content-hub.svg) ### Content Hub Content marketing software](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 12: 195289608884](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/data-hub.svg) ### Data Hub Data management software](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 13: 195140609672](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/commerce-hub.svg) ### Revenue Hub CPQ, billing, and payments software](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 14: 195146050660](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/smart-crm.svg) ### Smart CRM AI-powered, flexible CRM software](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/records/use-board-view&domain=knowledge.hubspot.com)",
+        "* [![Image 17: 210646671655](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/aeo.svg) ### AEO (Beta) Answer engine optimization tools that track and improve your brand's visibility in AI results](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/records/use-board-view&domain=knowledge.hubspot.com)"
+      ]
+    },
+    "hit_count": 26
+  },
+  "hubspot_leads_index": {
+    "url_src": "URL: https://knowledge.hubspot.com/crm-setup/manage-your-leads",
+    "hits": {
+      "ui_pattern": [
+        "* [Free Website Builder Free Website Builder](https://www.hubspot.com/products/cms/drag-and-drop-website-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-website&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)"
+      ],
+      "lead_flow": [
+        "URL: https://knowledge.hubspot.com/crm-setup/manage-your-leads",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://knowledge.hubspot.com/crm-setup/manage-your-leads",
+        "URL Source: https://knowledge.hubspot.com/crm-setup/manage-your-leads",
+        "[___](https://knowledge.hubspot.com/crm-setup/manage-your-leads#)",
+        "[Skip to content](https://knowledge.hubspot.com/crm-setup/manage-your-leads#global-nav-main-content)",
+        "* [日本語](https://knowledge.hubspot.com/crm-setup/manage-your-leads)",
+        "* [Deutsch](https://knowledge.hubspot.com/crm-setup/manage-your-leads)",
+        "* [English](https://knowledge.hubspot.com/crm-setup/manage-your-leads)"
+      ],
+      "activity": [
+        "* [Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Fcrm-setup%2Fmanage-your-leads&domain=knowledge.hubspot.com&uuid=anonf2864566b5c4c20ac132ec12aeb5)",
+        "* [Technology Partner Program](https://www.hubspot.com/partners/app?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-tech&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [HubSpot Blogs](https://blog.hubspot.com/?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-resources-blogs&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "[Log in](https://app.hubspot.com/login?hubs_signup-url=knowledge.hubspot.com%2F404&hubs_signup-cta=nav-utility-login&hubs_content=knowledge.hubspot.com%2F404&hubs_content-cta=nav-utility-login&url=%2Fcrm-setup%2Fmanage-your-leads&domain=knowledge.hubspot.com&uuid=anonf2864566b5c4c20ac132ec12aeb5)",
+        "* Stay ahead of the curve with the latest tips, trends, and news on the [HubSpot blog](https://blog.hubspot.com/?hubs_content-cta=404-blog&hubs_content=knowledge.hubspot.com/404&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com).",
+        "* [Free Meeting Scheduler App Free Meeting Scheduler App](https://www.hubspot.com/products/sales/schedule-meeting?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-meetings&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [Email Tracking Software Email Tracking Software](https://www.hubspot.com/products/sales/email-tracking?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailtracking&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [Email Marketing Software Email Marketing Software](https://www.hubspot.com/products/marketing/email?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-emailmarketing&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)"
+      ],
+      "ux_principle": [
+        "* [![Image 8: 195140668528](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/marketing-hub.svg) ### Marketing Hub Marketing automation software](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 9: 195146645596](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/sales-hub.svg) ### Sales Hub Sales software](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 10: 195140668527](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/service-hub.svg) ### Service Hub Customer service software](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 11: 195140649745](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/content-hub.svg) ### Content Hub Content marketing software](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 12: 195289608884](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/data-hub.svg) ### Data Hub Data management software](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 13: 195140609672](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/commerce-hub.svg) ### Revenue Hub CPQ, billing, and payments software](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 14: 195146050660](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/smart-crm.svg) ### Smart CRM AI-powered, flexible CRM software](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)",
+        "* [![Image 17: 210646671655](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/aeo.svg) ### AEO (Beta) Answer engine optimization tools that track and improve your brand's visibility in AI results](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/crm-setup/manage-your-leads&domain=knowledge.hubspot.com)"
+      ]
+    },
+    "hit_count": 25
+  },
+  "hubspot_manage_leads": {
+    "url_src": "URL: https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace",
+    "hits": {
+      "ui_pattern": [
+        "In the pop-up box, click the Property to update dropdown menu and select the property you want to edit. Choose the desired values and click Update .",
+        "In the pop-up box, click the Lead owner dropdown menu and select a lead owner . Then, click Update .",
+        "View leads that are associated to a contact or company in the sales workspace using preset views or saved views. You can also view and manage leads using the Manage leads in a board view (BETA) .",
+        "To change the lead pipeline, click the pipelines dropdown menu and select the pipeline you want to view, or select All pipelines.",
+        "To view and manage leads in a board view:",
+        "If you have Super Admin permissions or View sales workspace as another user permissions , you can view all leads. To view all leads, click the Actions dropdown menu on the top right and select View all leads .",
+        "On the left sidebar, click + Create view .",
+        "On the left sidebar, under Saved views , click your saved view ."
+      ],
+      "lead_flow": [
+        "URL: https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace",
+        "FETCHED_AS: https://knowledge.hubspot.com/prospecting/manage-leads-in-the-prospecting-workspace",
+        "Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy.",
+        "After you have created leads , you can manage them from the leads index page or the sales workspace . Create custom filtered views of leads to organize your prospecting efforts. You can create new leads, edit existing leads, or delete leads as you work through your sales prospects. To deactivate or rename the leads object, learn how to manage your CRM object data model .",
+        "Users with Super Admin permissions or View sales workspace as another user permissions can view all leads in the sales workspace.",
+        "For a lead to appear in the sales workspace, it must have an assigned owner. Unassigned leads will still appear on the leads index page and on the associated contact or company record.",
+        "Super Admin permissions or Edit permissions for leads are required to manage leads on the leads index page.",
+        "Super Admin permissions are required to edit a lead's stage after it has moved to a Qualified or Disqualified stage."
+      ],
+      "activity": [
+        "Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience.",
+        "HubSpot Blog Marketing, sales, agency, and customer success blog content.",
+        "Customer Blog Examples of how real customers use HubSpot for their business.",
+        "Product Updates Blog Updates on the latest releases from HubSpot’s Product team.",
+        "Available with any of the following subscriptions , except where noted:",
+        "Please note: the following content applies to accounts created before Aug. 27, 2025, whose users had previously been active in the sales workspace. For accounts created after Aug. 27, 2025, (or for accounts who are newly using the sales workspace), learn how to manage sales activities in the updated sales workspace .",
+        "Recent Activity: leads that have had recent activity.",
+        "In the dialog box, enter a name for your view, then click Create view ."
+      ],
+      "ux_principle": [
+        "Allow HubSpot to contact me about my documentation feedback.",
+        "Only used if we need clarification on your feedback.",
+        "Thank you for your feedback, it means a lot to us.",
+        "This form is used for documentation feedback only. Learn how to get help with HubSpot ."
+      ]
+    },
+    "hit_count": 28
+  },
+  "hubspot_object_pipelines": {
+    "url_src": "URL: https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages",
+    "hits": {
+      "ui_pattern": [
+        "Tasks only have the one default pipeline without conditional stage logic. Once you've set up pipelines, learn how to manage your records in board view .",
+        "In the left sidebar menu, in the Data Management section, click Objects .",
+        "On the Objects page, click the Select an object dropdown menu and select the object for which you want to create a pipeline.",
+        "Click the Create pipeline dropdown menu and select Create from scratch .",
+        "On the Objects page, click the Select an object dropdown menu and select the object for which you want to clone a pipeline.",
+        "Click the Create pipeline dropdown menu and select Clone from existing .",
+        "Pipeline to clone : click the Select pipeline to clone dropdown menu and select a pipeline .",
+        "On the Objects page, click the Select an object dropdown menu and select the object for which you want to edit a pipeline."
+      ],
+      "lead_flow": [
+        "URL: https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages",
+        "FETCHED_AS: https://knowledge.hubspot.com/object-settings/set-up-and-customize-your-deal-pipelines-and-deal-stages",
+        "Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy.",
+        "Pipelines help visualize your processes through stages, which are steps that signal where a record is in a process. For example, create deal pipelines to track revenue, ticket pipelines to track customer issues, or listing pipelines to track for-sale properties.",
+        "Learn more about building custom solutions using the Pipelines API .",
+        "A Professional or Enterprise subscription is required to manage lead object pipelines .",
+        "An Enterprise subscription is required to manage custom object pipelines.",
+        "Permissions required Edit property settings permissions are required to create and edit pipelines or stages."
+      ],
+      "activity": [
+        "Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience.",
+        "HubSpot Blog Marketing, sales, agency, and customer success blog content.",
+        "Customer Blog Examples of how real customers use HubSpot for their business.",
+        "Product Updates Blog Updates on the latest releases from HubSpot’s Product team.",
+        "Available with any of the following subscriptions , except where noted:",
+        "Please note: your account may use personalized names for each object (e.g., account instead of company). This article refers to objects by their HubSpot default names.",
+        "Tasks only have the one default pipeline without conditional stage logic. Once you've set up pipelines, learn how to manage your records in board view .",
+        "In the dialog box, enter a Pipeline name and click Create ."
+      ],
+      "ux_principle": [
+        "In your HubSpot account, click the settings icon in the top navigation bar.",
+        "Allow HubSpot to contact me about my documentation feedback.",
+        "Only used if we need clarification on your feedback.",
+        "Thank you for your feedback, it means a lot to us.",
+        "This form is used for documentation feedback only. Learn how to get help with HubSpot ."
+      ]
+    },
+    "hit_count": 29
+  },
+  "hubspot_sales_blog": {
+    "url_src": "URL: https://blog.hubspot.com/sales/sales-pipeline",
+    "hits": {
+      "ui_pattern": [
+        "However, a sales funnel suggests that the number of prospects you're working with will drop consistently as the sales process continues.",
+        "You may have a ton of prospects entering your pipeline, but the vast majority drop off after the qualification stage. After prospects have passed the critical point, most should become customers.",
+        "When you receive a purchase order, corporate credit card, or a signed contract, the evolution of a prospect into a customer is often an exciting milestone. Scheduling kickoff meetings, reminiscing about pre-sale negotiations, and receiving payment bring the kind of satisfaction that is only outdone by seeing the commission payment numbers in your bank account.",
+        "MQL → SQL conversion. This indicates whether the handoff is working. If marketing sent 120 MQLs and we accepted 60, that‘s 50%. If it drops, I don’t call a meeting — I fix the handoff (clear criteria, faster follow-up, better context in the notes).",
+        "Easily calculate drop-off rates and learn how to increase conversion and close rates."
+      ],
+      "lead_flow": [
+        "URL: https://blog.hubspot.com/sales/sales-pipeline",
+        "FETCHED_AS: https://blog.hubspot.com/sales/sales-pipeline",
+        "Sales pipelines: A comprehensive walkthrough for sales leaders and reps",
+        "Unpack everything you need to know about sales pipeline management, sales pipeline analytics, and how to drive sales pipeline revenue.",
+        "Track your sales pipeline with this free template.",
+        "When I carried a quota at IBM, I learned there's a difference between “lots of opportunities” and a pipeline you can trust. One month, I had my forecast packed with commits; by the end of the month, I was explaining two slips, a legal stall, and a deal with no exec sponsor.",
+        "The problem wasn't a lack of effort — it was a lack of structure. Everything changed when I started treating the sales pipeline like a system: using buyer-aligned stages, maintaining clean data in the CRM, and establishing a weekly rhythm that forces real next steps onto the calendar.",
+        "In this guide, I‘ll share my approach to sales pipeline management today — what it is, why it matters, and the practical steps I take to build, review, and refine it so that the forecast aligns with reality — and I’ll use examples from deals I've actually worked on."
+      ],
+      "activity": [
+        "URL: https://blog.hubspot.com/sales/sales-pipeline",
+        "FETCHED_AS: https://blog.hubspot.com/sales/sales-pipeline",
+        "Here, you reach out to qualified leads via email, phone, or social channels. The goal is to start a conversation, learn more about their pain points, and provide enough value upfront to keep the door open for deeper engagement. This stage is about listening, not pitching.",
+        "This is where the deal is either won or lost. If you close successfully, you move forward with onboarding or implementation. If not, you need to log why the deal didn't go through. Those insights can help refine your messaging, improve your sales process, and increase your win rate over time.",
+        "Sales educator and expert Jeff Hoffman clears this misconception by calling a sales pipeline a wide-mouthed cocktail glass instead of an evenly shaped funnel.",
+        "In the companies where I worked, we typically had six to eight sales stages that resembled the framework below. Your deal stage names and numbering may vary, which makes CRM and sales automation platform adoption easier. Just as in the real world, deals should have the mobility to move up and down the pipeline until they are signed, sealed, and delivered.",
+        "In this scenario, we upload leads from event attendee lists, trial requests, gated content forms, webinar audience members, or other early-stage prospects. They didn't specifically ask for a call, but are deemed outreach-worthy.",
+        "Once I make first contact with a prospect via email, phone, or at an event, I “park” a lead in this stage. Hopefully, there‘s commitment to a meeting or conversation, but I’m not ready to attract forecast-related attention yet."
+      ],
+      "ux_principle": [
+        "If it isn‘t written down with an owner and a date, it didn’t happen. I keep this simple and visible. For every decision we make during the review, I log a single action on the deal in the CRM, assign a single owner (not a committee), and include a date — usually with a task or calendar invite — so it appears in our workflow.",
+        "Pro tip: I use automation tools to streamline routine tasks, such as follow-up emails and data entry. In CRM, I set a workflow that enrolls any opportunity with no reply or next step after X days into a short follow-up sequence, creates a task if there's still no scheduled action, and downgrades the stage if inactivity continues past a threshold."
+      ]
+    },
+    "hit_count": 23
+  },
+  "hubspot_sales_pipeline_blog": {
+    "url_src": "URL: https://blog.hubspot.com/sales/sales-pipeline",
+    "hits": {
+      "ui_pattern": [
+        "However, a sales funnel suggests that the number of prospects you're working with will drop consistently as the sales process continues.",
+        "You may have a ton of prospects entering your pipeline, but the vast majority drop off after the qualification stage. After prospects have passed the critical point, most should become customers.",
+        "When you receive a purchase order, corporate credit card, or a signed contract, the evolution of a prospect into a customer is often an exciting milestone. Scheduling kickoff meetings, reminiscing about pre-sale negotiations, and receiving payment bring the kind of satisfaction that is only outdone by seeing the commission payment numbers in your bank account.",
+        "MQL → SQL conversion. This indicates whether the handoff is working. If marketing sent 120 MQLs and we accepted 60, that‘s 50%. If it drops, I don’t call a meeting — I fix the handoff (clear criteria, faster follow-up, better context in the notes).",
+        "Easily calculate drop-off rates and learn how to increase conversion and close rates."
+      ],
+      "lead_flow": [
+        "URL: https://blog.hubspot.com/sales/sales-pipeline",
+        "FETCHED_AS: https://blog.hubspot.com/sales/sales-pipeline",
+        "Sales pipelines: A comprehensive walkthrough for sales leaders and reps",
+        "Unpack everything you need to know about sales pipeline management, sales pipeline analytics, and how to drive sales pipeline revenue.",
+        "Track your sales pipeline with this free template.",
+        "When I carried a quota at IBM, I learned there's a difference between “lots of opportunities” and a pipeline you can trust. One month, I had my forecast packed with commits; by the end of the month, I was explaining two slips, a legal stall, and a deal with no exec sponsor.",
+        "The problem wasn't a lack of effort — it was a lack of structure. Everything changed when I started treating the sales pipeline like a system: using buyer-aligned stages, maintaining clean data in the CRM, and establishing a weekly rhythm that forces real next steps onto the calendar.",
+        "In this guide, I‘ll share my approach to sales pipeline management today — what it is, why it matters, and the practical steps I take to build, review, and refine it so that the forecast aligns with reality — and I’ll use examples from deals I've actually worked on."
+      ],
+      "activity": [
+        "URL: https://blog.hubspot.com/sales/sales-pipeline",
+        "FETCHED_AS: https://blog.hubspot.com/sales/sales-pipeline",
+        "Here, you reach out to qualified leads via email, phone, or social channels. The goal is to start a conversation, learn more about their pain points, and provide enough value upfront to keep the door open for deeper engagement. This stage is about listening, not pitching.",
+        "This is where the deal is either won or lost. If you close successfully, you move forward with onboarding or implementation. If not, you need to log why the deal didn't go through. Those insights can help refine your messaging, improve your sales process, and increase your win rate over time.",
+        "Sales educator and expert Jeff Hoffman clears this misconception by calling a sales pipeline a wide-mouthed cocktail glass instead of an evenly shaped funnel.",
+        "In the companies where I worked, we typically had six to eight sales stages that resembled the framework below. Your deal stage names and numbering may vary, which makes CRM and sales automation platform adoption easier. Just as in the real world, deals should have the mobility to move up and down the pipeline until they are signed, sealed, and delivered.",
+        "In this scenario, we upload leads from event attendee lists, trial requests, gated content forms, webinar audience members, or other early-stage prospects. They didn't specifically ask for a call, but are deemed outreach-worthy.",
+        "Once I make first contact with a prospect via email, phone, or at an event, I “park” a lead in this stage. Hopefully, there‘s commitment to a meeting or conversation, but I’m not ready to attract forecast-related attention yet."
+      ],
+      "ux_principle": [
+        "If it isn‘t written down with an owner and a date, it didn’t happen. I keep this simple and visible. For every decision we make during the review, I log a single action on the deal in the CRM, assign a single owner (not a committee), and include a date — usually with a task or calendar invite — so it appears in our workflow.",
+        "Pro tip: I use automation tools to streamline routine tasks, such as follow-up emails and data entry. In CRM, I set a workflow that enrolls any opportunity with no reply or next step after X days into a short follow-up sequence, creates a task if there's still no scheduled action, and downgrades the stage if inactivity continues past a threshold."
+      ]
+    },
+    "hit_count": 23
+  },
+  "hubspot_tasks": {
+    "url_src": "URL: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+    "hits": {
+      "ui_pattern": [
+        "* [Free Website Builder Free Website Builder](https://www.hubspot.com/products/cms/drag-and-drop-website-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-website&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ],
+      "lead_flow": [
+        "* ### [Generate leads](https://www.hubspot.com/use-case/generate-leads?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-leads&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Convert visitors into contacts for your database.",
+        "* ### [Build pipeline](https://www.hubspot.com/use-case/build-sales-pipeline?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-pipeline&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Generate a pipeline of high-quality prospects.",
+        "* ### [Close deals](https://www.hubspot.com/use-case/close-more-deals?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-deals&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Streamline your process and close more deals faster.",
+        "Generate leads through content, AI, and automation.",
+        "* ### [Automate sales prospecting](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-prospectagent&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ],
+      "activity": [
+        "URL: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "URL Source: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "[___](https://knowledge.hubspot.com/tasks/create-and-manage-tasks#)",
+        "[Skip to content](https://knowledge.hubspot.com/tasks/create-and-manage-tasks#global-nav-main-content)",
+        "* [日本語](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)",
+        "* [Deutsch](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)",
+        "* [English](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)"
+      ],
+      "ux_principle": [
+        "* [![Image 8: 195140668528](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/marketing-hub.svg) ### Marketing Hub Marketing automation software](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 9: 195146645596](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/sales-hub.svg) ### Sales Hub Sales software](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 10: 195140668527](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/service-hub.svg) ### Service Hub Customer service software](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 11: 195140649745](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/content-hub.svg) ### Content Hub Content marketing software](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 12: 195289608884](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/data-hub.svg) ### Data Hub Data management software](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 13: 195140609672](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/commerce-hub.svg) ### Revenue Hub CPQ, billing, and payments software](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 14: 195146050660](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/smart-crm.svg) ### Smart CRM AI-powered, flexible CRM software](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 17: 210646671655](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/aeo.svg) ### AEO (Beta) Answer engine optimization tools that track and improve your brand's visibility in AI results](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ]
+    },
+    "hit_count": 25
+  },
+  "hubspot_tasks_activities": {
+    "url_src": "URL: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+    "hits": {
+      "ui_pattern": [
+        "* [Free Website Builder Free Website Builder](https://www.hubspot.com/products/cms/drag-and-drop-website-builder?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=footer-features-website&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ],
+      "lead_flow": [
+        "* ### [Generate leads](https://www.hubspot.com/use-case/generate-leads?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-leads&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Convert visitors into contacts for your database.",
+        "* ### [Build pipeline](https://www.hubspot.com/use-case/build-sales-pipeline?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-pipeline&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Generate a pipeline of high-quality prospects.",
+        "* ### [Close deals](https://www.hubspot.com/use-case/close-more-deals?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-deals&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "Streamline your process and close more deals faster.",
+        "Generate leads through content, AI, and automation.",
+        "* ### [Automate sales prospecting](https://www.hubspot.com/products/sales/ai-prospecting-agent?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-solutions-prospectagent&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ],
+      "activity": [
+        "URL: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "URL Source: https://knowledge.hubspot.com/tasks/create-and-manage-tasks",
+        "[Skip to content](https://knowledge.hubspot.com/tasks/create-and-manage-tasks#global-nav-main-content)",
+        "* [日本語](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)",
+        "* [Deutsch](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)",
+        "* [English](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)",
+        "* [Español](https://knowledge.hubspot.com/tasks/create-and-manage-tasks)"
+      ],
+      "ux_principle": [
+        "* [![Image 8: 195140668528](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/marketing-hub.svg) ### Marketing Hub Marketing automation software](https://www.hubspot.com/products/marketing?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-marketing&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 9: 195146645596](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/sales-hub.svg) ### Sales Hub Sales software](https://www.hubspot.com/products/sales?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-sales&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 10: 195140668527](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/service-hub.svg) ### Service Hub Customer service software](https://www.hubspot.com/products/service?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-service&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 11: 195140649745](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/content-hub.svg) ### Content Hub Content marketing software](https://www.hubspot.com/products/content?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-content&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 12: 195289608884](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/data-hub.svg) ### Data Hub Data management software](https://www.hubspot.com/products/data?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-data&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 13: 195140609672](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/commerce-hub.svg) ### Revenue Hub CPQ, billing, and payments software](https://www.hubspot.com/products/revenue?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-revenue&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 14: 195146050660](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/smart-crm.svg) ### Smart CRM AI-powered, flexible CRM software](https://www.hubspot.com/products/crm/ai-crm?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-smartcrm&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)",
+        "* [![Image 17: 210646671655](https://www.hubspot.com/hubfs/assets/hubspot.com/global-navigation/2025/aeo.svg) ### AEO (Beta) Answer engine optimization tools that track and improve your brand's visibility in AI results](https://www.hubspot.com/products/aeo?hubs_content=knowledge.hubspot.com/404&hubs_content-cta=nav-software-aeo&url=/tasks/create-and-manage-tasks&domain=knowledge.hubspot.com)"
+      ]
+    },
+    "hit_count": 25
+  },
+  "hubspot_workflows": {
+    "url_src": "URL: https://knowledge.hubspot.com/workflows/create-workflows",
+    "hits": {
+      "ui_pattern": [
+        "To sort your templates, click the Sort by dropdown and select Relevance , Alphabetical , Newest , or Most popular .",
+        "You can also reference records previously created in your workflow, within the same workflow. For example, after creating an associated deal record, you can immediately send an internal notification with those record details. Learn how to use records created earlier in the same workflow .",
+        "In the top left, click Settings to manage the workflow's execution, notification, and metric settings. Learn more about managing your workflow settings .",
+        "At the bottom, click Next . You can review your workflow's Timing & Notifications , and Connections . Or, click Skip to turn on ."
+      ],
+      "lead_flow": [
+        "Academy Certification Courses A collection of lessons and practical exercises leading to an industry-recognized certification in HubSpot’s tools or strategy.",
+        "You can also reference records previously created in your workflow, within the same workflow. For example, after creating an associated deal record, you can immediately send an internal notification with those record details. Learn how to use records created earlier in the same workflow .",
+        "90 days: all workflow action log data will be stored, including high-level action log data such as object ID (which contact, company, deal, etc.), event type (enrollment, unenrollment, etc.), and action type."
+      ],
+      "activity": [
+        "Classroom Training Schedule in-person training for a hands-on and personalized HubSpot training experience.",
+        "HubSpot Blog Marketing, sales, agency, and customer success blog content.",
+        "Customer Blog Examples of how real customers use HubSpot for their business.",
+        "Product Updates Blog Updates on the latest releases from HubSpot’s Product team.",
+        "Available with any of the following subscriptions , except where noted:",
+        "For example, you can enroll all contacts that have submitted a specific form, then send a marketing email and assign these contacts to a user. You can also take action on associated records, such as updating an enrolled contact’s associated company. It is recommended to use the community workflow library for ideas when setting up your workflow.",
+        "To use a template, click Use template . You'll automatically be redirected to the workflow editor with the templated triggers and actions applied.",
+        "Enrollment triggers are a set of criteria that automatically enroll records in a workflow. You can set enrollment triggers manually, or generate triggers using AI ."
+      ],
+      "ux_principle": [
+        "URL: https://knowledge.hubspot.com/workflows/create-workflows",
+        "FETCHED_AS: https://knowledge.hubspot.com/workflows/create-workflows",
+        "Create workflows in HubSpot to automate your processes. First, you can choose to create your workflow using AI, templates, or from scratch. In the workflow editor, add enrollment triggers and configure re-enrollment and unenrollment settings. Then, add actions to your workflow.",
+        "When building larger workflows, use the minimap for a quick view of your workflow architecture. Finally, configure your workflow settings, then turn on and publish your workflow. When building a workflow, you can also learn how to quickly undo and redo action. Follow this step-by-step to learn how to build workflows.",
+        "For example, you can enroll all contacts that have submitted a specific form, then send a marketing email and assign these contacts to a user. You can also take action on associated records, such as updating an enrolled contact’s associated company. It is recommended to use the community workflow library for ideas when setting up your workflow.",
+        "Permissions required To create workflows, users must have Edit permissions for workflows or Super Admin permissions . To publish workflows, users must have Publish permissions for workflows.",
+        "Step 1: Choose how to create your workflow",
+        "Create workflows from scratch, create a workflow using AI, or use workflow templates to guide you along."
+      ]
+    },
+    "hit_count": 23
+  },
+  "miro_sales_pipeline": {
+    "url_src": "URL: https://miro.com/templates/sales-pipeline/",
+    "hits": {
+      "lead_flow": [
+        "URL: https://miro.com/templates/sales-pipeline/",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://miro.com/templates/sales-pipeline/",
+        "URL Source: https://miro.com/templates/sales-pipeline/"
+      ],
+      "activity": [
+        "![Image 1: Company Logo](https://cdn.cookielaw.org/logos/static/ot_company_logo.png)"
+      ]
+    },
+    "hit_count": 4
+  },
+  "nng_breadcrumbs": {
+    "url_src": "URL: https://www.nngroup.com/articles/breadcrumbs/",
+    "hits": {
+      "ui_pattern": [
+        "URL: https://www.nngroup.com/articles/breadcrumbs/",
+        "FETCHED_AS: https://www.nngroup.com/articles/breadcrumbs/",
+        "Breadcrumbs: 11 Design Guidelines for Desktop and Mobile - NN/G",
+        "Breadcrumbs: 11 Design Guidelines for Desktop and Mobile",
+        "Summary: Support wayfinding by including breadcrumbs that reflect your site's information hierarchy. On mobile, avoid using breadcrumbs that are too tiny or wrap.",
+        "Breadcrumbs are represented as a trail of links at the top of the page, usually just below the global navigation; the home page (or root node of the hierarchy) is the first link and the links are usually separated by the symbols “>” or “/”. We recommend the “>” character, though there is no functional difference, and either is acceptable.",
+        "A deep page typically shows content on a relatively narrow, specific topic, but the breadcrumb trail can lead users to more-general content in the current page’s parent and grandparent nodes.",
+        "Guidelines for Using Breadcrumbs on Desktop"
+      ],
+      "lead_flow": [
+        "A deep page typically shows content on a relatively narrow, specific topic, but the breadcrumb trail can lead users to more-general content in the current page’s parent and grandparent nodes."
+      ],
+      "activity": [
+        "A deep page typically shows content on a relatively narrow, specific topic, but the breadcrumb trail can lead users to more-general content in the current page’s parent and grandparent nodes.",
+        "6. Breadcrumbs Should Include Only Site Pages, Not Logical Categories in Your IA.",
+        "Each node in the breadcrumb trail should be a link to an ancestor page (with the important exception of the link corresponding to the current page, as noted above). If some of the subcategory labels in the global navigation don’t have a separate page dedicated to them do not include these subcategories in the breadcrumb trail.",
+        "Much like our guidelines for global navigation, links to the homepage (labeled Home ) are still necessary. However, note that duplicating the Home link in both the global navigation and the breadcrumb trail is not recommended — one or the other is fine.",
+        "Note that this advice conflicts with guideline #8, and should only be done on mobile. On desktop — where there’s more room — always show the full trail."
+      ],
+      "ux_principle": [
+        "Breadcrumbs are represented as a trail of links at the top of the page, usually just below the global navigation; the home page (or root node of the hierarchy) is the first link and the links are usually separated by the symbols “>” or “/”. We recommend the “>” character, though there is no functional difference, and either is acceptable.",
+        "1. Breadcrumbs Should Not Replace the Global Navigation Bar or the Local Navigation Within a Section.",
+        "Breadcrumbs are intended to supplement other navigational components, such as a global navigation bar that stretches across the top of every page or a local navigation bar that is often found on the left hand side. Breadcrumbs augment but do not replace those main forms of navigation.",
+        "Each node in the breadcrumb trail should be a link to an ancestor page (with the important exception of the link corresponding to the current page, as noted above). If some of the subcategory labels in the global navigation don’t have a separate page dedicated to them do not include these subcategories in the breadcrumb trail.",
+        "Newegg.com: The global-navigation megamenu (top) has subcategories that don’t have a page of their own — for example, Commercial Networking ( 1) . On the Wired Networking page (bottom), the breadcrumb trail (2) does not include Commercial Networking , because that subcategory does not have an associated page.",
+        "Much like our guidelines for global navigation, links to the homepage (labeled Home ) are still necessary. However, note that duplicating the Home link in both the global navigation and the breadcrumb trail is not recommended — one or the other is fine.",
+        "The Oregon state government website includes a breadcrumb trail, but omits a link to the homepage. However, in this case this is acceptable, as the site also includes a Home link in the global navigation — duplicating that homepage link is not necessary, but it does need to be shown in one of the two places.",
+        "Information Architecture,Navigation,Visual Design,responsive design,screen size"
+      ]
+    },
+    "hit_count": 22
+  },
+  "nng_drag_drop": {
+    "url_src": "URL: https://www.nngroup.com/articles/drag-drop/",
+    "hits": {
+      "ui_pattern": [
+        "URL: https://www.nngroup.com/articles/drag-drop/",
+        "FETCHED_AS: https://www.nngroup.com/articles/drag-drop/",
+        "Drag–and–Drop: How to Design for Ease of Use - NN/G",
+        "Drag–and–Drop: How to Design for Ease of Use",
+        "Summary: Clear signifiers and clear feedback at all stages of the interaction make drag–and–drop discoverable and easy to use.",
+        "Drag–and–drop has been around since the dawn of GUIs and is familiar to most users. It is a type of direct manipulation , particularly useful for grouping, reordering, moving, or resizing objects. It works as follows:",
+        "As with all direct-manipulation interactions, items of interest need to be visible on the screen — for example, icons, thumbnails, or explicit interface elements, such as column dividers in a table or spreadsheet. (In principle, we can drag invisible objects, but usability would surely suffer.)",
+        "While keeping the object selected (e.g., by continuous pressure on the mouse button), the user then moves the pointing device (mouse, finger, etc.) to some desired target. This is the “drag” part of the operation."
+      ],
+      "lead_flow": [
+        "Summary: Clear signifiers and clear feedback at all stages of the interaction make drag–and–drop discoverable and easy to use."
+      ],
+      "activity": [
+        "The downsides to drag–and–drop are that it can be inefficient, imprecise, and even physically challenging, especially over long distances: if they run out of room, users might need to reposition their mouse or adjust their finger on a touchscreen. Thus, it often results in errors — the user drops an item in the wrong spot, and has to start all over again.",
+        "When dragging a file (e.g., to upload it or moving it to a different location), the cursor will typically stay unchanged, but a small, translucent “ghost” preview image of the file will be displayed. This image communicates that the file is being dragged and, when the ghost image is clear enough, helps prevent slips where a user drags the wrong file accidentally."
+      ],
+      "ux_principle": [
+        "Summary: Clear signifiers and clear feedback at all stages of the interaction make drag–and–drop discoverable and easy to use.",
+        "As with all direct-manipulation interactions, items of interest need to be visible on the screen — for example, icons, thumbnails, or explicit interface elements, such as column dividers in a table or spreadsheet. (In principle, we can drag invisible objects, but usability would surely suffer.)",
+        "Because it is inherently a tricky physical interaction, understand your users’ mental model for the action that it will implement to make sure that they expect to use it. During usability testing, observe if users attempt to drag–and–drop objects (but don’t ask them about it directly ).",
+        "When appropriate, drag–and–drop is well understood, and quickly adopted by users. All the interactions that drag–and–drop is used for can be grouped in two main types: resizing objects and moving objects. These two capabilities need different microinteraction design to succeed as intuitive, responsive interfaces.",
+        "Clear Signifiers and Feedback for Drag–and–Drop",
+        "Feedback that an Object Has Been Grabbed",
+        "A selection of commonly used drag–and–drop handle icons meant to indicate that an object can be grabbed and moved. The lack of consistency makes it hard for users to recognize the meaning of these icons. Both the icon on the left and right are similar to familiar icons used for other functionalities: the kebab menu (or action overflow) and the hamburger menu, respectively.",
+        "Some of these icons also attempt to indicate the direction of movement: either in one dimension (e.g. reordering a list) or two dimensions (e.g. moving a window around on a screen), but their lack of external consistency fails to communicate the purpose clearly."
+      ]
+    },
+    "hit_count": 19
+  },
+  "nng_form_validation": {
+    "url_src": "URL: https://www.nngroup.com/articles/errors-forms-design-guidelines/",
+    "hits": {
+      "ui_pattern": [
+        "6. Use Modals or Confirmation Dialogs Sparingly",
+        "When you need to draw extra attention to a potential error, use a modal or confirmation dialog to explain details and help the user fix the issue. However, use such dialogs sparingly as they have two big disadvantages:",
+        "Modal dialogs are, however, okay if the error message is simple or the form could still be submitted as it is.",
+        "Gmail.com used a modal to warn the users that the attachment was missing. This error presentation is suitable because the error message is fairly simple, and the user can choose to proceed without including an attachment.",
+        "Tooltips are sometimes used to indicate errors, typically with an alert icon displayed next to the field(s) in error. When users hover over the icon or focus on the field, a tooltip or a toast containing the error message appears."
+      ],
+      "lead_flow": [
+        "Ideally, all validation should be inline ; that is, as soon as the user has finished filling in a field, an indicator should appear nearby if the field contains an error. This approach reduces interaction cost for the user by allowing them to fix errors immediately, without searching or returning to a field they thought was completed correctly.",
+        "In most cases, avoid showing an error until the user has finished with the field and moved to the next field. It’s frustrating to see an error message before being given the opportunity to finish typing."
+      ],
+      "activity": [
+        "Forms are necessary components of many applications and websites. They are used to log in, purchase items, send feedback, enter personal information, and more. When mistakes are made in forms, good error messages and thoughtful error flows can easily guide users to fixes.",
+        "6. Use Modals or Confirmation Dialogs Sparingly",
+        "An error flow should allow users to easily fix their mistakes and proceed with their tasks. Effective error design makes sure that:",
+        "When you need to draw extra attention to a potential error, use a modal or confirmation dialog to explain details and help the user fix the issue. However, use such dialogs sparingly as they have two big disadvantages:",
+        "Modal dialogs are, however, okay if the error message is simple or the form could still be submitted as it is.",
+        "When placing an order on BestBuy.com, an error message appeared in the Email Address field after the user navigated away from it. However, going back to fix the error prompted another error to appear in the Phone Number field, although the user had not started typing in that field.",
+        "Tooltips are sometimes used to indicate errors, typically with an alert icon displayed next to the field(s) in error. When users hover over the icon or focus on the field, a tooltip or a toast containing the error message appears.",
+        "Error flows should be designed to help users fix mistakes in a form and help them avoid making more. Ensure that users can easily detect errors, understand how to fix them, and see the error message while correcting the corresponding error. Remove the guesswork and let users get on with their tasks."
+      ],
+      "ux_principle": [
+        "Forms are necessary components of many applications and websites. They are used to log in, purchase items, send feedback, enter personal information, and more. When mistakes are made in forms, good error messages and thoughtful error flows can easily guide users to fixes.",
+        "Inline validation can also be used to indicate successful completion of fields. For example, when the user creates a username, a green checkmark and a message that the username is available provide clear feedback.",
+        "Revise error messages to provide more actionable feedback.",
+        "Components, design patterns, workflows, and ways of interacting with complex data",
+        "Usability Heuristic 9: Help Users Recognize, Diagnose, and Recover from Errors",
+        "Icon Usability: When and How to Evaluate Digital Icons"
+      ]
+    },
+    "hit_count": 21
+  },
+  "nng_kanban_boards": {
+    "url_src": "URL: https://www.nngroup.com/articles/kanban-boards/",
+    "hits": {
+      "ui_pattern": [
+        "URL: https://www.nngroup.com/articles/kanban-boards/",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://www.nngroup.com/articles/kanban-boards/",
+        "URL Source: https://www.nngroup.com/articles/kanban-boards/",
+        "[Skip to content](https://www.nngroup.com/articles/kanban-boards/#main)",
+        "[Log In](https://www.nngroup.com/login/?next=%2Farticles%2Fkanban-boards%2F)",
+        "![Image 7](https://bat.bing.com/action/0?ti=343242980&tm=gtm002&Ver=2&mid=4ed76406-1de5-4417-a9a9-e02e57728404&bo=1&sid=58e98fc0b64411f18250d3eb11dc9e9f&vid=58e9ad30b64411f1a41a1d326525f879&vids=1&msclkid=N&pi=918639831&lg=en-US&sw=1280&sh=1280&sc=24&tl=Page%20Not%20Found%20-%20NN%2FG&p=https%3A%2F%2Fwww.nngroup.com%2Farticles%2Fkanban-boards%2F&r=<=420&evt=pageLoad&sv=2&cdb=AQcR&rn=941916)"
+      ],
+      "activity": [
+        "* [Keynote Speaking](https://www.nngroup.com/consulting/keynote-speaking/)",
+        "[Log In](https://www.nngroup.com/login/?next=%2Farticles%2Fkanban-boards%2F)"
+      ]
+    },
+    "hit_count": 8
+  },
+  "nng_progressive_disclosure": {
+    "url_src": "URL: https://www.nngroup.com/articles/progressive-disclosure/",
+    "hits": {
+      "ui_pattern": [
+        "Summary: Progressive disclosure defers advanced or rarely used features to a secondary screen, making applications easier to learn and less error-prone.",
+        "Progressive disclosure is one of the best ways to satisfy both of these conflicting requirements. It's a simple, yet powerful idea:",
+        "Usability Criteria for Progressive Disclosure",
+        "Progressive disclosure has long been one of application design's primary guidelines , because most applications have so many commands, features, and options that it makes sense to defer some to a secondary area. Websites have grown so complex that progressive disclosure is a good idea for many information-rich sites as well. Deferring secondary material is also a key guideline for mobile design .",
+        "Hypertext provides a simple implementation of progressive disclosure: higher-level pages contain higher-level concepts and simplified descriptions, and lower-level pages fill in the details for those users who want to know everything.",
+        "In a system designed with progressive disclosure, the very fact that something appears on the initial display tells users that it's important .",
+        "For novice users , this helps prioritize their attention so that they spend time only on features that are most likely to be useful to them. By hiding the advanced settings, progressive disclosure helps novice users avoid mistakes and saves them the time they would have spent contemplating features that they don't need.",
+        "Progressive disclosure thus improves 3 of usability's 5 components : learnability, efficiency of use, and error rate."
+      ],
+      "lead_flow": [
+        "The initial print dialog box typically contains one or more buttons for advanced options. These buttons lead to secondary dialogs that let users specify rarely used settings, such as scaling and printing the pages in reverse sequence. If the user clicks the advanced options button, the system discloses the additional features.",
+        "Staged disclosure is a variant in which users step through a linear sequence of options, with a subset displayed at each step. Wizards are the classic example of staged disclosure. The differences between progressive disclosure and staged disclosure are:",
+        "Staged disclosure is useful when you can divide a task into distinct steps that have little interaction. It is problematic when the steps are interdependent and users must alternate between them.",
+        "When researching the usability of 46 web-based applications , we tested a hotel reservation system that squeezed all the reservation stages onto a single screen. Comparing this design with most hotel sites — which distribute the reservation stages over multiple pages — shows the benefits and drawbacks of staged disclosure:",
+        "As this example shows, staged disclosure requires a thorough task analysis to understand which options are used together and which are better thought of as separate stages. The more features you can defer, the simpler your design, but if you divide the task into too many steps, users get bogged down by excess navigation.",
+        "Progressive disclosure and staged disclosure are both strategies to manage the profusion of features and options in modern user interfaces. They are both more than 30 years old and have proven themselves useful in countless applications, and even some websites. Try them — but stay aware of their weaknesses."
+      ],
+      "activity": [
+        "Offer a larger set of specialized options upon request. Disclose these secondary features only if a user asks for them, meaning that most users can proceed with their tasks without worrying about this added complexity.",
+        "The initial print dialog box typically contains one or more buttons for advanced options. These buttons lead to secondary dialogs that let users specify rarely used settings, such as scaling and printing the pages in reverse sequence. If the user clicks the advanced options button, the system discloses the additional features.",
+        "Features that users access first in the task sequence",
+        "Features that users access later in the task, even if these features are equally important (or more important)",
+        "Yes — unless users stop the task before completing the sequence",
+        "Linear : users progress through the task one step at a time",
+        "Staged disclosure is useful when you can divide a task into distinct steps that have little interaction. It is problematic when the steps are interdependent and users must alternate between them.",
+        "As this example shows, staged disclosure requires a thorough task analysis to understand which options are used together and which are better thought of as separate stages. The more features you can defer, the simpler your design, but if you divide the task into too many steps, users get bogged down by excess navigation."
+      ],
+      "ux_principle": [
+        "Usability Criteria for Progressive Disclosure",
+        "Progressive disclosure thus improves 3 of usability's 5 components : learnability, efficiency of use, and error rate.",
+        "When researching the usability of 46 web-based applications , we tested a hotel reservation system that squeezed all the reservation stages onto a single screen. Comparing this design with most hotel sites — which distribute the reservation stages over multiple pages — shows the benefits and drawbacks of staged disclosure:",
+        "As this example shows, staged disclosure requires a thorough task analysis to understand which options are used together and which are better thought of as separate stages. The more features you can defer, the simpler your design, but if you divide the task into too many steps, users get bogged down by excess navigation.",
+        "Components, design patterns, workflows, and ways of interacting with complex data",
+        "Wireflows: A UX Deliverable for Workflows and Apps"
+      ]
+    },
+    "hit_count": 28
+  },
+  "nng_ten_heuristics": {
+    "url_src": "URL: https://www.nngroup.com/articles/ten-usability-heuristics/",
+    "hits": {
+      "lead_flow": [
+        "Present feedback to the user as quickly as possible (ideally, immediately)."
+      ],
+      "activity": [
+        "Summary: Jakob Nielsen's 10 general principles for interaction design. They are called \"heuristics\" because they are broad rules of thumb and not specific usability guidelines.",
+        "The design should speak the users' language. Use words, phrases, and concepts familiar to the user, rather than internal jargon. Follow real-world conventions, making information appear in a natural and logical order.",
+        "When a design’s controls follow real-world conventions and correspond to desired outcomes (called natural mapping ), it’s easier for users to learn and remember how the interface works. This helps to build an experience that feels intuitive.",
+        "User research will uncover your users' familiar terminology, as well as their mental models around important concepts.",
+        "Let people recognize information in the interface, rather than forcing them to remember (“recall”) it.",
+        "Full article: Recognition vs. Recall in UX",
+        "It’s best if the system doesn’t need any additional explanation. However, it may be necessary to provide documentation to help users understand how to complete their tasks.",
+        "Help and documentation content should be easy to search and focused on the user's task. Keep it concise, and list concrete steps that need to be carried out."
+      ],
+      "ux_principle": [
+        "URL: https://www.nngroup.com/articles/ten-usability-heuristics/",
+        "FETCHED_AS: https://www.nngroup.com/articles/ten-usability-heuristics/",
+        "10 Usability Heuristics for User Interface Design - NN/G",
+        "10 Usability Heuristics for User Interface Design",
+        "Summary: Jakob Nielsen's 10 general principles for interaction design. They are called \"heuristics\" because they are broad rules of thumb and not specific usability guidelines.",
+        "Thank you to Kate Moran and Feifei Liu for updating the heuristic names, descriptions, and examples.",
+        "The design should always keep users informed about what is going on, through appropriate feedback within a reasonable amount of time.",
+        "Use the heuristics to defend and inform your design in our self-paced course, 10 Usability Heuristics — created by the team who brought you the framework first."
+      ]
+    },
+    "hit_count": 17
+  },
+  "pipedrive_activities": {
+    "url_src": "URL: https://support.pipedrive.com/en/article/activities",
+    "hits": {
+      "ui_pattern": [
+        "Click the activity icon on a deal card in your pipeline ."
+      ],
+      "lead_flow": [
+        "Activities in Pipedrive represent any action you take to move your deals forward, such as calls, meetings, tasks or emails. You can link activities to people, organizations, leads, deals or projects to keep a clear view of what‘s next.",
+        "Click the activity icon on a deal card in your pipeline .",
+        "Open the detail view of a deal, project, person or organization and click the activity tab to link an activity directly to that item.",
+        "Open a lead from your Leads Inbox and click on the “Activity” tab at the top to create and link an activity to it.",
+        "Bulk activity creation is available in the list views of the deals , contacts , leads and Sales Inbox (Sent folder) sections.",
+        "Update time – The date of the last update made on an item (a new activity created, a field updated, moving stages etc.)",
+        "In the Schedule an activity window, you can select the owner and link the activity to a deal, organization or person.",
+        "Linked deal – An activity linked to only a deal is automatically linked to the contact person and organization linked to that deal."
+      ],
+      "activity": [
+        "English Deutsch Español Italiano Français Português (BR) Japanese (日本語) Українська Chinese (繁體中文) Korean (한국어) Eesti Čeština Türkçe Bahasa Indonesia Polski Latviešu valoda Русский Norsk Svenska Suomi Nederlands ภาษาไทย Magyar Română Log in Try it free",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "Note: Use the calendar sync feature to sync activities with your calendar provider. Use the meeting scheduler feature to set your availability and book activities with your contacts.",
+        "Activities in Pipedrive represent any action you take to move your deals forward, such as calls, meetings, tasks or emails. You can link activities to people, organizations, leads, deals or projects to keep a clear view of what‘s next.",
+        "Note: To see an activity, a user must have visibility into all items linked to it.",
+        "Note: You can set up an activity as a call , meeting , task , deadline , email , or lunch type by default, but you can also create custom activity types for activities specific to your company’s needs.",
+        "Click the activity icon on a deal card in your pipeline .",
+        "Open the detail view of a deal, project, person or organization and click the activity tab to link an activity directly to that item."
+      ],
+      "ux_principle": [
+        "You can find your activities by clicking the activities icon on the left-side navigation menu:"
+      ]
+    },
+    "hit_count": 18
+  },
+  "pipedrive_deal_detail": {
+    "url_src": "URL: https://support.pipedrive.com/en/article/deal-details-view",
+    "hits": {
+      "lead_flow": [
+        "URL: https://support.pipedrive.com/en/article/deal-details-view",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://support.pipedrive.com/en/article/deal-details-view",
+        "URL Source: https://support.pipedrive.com/en/article/deal-details-view",
+        "[Partner Program](https://www.pipedrive.com/en/partner)[Sales Pipeline Course](https://www.pipedrive.com/en/resources/sales-pipeline-course)[What is CRM?](https://www.pipedrive.com/en/products/what-is-crm)[CRM Comparison](https://www.pipedrive.com/en/crm-comparison)[Resources](https://www.pipedrive.com/en/resources)"
+      ],
+      "activity": [
+        "[Log in](https://app.pipedrive.com/auth/login)[Try it free](https://www.pipedrive.com/en/register)",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "[About](https://www.pipedrive.com/en/about)[Pricing](https://www.pipedrive.com/en/pricing)[Jobs](https://www.pipedrive.com/en/jobs)[Blog](https://www.pipedrive.com/en/blog)[Newsroom](https://www.pipedrive.com/en/newsroom)",
+        "![Image 2: Company Logo](https://cdn.cookielaw.org/logos/93bc8daa-5b3a-4f92-bef0-2fbea0b508b4/6e1288c1-32b6-4bd1-9da3-a1d3837e2da6/db1a64a6-ff95-40e1-bd8a-7cb0381253cd/Pipedrive_Logo_Green.png)",
+        "[![Image 3: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/solutions/consent-and-preferences/?utm_source=cmp&utm_medium=cmpbanner)"
+      ]
+    },
+    "hit_count": 9
+  },
+  "pipedrive_lead_qualification": {
+    "url_src": "URL: https://www.pipedrive.com/en/blog/sales-lead-qualification",
+    "hits": {
+      "ui_pattern": [
+        "Where do qualified leads typically drop out of the pipeline?",
+        "Discarding leads that should be recycled",
+        "However, dragging out unqualified deals reduces pipeline clarity and slows down focus on real opportunities."
+      ],
+      "lead_flow": [
+        "URL: https://www.pipedrive.com/en/blog/sales-lead-qualification",
+        "FETCHED_AS: https://www.pipedrive.com/en/blog/sales-lead-qualification",
+        "Best Sales Lead Qualification Guide 2026",
+        "Sales lead qualification: the modern, simplified 2026 playbook",
+        "When pipelines look healthy, but revenue consistently falls short of forecasts, poor sales lead qualification is often the hidden cause.",
+        "By prioritizing the right buyers, your team can make better use of their time and close deals more often.",
+        "In this guide, you’ll learn why lead qualification is breaking down in 2026 and four practical steps for SMBs to build a more predictable, revenue-driving sales process.",
+        "Key takeaways from sales lead qualification"
+      ],
+      "activity": [
+        "URL: https://www.pipedrive.com/en/blog/sales-lead-qualification",
+        "FETCHED_AS: https://www.pipedrive.com/en/blog/sales-lead-qualification",
+        "Meet Pipedrive Nova: Our new built-in meeting intelligence tool. Learn more .",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "Successful sales lead qualification involves defining clear criteria, creating scoring frameworks, automating repetitive tasks and continuously refining your process.",
+        "An MQL has consumed your e-books, webinars or blog posts and shown enough interest that marketing thinks they will buy.",
+        "If a rep speaks with the lead (usually during a discovery call or initial sales conversation ) and they meet qualification criteria, they become an SQL.",
+        "Clear definitions make it easier to prioritize follow-ups and move the right prospects through your pipeline faster."
+      ],
+      "ux_principle": [
+        "You can also build automated lead qualification triggers to streamline workflows.",
+        "It also has hundreds of integrations (e.g., social media and AI-powered analytics platforms) to improve scoring accuracy and consistency."
+      ]
+    },
+    "hit_count": 21
+  },
+  "pipedrive_leads_inbox": {
+    "url_src": "URL: https://support.pipedrive.com/en/article/leads-inbox",
+    "hits": {
+      "ui_pattern": [
+        "To begin adding leads, you’ll first need to open the leads tab from the left sidebar and select “Leads Inbox” ."
+      ],
+      "lead_flow": [
+        "URL: https://support.pipedrive.com/en/article/leads-inbox",
+        "FETCHED_AS: https://support.pipedrive.com/en/article/leads-inbox",
+        "Leads Inbox - Knowledge Base | Pipedrive",
+        "Knowledge Base / Lead generation / Lead Inbox / Leads Inbox",
+        "In the early stages of your lead generation process, it’s common to have potential opportunities that aren’t ready to move through your pipeline yet.",
+        "Keeping these leads in your pipeline can create clutter and make it harder to focus on active opportunities.",
+        "The Leads Inbox in Pipedrive offers a dedicated space to store and organize your unqualified leads. When a lead is ready to move forward, you can convert it into a deal and add it to your pipeline to begin your sales process.",
+        "Note: You can learn more about adjusting lead visibility by checking out this article ."
+      ],
+      "activity": [
+        "English Deutsch Español Italiano Français Português (BR) Japanese (日本語) Українська Chinese (繁體中文) Korean (한국어) Eesti Čeština Türkçe Bahasa Indonesia Polski Latviešu valoda Русский Norsk Svenska Suomi Nederlands ภาษาไทย Magyar Log in Try it free",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "Note: We’ve recently launched new plan tiers, names and limits. You can find the latest information about new plans in this article .",
+        "Note: You can learn more about adjusting lead visibility by checking out this article .",
+        "Note: You can read more about how to import leads in this article .",
+        "Note: You can learn about setting up lead labels in this article .",
+        "Person – You can see person-related fields, for example, person name , email and phone number",
+        "On the composer to the right, you can add notes , schedule activities , write an email , and upload files to the linked contact."
+      ]
+    },
+    "hit_count": 17
+  },
+  "pipedrive_pipeline_management": {
+    "url_src": "URL: https://support.pipedrive.com/en/article/pipeline-management",
+    "hits": {
+      "lead_flow": [
+        "URL: https://support.pipedrive.com/en/article/pipeline-management",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://support.pipedrive.com/en/article/pipeline-management",
+        "URL Source: https://support.pipedrive.com/en/article/pipeline-management",
+        "[Partner Program](https://www.pipedrive.com/en/partner)[Sales Pipeline Course](https://www.pipedrive.com/en/resources/sales-pipeline-course)[What is CRM?](https://www.pipedrive.com/en/products/what-is-crm)[CRM Comparison](https://www.pipedrive.com/en/crm-comparison)[Resources](https://www.pipedrive.com/en/resources)"
+      ],
+      "activity": [
+        "[Log in](https://app.pipedrive.com/auth/login)[Try it free](https://www.pipedrive.com/en/register)",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "[About](https://www.pipedrive.com/en/about)[Pricing](https://www.pipedrive.com/en/pricing)[Jobs](https://www.pipedrive.com/en/jobs)[Blog](https://www.pipedrive.com/en/blog)[Newsroom](https://www.pipedrive.com/en/newsroom)",
+        "![Image 2: Company Logo](https://cdn.cookielaw.org/logos/93bc8daa-5b3a-4f92-bef0-2fbea0b508b4/6e1288c1-32b6-4bd1-9da3-a1d3837e2da6/db1a64a6-ff95-40e1-bd8a-7cb0381253cd/Pipedrive_Logo_Green.png)",
+        "[![Image 3: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/solutions/consent-and-preferences/?utm_source=cmp&utm_medium=cmpbanner)"
+      ]
+    },
+    "hit_count": 9
+  },
+  "pipedrive_pipeline_mgmt": {
+    "url_src": "URL: https://support.pipedrive.com/en/article/pipeline-management",
+    "hits": {
+      "lead_flow": [
+        "URL: https://support.pipedrive.com/en/article/pipeline-management",
+        "FETCHED_AS: https://r.jina.ai/http://r.jina.ai/http://https://support.pipedrive.com/en/article/pipeline-management",
+        "URL Source: https://support.pipedrive.com/en/article/pipeline-management",
+        "[Partner Program](https://www.pipedrive.com/en/partner)[Sales Pipeline Course](https://www.pipedrive.com/en/resources/sales-pipeline-course)[What is CRM?](https://www.pipedrive.com/en/products/what-is-crm)[CRM Comparison](https://www.pipedrive.com/en/crm-comparison)[Resources](https://www.pipedrive.com/en/resources)"
+      ],
+      "activity": [
+        "[Log in](https://app.pipedrive.com/auth/login)[Try it free](https://www.pipedrive.com/en/register)",
+        "All categories Marketplace apps Blog Knowledge Base Academy",
+        "[About](https://www.pipedrive.com/en/about)[Pricing](https://www.pipedrive.com/en/pricing)[Jobs](https://www.pipedrive.com/en/jobs)[Blog](https://www.pipedrive.com/en/blog)[Newsroom](https://www.pipedrive.com/en/newsroom)",
+        "![Image 2: Company Logo](https://cdn.cookielaw.org/logos/93bc8daa-5b3a-4f92-bef0-2fbea0b508b4/6e1288c1-32b6-4bd1-9da3-a1d3837e2da6/db1a64a6-ff95-40e1-bd8a-7cb0381253cd/Pipedrive_Logo_Green.png)",
+        "[![Image 3: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/solutions/consent-and-preferences/?utm_source=cmp&utm_medium=cmpbanner)"
+      ]
+    },
+    "hit_count": 9
+  },
+  "smashing_crm_ux": {
+    "url_src": "URL: https://www.smashingmagazine.com/?s=CRM+UX+design",
+    "hits": {
+      "ui_pattern": [
+        "Reliable accessible UI components: :focus styles, modals, date pickers, navigation, tables, buttons, SVGs.",
+        "Meet Smashing Workshops , with practical, actionable insights from experts — live. With interactive exercises, slides, video recordings and a friendly Q&A."
+      ],
+      "activity": [
+        "When tasked with building a highly interactive, tactile web experience, the architecture must serve the art direction. In this article, Alexey Kopytin explains their architectural rationale for building a digital stress-relief squeeze toy game using Lottie animations, DOM events, and distance-based math to maintain absolute control over their designers’ intentional motion.",
+        "September 17, 2026 — If you understand the peculiarities of human vision, you can create better designs. Slava Shestopalov wrote a guide on how to make optically balanced icons, correct shape alignment, and perfect corner rounding."
+      ],
+      "ux_principle": [
+        "Reliable accessible UI components: :focus styles, modals, date pickers, navigation, tables, buttons, SVGs.",
+        "September 21, 2026 — Created by David Dias, Front-End Checklist is a collection of front-end quality rules and guided workflows for humans and AI agents. It covers launch, review, accessibility, performance, security, privacy, and SEO."
+      ]
+    },
+    "hit_count": 6
+  },
+  "uxplanet_crm": {
+    "url_src": "URL: https://uxplanet.org/?s=CRM+design",
+    "hits": {
+      "ux_principle": [
+        "![Image 2: Claude Design for UX: How to Design Complete User Flows, Not Just UI Screens](https://miro.medium.com/v2/resize:fill:80:53/format:webp/1*XWHUcD0Mb2hmoX9XlUDO-Q.png)",
+        "![Image 3: Claude Design for UX: How to Design Complete User Flows, Not Just UI Screens](https://miro.medium.com/v2/resize:fill:160:107/format:webp/1*XWHUcD0Mb2hmoX9XlUDO-Q.png)",
+        "![Image 30: 3 Types of Agentic Workflows in Claude Code: Safe, Risky, and Dangerous](https://miro.medium.com/v2/resize:fill:80:53/format:webp/1*NeZKZA0zklDrjZUm7xjT4g.png)",
+        "![Image 31: 3 Types of Agentic Workflows in Claude Code: Safe, Risky, and Dangerous](https://miro.medium.com/v2/resize:fill:160:107/format:webp/1*NeZKZA0zklDrjZUm7xjT4g.png)",
+        "![Image 49: Claude Design for UX: How to Design Complete User Flows, Not Just UI Screens](https://miro.medium.com/v2/resize:fit:660/format:webp/1*XWHUcD0Mb2hmoX9XlUDO-Q.png)",
+        "![Image 63: 3 Types of Agentic Workflows in Claude Code: Safe, Risky, and Dangerous](https://miro.medium.com/v2/resize:fit:660/format:webp/1*NeZKZA0zklDrjZUm7xjT4g.png)"
+      ]
+    },
+    "hit_count": 6
+  }
+}
