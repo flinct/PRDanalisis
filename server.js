@@ -280,6 +280,8 @@ function normalizeWorkPackage(wp) {
     versionId: parseIdFromHref(versionHref),
     versionName: wp._links?.version?.title || "",
     percentageDone: wp.percentageDone || 0,
+    spentTime: wp.spentTime || 0,
+    estimatedTime: wp.estimatedTime || 0,
     startDate: wp.startDate || null,
     dueDate: wp.dueDate || null,
     updatedAt: wp.updatedAt || null,
