@@ -812,7 +812,7 @@
       "task": "MUV",
       "strategicArea": "Analytics",
       "sourceColumn": "FEATURE",
-      "desc": "hitung inbound pertamakali yang masuk ke channel terhubung di satuinbox`",
+      "desc": "hitung inbound pertamakali yang masuk ke channel terhubung di satuinbox asd",
       "effort": "M",
       "impact": "H",
       "testing": "L",
@@ -833,7 +833,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "",
-      "prdStatus": ""
+      "prdStatus": "",
+      "progress": 99
     },
     {
       "id": "op-3844",
