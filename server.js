@@ -277,6 +277,13 @@ function normalizeWorkPackage(wp) {
     priorityName: wp._links?.priority?.title || "",
     assigneeId: parseIdFromHref(assigneeHref),
     assigneeName: wp._links?.assignee?.title || "",
+    // ponytail: customField3 = QA Assignee (multi-user)
+    qaAssigneeIds: Array.isArray(wp._links?.customField3)
+      ? wp._links.customField3.map(u => parseIdFromHref(u.href)).filter(Boolean)
+      : [],
+    qaAssigneeNames: Array.isArray(wp._links?.customField3)
+      ? wp._links.customField3.map(u => u.title || "").filter(Boolean)
+      : [],
     versionId: parseIdFromHref(versionHref),
     versionName: wp._links?.version?.title || "",
     percentageDone: wp.percentageDone || 0,
@@ -907,7 +914,12 @@ app.patch("/api/dashboard/openproject/work-package/:id", async (req, res) => {
       links.responsible = toIntOrNull(req.body.responsibleId) ? { href: `/api/v3/users/${toIntOrNull(req.body.responsibleId)}` } : { href: null };
     if (req.body.versionId !== undefined)
       links.version = toIntOrNull(req.body.versionId) ? { href: `/api/v3/versions/${toIntOrNull(req.body.versionId)}` } : { href: null };
+    // ponytail: customField3 = QA Assignee (multi-user)
+    if (Array.isArray(req.body.qaAssigneeIds))
+      links.customField3 = req.body.qaAssigneeIds.map(id => ({ href: `/api/v3/users/${id}` }));
     if (Object.keys(links).length) body._links = links;
+    const pctDone = toIntOrNull(req.body.percentageDone);
+    if (pctDone != null) body.percentageDone = Math.min(100, Math.max(0, pctDone));
     if (Object.keys(body).length < 2)
       return res.status(400).json({ ok: false, error: "nothing to update" });
     const updated = await openProjectRequest(`/api/v3/work_packages/${id}`, {
@@ -949,6 +961,11 @@ app.post("/api/dashboard/openproject/work-package", async (req, res) => {
     if (responsibleId) body._links.responsible = { href: `/api/v3/users/${responsibleId}` };
     const versionId = toIntOrNull(req.body.versionId);
     if (versionId) body._links.version = { href: `/api/v3/versions/${versionId}` };
+    // ponytail: customField3 = QA Assignee (multi-user)
+    if (Array.isArray(req.body.qaAssigneeIds))
+      body._links.customField3 = req.body.qaAssigneeIds.map(id => ({ href: `/api/v3/users/${id}` }));
+    const pctDone = toIntOrNull(req.body.percentageDone);
+    if (pctDone != null) body.percentageDone = Math.min(100, Math.max(0, pctDone));
     const created = await openProjectRequest("/api/v3/work_packages", {
       method: "POST",
       body,

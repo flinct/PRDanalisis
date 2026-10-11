@@ -9067,37 +9067,40 @@
           React.useEffect(() => { if (descRef.current) descRef.current.value = r[11] || ""; }, [r[11]]);
           const existingOpId = rawTask?.opId || "";
           const [opSt, setOpSt] = React.useState({ status: existingOpId ? "linked" : "idle", opId: existingOpId, error: "" });
-          // Push form state
-          const PRIORITIES = ["Urgent","High","Normal","Low"];
+          // OP types + task type (persisted on task)
           const OP_TYPES = [{name:"TASK",id:1,color:"#3B82F6"},{name:"MILESTONE",id:2,color:"#22C55E"},{name:"FEATURE",id:3,color:"#14B8A6"},{name:"EPIC",id:4,color:"#A78BFA"},{name:"USER STORY",id:5,color:"#06B6D4"},{name:"BUG",id:6,color:"#EF4444"}];
-          const prioFromRm = (p) => ({P0:"Urgent",P1:"Urgent",P2:"High",P3:"Normal",Backlog:"Low"})[p] || "Normal";
-          const [formType, setFormType] = React.useState(1); // typeId
-          const [formDesc, setFormDesc] = React.useState(rawTask?.desc || r[11] || "");
-          const [formPrio, setFormPrio] = React.useState(prioFromRm(r[3]));
-          const [formVersion, setFormVersion] = React.useState("");
-          const [formAssignee, setFormAssignee] = React.useState("");
-          const [formQA, setFormQA] = React.useState("");
-          const [formAccountable, setFormAccountable] = React.useState("");
-          const [formProgress, setFormProgress] = React.useState("");
-          const [formGenerating, setFormGenerating] = React.useState(false);
-          const [opVersions, setOpVersions] = React.useState([]);
-          const [opAssignees, setOpAssignees] = React.useState([]);
-          const [formMode, setFormMode] = React.useState("push"); // 'push' | 'update'
+          const [taskType, setTaskType] = React.useState(rawTask?.type || 1);
+          // assignee initials → OP user ID resolver
+          const resolvePersonId = (ini) => {
+            if (!ini) return null;
+            const name = FULL[ini] || ini;
+            const hit = (opPeople || []).find(p => p.name.toLowerCase() === name.toLowerCase());
+            return hit ? hit.id : null;
+          };
+          // build description with metric meta block at top
+          const buildOpDesc = () => {
+            const metaLines = [];
+            const metrics = [r[6]||"-", r[5]||"-", r[7]||"-"].join(" / ");
+            metaLines.push("Impact / Effort / Testing: " + metrics);
+            const base = rawTask?.desc || r[11] || "";
+            return metaLines.join("\n") + (base ? "\n\n" + base : "");
+          };
+          // resolve QA assignee initials → OP user IDs (multi)
+          const resolveQaIds = () => {
+            const qaArr = Array.isArray(aList[1]) ? aList[1] : (aList[1] ? [aList[1]] : []);
+            return qaArr.map(ini => resolvePersonId(ini)).filter(Boolean);
+          };
           const doCheckOp = async () => {
             console.log("[CheckOP] click", id, rawTask?.task, "opId:", existingOpId, "status:", opSt.status);
-            if (opSt.status === "not-found") { setFormMode("push"); setOpSt(s => ({...s, status: "form"})); return; }
-            if (opSt.status === "linked" || opSt.status === "found" || opSt.status === "pushed") {
-              // ponytail: open form directly — no auto-sync that clobbers local edits
-              setFormMode("update"); setOpSt(s => ({...s, status: "form"}));
-              return;
-            }
+            if (opSt.status === "not-found") { doPushOp(); return; }
+            if (opSt.status === "linked" || opSt.status === "found" || opSt.status === "pushed") { doUpdateOp(); return; }
+            // idle/unknown → check OP
             setOpSt({ status: "checking", opId: opSt.opId, error: "" });
             try {
               const query = rawTask?.task || r[1];
               const rs = await fetch(`/api/dashboard/openproject/search?q=${encodeURIComponent(query)}`);
               const j = await rs.json();
               if (!j.ok) throw new Error(j.error);
-              // exact case-insensitive match on subject
               const exact = (j.results || []).find(x => (x.subject || "").toLowerCase() === query.toLowerCase());
               if (exact) {
                 const oid = String(exact.id);
@@ -9127,65 +9130,46 @@
             } catch(e) { console.warn("[SyncOP]", e); }
             setOpSt(s => ({...s, status: "linked"}));
           };
-          // Load versions + assignees when form opens; also fetch OP data for update mode
-          React.useEffect(() => {
-            if (opSt.status !== "form") return;
-            fetch("/api/dashboard/openproject/versions").then(r=>r.json()).then(j=>{ if(j.ok) setOpVersions(j.versions); }).catch(()=>{});
-            fetch("/api/dashboard/openproject/available-assignees").then(r=>r.json()).then(j=>{ if(j.ok) setOpAssignees(j.assignees); }).catch(()=>{});
-            // For update mode: fetch current OP WP data — only pre-fill fields NOT edited locally
-            if (formMode === "update" && opSt.opId) {
-              fetch(`/api/dashboard/openproject/search?q=${opSt.opId}`).then(r=>r.json()).then(j=>{
-                if (!j.ok) return;
-                const wp = (j.results || []).find(x => String(x.id) === opSt.opId);
-                if (!wp) return;
-                // ponytail: skip desc/prio pre-fill — local data already in form from useState init
-                if (wp.assigneeId) setFormAssignee(String(wp.assigneeId));
-                if (wp.versionId) setFormVersion(String(wp.versionId));
-                if (wp.percentageDone != null) setFormProgress(String(wp.percentageDone));
-              }).catch(()=>{});
-            }
-          }, [opSt.status]);
-          const generateDesc = async () => {
-            setFormGenerating(true);
-            try {
-              const prompt = `Write a concise, professional OpenProject work package description (2-3 paragraphs max, markdown format) for:\nTitle: ${rawTask?.task || r[1]}\nCurrent notes: ${rawTask?.desc || r[11] || "(none)"}\nPriority: ${r[3]}\nArea: ${r[2] || "(none)"}\nReturn ONLY the description text, no headers or meta.`;
-              const rs = await fetch("/api/hermes", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({prompt}) });
-              const j = await rs.json();
-              if (j.ok && j.output) setFormDesc(j.output.trim());
-            } catch(e) { console.error("[Generate]", e); }
-            setFormGenerating(false);
-          };
           const doPushOp = async () => {
             setOpSt(s => ({...s, status: "pushing", error: ""}));
             try {
-              const prioHit = opMeta.priorities?.find(p => (p.name||"").toLowerCase() === formPrio.toLowerCase());
-              const body = { subject: rawTask?.task || r[1], projectId: 7, typeId: formType };
+              const prioName = ({P0:"Urgent",P1:"Urgent",P2:"High",P3:"Normal",Backlog:"Low"})[r[3]] || "Normal";
+              const prioHit = opMeta.priorities?.find(p => (p.name||"").toLowerCase() === prioName.toLowerCase());
+              const body = { subject: rawTask?.task || r[1], projectId: 7, typeId: taskType, description: buildOpDesc() };
               if (prioHit) body.priorityId = prioHit.id;
-              if (formDesc) body.description = formDesc;
-              if (formAssignee) body.assigneeId = formAssignee;
-              if (formAccountable) body.responsibleId = formAccountable;
-              if (formVersion) body.versionId = formVersion;
+              const assigneeId = resolvePersonId(aList[0]);
+              if (assigneeId) body.assigneeId = assigneeId;
+              const responsibleId = resolvePersonId(aList[2]);
+              if (responsibleId) body.responsibleId = responsibleId;
+              const qaIds = resolveQaIds();
+              if (qaIds.length) body.qaAssigneeIds = qaIds;
+              const pct = rawTask?.progress;
+              if (pct != null && pct !== "") body.percentageDone = Number(pct);
               const rs = await fetch("/api/dashboard/openproject/work-package", {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
               });
               const j = await rs.json();
               if (!j.ok) throw new Error(j.error);
               const oid = String(j.workPackage.id);
-              patchTask(id, { opId: oid, desc: formDesc || rawTask?.desc || "" });
+              patchTask(id, { opId: oid });
               setOpSt({ status: "pushed", opId: oid, error: "" });
             } catch (e) { setOpSt(s => ({...s, status: "error", error: e.message})); }
           };
           const doUpdateOp = async () => {
             setOpSt(s => ({...s, status: "pushing", error: ""}));
             try {
-              const prioHit = opMeta.priorities?.find(p => (p.name||"").toLowerCase() === formPrio.toLowerCase());
-              const body = {};
-              if (rawTask?.task || r[1]) body.subject = rawTask?.task || r[1];
-              if (formDesc) body.description = formDesc;
+              const prioName = ({P0:"Urgent",P1:"Urgent",P2:"High",P3:"Normal",Backlog:"Low"})[r[3]] || "Normal";
+              const prioHit = opMeta.priorities?.find(p => (p.name||"").toLowerCase() === prioName.toLowerCase());
+              const body = { subject: rawTask?.task || r[1], description: buildOpDesc() };
               if (prioHit) body.priorityId = prioHit.id;
-              if (formAssignee) body.assigneeId = formAssignee;
-              if (formAccountable) body.responsibleId = formAccountable;
-              if (formVersion) body.versionId = formVersion;
+              const assigneeId = resolvePersonId(aList[0]);
+              if (assigneeId) body.assigneeId = assigneeId;
+              const responsibleId = resolvePersonId(aList[2]);
+              if (responsibleId) body.responsibleId = responsibleId;
+              const qaIds = resolveQaIds();
+              if (qaIds.length) body.qaAssigneeIds = qaIds;
+              const pct = rawTask?.progress;
+              if (pct != null && pct !== "") body.percentageDone = Number(pct);
               const rs = await fetch(`/api/dashboard/openproject/work-package/${opSt.opId}`, {
                 method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
               });
@@ -9231,8 +9215,12 @@
                     <InlineEdit value={r[2]} onSave={(v) => editField(id,"strategicArea",v)} placeholder="Area" style={{fontSize:12,color:"#fff",background:"none",border:"none",padding:0}} />
                   </span>
                   <svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="#6B7280"><path d="M7 10l5 5 5-5"/></svg>
-                </div>
-              </div>
+                  </div>
+                  <div style={S.label}>Type</div>
+                  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                  {OP_TYPES.map(t => <div key={t.id} onClick={()=>{setTaskType(t.id);patchTask(id,{type:t.id});}} style={{padding:"4px 8px",borderRadius:4,fontSize:9,fontWeight:700,cursor:"pointer",border:"1px solid "+(taskType===t.id?t.color:"#334155"),background:taskType===t.id?t.color+"25":"#1E293B",color:taskType===t.id?t.color:"#94A3B8"}}>{t.name}</div>)}
+                  </div>
+                  </div>
 
               <div style={{...S.card,flex:1}}>
                 <div style={S.hdr}>
@@ -9317,14 +9305,14 @@
                     Status & Actions
                   </h5>
                   <div style={{fontSize:11,color:"#94a3b8"}}><span style={{fontWeight:600}}>Status:</span> {r[4]||"—"} · <span style={{fontWeight:600}}>Priority:</span> {r[3]||"-"}</div>
-                  <button type="button" style={{...S.btn, ...(opSt.status === 'not-found' ? {background:'#2563eb'} : opSt.status === 'found' || opSt.status === 'pushed' || opSt.status === 'linked' ? {background:'#059669'} : opSt.status === 'error' ? {background:'#dc2626'} : opSt.status === 'form' ? {display:'none'} : {})}}
-                    disabled={opSt.status === 'checking' || opSt.status === 'pushing' || opSt.status === 'form'}
+                  <button type="button" style={{...S.btn, ...(opSt.status === 'not-found' ? {background:'#2563eb'} : opSt.status === 'found' || opSt.status === 'pushed' || opSt.status === 'linked' ? {background:'#059669'} : opSt.status === 'error' ? {background:'#dc2626'} : {})}}
+                    disabled={opSt.status === 'checking' || opSt.status === 'pushing'}
                     onClick={doCheckOp}>
-                    {opSt.status === 'linked' ? <><svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> OP #{opSt.opId}</>
+                    {opSt.status === 'linked' ? <><svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> Update OP #{opSt.opId}</>
                     : opSt.status === 'checking' ? <><span className="rm-op-spinner"></span> Checking…</>
                     : opSt.status === 'not-found' ? '⚡ Push to OP'
                     : opSt.status === 'pushing' ? <><span className="rm-op-spinner"></span> Pushing…</>
-                    : opSt.status === 'found' ? `✓ OP #${opSt.opId}`
+                    : opSt.status === 'found' ? `✓ Update OP #${opSt.opId}`
                     : opSt.status === 'pushed' ? `✓ Pushed #${opSt.opId}`
                     : opSt.status === 'error' ? '↻ Retry'
                     : <><svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> Check OP</>}
@@ -9336,87 +9324,10 @@
                       Sync from OP
                     </button>
                   }
+                  {opSt.status === 'linked' && <a href={`https://pm.infradigital.id/projects/satuinbox-indonesia/work_packages/${opSt.opId}`} target="_blank" rel="noopener" style={{fontSize:10,color:'#3B82F6',textDecoration:'none'}}>↗ Open in OP</a>}
                   {opSt.status === 'not-found' && <span style={{fontSize:10,color:'#93c5fd'}}>Tidak ditemukan di OP. Klik lagi untuk push.</span>}
                   {opSt.status === 'error' && <span style={{fontSize:10,color:'#ef4444'}}>{opSt.error}</span>}
                   {opSt.status === 'idle' && <span style={{fontSize:10,color:"#4B5563"}}>Cek apakah task ini sudah ada di OpenProject.</span>}
-                  {/* ── Push to OP Form ────────────────────────── */}
-                  {opSt.status === 'form' && (
-                    <div style={{marginTop:8,padding:12,borderRadius:8,background:"#111827",border:"1px solid #2A3555",display:"flex",flexDirection:"column",gap:10}}>
-                      <div style={{fontSize:12,fontWeight:700,color:"#F1F5F9",display:"flex",alignItems:"center",gap:6}}>
-                        <svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke={formMode==="update"?"#22C55E":"#3B82F6"} strokeWidth="2">
-                          {formMode==="update" ? <><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></> : <><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></>}
-                        </svg>
-                        {formMode==="update" ? `Update OP #${opSt.opId}` : "Push to OpenProject"}
-                        {formMode==="update" && <a href={`https://pm.infradigital.id/projects/satuinbox-indonesia/work_packages/${opSt.opId}`} target="_blank" rel="noopener" style={{marginLeft:"auto",fontSize:9,color:"#3B82F6",textDecoration:"none"}}>↗ Open in OP</a>}
-                      </div>
-                      {/* Type chips — push only */}
-                      {formMode==="push" && <div><div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Type</div>
-                        <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-                          {OP_TYPES.map(t => <div key={t.id} onClick={()=>setFormType(t.id)} style={{padding:"4px 8px",borderRadius:4,fontSize:9,fontWeight:700,cursor:"pointer",border:"1px solid "+(formType===t.id?t.color:"#334155"),background:formType===t.id?t.color+"25":"#1E293B",color:formType===t.id?t.color:"#94A3B8"}}>{t.name}</div>)}
-                        </div>
-                      </div>}
-                      {/* Description + Generate */}
-                      <div>
-                        <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4,display:"flex",alignItems:"center",gap:6}}>
-                          Description
-                          <div onClick={!formGenerating ? generateDesc : undefined} style={{marginLeft:"auto",padding:"3px 8px",borderRadius:4,fontSize:9,fontWeight:700,cursor:formGenerating?"wait":"pointer",border:"1px solid rgba(124,107,255,.4)",background:formGenerating?"rgba(124,107,255,.08)":"rgba(124,107,255,.12)",color:"#A78BFA",display:"flex",alignItems:"center",gap:3,opacity:formGenerating?.5:1}}>
-                            <svg style={{width:10,height:10}} viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                            {formGenerating ? "Generating…" : "Generate by Hermes"}
-                          </div>
-                        </div>
-                        <textarea value={formDesc} onChange={e=>setFormDesc(e.target.value)} onClick={e=>e.stopPropagation()}
-                          placeholder="Deskripsi work package…"
-                          style={{background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"6px 8px",fontSize:11,color:"#fff",lineHeight:1.4,minHeight:60,resize:"vertical",width:"100%",boxSizing:"border-box",fontFamily:"inherit",outline:"none"}} />
-                      </div>
-                      {/* Priority + Version row */}
-                      <div style={{display:"flex",gap:8}}>
-                        <div style={{flex:1}}>
-                          <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Priority</div>
-                          <select value={formPrio} onChange={e=>setFormPrio(e.target.value)} style={{width:"100%",background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"5px 8px",fontSize:11,color:"#fff",fontFamily:"inherit",outline:"none"}}>
-                            {PRIORITIES.map(p=><option key={p} value={p}>{p}</option>)}
-                          </select>
-                        </div>
-                        <div style={{flex:1}}>
-                          <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Version</div>
-                          <select value={formVersion} onChange={e=>setFormVersion(e.target.value)} style={{width:"100%",background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"5px 8px",fontSize:11,color:"#fff",fontFamily:"inherit",outline:"none"}}>
-                            <option value="">— none —</option>
-                            {opVersions.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                      {/* Assignee + QA row */}
-                      <div style={{display:"flex",gap:8}}>
-                        <div style={{flex:1}}>
-                          <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Assignee</div>
-                          <select value={formAssignee} onChange={e=>setFormAssignee(e.target.value)} style={{width:"100%",background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"5px 8px",fontSize:11,color:"#fff",fontFamily:"inherit",outline:"none"}}>
-                            <option value="">— none —</option>
-                            {opAssignees.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
-                          </select>
-                        </div>
-                        <div style={{flex:1}}>
-                          <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Accountable</div>
-                          <select value={formAccountable} onChange={e=>setFormAccountable(e.target.value)} style={{width:"100%",background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"5px 8px",fontSize:11,color:"#fff",fontFamily:"inherit",outline:"none"}}>
-                            <option value="">— none —</option>
-                            {opAssignees.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                      {/* Progress */}
-                      <div style={{width:"50%"}}>
-                        <div style={{fontSize:10,fontWeight:600,color:"#94A3B8",marginBottom:4}}>Progress (%)</div>
-                        <input type="text" inputMode="numeric" value={formProgress} onChange={e=>setFormProgress(e.target.value.replace(/[^0-9]/g,""))} placeholder="0"
-                          style={{background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"5px 8px",fontSize:11,color:"#fff",width:60,fontFamily:"inherit",outline:"none"}} />
-                      </div>
-                      {/* Actions */}
-                      <div style={{display:"flex",justifyContent:"flex-end",gap:8,marginTop:4}}>
-                        <div onClick={()=>setOpSt(formMode==="update" ? {status:"linked",opId:opSt.opId,error:""} : {status:"idle",opId:"",error:""})} style={{padding:"6px 14px",borderRadius:6,fontSize:11,fontWeight:600,cursor:"pointer",border:"1px solid #2A3555",background:"transparent",color:"#94A3B8"}}>Cancel</div>
-                        <div onClick={formMode==="update" ? doUpdateOp : doPushOp} style={{padding:"6px 14px",borderRadius:6,fontSize:11,fontWeight:700,cursor:"pointer",background:formMode==="update"?"#22C55E":"#3B82F6",color:"#fff",display:"flex",alignItems:"center",gap:5}}>
-                          {formMode==="update" ? <svg style={{width:12,height:12}} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg> : <svg style={{width:12,height:12}} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>}
-                          {formMode==="update" ? "Update OP" : "Push to OP"}
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
