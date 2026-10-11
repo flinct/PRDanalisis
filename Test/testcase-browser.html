@@ -9675,7 +9675,7 @@
                   // so a task only counts toward a prio/status card once that field is actually set. Total counts everything.
                   const rawById = Object.fromEntries(rawTasks.current.map((t) => [t.id, t]));
                   const all = sections.flatMap((s) => s[2]).filter((r) => monthAbs >= r[9][0] && monthAbs <= r[9][1] && (!depCluster || depCluster.has(r[12])));
-                  window._capRows.month = all; window._capRows.monthLabel = q.months[monthView.mi]; window._capDirty = true; // ponytail: sync to vanilla capacity UI
+                  window._capRows.month = all.concat((mvOp.rows||[]).map(wp => { const o = opRowView(wp); return [null, o.subject||wp.subject, null, null, null, o.effort||"", o.impact||"", o.testing||"", null, [0,0], null, null, "op-"+wp.id]; })); window._capRows.monthLabel = q.months[monthView.mi]; window._capDirty = true; // ponytail: sync to vanilla capacity UI
                   const raw = (r) => rawById[r[12]] || {};
                   const k = {
                     total: all.length,
