@@ -9070,6 +9070,7 @@
           // OP types + task type (persisted on task)
           const OP_TYPES = [{name:"TASK",id:1,color:"#3B82F6"},{name:"MILESTONE",id:2,color:"#22C55E"},{name:"FEATURE",id:3,color:"#14B8A6"},{name:"EPIC",id:4,color:"#A78BFA"},{name:"USER STORY",id:5,color:"#06B6D4"},{name:"BUG",id:6,color:"#EF4444"}];
           const [taskType, setTaskType] = React.useState(rawTask?.type || 1);
+          const [genLoading, setGenLoading] = React.useState(false);
           // OP people mapped to MemberSelect shape; fallback to ROLE_PEOPLE
           const opPeopleMapped = opPeople.length
             ? opPeople.map(p => ({ id: p.id, name: p.name, color: colorOf(p.name), ini: iniOf(p.name) }))
@@ -9196,7 +9197,23 @@
                 <div style={S.label}>Title</div>
                 <div style={S.input}><InlineEdit value={r[1]} onSave={(v) => editField(id,"task",v)} placeholder="Judul task" style={{fontSize:12,color:"#fff",background:"none",border:"none",padding:0,width:"100%"}} /></div>
                 <div style={{...S.label,display:"flex",justifyContent:"space-between",alignItems:"center"}}>Description
-                  <svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <div onClick={async () => {
+                      if (genLoading) return;
+                      setGenLoading(true);
+                      try {
+                        const prompt = `Write a concise professional work package description (2-3 paragraphs max, markdown) for:\nTitle: ${r[1]}\nNotes: ${r[11] || "(none)"}\nPriority: ${r[3]}\nArea: ${r[2] || "(none)"}\nReturn ONLY the description text.`;
+                        const rs = await fetch("/api/hermes", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({prompt}) });
+                        const j = await rs.json();
+                        if (j.ok && j.output && descRef.current) { descRef.current.value = j.output.trim(); editField(id, "desc", j.output.trim()); }
+                      } catch(e) { console.error("[Generate]", e); }
+                      setGenLoading(false);
+                    }} style={{padding:"3px 8px",borderRadius:4,fontSize:9,fontWeight:700,cursor:genLoading?"wait":"pointer",border:"1px solid rgba(124,107,255,.4)",background:genLoading?"rgba(124,107,255,.08)":"rgba(124,107,255,.12)",color:"#A78BFA",display:"flex",alignItems:"center",gap:3,opacity:genLoading?.5:1}}>
+                      <svg style={{width:10,height:10}} viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                      {genLoading ? "Generating…" : "Generate by Hermes"}
+                    </div>
+                    <svg style={{width:14,height:14}} viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                  </div>
                 </div>
                 <div className="rm-resize-wrap">
                 <textarea ref={descRef} defaultValue={r[11] || ""} placeholder="Tambah deskripsi…"
