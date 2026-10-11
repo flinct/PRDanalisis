@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Push to OP — Form Mockup</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0B0F1A;font-family:'Segoe UI',system-ui,sans-serif;display:flex;justify-content:center;padding:40px;min-height:100vh;color:#F1F5F9}
+.card{width:520px;background:#0B0F1A;border:1px solid #2A3555;border-radius:12px;overflow:hidden}
+.hdr{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid #1E293B}
+.hdr svg{width:16px;height:16px;stroke:#3B82F6;fill:none;stroke-width:2}
+.hdr span{font-size:14px;font-weight:600;color:#F1F5F9}
+.body{padding:20px;display:flex;flex-direction:column;gap:14px}
+.banner{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25)}
+.banner svg{width:12px;height:12px;stroke:#3B82F6;fill:none;stroke-width:2;flex-shrink:0}
+.banner-info{display:flex;flex-direction:column;gap:2px}
+.banner-title{font-size:11px;font-weight:600;color:#F1F5F9}
+.banner-sub{font-size:9px;color:#64748B}
+.section-label{font-size:11px;font-weight:600;color:#94A3B8;margin-bottom:4px}
+.type-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 10px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.chip.active{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.chip:not(.active){background:#1E293B;color:#94A3B8;border-color:#334155}
+.chip:not(.active):hover{border-color:#475569;color:#CBD5E1}
+.field{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:11px;font-weight:600;color:#94A3B8;display:flex;align-items:center;gap:8px}
+.field-input{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:6px;background:#0C1022;border:1px solid #2A3555;font-size:12px;color:#F1F5F9;cursor:text;min-height:36px}
+.field-input .placeholder{color:#475569}
+.field-input .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.field-input .arrow{margin-left:auto;color:#64748B;font-size:10px}
+.field-input textarea{background:none;border:none;color:#F1F5F9;font-size:12px;font-family:inherit;resize:none;outline:none;width:100%;line-height:1.4}
+.field-input input{background:none;border:none;color:#F1F5F9;font-size:12px;font-family:inherit;outline:none;width:100%}
+.member{display:flex;align-items:center;gap:8px}
+.avatar{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sep{height:1px;background:#1E293B}
+.footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 20px;border-top:1px solid #1E293B}
+.btn{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn-cancel{background:transparent;border:1px solid #2A3555;color:#94A3B8}
+.btn-cancel:hover{border-color:#475569;color:#CBD5E1}
+.btn-push{background:#3B82F6;color:#fff}
+.btn-push:hover{background:#2563EB}
+.btn-push svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
+.btn-generate{margin-left:auto;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(124,107,255,.4);background:rgba(124,107,255,.12);color:#A78BFA;display:flex;align-items:center;gap:4px;transition:all .15s}
+.btn-generate:hover{background:rgba(124,107,255,.22);border-color:#7C6BFF;color:#C4B5FD}
+.btn-generate svg{width:12px;height:12px;stroke:#A78BFA;fill:none;stroke-width:2}
+.gen-status{margin-top:4px;font-size:10px;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;background:rgba(124,107,255,.08);border:1px solid rgba(124,107,255,.2)}
+.gen-status .spinner{width:12px;height:12px;border:2px solid rgba(167,139,250,.3);border-top-color:#A78BFA;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-status span{color:#A78BFA;font-weight:600}
+.gen-status .sub{color:#64748B;font-weight:400}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="hdr">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <span>Push to OpenProject</span>
+  </div>
+  <div class="body">
+    <div class="banner">
+      <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <div class="banner-info">
+        <div class="banner-title">infra stability — slice 1: SLO + top incident fixes</div>
+        <div class="banner-sub">Task roadmap akan dibuat sebagai Work Package di OP</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Type</div>
+      <div class="type-chips">
+        <div class="chip active" style="--c:#3B82F6">TASK</div>
+        <div class="chip" style="--c:#22C55E">MILESTONE</div>
+        <div class="chip" style="--c:#14B8A6">FEATURE</div>
+        <div class="chip" style="--c:#A78BFA">EPIC</div>
+        <div class="chip" style="--c:#06B6D4">USER STORY</div>
+        <div class="chip" style="--c:#EF4444">BUG</div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Title</div>
+      <div class="field-input"><input type="text" value="infra stability — slice 1: SLO + top incident fixes" /></div>
+    </div>
+    <div class="field">
+      <div class="field-label">
+        Description
+        <button class="btn-generate" id="genBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Generate by Hermes
+        </button>
+      </div>
+      <div class="field-input" style="min-height:80px;align-items:flex-start"><textarea rows="4" id="descArea">Stabilisasi infrastruktur: SLO monitoring, top incident fixes, observability baseline</textarea></div>
+      <div class="gen-status" id="genStatus" style="display:none">
+        <div class="spinner"></div>
+        <span>Generating description…</span>
+        <span class="sub">via Hermes AI</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Priority</div><div class="field-input"><span class="dot" style="background:#3B82F6"></span><span>Normal</span><span class="arrow">▾</span></div></div>
+      <div class="field"><div class="field-label">Version</div><div class="field-input"><span>v2.1 Sprint 3</span><span class="arrow">▾</span></div></div>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Assignee</div><div class="field-input"><div class="member"><div class="avatar" style="background:rgba(59,130,246,.2);color:#3B82F6">DC</div><span>Dany Christian</span></div><span class="arrow">▾</span></div></div>
+      <div class="field"><div class="field-label">QA Assignee</div><div class="field-input"><span class="placeholder">Pilih member…</span><span class="arrow">▾</span></div></div>
+    </div>
+    <div class="row2">
+      <div class="field"><div class="field-label">Progress</div><div class="field-input" style="gap:4px"><input type="text" value="" placeholder="0" style="width:40px" /><span style="color:#7C7BF5;font-size:11px;font-weight:600">%</span></div></div>
+      <div class="field"><div class="field-label">Accountable</div><div class="field-input"><span class="placeholder">Pilih member…</span><span class="arrow">▾</span></div></div>
+    </div>
+  </div>
+  <div class="footer">
+    <button class="btn btn-cancel">Cancel</button>
+    <button class="btn btn-push"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Push to OP</button>
+  </div>
+</div>
+<script>
+const btn=document.getElementById('genBtn'),status=document.getElementById('genStatus'),desc=document.getElementById('descArea');
+btn.addEventListener('click',()=>{
+  if(btn.dataset.loading==='1')return;
+  btn.dataset.loading='1';btn.style.opacity='.5';btn.style.cursor='wait';
+  status.style.display='flex';
+  setTimeout(()=>{
+    desc.value="## Infrastructure Stability \u2014 Slice 1\n\n**Objective:** Establish SLO monitoring, address top incident fixes, and build an observability baseline for production systems.\n\n**Scope:**\n- Define and instrument SLOs for critical service paths\n- Triage and resolve top-3 recurring incidents from last quarter\n- Set up centralized logging + alerting baseline\n\n**Acceptance Criteria:** SLO dashboard live, P1 incident count reduced by 50%, alerting coverage \u2265 80% of critical paths.";
+    status.style.display='none';btn.dataset.loading='0';btn.style.opacity='1';btn.style.cursor='pointer';
+  },2000);
+});
+</script>
+</body>
+</html>

@@ -905,6 +905,8 @@ app.patch("/api/dashboard/openproject/work-package/:id", async (req, res) => {
       links.assignee = toIntOrNull(req.body.assigneeId) ? { href: `/api/v3/users/${toIntOrNull(req.body.assigneeId)}` } : { href: null };
     if (req.body.responsibleId !== undefined)
       links.responsible = toIntOrNull(req.body.responsibleId) ? { href: `/api/v3/users/${toIntOrNull(req.body.responsibleId)}` } : { href: null };
+    if (req.body.versionId !== undefined)
+      links.version = toIntOrNull(req.body.versionId) ? { href: `/api/v3/versions/${toIntOrNull(req.body.versionId)}` } : { href: null };
     if (Object.keys(links).length) body._links = links;
     if (Object.keys(body).length < 2)
       return res.status(400).json({ ok: false, error: "nothing to update" });
@@ -924,6 +926,39 @@ app.patch("/api/dashboard/openproject/work-package/:id", async (req, res) => {
   }
 });
 
+// Create work package in OpenProject. Roadmap "Push to OP" flow.
+app.post("/api/dashboard/openproject/work-package", async (req, res) => {
+  try {
+    const subject = String(req.body.subject || "").trim();
+    if (!subject) return res.status(400).json({ ok: false, error: "subject required" });
+    const projectId = toIntOrNull(req.body.projectId) || 7;
+    const body = {
+      subject,
+      _links: {
+        project: { href: `/api/v3/projects/${projectId}` },
+        type: { href: `/api/v3/types/${toIntOrNull(req.body.typeId) || 1}` },
+        status: { href: `/api/v3/statuses/${toIntOrNull(req.body.statusId) || 1}` },
+      },
+    };
+    const priorityId = toIntOrNull(req.body.priorityId);
+    if (priorityId) body._links.priority = { href: `/api/v3/priorities/${priorityId}` };
+    if (typeof req.body.description === "string") body.description = { raw: req.body.description };
+    const assigneeId = toIntOrNull(req.body.assigneeId);
+    if (assigneeId) body._links.assignee = { href: `/api/v3/users/${assigneeId}` };
+    const responsibleId = toIntOrNull(req.body.responsibleId);
+    if (responsibleId) body._links.responsible = { href: `/api/v3/users/${responsibleId}` };
+    const versionId = toIntOrNull(req.body.versionId);
+    if (versionId) body._links.version = { href: `/api/v3/versions/${versionId}` };
+    const created = await openProjectRequest("/api/v3/work_packages", {
+      method: "POST",
+      body,
+    });
+    res.json({ ok: true, workPackage: normalizeWorkPackage(created) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // Available assignees for the project (users assignable to work packages).
 // The flat /users endpoint is unauthorized for this token; available_assignees usually is not.
 app.get("/api/dashboard/openproject/available-assignees", async (req, res) => {
@@ -936,6 +971,18 @@ app.get("/api/dashboard/openproject/available-assignees", async (req, res) => {
     res.json({ ok: true, assignees: els.map((u) => ({ id: u.id, name: u.name || "", email: u.email || "" })) });
   } catch (e) {
     res.json({ ok: false, error: e.message, assignees: [] });
+  }
+});
+
+// Project versions (milestones/sprints) for the Push to OP form.
+app.get("/api/dashboard/openproject/versions", async (req, res) => {
+  try {
+    const projectId = toIntOrNull(req.query.projectId) || 7;
+    const data = await openProjectRequest(`/api/v3/projects/${projectId}/versions?pageSize=200`);
+    const els = Array.isArray(data._embedded?.elements) ? data._embedded.elements : [];
+    res.json({ ok: true, versions: els.map((v) => ({ id: v.id, name: v.name || "", status: v.status || "" })) });
+  } catch (e) {
+    res.json({ ok: false, error: e.message, versions: [] });
   }
 });
 

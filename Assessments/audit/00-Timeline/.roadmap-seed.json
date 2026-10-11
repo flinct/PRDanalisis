@@ -809,14 +809,14 @@
     {
       "id": "tmucfgez3",
       "rank": 31,
-      "task": "MUV",
+      "task": "MUV - monthly unique visitor",
       "strategicArea": "Analytics",
       "sourceColumn": "FEATURE",
-      "desc": "hitung inbound pertamakali yang masuk ke channel terhubung di satuinbox asd",
+      "desc": "Menghitung jumlah inbound pertama kali yang masuk ke setiap channel terhubung di SatuInbox. Metric ini mengukur volume first-contact inbound per channel integration (WhatsApp, Email, dsb.) sebagai baseline untuk analisis beban operasional dan perencanaan kapasitas agent.\n\nImplementasi meliputi query aggregation pada conversation collection yang memfilter `isFirstMessage=true` dan mengelompokkan berdasarkan `channelId`/`channelType`, kemudian menampilkan hasilnya di dashboard Analytics. Pastikan filter hanya menghitung conversation yang benar-benar terhubung (status connected), bukan yang gagal routing atau spam-blocked. test",
       "effort": "M",
       "impact": "H",
       "testing": "L",
-      "priority": "P1",
+      "priority": "P0",
       "current": true,
       "schedule": {
         "start": {
@@ -828,13 +828,14 @@
           "week": 4
         }
       },
-      "status": "active",
+      "status": "done",
       "dependency": [],
       "risk": 1,
       "pm_front_weeks": 0,
-      "opId": "",
+      "opId": "4371",
       "prdStatus": "",
-      "progress": 99
+      "progress": 0,
+      "_descH": 143
     },
     {
       "id": "op-3844",
