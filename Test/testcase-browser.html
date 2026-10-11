@@ -9070,10 +9070,16 @@
           // OP types + task type (persisted on task)
           const OP_TYPES = [{name:"TASK",id:1,color:"#3B82F6"},{name:"MILESTONE",id:2,color:"#22C55E"},{name:"FEATURE",id:3,color:"#14B8A6"},{name:"EPIC",id:4,color:"#A78BFA"},{name:"USER STORY",id:5,color:"#06B6D4"},{name:"BUG",id:6,color:"#EF4444"}];
           const [taskType, setTaskType] = React.useState(rawTask?.type || 1);
-          // assignee initials → OP user ID resolver
-          const resolvePersonId = (ini) => {
-            if (!ini) return null;
-            const name = FULL[ini] || ini;
+          // OP people mapped to MemberSelect shape; fallback to ROLE_PEOPLE
+          const opPeopleMapped = opPeople.length
+            ? opPeople.map(p => ({ id: p.id, name: p.name, color: colorOf(p.name), ini: iniOf(p.name) }))
+            : ROLE_PEOPLE;
+          // assignee value → OP user ID resolver (handles both old initials and new OP IDs)
+          const resolvePersonId = (val) => {
+            if (!val) return null;
+            if (typeof val === 'number') return val;
+            if (/^\d+$/.test(String(val))) return Number(val);
+            const name = FULL[val] || val;
             const hit = (opPeople || []).find(p => p.name.toLowerCase() === name.toLowerCase());
             return hit ? hit.id : null;
           };
@@ -9231,7 +9237,7 @@
                   {[["Assignee","single"],["QA Assignee","multi"],["Accountable","single"]].map(([label,mode],slot) => {
                     const a = aList[slot];
                     const val = mode==="multi" ? (Array.isArray(a)?a:(a?[a]:[])) : (a||null);
-                    return <div key={label} style={{flex:1,minWidth:0}}><div style={{...S.label,marginBottom:4}}>{label}</div><MemberSelect mode={mode} value={val} people={ROLE_PEOPLE} placeholder="Pilih member…" onChange={(nid) => { const list=[...aList]; list[slot]=mode==="multi"?nid:(nid||""); saveAssignees(r[1],list); }} /></div>;
+                    return <div key={label} style={{flex:1,minWidth:0}}><div style={{...S.label,marginBottom:4}}>{label}</div><MemberSelect mode={mode} value={val} people={opPeopleMapped} placeholder="Pilih member…" onChange={(nid) => { const list=[...aList]; list[slot]=mode==="multi"?nid:(nid||""); saveAssignees(r[1],list); }} /></div>;
                   })}
                 </div>
                 <div style={S.label}>Dependency</div>
@@ -9332,7 +9338,7 @@
               </div>
             </div>
           );
-        }, [opMeta, assignMap]);
+        }, [opMeta, assignMap, opPeople]);
         // one quarter's 3 month bar cells (w45 each, gap2); each cell a rounded-5 pill: active=prioColor@50, inactive=#1e293b
         // click OR drag across month cells → fill span with prio color → persist schedule to IDB
         const idByUid = (uid) => { for (const [n, , rows] of sections) for (const r of rows) if (n + "-" + r[0] === uid) return r[12]; return null; };
