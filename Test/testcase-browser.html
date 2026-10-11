@@ -386,6 +386,135 @@
     <script type="text/babel" src="./modules/ui-monitoring.js"></script>
     <script type="text/babel" src="./modules/ui-memory.js"></script>
     <script type="text/babel" src="./modules/ui-new-request.js"></script>
+    <script>
+      // ponytail: capacity model — reads cfg from window._rmCfg, set by Babel code
+      window._rmCfg = { dev: 2, qa: 1, cap: 0.8 };
+      window._capRows = { month: [], all: [], monthLabel: "All" }; // set by Babel code during render
+      window.calcCapacity = function(rows) {
+        var cfg = window._rmCfg;
+        var DEV={L:2,M:4,H:8}, QA={L:1,M:2,H:3};
+        var dL=0, qL=0, i=rows.length;
+        while(i--){dL+=(DEV[rows[i][5]]||4);qL+=(QA[rows[i][7]]||2);}
+        var dC=cfg.dev*4*cfg.cap, qC=cfg.qa*4*cfg.cap;
+        var dU=dC>0?dL/dC:0, qU=qC>0?qL/qC:0, p=Math.max(dU,qU);
+        return{devLoad:dL,qaLoad:qL,devCap:Math.round(dC*10)/10,qaCap:Math.round(qC*10)/10,
+          devPct:Math.round(dU*100),qaPct:Math.round(qU*100),
+          status:p<0.8?"ok":p<=1?"tight":"over",
+          bottleneck:dU>=qU?"dev":"qa",n:rows.length};
+      };
+      // Vanilla DOM capacity UI — zero Babel dependency
+      (function(){
+        var DEV={L:2,M:4,H:8}, QA={L:1,M:2,H:3};
+        var _open = { month: false, all: false };
+        function el(tag, attrs, kids) {
+          var e = document.createElement(tag);
+          if (attrs) Object.keys(attrs).forEach(function(k){ if(k==='style') Object.assign(e.style, attrs[k]); else if(k==='onclick') e.onclick=attrs[k]; else if(k==='innerHTML') e.innerHTML=attrs[k]; else e.setAttribute(k,attrs[k]); });
+          if (kids) kids.forEach(function(c){ if(typeof c==='string') e.appendChild(document.createTextNode(c)); else if(c) e.appendChild(c); });
+          return e;
+        }
+        function pill(label, color, extra) {
+          return el('span', {style:{cursor:'pointer',display:'inline-flex',alignItems:'center',gap:4,background:color+'14',border:'1px solid '+color+'40',borderRadius:999,padding:'3px 10px',fontSize:'11px',color:color,whiteSpace:'nowrap',fontWeight:'700'}}, [label]);
+        }
+        function gaugeRow(label, load, capW, pct) {
+          var c = pct<80?'#22c55e':pct<=100?'#f59e0b':'#ef4444';
+          var row = el('div', {style:{marginBottom:'10px'}});
+          var hdr = el('div', {style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px',fontSize:'11px'}}, [
+            el('span', {style:{color:'#94a3b8',fontWeight:'700',width:'70px'}}, [label]),
+            el('span', {style:{color:'#f1f5f9'}}, [load+'w / '+capW+'w']),
+            el('span', {style:{padding:'2px 8px',borderRadius:'4px',background:c+'25',fontSize:'9px',fontWeight:'700',color:c}}, [pct+'%'])
+          ]);
+          var track = el('div', {style:{height:'10px',background:'#1e293b',borderRadius:'5px',overflow:'hidden'}});
+          track.appendChild(el('div', {style:{height:'100%',width:Math.min(100,pct)+'%',background:c,borderRadius:'5px'}}));
+          row.appendChild(hdr); row.appendChild(track);
+          return row;
+        }
+        function renderPills(containerId, rows) {
+          var c = document.getElementById(containerId);
+          if (!c) return;
+          c.innerHTML = '';
+          var cap = window.calcCapacity(rows);
+          var color = cap.status==='ok'?'#22c55e':cap.status==='tight'?'#f59e0b':'#ef4444';
+          var key = containerId.indexOf('month')>=0?'month':'all';
+          var span = el('span', {style:{cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'5px',background:color+'14',border:'1px solid '+color+'40',borderRadius:'999px',padding:'3px 10px',fontSize:'11px',color:color,whiteSpace:'nowrap'}, onclick:function(){
+            _open[key] = !_open[key];
+            renderPanel(containerId.replace('pills','panel'), rows, key);
+          }}, [
+            el('b', {style:{fontWeight:'700'}}, [cap.devLoad+'w']), ' / '+cap.devCap+'w · ',
+            el('span', {style:{padding:'1px 6px',borderRadius:'4px',background:color+'25',fontWeight:'700'}}, ['DEV '+cap.devPct+'%'])
+          ]);
+          var qColor = cap.qaPct<80?'#22c55e':cap.qaPct<=100?'#f59e0b':'#ef4444';
+          var span2 = el('span', {style:{cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'5px',background:qColor+'14',border:'1px solid '+qColor+'40',borderRadius:'999px',padding:'3px 10px',fontSize:'11px',color:qColor,whiteSpace:'nowrap'}, onclick:function(){
+            _open[key] = !_open[key];
+            renderPanel(containerId.replace('pills','panel'), rows, key);
+          }}, [
+            el('b', {style:{fontWeight:'700'}}, [cap.qaLoad+'w']), ' / '+cap.qaCap+'w · ',
+            el('span', {style:{padding:'1px 6px',borderRadius:'4px',background:qColor+'25',fontWeight:'700'}}, ['QA '+cap.qaPct+'%'])
+          ]);
+          c.appendChild(span); c.appendChild(span2);
+        }
+        function renderPanel(containerId, rows, key) {
+          var c = document.getElementById(containerId);
+          if (!c) return;
+          c.innerHTML = '';
+          if (!_open[key]) return;
+          var cap = window.calcCapacity(rows);
+          var panel = el('div', {style:{padding:'12px 16px',background:'#111827',borderRadius:'8px',margin:'8px 0',border:'1px solid #1e293b'}});
+          // header
+          var hdr = el('div', {style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}});
+          hdr.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>';
+          hdr.appendChild(el('span', {style:{fontSize:'13px',fontWeight:'700',color:'#f1f5f9'}}, ['Capacity Analysis — '+window._capRows.monthLabel]));
+          hdr.appendChild(el('span', {style:{fontSize:'11px',color:'#94a3b8',marginLeft:'8px'}}, [cap.n+' tasks · '+(cap.status==='ok'?'✅ Feasible':cap.status==='tight'?'⚠️ At capacity':'🔴 Over')]));
+          // manpower inputs
+          var cfg = window._rmCfg;
+          var inputs = el('div', {style:{marginLeft:'auto',display:'flex',gap:'8px',alignItems:'center'}});
+          function numInput(label, key, min, max, step) {
+            var lbl = el('label', {style:{fontSize:'10px',color:'#64748b'}}, [label]);
+            var inp = el('input', {type:'number',style:{width:'36px',marginLeft:'4px',background:'#0f172a',border:'1px solid #1e293b',borderRadius:'4px',padding:'2px 4px',fontSize:'11px',color:'#e5e7eb',textAlign:'center'}});
+            inp.min=min; inp.max=max; if(step) inp.step=step; if(key==='cap') inp.style.width='42px';
+            inp.value = cfg[key];
+            inp.onchange = function(){ window._rmCfg[key]=Math.max(min,Math.min(max,+this.value||min)); window._capDirty=true; };
+            lbl.appendChild(inp); return lbl;
+          }
+          inputs.appendChild(numInput('Dev','dev',1,9));
+          inputs.appendChild(numInput('QA','qa',1,9));
+          inputs.appendChild(numInput('Cap','cap',0.1,1,0.05));
+          hdr.appendChild(inputs);
+          panel.appendChild(hdr);
+          panel.appendChild(gaugeRow('Dev Lane', cap.devLoad, cap.devCap, cap.devPct));
+          panel.appendChild(gaugeRow('QA Lane', cap.qaLoad, cap.qaCap, cap.qaPct));
+          // task table
+          var wrap = el('div', {style:{marginTop:'8px',maxHeight:'200px',overflow:'auto'}});
+          var tbl = el('table', {style:{width:'100%',borderCollapse:'collapse',fontSize:'10px'}});
+          tbl.innerHTML = '<thead><tr style="border-bottom:1px solid #1e293b"><th style="text-align:left;padding:4px 8px;color:#475569">Task</th><th style="text-align:center;padding:4px 8px;color:#475569">E</th><th style="text-align:center;padding:4px 8px;color:#475569">T</th><th style="text-align:center;padding:4px 8px;color:#3b82f6">Dev</th><th style="text-align:center;padding:4px 8px;color:#3b82f6">QA</th><th style="text-align:center;padding:4px 8px;color:#3b82f6">Total</th></tr></thead>';
+          var tbody = document.createElement('tbody');
+          rows.forEach(function(r){
+            var dw=DEV[r[5]]||4, qw=QA[r[7]]||2, t=dw+qw;
+            var tc=t>=10?'#ef4444':t>=6?'#f59e0b':'#22c55e';
+            var tr=document.createElement('tr'); tr.style.borderBottom='1px solid #1e293b20';
+            tr.innerHTML='<td style="padding:3px 8px;color:#e5e7eb">'+r[1]+'</td>'
+              +'<td style="text-align:center;padding:3px"><span style="padding:1px 6px;border-radius:4px;background:'+(r[5]==='H'?'#ef4444':r[5]==='M'?'#f59e0b':'#22c55e')+'20;color:'+(r[5]==='H'?'#ef4444':r[5]==='M'?'#f59e0b':'#22c55e')+';font-weight:700">'+r[5]+'</span></td>'
+              +'<td style="text-align:center;padding:3px"><span style="padding:1px 6px;border-radius:4px;background:'+(r[7]==='H'?'#ef4444':r[7]==='M'?'#f59e0b':'#22c55e')+'20;color:'+(r[7]==='H'?'#ef4444':r[7]==='M'?'#f59e0b':'#22c55e')+';font-weight:700">'+r[7]+'</span></td>'
+              +'<td style="text-align:center;padding:3px;color:#94a3b8">'+dw+'w</td>'
+              +'<td style="text-align:center;padding:3px;color:#94a3b8">'+qw+'w</td>'
+              +'<td style="text-align:center;padding:3px;color:'+tc+';font-weight:700">'+t+'w</td>';
+            tbody.appendChild(tr);
+          });
+          tbl.appendChild(tbody); wrap.appendChild(tbl); panel.appendChild(wrap);
+          c.appendChild(panel);
+        }
+        // poll: when Babel sets _capRows, render the capacity UI
+        window._capDirty = true;
+        setInterval(function(){
+          if (!window._capDirty) return;
+          window._capDirty = false;
+          var r = window._capRows;
+          if (r.month && document.getElementById('cap-month-pills')) renderPills('cap-month-pills', r.month);
+          if (r.all && document.getElementById('cap-all-pills')) renderPills('cap-all-pills', r.all);
+          if (_open.month && document.getElementById('cap-month-panel')) renderPanel('cap-month-panel', r.month, 'month');
+          if (_open.all && document.getElementById('cap-all-panel')) renderPanel('cap-all-panel', r.all, 'all');
+        }, 500);
+      })();
+    </script>
     <script type="text/babel">
       const {
         useState,
@@ -6660,6 +6789,7 @@
         const [cfg, setCfg] = React.useState(RM_DEFAULT_CFG);
         const [deferred, setDeferred] = React.useState([]); // ids blocked-downstream, unscheduled
         const [preview, setPreview] = React.useState(null); // {id:{lo,hi}} scheduler result, not committed until Apply
+        // ponytail: capacity UI rendered from vanilla DOM — no Babel state needed
         // month-view: click month → filter tasks, optionally link OP version
         const [monthView, setMonthView] = React.useState(null); // null=all, or "Sep"/"Oct"/etc
         const [verMap, setVerMap] = React.useState({}); // {"Oct": [versionId,...], ...}
@@ -9321,6 +9451,14 @@
                     <div style={S.mInfo}><span style={S.mName}>{label}</span><span style={S.mDesc}>{(DESC[label]&&DESC[label][lv])||"Unknown"}</span></div>
                   </div>
                 ))}
+                {/* estimate row */}
+                <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:"#3b82f60a",borderRadius:6,border:"1px solid #3b82f620",marginTop:6}}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:"#e5e7eb"}}>Estimate: {(DEV_WEEKS[r[5]]||4)}+{(QA_WEEKS[r[7]]||2)} = {(DEV_WEEKS[r[5]]||4)+(QA_WEEKS[r[7]]||2)} weeks</div>
+                    <div style={{fontSize:10,color:"#64748b"}}>Dev {(DEV_WEEKS[r[5]]||4)}w → QA {(QA_WEEKS[r[7]]||2)}w</div>
+                  </div>
+                </div>
                 <div style={S.div}/>
                 <div style={S.sec}>
                   <h5 style={S.secH}>
@@ -9537,6 +9675,7 @@
                   // so a task only counts toward a prio/status card once that field is actually set. Total counts everything.
                   const rawById = Object.fromEntries(rawTasks.current.map((t) => [t.id, t]));
                   const all = sections.flatMap((s) => s[2]).filter((r) => monthAbs >= r[9][0] && monthAbs <= r[9][1] && (!depCluster || depCluster.has(r[12])));
+                  window._capRows.month = all; window._capRows.monthLabel = q.months[monthView.mi]; window._capDirty = true; // ponytail: sync to vanilla capacity UI
                   const raw = (r) => rawById[r[12]] || {};
                   const k = {
                     total: all.length,
@@ -9550,10 +9689,13 @@
                     {rmPill(k.total, "Total")}{rmPill(k.current, "Current")}
                     {k.p0 > 0 && rmPill(k.p0, "P0", prio.P0)}{rmPill(k.p1, "P1", prio.P1)}{rmPill(k.p2, "P2", prio.P2)}{rmPill(k.backlog, "Backlog", stat.backlog)}
                     {lkInScope && !mvOp.loading && mvOp.rows.length > 0 && rmPill(mvOp.rows.length, "OP", "#f59e0b")}
+                    <div style={{width:1,height:18,background:"#1e293b"}} />
+                    <div id="cap-month-pills" style={{display:"inline-flex",alignItems:"center",gap:5}}></div>
                     {saveCd > 0 && <span style={{fontSize:10,fontWeight:600,color:"#f59e0b",marginLeft:8,opacity:0.9}}>saving in {saveCd}s</span>}
                     {savedFlash && <span style={{fontSize:10,fontWeight:600,color:"#22c55e",marginLeft:8,opacity:0.9}}>✓ saved</span>}
                   </div>);
                 })()}
+                <div id="cap-month-panel"></div>
               </div>
               <div style={{ minWidth: 598 + 4 * 152, display: "flex", flexDirection: "column", padding: "0 24px" }}>
                 {/* header: frozen cols + W1-W4 */}
@@ -9722,6 +9864,7 @@
         }
         // ── KPI mini + search (dashboard v2 roadmap only) ──
         const rmAllRows = sections.flatMap((s) => s[2]);
+        window._capRows.all = rmAllRows; window._capDirty = true; // ponytail: sync to vanilla capacity UI
         const rmQ = rmq.trim().toLowerCase();
         let rmFiltered = rmQ
           ? sections.map(([n, c, rows]) => [n, c, rows.filter((r) =>
@@ -9759,6 +9902,8 @@
               {rmPill(rmKpi.p1, "P1", prio.P1)}
               {rmPill(rmKpi.p2, "P2", prio.P2)}
               {rmPill(rmKpi.backlog, "Backlog", stat.backlog)}
+              <div style={{width:1,height:18,background:"#1e293b"}} />
+              <div id="cap-all-pills" style={{display:"inline-flex",alignItems:"center",gap:4}}></div>
               <input
                 type="search"
                 value={rmq}
@@ -9767,6 +9912,7 @@
                 style={{ marginLeft: "auto", width: 200, background: "#0f172a", border: "1px solid #1e293b", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "#e5e7eb", outline: "none", fontFamily: "inherit" }}
               />
             </div>
+            <div id="cap-all-panel"></div>
             {/* table header: # Task Area Prio Status Effort Impact Test Assignee + 4 quarter groups */}
             <div style={{ minWidth: 640, display: "flex", flexDirection: "column" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 12px", background: "#111827", borderRadius: 8, position: "sticky", top: 0, zIndex: 3 }}>
