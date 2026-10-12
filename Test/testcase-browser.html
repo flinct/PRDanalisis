@@ -8680,6 +8680,9 @@
         }, [bdTarget]);
         const [qPopup, setQPopup] = React.useState(null); // { label, x, y }
         const [monthView, setMonthView] = React.useState(null); // null | { qLabel, mi } (mi 0..2 within quarter)
+        const [addModal, setAddModal] = React.useState(null); // null | 'single' | 'multi' | 'import'
+        const [addRows, setAddRows] = React.useState([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]);
+        const addFileRef = React.useRef(null);
         const qClickTimer = React.useRef(null); // distinguish single (month view) vs double (link popup) click on Q
         // Q timeline area is capped at 38vw and scrolls horizontally. ALL strips (header + every row) are scroll sources,
         // synced to one shared scrollLeft so dragging from any row moves the whole timeline together. header row is sticky-top.
@@ -8763,6 +8766,9 @@
         const prio = { P0: "#ef4444", P1: "#f59e0b", P2: "#a78bfa", P3: "#475569" };
         // status vocab mapped to new set: Active→now, In Progress→next, New→backlog (+ hold/blocked selectable)
         const stat = { now: "#f59e0b", next: "#3b82f6", backlog: "#475569", hold: "#a78bfa", blocked: "#ef4444", done: "#22c55e" };
+        // ponytail: DEV_WEEKS/QA_WEEKS duplicated from RoadmapView — detail panel needs them in scope
+        const DEV_WEEKS = { L: 2, M: 4, H: 8 };
+        const QA_WEEKS = { L: 1, M: 2, H: 3 };
         const PRIO_OPTS = ["P0", "P1", "P2", "P3"];
         const STAT_OPTS = ["now", "next", "backlog", "hold", "blocked"];
         const EIM_OPTS = ["H", "M", "L"];
@@ -8802,6 +8808,68 @@
           const key = (wp) => { const v = opRowView(wp); return PR[v.prio] != null ? PR[v.prio] : 3; };
           return [...rows].sort((a, b) => key(a) - key(b));
         };
+        // ── Add Task helpers ──
+        const parseImportMd = (md) => {
+          const lines = md.split('\n');
+          const items = [];
+          let cur = null;
+          for (const ln of lines) {
+            const m2 = /^##\s+(.+)/.exec(ln);
+            const m3 = /^###\s+(.+)/.exec(ln);
+            if (m2) { cur = { id: 'im' + items.length, title: m2[1].trim(), description: '', area: '', priority: 'P2', effort: '', dev: '', qa: '', type: 2, breakdowns: [] }; items.push(cur); }
+            else if (m3 && cur) { cur.breakdowns.push({ title: m3[1].replace(/^BD:\s*/i, '').trim(), effort: '', gap: '' }); }
+            else if (cur && ln.trim()) { cur.description += (cur.description ? '\n' : '') + ln.trim(); }
+          }
+          return items;
+        };
+        const checkDuplicateTask = async (title) => {
+          if (!title || !title.trim()) return { status: 'new', matches: [] };
+          const q = title.trim().toLowerCase();
+          // IDB fuzzy check
+          const idbHits = (rawTasks.current || []).filter(t => (t.task || '').toLowerCase().includes(q));
+          if (idbHits.length > 0) return { status: 'exists', matches: idbHits.slice(0, 3).map(t => t.task) };
+          // OP API check
+          try {
+            const r = await fetch('/api/dashboard/openproject/search?q=' + encodeURIComponent(title.trim()) + '&projectId=7');
+            const d = await r.json();
+            if (d.ok && Array.isArray(d.results) && d.results.length > 0) return { status: 'duplicate', matches: d.results.slice(0, 3).map(x => x.subject) };
+          } catch (_) {}
+          return { status: 'new', matches: [] };
+        };
+        const setAddRowAt = (idx, patch) => { setAddRows(prev => { const n = [...prev]; n[idx] = { ...n[idx], ...patch }; return n; }); };
+        const runAddCheck = async (idx) => {
+          setAddRowAt(idx, { checking: true, checkResult: null });
+          const res = await checkDuplicateTask(addRows[idx].title);
+          setAddRowAt(idx, { checking: false, checkResult: res });
+        };
+        const runAllChecks = async () => {
+          for (let i = 0; i < addRows.length; i++) {
+            if (!addRows[i].checkResult && addRows[i].title.trim()) await runAddCheck(i);
+          }
+        };
+        const createAddTasks = (rows) => {
+          const confirmed = rows.filter(r => r.title.trim() && (!r.checkResult || r.checkResult.status !== 'exists'));
+          if (!confirmed.length) return 0;
+          const maxRank = Math.max(0, ...rawTasks.current.map(t => t.rank || 0));
+          const newTasks = confirmed.map((r, i) => ({
+            id: 't' + Date.now().toString(36) + i,
+            rank: maxRank + 1 + i,
+            task: r.title.trim(),
+            strategicArea: '',
+            sourceColumn: 'FEATURE',
+            type: r.type || 3, // ponytail: 1=TASK 2=MILESTONE 3=FEATURE 4=EPIC 5=USER STORY 6=BUG
+            desc: r.desc || '',
+            effort: '',
+            impact: '',
+            testing: '',
+            priority: 'P2',
+            current: false,
+            schedule: null,
+          }));
+          applyRaw([...rawTasks.current, ...newTasks]);
+          return confirmed.length;
+        };
+        // ── End Add Task helpers ──
         // roadmap→OP id lookups for push
         const RM_PRIO_TO_OP_NAME = { P0: "urgent", P1: "high", P2: "normal", P3: "low" };
         const RM_STATUS_TO_OP_NAME = { next: "new", done: "closed", now: "in progress", backlog: "new", hold: "on hold", blocked: "rejected" };
@@ -9627,6 +9695,97 @@
             <b style={{ fontSize: 12, fontWeight: 700, color: "#e5e7eb" }}>{num}</b> {label}
           </span>
         );
+        // shared Add Task Modal — rendered in BOTH month-view and all-view returns (fixed-positioned)
+        const addTaskModalEl = addModal && (() => {
+          const modalTitle = addModal === 'single' ? 'Add Task' : addModal === 'multi' ? 'Add Multiple Tasks' : 'Import from Markdown';
+          const addRowUI = (row, idx, isMulti) => {
+            const sc = row.checkResult ? row.checkResult.status : null;
+            const badgeColor = sc === 'new' ? '#22c55e' : sc === 'duplicate' ? '#f59e0b' : sc === 'exists' ? '#ef4444' : null;
+            const badgeText = sc === 'new' ? 'NEW' : sc === 'duplicate' ? 'POSSIBLE DUPLICATE' : sc === 'exists' ? 'EXISTS' : '';
+            return (
+              <div key={idx} style={{background:'#0f172a',border:'1px solid #1e293b',borderRadius:8,padding:10,display:'flex',flexDirection:'column',gap:6}}>
+                {isMulti && <div style={{fontSize:9,color:'#64748b',fontWeight:700}}>#{idx+1}</div>}
+                <input value={row.title} onChange={(e) => setAddRowAt(idx, {title: e.target.value, checkResult: null})} placeholder="Task title…" style={{background:'#111827',color:'#e5e7eb',border:'1px solid #1e293b',borderRadius:5,padding:'5px 8px',fontSize:12,outline:'none',fontFamily:'inherit'}} />
+                <textarea value={row.desc} onChange={(e) => setAddRowAt(idx, {desc: e.target.value})} placeholder="Description (optional)…" rows={2} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:5,padding:'5px 8px',fontSize:11,outline:'none',resize:'vertical',fontFamily:'inherit'}} />
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                  <span style={{fontSize:10,color:'#64748b',width:30}}>Type</span>
+                  <select value={row.type||3} onChange={(e) => setAddRowAt(idx, {type: Number(e.target.value)})} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,flex:1}}>
+                    <option value={5}>User Story</option>
+                    <option value={2}>Milestone</option>
+                    <option value={4}>Epic</option>
+                    <option value={3}>Feature</option>
+                    <option value={1}>Task</option>
+                    <option value={6}>Bug</option>
+                  </select>
+                </div>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                  <span style={{fontSize:10,color:'#64748b',width:30}}>Dev</span>
+                  <select value={row.dev||''} onChange={(e) => setAddRowAt(idx, {dev: e.target.value})} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,flex:1}}>
+                    <option value="">--</option>
+                    {ROLE_PEOPLE.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <span style={{fontSize:10,color:'#64748b',width:26}}>QA</span>
+                  <select value={row.qa||''} onChange={(e) => setAddRowAt(idx, {qa: e.target.value})} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,flex:1}}>
+                    <option value="">--</option>
+                    {ROLE_PEOPLE.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <button type="button" onClick={() => runAddCheck(idx)} disabled={row.checking || !row.title.trim()} style={{background:'transparent',color:'#3b82f6',border:'1px solid #3b82f6',borderRadius:4,padding:'3px 10px',fontSize:10,fontWeight:700,cursor:'pointer',opacity:(row.checking||!row.title.trim())?0.5:1}}>{row.checking ? '…' : 'Check'}</button>
+                </div>
+                {sc && <span style={{fontSize:10,fontWeight:700,color:badgeColor}}>{badgeText}{row.checkResult.matches && row.checkResult.matches.length ? ': ' + row.checkResult.matches.join(', ') : ''}</span>}
+              </div>
+            );
+          };
+          return (
+            <div style={{position:'fixed',inset:0,zIndex:9000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={(e) => { if (e.target === e.currentTarget) setAddModal(null); }}>
+              <div style={{background:'#121820',border:'1.5px solid #3B82F6',borderRadius:10,padding:'16px 18px',width:520,maxHeight:'80vh',display:'flex',flexDirection:'column',gap:10,boxShadow:'0 10px 40px rgba(0,0,0,.6)',overflow:'auto'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <span style={{color:'#E6EAF1',fontSize:15,fontWeight:700}}>{modalTitle}</span>
+                  <span onClick={() => setAddModal(null)} style={{cursor:'pointer',fontSize:18,color:'#64748b'}}>✕</span>
+                </div>
+                <div style={{display:'flex',gap:4}}>
+                  {[['single','Single'],['multi','Multi'],['import','Import']].map(([k,l]) => (
+                    <div key={k} onClick={() => { setAddModal(k); if (k !== 'import') setAddRows(prev => k === 'multi' ? (prev.length ? prev : [{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]) : [{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); }} style={{cursor:'pointer',padding:'4px 14px',borderRadius:6,fontSize:11,fontWeight:700,color:addModal===k?'#3b82f6':'#64748b',background:addModal===k?'#111827':'transparent'}}>{l}</div>
+                  ))}
+                </div>
+                {addModal === 'single' && (
+                  <>
+                    {addRowUI(addRows[0], 0, false)}
+                    <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+                      <button type="button" onClick={() => { const n = createAddTasks(addRows); if (n > 0) { setAddModal(null); setAddRows([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); } }} disabled={!addRows[0]?.title?.trim() || (addRows[0].checkResult && addRows[0].checkResult.status === 'exists')} style={{background:'#3b82f6',color:'#fff',border:'none',borderRadius:6,padding:'6px 16px',fontSize:11,fontWeight:700,cursor:'pointer',opacity:(!addRows[0]?.title?.trim()||(addRows[0].checkResult&&addRows[0].checkResult.status==='exists'))?0.5:1}}>Create</button>
+                    </div>
+                  </>
+                )}
+                {addModal === 'multi' && (
+                  <>
+                    {addRows.map((row, i) => addRowUI(row, i, true))}
+                    <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                      <button type="button" onClick={() => setAddRows(prev => [...prev, {title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}])} style={{background:'transparent',color:'#3b82f6',border:'1px solid #3b82f6',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer'}}>+ Add Row</button>
+                      <button type="button" onClick={runAllChecks} style={{background:'transparent',color:'#f59e0b',border:'1px solid #f59e0b',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer'}}>Bulk Check</button>
+                      <span style={{marginLeft:'auto',fontSize:10,color:'#64748b'}}>{addRows.filter(r=>r.checkResult && r.checkResult.status==='new').length} new / {addRows.filter(r=>r.title.trim()).length} total</span>
+                      <button type="button" onClick={() => { const n = createAddTasks(addRows); if (n > 0) { setAddModal(null); setAddRows([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); } }} disabled={!addRows.some(r=>r.title.trim())} style={{background:'#3b82f6',color:'#fff',border:'none',borderRadius:6,padding:'6px 16px',fontSize:11,fontWeight:700,cursor:'pointer',opacity:!addRows.some(r=>r.title.trim())?0.5:1}}>Create All</button>
+                    </div>
+                  </>
+                )}
+                {addModal === 'import' && (
+                  <>
+                    <textarea placeholder="Paste markdown (## = milestone, ### BD: = breakdown)" rows={6} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:5,padding:'8px',fontSize:11,outline:'none',resize:'vertical',fontFamily:'monospace'}} onChange={(e) => { const parsed = parseImportMd(e.target.value); if (parsed.length) setAddRows(parsed.map(p => ({title:p.title, desc:p.description, dev:'', qa:'', type:p.type||2, checkResult:null, checking:false}))); }} />
+                    <div style={{fontSize:10,color:'#64748b'}}>…or <span onClick={() => addFileRef.current && addFileRef.current.click()} style={{color:'#3b82f6',cursor:'pointer',textDecoration:'underline'}}>pick a .md file</span><input ref={addFileRef} type="file" accept=".md,.txt" style={{display:'none'}} onChange={(e) => { const f = e.target.files[0]; if (!f) return; const reader = new FileReader(); reader.onload = () => { const parsed = parseImportMd(reader.result); if (parsed.length) setAddRows(parsed.map(p => ({title:p.title, desc:p.description, dev:'', qa:'', type:p.type||2, checkResult:null, checking:false}))); }; reader.readAsText(f); }} /></div>
+                    {addRows.length > 0 && addRows[0].title && (
+                      <>
+                        <div style={{fontSize:11,fontWeight:700,color:'#94a3b8'}}>Parsed {addRows.length} item(s):</div>
+                        {addRows.map((row, i) => addRowUI(row, i, true))}
+                        <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+                          <button type="button" onClick={runAllChecks} style={{background:'transparent',color:'#f59e0b',border:'1px solid #f59e0b',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer'}}>Bulk Check</button>
+                          <button type="button" onClick={() => { const n = createAddTasks(addRows); if (n > 0) { setAddModal(null); setAddRows([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); } }} style={{background:'#3b82f6',color:'#fff',border:'none',borderRadius:6,padding:'6px 16px',fontSize:11,fontWeight:700,cursor:'pointer'}}>Create All</button>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })();
         // ── Month View: click a Q → table scoped to one month, timeline split W1-W4 (pen 'Month View') ──
         if (monthView) {
           const q = QUARTERS.find((x) => x.label === monthView.qLabel) || QUARTERS[0];
@@ -9671,6 +9830,8 @@
                       style={{ cursor: "pointer", padding: "4px 14px", borderRadius: 6, fontSize: 12, fontWeight: 700, color: mi === monthView.mi ? "#3b82f6" : "#475569", background: mi === monthView.mi ? "#111827" : "transparent" }}>{mn}</div>
                   ))}
                 </div>
+                <div style={{ width: 1, height: 18, background: "#1e293b" }} />
+                <button type="button" onClick={() => { setAddModal('single'); setAddRows([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); }} style={{background:'#3b82f6',color:'#fff',border:'none',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:4}}><span style={{fontSize:14}}>+</span> Add Task</button>
                 <div style={{ width: 1, height: 18, background: "#1e293b" }} />
                 {(() => {
                   // KPI represents only tasks visible in this active month (span covers monthAbs), matching the rows below.
@@ -9864,6 +10025,7 @@
               {qPopupEl}
               {tipEl}
               {roleTaskEl}
+              {addTaskModalEl}
             </div>
           );
         }
@@ -9916,6 +10078,7 @@
                 placeholder="Search tasks…"
                 style={{ marginLeft: "auto", width: 200, background: "#0f172a", border: "1px solid #1e293b", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "#e5e7eb", outline: "none", fontFamily: "inherit" }}
               />
+              <button type="button" onClick={() => { setAddModal('single'); setAddRows([{title:'',desc:'',dev:'',qa:'',type:3,checkResult:null,checking:false}]); }} style={{background:'#3b82f6',color:'#fff',border:'none',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:4}}><span style={{fontSize:14}}>+</span> Add Task</button>
             </div>
             <div id="cap-all-panel"></div>
             {/* table header: # Task Area Prio Status Effort Impact Test Assignee + 4 quarter groups */}
@@ -10034,6 +10197,7 @@
                 </div>
               </div>
             )}
+            {addTaskModalEl}
           </div>
         );
       }
