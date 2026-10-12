@@ -8796,12 +8796,11 @@
             responsibleId: o.responsibleId != null ? o.responsibleId : null,
           };
         };
-        // OP rows follow the same roadmap order rule as tasksToSections: prio(P0<P1<P2<P3) → impact(H<M<L) → effort(L<M<H) → testing(L<M<H). ties keep stable order.
+        // ponytail: OP rows sort by prio only — no grouping by status, no metric tiebreak
         const opSortRows = (rows) => {
-          const PR = { P0: 0, P1: 1, P2: 2, P3: 3 }, HI = { H: 0, M: 1, L: 2 }, LO = { L: 0, M: 1, H: 2 };
-          const g = (m, v) => (v in m ? m[v] : 1); // unset → M (matches lvl() coercion)
-          const key = (wp) => { const v = opRowView(wp); return [PR[v.prio] != null ? PR[v.prio] : 3, g(HI, v.impact), g(LO, v.effort), g(LO, v.testing)]; };
-          return [...rows].sort((a, b) => { const ka = key(a), kb = key(b); return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2] || ka[3] - kb[3]; });
+          const PR = { P0: 0, P1: 1, P2: 2, P3: 3 };
+          const key = (wp) => { const v = opRowView(wp); return PR[v.prio] != null ? PR[v.prio] : 3; };
+          return [...rows].sort((a, b) => key(a) - key(b));
         };
         // roadmap→OP id lookups for push
         const RM_PRIO_TO_OP_NAME = { P0: "urgent", P1: "high", P2: "normal", P3: "low" };
@@ -9639,6 +9638,10 @@
           // a task shows in this month if its span covers monthAbs; week bar = full width when active (no per-week model yet)
           const WK = ["W1", "W2", "W3", "W4"];
           let rc = 0;
+          // ponytail: dedup — hide OP rows whose opId is linked to a roadmap-origin task
+          const isOpTask = (t) => t._source === "op" || (typeof t.id === "string" && t.id.startsWith("op-")) || t.sourceColumn === "OP";
+          const linkedOpIds = new Set((rawTasks.current || []).filter(t => t.opId && !isOpTask(t)).map(t => String(t.opId)).filter(Boolean));
+          const filteredOpRows = opSortRows(mvOp.rows).filter(wp => !linkedOpIds.has(String(wp.id)));
           return (
             <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#0B0F15", padding: "0 0 8px" }}>
               {/* single header row: All toggle · Qn-version · month tabs · KPI pills */}
@@ -9786,7 +9789,9 @@
                       <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Loading OP tasks…</div>
                     ) : mvOp.rows.length === 0 ? (
                       <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Tidak ada task OP di version ini.</div>
-                    ) : opSortRows(mvOp.rows).map((wp, wi) => {
+                    ) : filteredOpRows.length === 0 ? (
+                      <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Semua task OP sudah ada di roadmap.</div>
+                    ) : filteredOpRows.map((wp, wi) => {
                       const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
                       const v = opRowView(wp);
                       const opWk = opWeeksForMonth(wp, monthAbs); // [w1,w4] when this WP is worked in this month, or null
