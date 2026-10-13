@@ -880,8 +880,23 @@ function RoadmapPage() {
     const seg = segs[Math.min(week, segs.length) - 1] || segs[segs.length - 1];
     return atEnd ? seg.eISO : seg.sISO;
   };
-  // {wpId: monthAbs} pending first-click for the quarter bar; {wpId: week} for the month bar. null = fresh.
-  const [barPending, setBarPending] = React.useState({}); // { [wpId]: {kind:'q'|'w', a:idx} }
+  // ── Timeline bar DRAG state. mousedown on a cell = anchor; mouseenter while dragging = hover (live preview);
+  // global mouseup = commit [anchor..hover] to start/due. A plain click (down+up same cell) sets a 1-cell range. ──
+  const [barDrag, setBarDrag] = React.useState(null); // { wpId, kind:'q'|'w', monthAbs, anchor, hover }
+  const barDragRef = React.useRef(null);
+  React.useEffect(() => { barDragRef.current = barDrag; }, [barDrag]);
+  React.useEffect(() => {
+    const onUp = () => {
+      const d = barDragRef.current;
+      if (!d) return;
+      if (d.kind === "q") setQuarterRange(d.wpId, d.anchor, d.hover);
+      else setWeekRange(d.wpId, d.monthAbs, d.anchor, d.hover);
+      suppressClick.current = true; // block the row onClick (expand/collapse) that fires right after the bar mouseup
+      setBarDrag(null);
+    };
+    window.addEventListener("mouseup", onUp);
+    return () => window.removeEventListener("mouseup", onUp);
+  }, []);
   // commit a start/due range (indices a<=b) for a wp from the quarter bar.
   const setQuarterRange = (wpId, a, b) => {
     const lo = Math.min(a, b), hi = Math.max(a, b);
@@ -893,32 +908,30 @@ function RoadmapPage() {
     setOpEdit(wpId, "startDate", weekToISO(monthAbsIdx, lo, false));
     setOpEdit(wpId, "dueDate", weekToISO(monthAbsIdx, hi, true));
   };
-  // editable quarter bar (All View). span = current [lo,hi] month indices from opRowView dates. click cells to set range.
+  // editable quarter bar (All View). span = current [lo,hi] month indices from opRowView dates. DRAG across cells to set range.
   const barQuarterEdit = (wp, qIdx) => {
     const v = opRowView(wp);
     const span = opSpanFromDates({ startDate: v.startDate, dueDate: v.dueDate });
-    const pend = barPending[wp.id];
+    const drag = barDrag && barDrag.wpId === wp.id && barDrag.kind === "q" ? barDrag : null;
+    const dragLo = drag ? Math.min(drag.anchor, drag.hover) : null, dragHi = drag ? Math.max(drag.anchor, drag.hover) : null;
     return (
       <div key={qIdx} style={{ width: 152, flexShrink: 0, display: "flex", gap: 2, justifyContent: "center", alignItems: "center" }}>
         {[0, 1, 2].map((mi) => {
           const m = qIdx * 3 + mi;
-          const on = span && m >= span[0] && m <= span[1];
-          const isPend = pend && pend.kind === "q" && pend.a === m;
+          const inDrag = drag && m >= dragLo && m <= dragHi;
+          const on = !drag && span && m >= span[0] && m <= span[1];
           // concrete calendar range this month-cell covers (full month: day 1 → last day).
           const sISO = monthAbsToISO(m, false), eISO = monthAbsToISO(m, true);
           const realMo = (9 + m) % 12, realYr = Q0_YEAR + Math.floor((9 + m) / 12);
           const moName = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"][realMo] + " " + realYr;
-          const tip = (pend && pend.kind === "q")
-            ? "Mulai · klik di sini → selesai " + moName + " (" + sISO.slice(8) + "–" + eISO.slice(8) + ")"
-            : moName + " (" + sISO.slice(8) + "–" + eISO.slice(8) + ") · klik untuk set mulai";
+          const tip = moName + " (" + sISO.slice(8) + "–" + eISO.slice(8) + ") · drag untuk set rentang";
           return (
             <div key={mi} title={tip}
-              onClick={(e) => { e.stopPropagation();
-                if (!pend || pend.kind !== "q") { setBarPending((p) => ({ ...p, [wp.id]: { kind: "q", a: m } })); }
-                else { setQuarterRange(wp.id, pend.a, m); setBarPending((p) => { const n = { ...p }; delete n[wp.id]; return n; }); }
-              }}
-              style={{ width: 45, flexShrink: 0, height: 22, padding: "6px 0", display: "flex", cursor: "pointer" }}>
-              <div style={{ flex: "1 1 0", height: 10, background: isPend ? "#3b82f6" : on ? "#f59e0b80" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
+              onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); setBarDrag({ wpId: wp.id, kind: "q", anchor: m, hover: m }); }}
+              onMouseEnter={() => { if (barDragRef.current && barDragRef.current.wpId === wp.id && barDragRef.current.kind === "q") setBarDrag((d) => ({ ...d, hover: m })); }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: 45, flexShrink: 0, height: 22, padding: "6px 0", display: "flex", cursor: "ew-resize" }}>
+              <div style={{ flex: "1 1 0", height: 10, background: inDrag ? "#3b82f6" : on ? "#f59e0b80" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
             </div>
           );
         })}
@@ -1449,29 +1462,27 @@ function RoadmapPage() {
                     <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
                     <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
                     <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
-                    {/* OP timeline bar = real calendar weeks (Sun–Sat) of this month. Click a week to set start, click again to set due. Saved to opEdits, pushed on "Push ke OP". */}
+                    {/* OP timeline bar = real calendar weeks (Sun–Sat) of this month. DRAG across weeks to set start→due. Saved to opEdits, pushed on "Push ke OP". */}
                     {(() => {
                       const segs = monthWeeks(monthAbs); // real calendar weeks (4–6 cells)
                       const liveWk = opWeeksForMonth({ startDate: v.startDate, dueDate: v.dueDate }, monthAbs) || opWk;
-                      const pend = barPending[wp.id];
+                      const drag = barDrag && barDrag.wpId === wp.id && barDrag.kind === "w" ? barDrag : null;
+                      const dragLo = drag ? Math.min(drag.anchor, drag.hover) : null, dragHi = drag ? Math.max(drag.anchor, drag.hover) : null;
                       const mLbl = q.months[monthView.mi];
                       const totalW = 608; // keep the week-strip overall width stable (was 4×152)
                       return segs.map((seg, i) => {
                         const w = i + 1;
-                        const on = liveWk && w >= liveWk[0] && w <= liveWk[1];
-                        const isPend = pend && pend.kind === "w" && pend.a === w;
-                        const tip = (pend && pend.kind === "w")
-                          ? "Mulai tgl " + segs[pend.a - 1].s + " · klik di sini → selesai (" + seg.s + "–" + seg.e + " " + mLbl + ")"
-                          : seg.s + "–" + seg.e + " " + mLbl + " · klik untuk set mulai";
+                        const inDrag = drag && w >= dragLo && w <= dragHi;
+                        const on = !drag && liveWk && w >= liveWk[0] && w <= liveWk[1];
+                        const tip = seg.s + "–" + seg.e + " " + mLbl + " · drag untuk set rentang";
                         return (
                           <div key={w} title={tip}
-                            onClick={(e) => { e.stopPropagation();
-                              if (!pend || pend.kind !== "w") { setBarPending((p) => ({ ...p, [wp.id]: { kind: "w", a: w } })); }
-                              else { setWeekRange(wp.id, monthAbs, pend.a, w); setBarPending((p) => { const n = { ...p }; delete n[wp.id]; return n; }); }
-                            }}
-                            style={{ width: totalW / segs.length, flexShrink: 0, height: 26, padding: "2px 3px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "pointer" }}>
-                            <div style={{ width: "100%", height: 10, background: isPend ? "#3b82f6" : on ? "#f59e0b55" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
-                            <span style={{ fontSize: 8, lineHeight: 1, color: (isPend || on) ? "#f59e0b" : "#475569", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</span>
+                            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); setBarDrag({ wpId: wp.id, kind: "w", monthAbs, anchor: w, hover: w }); }}
+                            onMouseEnter={() => { if (barDragRef.current && barDragRef.current.wpId === wp.id && barDragRef.current.kind === "w") setBarDrag((d) => ({ ...d, hover: w })); }}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ width: totalW / segs.length, flexShrink: 0, height: 26, padding: "2px 3px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "ew-resize" }}>
+                            <div style={{ width: "100%", height: 10, background: inDrag ? "#3b82f6" : on ? "#f59e0b55" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
+                            <span style={{ fontSize: 8, lineHeight: 1, color: (inDrag || on) ? "#f59e0b" : "#475569", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</span>
                           </div>
                         );
                       });

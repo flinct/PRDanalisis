@@ -1863,7 +1863,7 @@
           if (!resp.ok) throw new Error(await resp.text());
           _rmSeedLastJSON = body;
           _rmSavedFlashUntil = Date.now() + 3000; // show "✓ saved" for 3s
-          console.log("[RM] seed saved OK, keys:", Object.keys(snapshot).join(","));
+          console.log("[RM] seed saved OK, keys:", Object.keys(JSON.parse(body)).join(","));
         } catch (e) { console.warn("[RM] seed save failed:", e.message || e); }
         _rmSaveCountdown = 0; clearInterval(_rmSaveCountdownTimer);
       }
@@ -1886,21 +1886,20 @@
         clearTimeout(_rmSeedTimer); _rmSeedTimer = null;
         _doSave(); // fire-and-forget
       });
-      // ─── FLOATING SAVE BANNER ─────────────────────────────────────────────────
-      // Always-visible banner at top-right — independent of which component is mounted.
+      // ─── SAVE INDICATOR (inline, next to the "+ Q" button) ────────────────
+      // Updates the #rm-save-inline span (rendered inside the Roadmap sub-nav). Shows the
+      // auto-save countdown, then a brief "✓ saved", then fades out. No floating banner.
       (function initSaveBanner() {
-        const el = document.createElement("div");
-        el.id = "rm-save-banner";
-        el.style.cssText = "position:fixed;top:5vh;right:10vw;z-index:99999;padding:6px 18px;border-radius:8px;font-size:13px;font-weight:700;font-family:system-ui,sans-serif;pointer-events:none;transition:opacity .3s;opacity:0;display:flex;align-items:center;gap:6px;";
-        document.body.appendChild(el);
         setInterval(() => {
+          const el = document.getElementById("rm-save-inline");
+          if (!el) return; // only present while Roadmap sub-nav is mounted
           const cd = _rmSaveCountdown;
           const flash = _rmSavedFlashUntil > Date.now();
           if (cd > 0) {
-            el.textContent = "⏳ auto-save in " + cd + "s";
+            el.textContent = "⏳ auto-save " + cd + "s";
             el.style.background = "#f59e0b22"; el.style.color = "#f59e0b"; el.style.border = "1px solid #f59e0b55"; el.style.opacity = "1";
           } else if (flash) {
-            el.textContent = "✓ saved to server";
+            el.textContent = "✓ saved";
             el.style.background = "#22c55e22"; el.style.color = "#22c55e"; el.style.border = "1px solid #22c55e55"; el.style.opacity = "1";
           } else {
             el.style.opacity = "0";
@@ -8851,11 +8850,14 @@
                     </div>
                   ))}
                   {dashV2Sub === "roadmap" && (
-                    <button type="button" title="Tambah kuartal berikutnya (auto Q4→Q1, bulan ikut)"
-                      onClick={() => window.roadmapAddQ && window.roadmapAddQ.fn && window.roadmapAddQ.fn()}
-                      style={{ marginLeft: "auto", marginRight: 10, cursor: "pointer", border: "1px solid #22c55e", background: "#111827", color: "#22c55e", borderRadius: 8, padding: "4px 14px", fontSize: 13, fontWeight: 700, fontFamily: "inherit" }}>
-                      + Q
-                    </button>
+                    <div style={{ marginLeft: "auto", marginRight: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span id="rm-save-inline" style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 6, whiteSpace: "nowrap", opacity: 0, transition: "opacity .3s" }} />
+                      <button type="button" title="Tambah kuartal berikutnya (auto Q4→Q1, bulan ikut)"
+                        onClick={() => window.roadmapAddQ && window.roadmapAddQ.fn && window.roadmapAddQ.fn()}
+                        style={{ cursor: "pointer", border: "1px solid #22c55e", background: "#111827", color: "#22c55e", borderRadius: 8, padding: "4px 14px", fontSize: 13, fontWeight: 700, fontFamily: "inherit" }}>
+                        + Q
+                      </button>
+                    </div>
                   )}
                 </div>
               ) : null}
