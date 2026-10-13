@@ -409,9 +409,16 @@ function RoadmapPage() {
   const opStatusBucket = (name) => OP_STATUS_BUCKET[String(name || "").trim().toLowerCase()] || "backlog";
   // group a list of WP into ordered buckets [key,label,color,rows]. order = NOW, NEXT, BACKLOG, DONE.
   const OP_BUCKET_META = [["now", "NOW", "#f59e0b"], ["next", "NEXT", "#3b82f6"], ["backlog", "BACKLOG", "#475569"], ["done", "DONE", "#22c55e"]];
+  // resolve a WP's section bucket: locally-edited status overlay (opEdits) wins over OP statusName.
+  // overlay values: now/next/backlog/done/hold/blocked — hold & blocked collapse into backlog.
+  const opBucketOf = (wp) => {
+    const ov = opEdits[wp.id] || {};
+    if (ov.status != null) return (ov.status === "hold" || ov.status === "blocked") ? "backlog" : (["now","next","backlog","done"].includes(ov.status) ? ov.status : opStatusBucket(wp.statusName));
+    return opStatusBucket(wp.statusName);
+  };
   const groupOpByStatus = (rows) => {
     const b = { now: [], next: [], backlog: [], done: [] };
-    (rows || []).forEach((wp) => { b[opStatusBucket(wp.statusName)].push(wp); });
+    (rows || []).forEach((wp) => { (b[opBucketOf(wp)] || b.backlog).push(wp); });
     return OP_BUCKET_META.map(([k, label, color]) => [k, label, color, b[k]]).filter(([, , , r]) => r.length > 0);
   };
   // OP timeline = WHEN worked (which week), from the work package's start/due dates intersected with the viewed month.
@@ -1380,10 +1387,10 @@ function RoadmapPage() {
             // Month View KPI — OP-source. Counts OP rows for this linked version, by status bucket.
             const k = {
               total: monthOpRows.length,
-              now: monthOpRows.filter((wp) => opStatusBucket(wp.statusName) === "now").length,
-              next: monthOpRows.filter((wp) => opStatusBucket(wp.statusName) === "next").length,
-              backlog: monthOpRows.filter((wp) => opStatusBucket(wp.statusName) === "backlog").length,
-              done: monthOpRows.filter((wp) => opStatusBucket(wp.statusName) === "done").length,
+              now: monthOpRows.filter((wp) => opBucketOf(wp) === "now").length,
+              next: monthOpRows.filter((wp) => opBucketOf(wp) === "next").length,
+              backlog: monthOpRows.filter((wp) => opBucketOf(wp) === "backlog").length,
+              done: monthOpRows.filter((wp) => opBucketOf(wp) === "done").length,
             };
             window._capRows.month = monthOpRows.map(wp => { const o = opRowView(wp); return [null, o.subject||wp.subject, null, null, null, o.effort||"", o.impact||"", o.testing||"", null, [0,0], null, null, "op-"+wp.id]; }); window._capRows.monthLabel = q.months[monthView.mi]; window._capDirty = true;
             return (<div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
@@ -1511,10 +1518,10 @@ function RoadmapPage() {
   const allGroups = groupOpByStatus(opSortRows(allOpRows));
   const rmKpi = {
     total: allOpRows.length,
-    now: allOpRows.filter((wp) => opStatusBucket(wp.statusName) === "now").length,
-    next: allOpRows.filter((wp) => opStatusBucket(wp.statusName) === "next").length,
-    backlog: allOpRows.filter((wp) => opStatusBucket(wp.statusName) === "backlog").length,
-    done: allOpRows.filter((wp) => opStatusBucket(wp.statusName) === "done").length,
+    now: allOpRows.filter((wp) => opBucketOf(wp) === "now").length,
+    next: allOpRows.filter((wp) => opBucketOf(wp) === "next").length,
+    backlog: allOpRows.filter((wp) => opBucketOf(wp) === "backlog").length,
+    done: allOpRows.filter((wp) => opBucketOf(wp) === "done").length,
   };
   return (
     <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#0B0F15", padding: "8px 24px" }}>
