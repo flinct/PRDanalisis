@@ -417,9 +417,32 @@ function RoadmapPage() {
   // OP timeline = WHEN worked (which week), from the work package's start/due dates intersected with the viewed month.
   // roadmap fiscal year starts Oct (monthAbs 0 = Oct of the first quarter's year). returns [w1,w4] 1-based, or null if no date in this month.
   const Q0_YEAR = parseInt(String((QUARTERS[0] && QUARTERS[0].label) || "").match(/\d{4}/) || ["2026"], 10) || 2026;
+  // ── Real calendar weeks of a month (US: week starts Sunday). ──
+  // Returns segments [{s,e,sISO,eISO}] where s/e are day-of-month ints and *ISO are full dates,
+  // each segment = one calendar week clipped to this month. A month yields 4–6 segments (real, not fixed /7).
+  const monthWeeks = (monthAbsIdx) => {
+    const realMonth = (9 + monthAbsIdx) % 12, realYear = Q0_YEAR + Math.floor((9 + monthAbsIdx) / 12);
+    const last = new Date(realYear, realMonth + 1, 0).getDate();
+    const iso = (day) => realYear + "-" + String(realMonth + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+    const segs = [];
+    let d = 1;
+    while (d <= last) {
+      const dow = new Date(realYear, realMonth, d).getDay(); // 0=Sun..6=Sat
+      const end = Math.min(d + (6 - dow), last); // clip this calendar week (Sun→Sat) to month end
+      segs.push({ s: d, e: end, sISO: iso(d), eISO: iso(end) });
+      d = end + 1;
+    }
+    return segs;
+  };
+  // which real-week index (1-based) a given day-of-month falls into, per monthWeeks segmentation.
+  const weekIdxOfDay = (monthAbsIdx, day) => {
+    const segs = monthWeeks(monthAbsIdx);
+    for (let i = 0; i < segs.length; i++) if (day >= segs[i].s && day <= segs[i].e) return i + 1;
+    return null;
+  };
   const opWeeksForMonth = (wp, monthAbsIdx) => {
     const realMonth = (9 + monthAbsIdx) % 12, realYear = Q0_YEAR + Math.floor((9 + monthAbsIdx) / 12);
-    const wkOf = (iso) => { const d = new Date(iso); if (isNaN(d) || d.getMonth() !== realMonth || d.getFullYear() !== realYear) return null; return Math.min(4, Math.max(1, Math.ceil(d.getDate() / 7))); };
+    const wkOf = (iso) => { const d = new Date(iso); if (isNaN(d) || d.getMonth() !== realMonth || d.getFullYear() !== realYear) return null; return weekIdxOfDay(monthAbsIdx, d.getDate()); };
     const s = wp.startDate ? wkOf(wp.startDate) : null, e = wp.dueDate ? wkOf(wp.dueDate) : null;
     if (s == null && e == null) return null;
     return [s || e, e || s].sort((a, b) => a - b);
@@ -853,14 +876,9 @@ function RoadmapPage() {
   };
   // week (1..4) within an absolute month → ISO. start = (w-1)*7+1, end = min(w*7, lastDay).
   const weekToISO = (monthAbsIdx, week, atEnd) => {
-    const realMonth = (9 + monthAbsIdx) % 12, realYear = Q0_YEAR + Math.floor((9 + monthAbsIdx) / 12);
-    const last = new Date(realYear, realMonth + 1, 0).getDate();
-    // bar has exactly 4 week-cells → the 4th cell covers the rest of the month (day 22 → last day, e.g. 31),
-    // so W4 end must snap to the real last day, not a fixed 4*7=28. start of W4 is day 22.
-    const day = atEnd
-      ? (week >= 4 ? last : Math.min(week * 7, last))
-      : Math.min((week - 1) * 7 + 1, last);
-    return realYear + "-" + String(realMonth + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+    const segs = monthWeeks(monthAbsIdx);
+    const seg = segs[Math.min(week, segs.length) - 1] || segs[segs.length - 1];
+    return atEnd ? seg.eISO : seg.sISO;
   };
   // {wpId: monthAbs} pending first-click for the quarter bar; {wpId: week} for the month bar. null = fresh.
   const [barPending, setBarPending] = React.useState({}); // { [wpId]: {kind:'q'|'w', a:idx} }
@@ -1380,7 +1398,9 @@ function RoadmapPage() {
             <div style={txt(COLW.eim, "#e5e7eb", 10, true, { textAlign: "center" })}>Effort</div>
             <div style={txt(COLW.eim, "#e5e7eb", 10, true, { textAlign: "center" })}>Test</div>
             <div style={txt(COLW.assignee, "#e5e7eb", 10, true)}>Assignee</div>
-            {WK.map((w) => <div key={w} style={{ width: 152, flexShrink: 0, fontSize: 10, fontWeight: 700, color: "#e5e7eb", textAlign: "center" }}>{w}</div>)}
+            {(() => { const segs = monthWeeks(monthAbs); const totalW = 608; return segs.map((seg, i) => (
+              <div key={i} title={seg.s + "–" + seg.e + " " + q.months[monthView.mi]} style={{ width: totalW / segs.length, flexShrink: 0, fontSize: 9, fontWeight: 700, color: "#e5e7eb", textAlign: "center", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</div>
+            )); })()}
           </div>
           {/* local v2 tasks whose timeline bar covers this month — always shown */}
           {lkInScope && (
@@ -1429,28 +1449,29 @@ function RoadmapPage() {
                     <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
                     <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
                     <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
-                    {/* OP timeline bar = week worked in this month. Click a week to set start, click again to set due. Saved to opEdits, pushed on "Push ke OP". */}
+                    {/* OP timeline bar = real calendar weeks (Sun–Sat) of this month. Click a week to set start, click again to set due. Saved to opEdits, pushed on "Push ke OP". */}
                     {(() => {
-                      // live week range from edited dates (fallback to opWk from original wp).
+                      const segs = monthWeeks(monthAbs); // real calendar weeks (4–6 cells)
                       const liveWk = opWeeksForMonth({ startDate: v.startDate, dueDate: v.dueDate }, monthAbs) || opWk;
                       const pend = barPending[wp.id];
-                      return [1, 2, 3, 4].map((w) => {
+                      const mLbl = q.months[monthView.mi];
+                      const totalW = 608; // keep the week-strip overall width stable (was 4×152)
+                      return segs.map((seg, i) => {
+                        const w = i + 1;
                         const on = liveWk && w >= liveWk[0] && w <= liveWk[1];
                         const isPend = pend && pend.kind === "w" && pend.a === w;
-                        // real calendar days this week-cell covers (e.g. W2 = 8–14 Okt, W4 = 22–31 Okt).
-                        const dS = weekToISO(monthAbs, w, false).slice(8), dE = weekToISO(monthAbs, w, true).slice(8);
-                        const mLbl = q.months[monthView.mi];
                         const tip = (pend && pend.kind === "w")
-                          ? "Mulai W" + pend.a + " · klik di sini → selesai W" + w + " (" + dS + "–" + dE + " " + mLbl + ")"
-                          : "W" + w + ": " + dS + "–" + dE + " " + mLbl + " · klik untuk set mulai";
+                          ? "Mulai tgl " + segs[pend.a - 1].s + " · klik di sini → selesai (" + seg.s + "–" + seg.e + " " + mLbl + ")"
+                          : seg.s + "–" + seg.e + " " + mLbl + " · klik untuk set mulai";
                         return (
                           <div key={w} title={tip}
                             onClick={(e) => { e.stopPropagation();
                               if (!pend || pend.kind !== "w") { setBarPending((p) => ({ ...p, [wp.id]: { kind: "w", a: w } })); }
                               else { setWeekRange(wp.id, monthAbs, pend.a, w); setBarPending((p) => { const n = { ...p }; delete n[wp.id]; return n; }); }
                             }}
-                            style={{ width: 152, flexShrink: 0, height: 14, padding: "2px 4px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                            style={{ width: totalW / segs.length, flexShrink: 0, height: 26, padding: "2px 3px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "pointer" }}>
                             <div style={{ width: "100%", height: 10, background: isPend ? "#3b82f6" : on ? "#f59e0b55" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
+                            <span style={{ fontSize: 8, lineHeight: 1, color: (isPend || on) ? "#f59e0b" : "#475569", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</span>
                           </div>
                         );
                       });
