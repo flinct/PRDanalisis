@@ -6167,6 +6167,7 @@
 .rm-search{margin-left:auto;background:var(--elevated-bg);border:1px solid var(--border-2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text-2);width:180px}
 .rm-search:focus{outline:none;border-color:var(--accent-primary)}
 .rm-addbtn:hover{filter:brightness(1.1)}
+.no-spin::-webkit-inner-spin-button,.no-spin::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .rm-addnext{background:var(--elevated-bg);color:var(--text-2);border:1px solid var(--border-2)}
 .rm-head .rm-saved{margin-left:8px}
 .rm-editable{display:block;min-width:40px;min-height:16px;cursor:text;border-radius:4px;padding:1px 3px;white-space:pre-wrap;word-break:break-word}
@@ -6966,10 +6967,10 @@
           return prev.size === all.length ? new Set() : new Set(all);
         });
         const statusPatch = (v) => v === "NOW" ? { current: true, status: "active" }
-          : v === "NEXT" ? { current: false, status: "active" }
+          : v === "NEXT" ? { current: false, status: "active", schedule: { start: { month: months[0], week: 1 }, end: { month: months[0], week: 4 } } }
           : v === "BACKLOG" ? { current: false, status: "active", schedule: null }
-          : v === "HOLD" ? { status: "hold" }
-          : { status: "blocked" };
+          : v === "HOLD" ? { status: "hold", current: false, schedule: null }
+          : { status: "blocked", current: false, schedule: null };
         const bulkApply = (prio, stat) => {
           const ids = selIds;
           const list = tasks || [];
@@ -8029,10 +8030,10 @@
                                   options={["NOW", "NEXT", "BACKLOG", "HOLD", "BLOCKED"]}
                                   onChange={(v) => {
                                     if (v === "NOW") updateTask(t.id, { current: true, status: "active" });
-                                    else if (v === "NEXT") updateTask(t.id, { current: false, status: "active" });
+                                    else if (v === "NEXT") updateTask(t.id, { current: false, status: "active", schedule: { start: { month: months[0], week: 1 }, end: { month: months[0], week: 4 } } });
                                     else if (v === "BACKLOG") updateTask(t.id, { current: false, status: "active", schedule: null });
-                                    else if (v === "HOLD") updateTask(t.id, { status: "hold" });
-                                    else updateTask(t.id, { status: "blocked" });
+                                    else if (v === "HOLD") updateTask(t.id, { status: "hold", current: false, schedule: null });
+                                    else updateTask(t.id, { status: "blocked", current: false, schedule: null });
                                   }}
                                   label={`Status for ${t.task}`}
                                   renderValue={(v) => (
@@ -9043,8 +9044,9 @@
         const editCell = (id, col, val) => {
           if (col === 4) { // status: v2 vocab → task.status/current (backlog/hold/blocked stored as status; now→current+active; next→active)
             if (val === "now") patchTask(id, { status: "active", current: true });
-            else if (val === "next") patchTask(id, { status: "active", current: false });
-            else patchTask(id, { status: val, current: false });
+            else if (val === "next") patchTask(id, { status: "active", current: false, schedule: { start: { month: RM_IDX_MON[0], week: 1 }, end: { month: RM_IDX_MON[0], week: 4 } } });
+            else if (val === "backlog") patchTask(id, { status: "backlog", current: false, schedule: null });
+            else patchTask(id, { status: val, current: false, schedule: null });
             return;
           }
           const f = COL_FIELD[col];
@@ -9720,15 +9722,9 @@
                 </div>
                 <div style={{display:'flex',gap:8,alignItems:'center'}}>
                   <span style={{fontSize:10,color:'#64748b',width:30}}>Dev</span>
-                  <select value={row.dev||''} onChange={(e) => setAddRowAt(idx, {dev: e.target.value})} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,flex:1}}>
-                    <option value="">--</option>
-                    {ROLE_PEOPLE.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
+                  <input type="number" min="0" max="9" value={row.dev||''} onChange={(e) => setAddRowAt(idx, {dev: e.target.value})} placeholder="0" style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,width:50,outline:'none',MozAppearance:'textfield'}} className="no-spin" />
                   <span style={{fontSize:10,color:'#64748b',width:26}}>QA</span>
-                  <select value={row.qa||''} onChange={(e) => setAddRowAt(idx, {qa: e.target.value})} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,flex:1}}>
-                    <option value="">--</option>
-                    {ROLE_PEOPLE.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
+                  <input type="number" min="0" max="9" value={row.qa||''} onChange={(e) => setAddRowAt(idx, {qa: e.target.value})} placeholder="0" style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'3px 6px',fontSize:10,width:50,outline:'none',MozAppearance:'textfield'}} className="no-spin" />
                   <button type="button" onClick={() => runAddCheck(idx)} disabled={row.checking || !row.title.trim()} style={{background:'transparent',color:'#3b82f6',border:'1px solid #3b82f6',borderRadius:4,padding:'3px 10px',fontSize:10,fontWeight:700,cursor:'pointer',opacity:(row.checking||!row.title.trim())?0.5:1}}>{row.checking ? '…' : 'Check'}</button>
                 </div>
                 {sc && <span style={{fontSize:10,fontWeight:700,color:badgeColor}}>{badgeText}{row.checkResult.matches && row.checkResult.matches.length ? ': ' + row.checkResult.matches.join(', ') : ''}</span>}
@@ -9988,34 +9984,113 @@
                             );
                           })}
                         </div>
-                        {oOpen && (
-                          <div style={{ background: "#0d1420", padding: "14px 16px", borderLeft: "2px solid #f59e0b", marginBottom: 2, display: "flex", flexDirection: "column", gap: 10 }}>
-                            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-                              <div style={{ minWidth: 220, flex: 1 }}><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Title</div>
-                                <InlineEdit value={v.subject} onSave={(x) => setOpEdit(wp.id, "subject", x)} placeholder="Judul" style={{ fontSize: 13, color: "#f1f5f9", fontWeight: 600 }} /></div>
+                        {oOpen && (() => {
+                          // OP detail panel mirrors the roadmap DetailPanel 3-card layout, wired to opRowView/setOpEdit.
+                          const ic = {width:16,height:16,flexShrink:0};
+                          const OS = {
+                            root:{display:"flex",gap:12,padding:16,borderLeft:"2px solid #f59e0b",background:"#0A0E1F"},
+                            card:{background:"#111827",border:"1px solid #2A3555",borderRadius:10,padding:14,display:"flex",flexDirection:"column",gap:10},
+                            hdr:{display:"flex",alignItems:"center",gap:6,fontSize:13,fontWeight:700,color:"#fff"},
+                            label:{fontSize:11,color:"#8B93A7",fontWeight:600},
+                            input:{background:"#0C1022",border:"1px solid #2A3555",borderRadius:6,padding:"6px 10px",fontSize:12,color:"#fff",display:"flex",alignItems:"center",justifyContent:"space-between",gap:6},
+                            id:{marginLeft:"auto",background:"#1E293B",borderRadius:10,padding:"3px 8px",fontSize:10,fontWeight:600,color:"#8B93A7"},
+                            assignRow:{display:"flex",gap:8},
+                            div:{height:1,background:"#1E293B",width:"100%"},
+                            schedRow:{display:"flex",gap:12},
+                            sched:{flex:1,display:"flex",flexDirection:"column",gap:6},
+                            schedH:{display:"flex",alignItems:"center",gap:4,fontSize:12,fontWeight:700,color:"#fff"},
+                            arrow:{color:"#4B5563",fontSize:12},
+                            mRow:{display:"flex",alignItems:"center",gap:8,padding:"4px 0"},
+                            mInfo:{display:"flex",flexDirection:"column",gap:1},
+                            mName:{fontSize:12,fontWeight:600,color:"#fff"},
+                            mDesc:{fontSize:10,color:"#8B93A7"},
+                            btn:{display:"flex",alignItems:"center",justifyContent:"center",gap:6,width:"100%",padding:"8px 14px",borderRadius:8,background:"#f59e0b",color:"#1C1917",border:"none",fontSize:13,fontWeight:700,cursor:"pointer"},
+                            sec:{display:"flex",flexDirection:"column",gap:8},
+                            secH:{margin:0,fontSize:12,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",gap:6},
+                            textLabel:{fontSize:12,color:"#cbd5e1",padding:"6px 0"},
+                          };
+                          const obadge = (lv) => { const colors={H:"#E5484D",M:"#E5A83B",L:"#3FB950"}; const c=colors[lv]||"#6B7280"; return <div style={{width:24,height:24,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,background:c+"30",color:c,flexShrink:0}}>{lv||"?"}</div>; };
+                          const estW = (DEV_WEEKS[v.effort]||4) + (QA_WEEKS[v.testing]||2);
+                          return (
+                          <div style={OS.root}>
+                            {/* ── Task Information ── */}
+                            <div style={{...OS.card,flex:"0 0 28%"}}>
+                              <div style={OS.hdr}>
+                                <svg style={ic} viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
+                                Task Information<span style={OS.id}>OP #{wp.id}</span>
+                              </div>
+                              <div style={OS.label}>Title</div>
+                              <div style={OS.input}><InlineEdit value={v.subject} onSave={(x) => setOpEdit(wp.id, "subject", x)} placeholder="Judul task" style={{fontSize:12,color:"#fff",background:"none",border:"none",padding:0,width:"100%"}} /></div>
+                              <div style={OS.label}>Description</div>
+                              <div style={{...OS.input,alignItems:"stretch"}}><InlineEdit value={v.desc} onSave={(x) => setOpEdit(wp.id, "desc", x)} multiline placeholder="Tambah deskripsi…" style={{fontSize:11,color:"#fff",background:"none",border:"none",padding:0,width:"100%",lineHeight:1.4,display:"block"}} /></div>
+                              <div style={OS.label}>Type</div>
+                              <div style={OS.input}><span style={{fontSize:12,color:"#cbd5e1"}}>{wp.typeName || "—"}</span></div>
                             </div>
-                            <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Description</div>
-                              <InlineEdit value={v.desc} onSave={(x) => setOpEdit(wp.id, "desc", x)} multiline placeholder="Deskripsi…" style={{ fontSize: 12, color: "#cbd5e1", lineHeight: 1.5, display: "block" }} /></div>
-                            <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Dependency</div>
-                              <InlineEdit value={v.dependency} onSave={(x) => setOpEdit(wp.id, "dependency", x)} placeholder="nama/id, dipisah koma" style={{ fontSize: 12, color: "#cbd5e1", display: "block" }} /></div>
-                            {/* assignee (single) · QA assignee (multiple) · accountable (single). OP native only has assignee+responsible; QA lives in desc meta. */}
-                            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 12 }}>
-                              <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Assignee</div>
-                                <MemberSelect mode="single" value={v.assigneeId} people={opPeople} placeholder="PIC utama…" onChange={(id) => setOpEdit(wp.id, "assigneeId", id ? Number(id) : null)} /></div>
-                              <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>QA Assignee (multi)</div>
-                                <MemberSelect mode="multi" value={v.qa} people={opPeople} placeholder="Tim QA…" onChange={(ids) => setOpEdit(wp.id, "qa", ids)} /></div>
-                              <div><div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Accountable</div>
-                                <MemberSelect mode="single" value={v.responsibleId} people={opPeople} placeholder="Penanggung jawab…" onChange={(id) => setOpEdit(wp.id, "responsibleId", id ? Number(id) : null)} /></div>
+
+                            {/* ── People & Dependency ── */}
+                            <div style={{...OS.card,flex:1}}>
+                              <div style={OS.hdr}>
+                                <svg style={ic} viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                                People & Dependency
+                              </div>
+                              <div style={OS.assignRow}>
+                                <div style={{flex:1,minWidth:0}}><div style={{...OS.label,marginBottom:4}}>Assignee</div><MemberSelect mode="single" value={v.assigneeId} people={opPeople} placeholder="PIC utama…" onChange={(id) => setOpEdit(wp.id, "assigneeId", id ? Number(id) : null)} /></div>
+                                <div style={{flex:1,minWidth:0}}><div style={{...OS.label,marginBottom:4}}>QA Assignee</div><MemberSelect mode="multi" value={v.qa} people={opPeople} placeholder="Tim QA…" onChange={(ids) => setOpEdit(wp.id, "qa", ids)} /></div>
+                                <div style={{flex:1,minWidth:0}}><div style={{...OS.label,marginBottom:4}}>Accountable</div><MemberSelect mode="single" value={v.responsibleId} people={opPeople} placeholder="Penanggung jawab…" onChange={(id) => setOpEdit(wp.id, "responsibleId", id ? Number(id) : null)} /></div>
+                              </div>
+                              {opPeople.length === 0 && <div style={{ fontSize: 11, color: "#b45309" }}>⚠ Daftar assignee OP kosong (token OpenProject tak punya izin baca users).</div>}
+                              <div style={OS.label}>Dependency</div>
+                              <div style={{...OS.input,alignItems:"stretch"}}><InlineEdit value={v.dependency} onSave={(x) => setOpEdit(wp.id, "dependency", x)} placeholder="nama/id, dipisah koma" style={{fontSize:12,color:"#fff",background:"none",border:"none",padding:0,width:"100%",display:"block"}} /></div>
+                              <div style={OS.div}/>
+                              <div style={OS.schedRow}>
+                                <div style={OS.sched}>
+                                  <div style={OS.schedH}><svg style={{width:12,height:12}} viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Schedule</div>
+                                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                                    <span style={OS.textLabel}>{wp.startDate || "—"}</span>
+                                    <span style={OS.arrow}>→</span>
+                                    <span style={OS.textLabel}>{wp.dueDate || "—"}</span>
+                                  </div>
+                                  {opWk && <div style={{fontSize:11,color:"#94a3b8"}}>{"W"+opWk[0]+(opWk[1]!==opWk[0]?"–W"+opWk[1]:"")+" ("+q.months[monthView.mi]+")"}</div>}
+                                </div>
+                              </div>
                             </div>
-                            {opPeople.length === 0 && <div style={{ fontSize: 11, color: "#b45309" }}>⚠ Daftar assignee OP kosong (token OpenProject tak punya izin baca users). Assignee/QA/Accountable belum bisa dipilih.</div>}
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                              <button onClick={() => pushOpToOP(wp)} disabled={push === "saving"} style={{ cursor: "pointer", border: "1px solid #f59e0b", background: "#f59e0b22", color: "#f59e0b", borderRadius: 6, padding: "6px 16px", fontSize: 12, fontWeight: 700 }}>{push === "saving" ? "Mengirim…" : "Push ke OpenProject"}</button>
-                              {push === "ok" && <span style={{ fontSize: 11, color: "#22c55e" }}>✓ Terkirim ke OP</span>}
-                              {push && push !== "ok" && push !== "saving" && <span style={{ fontSize: 11, color: "#ef4444" }}>✗ {push}</span>}
-                              <a href={"https://project.ordo.co.id/work_packages/" + wp.id} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#64748b", marginLeft: "auto" }}>Buka di OP ↗</a>
+
+                            {/* ── Metrics ── */}
+                            <div style={{...OS.card,flex:"0 0 24%"}}>
+                              <div style={OS.hdr}>
+                                <svg style={ic} viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx=".5"/><rect x="12" y="7" width="3" height="10" rx=".5"/><rect x="17" y="13" width="3" height="4" rx=".5"/></svg>
+                                Metrics
+                              </div>
+                              {[["Impact","impact",v.impact],["Effort","effort",v.effort],["Testing","testing",v.testing]].map(([label,field,lv]) => (
+                                <div key={label} style={OS.mRow}>
+                                  {obadge(lv)}
+                                  <div style={{...OS.mInfo,flex:1}}><span style={OS.mName}>{label}</span><span style={OS.mDesc}>{(DESC[label]&&DESC[label][lv])||"Belum di-set"}</span></div>
+                                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={lv||"—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, field, x)} /></div>
+                                </div>
+                              ))}
+                              <div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:"#f59e0b0a",borderRadius:6,border:"1px solid #f59e0b20",marginTop:6}}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                <div>
+                                  <div style={{fontSize:13,fontWeight:700,color:"#e5e7eb"}}>Estimate: {(DEV_WEEKS[v.effort]||4)}+{(QA_WEEKS[v.testing]||2)} = {estW} weeks</div>
+                                  <div style={{fontSize:10,color:"#64748b"}}>Dev {(DEV_WEEKS[v.effort]||4)}w → QA {(QA_WEEKS[v.testing]||2)}w</div>
+                                </div>
+                              </div>
+                              <div style={OS.div}/>
+                              <div style={OS.sec}>
+                                <h5 style={OS.secH}>
+                                  <svg style={ic} viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+                                  Status & Actions
+                                </h5>
+                                <div style={{fontSize:11,color:"#94a3b8"}}><span style={{fontWeight:600}}>Status:</span> {v.status||"—"} · <span style={{fontWeight:600}}>Priority:</span> {v.prio||"-"}</div>
+                                <button type="button" onClick={() => pushOpToOP(wp)} disabled={push === "saving"} style={OS.btn}>{push === "saving" ? "Mengirim…" : "Push ke OpenProject"}</button>
+                                {push === "ok" && <span style={{ fontSize: 11, color: "#22c55e" }}>✓ Terkirim ke OP</span>}
+                                {push && push !== "ok" && push !== "saving" && <span style={{ fontSize: 11, color: "#ef4444" }}>✗ {push}</span>}
+                                <a href={"https://pm.infradigital.id/projects/satuinbox-indonesia/work_packages/" + wp.id} target="_blank" rel="noreferrer" style={{ fontSize: 10, color: "#f59e0b", textDecoration: "none" }}>↗ Buka di OP</a>
+                              </div>
                             </div>
                           </div>
-                        )}
+                          );
+                        })()}
                         </React.Fragment>
                       );
                     })}

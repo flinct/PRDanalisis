@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SatuInbox — Roadmap Milestone &amp; Breakdown</title>
+<style>
+:root{
+  --bg: var(--background, #0f1117);
+  --fg: var(--foreground, #e8eaf0);
+  --muted: var(--muted-foreground, #9aa3b2);
+  --accent: var(--accent, #6c8cff);
+  --border: var(--border, #262b36);
+  --card: var(--card, #171a22);
+  --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --info:#3b82f6; --vio:#8b5cf6;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:22px 26px 60px;background:var(--bg);color:var(--fg);
+  font:14px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+h1{font-size:21px;margin:0 0 4px}
+h2{font-size:15px;margin:0;letter-spacing:.3px}
+h3{font-size:14px;margin:2px 0 6px}
+.sub{color:var(--muted);margin:0 0 10px;font-size:12.5px}
+.hdr{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:16px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);
+  border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.chip b{color:var(--fg);font-weight:600}
+.hdr-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.stat .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.stat .val{font-size:21px;font-weight:650;margin-top:2px}
+.stat .sub2{font-size:11px;color:var(--muted);margin-top:2px}
+.stackbar{display:flex;height:7px;border-radius:5px;overflow:hidden;margin-top:7px;background:var(--border)}
+.stackbar i{display:block;height:100%}
+
+/* milestone totals table */
+.ms-tbl{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.ms-tbl thead{background:var(--card);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.ms-tbl th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.ms-tbl td{padding:7px 10px;border-top:1px solid var(--border);font-size:12px;background:var(--bg)}
+.ms-tbl tr.ms-row:hover{background:color-mix(in srgb,var(--accent) 6%, transparent)}
+.ms-tbl tr.ms-sub{background:var(--card)}
+.ms-tbl tr.ms-sub td{font-weight:700;font-size:12px;border-top:1px solid var(--border);background:var(--card)}
+
+/* methodology */
+details.method{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px;margin-bottom:18px;font-size:12.5px}
+details.method summary{cursor:pointer;font-weight:600;color:var(--accent)}
+details.method .body{color:var(--muted);margin-top:10px}
+details.method table{border-collapse:collapse;width:100%;margin-top:8px}
+details.method th,details.method td{border:1px solid var(--border);padding:5px 8px;text-align:left;font-size:11.5px}
+details.method th{color:var(--fg)}
+.chains{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chain{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:5px 9px;font-size:11px}
+.chain .node{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:2px 7px}
+.chain .arw{color:var(--accent);font-weight:700}
+
+/* section heads */
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 0 12px;flex-wrap:wrap}
+.btn{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:8px;
+  padding:6px 12px;font-size:12px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.filters input{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--fg);
+  padding:6px 10px;font-size:12px;width:230px}
+
+/* milestone grid */
+.ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:22px}
+.ms-card{position:relative;text-align:left;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:13px 14px;cursor:pointer;color:var(--fg);font:inherit;
+  display:flex;flex-direction:column;gap:7px;transition:border-color .15s, transform .15s}
+.ms-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.ms-card.sel{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 45%, transparent)}
+.ms-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tier{font-size:9.5px;letter-spacing:.8px;font-weight:700;border-radius:5px;padding:2px 7px}
+.tier.primary{background:color-mix(in srgb,var(--accent) 22%, transparent);color:var(--accent)}
+.tier.supporting{background:color-mix(in srgb,var(--muted) 20%, transparent);color:var(--muted)}
+.ms-desc{margin:0;font-size:11.8px;color:var(--muted);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ms-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11.5px}
+.ms-fields .lbl{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;display:block}
+.ms-prog{display:flex;align-items:center;gap:8px}
+.bar{flex:1;height:7px;background:var(--border);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--vio))}
+.ms-stats{font-size:10.8px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.ms-stats b{color:var(--fg);font-weight:600}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 8px;font-size:10.8px;
+  font-weight:600;white-space:nowrap;border:1px solid transparent}
+.pill.done{background:color-mix(in srgb,var(--ok) 18%, transparent);color:var(--ok)}
+.pill.prog{background:color-mix(in srgb,var(--info) 18%, transparent);color:var(--info)}
+.pill.blocked{background:color-mix(in srgb,var(--bad) 18%, transparent);color:var(--bad)}
+.pill.planned{background:color-mix(in srgb,var(--muted) 16%, transparent);color:var(--muted)}
+.pill.u{background:color-mix(in srgb,var(--bad) 20%, transparent);color:var(--bad)}
+.pill.h{background:color-mix(in srgb,var(--warn) 20%, transparent);color:var(--warn)}
+.pill.n{background:color-mix(in srgb,var(--info) 16%, transparent);color:var(--info)}
+.pill.l{background:color-mix(in srgb,var(--muted) 16%, transparent);color:var(--muted)}
+.mchip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;
+  border-radius:5px;padding:1px 6px;background:color-mix(in srgb,var(--muted) 14%, transparent);color:var(--muted)}
+.mchip b{font-size:10px}
+.mchip .h{color:var(--bad)} .mchip .m{color:var(--warn)} .mchip .l{color:var(--ok)}
+
+/* assignee */
+.who{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.av{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:8.5px;font-weight:700;color:#fff;flex:none}
+
+/* breakdown table */
+.group-head{display:flex;align-items:center;gap:10px;margin:16px 0 6px;padding:7px 12px;
+  background:color-mix(in srgb,var(--accent) 10%, transparent);border:1px solid var(--border);border-radius:9px}
+.group-head .gt{font-weight:650;font-size:12.5px}
+.group-head .gm{margin-left:auto;font-size:11px;color:var(--muted);display:flex;gap:10px}
+.tbl{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.thead,.row{display:grid;grid-template-columns:minmax(320px,2.6fr) 150px 130px 150px 90px 130px;gap:10px;
+  padding:9px 12px;align-items:center}
+.thead{background:var(--card);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
+  position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
+.thead span{cursor:pointer;user-select:none}
+.thead span:hover{color:var(--fg)}
+.thead .ar{color:var(--accent)}
+.row{border-top:1px solid var(--border);font-size:12px;background:var(--bg)}
+.row:hover{background:color-mix(in srgb,var(--accent) 6%, transparent)}
+.row .t{font-weight:600;line-height:1.35}
+.row .badges{margin-top:2px;display:flex;gap:5px;flex-wrap:wrap}
+.badge{font-size:9.5px;border-radius:4px;padding:1px 6px;border:1px solid var(--border);color:var(--muted)}
+.badge.rm{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%, transparent)}
+.badge.op{color:var(--vio);border-color:color-mix(in srgb,var(--vio) 40%, transparent)}
+.row .desc{display:none;margin-top:6px;font-size:11.3px;color:var(--muted);
+  border-left:2px solid var(--border);padding-left:9px;white-space:pre-wrap}
+.row.open .desc{display:block}
+.exp{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;
+  width:20px;height:20px;cursor:pointer;flex:none;font-size:10px;padding:0}
+.row.open .exp{transform:rotate(90deg);color:var(--accent)}
+.c-title{display:flex;gap:8px;align-items:flex-start}
+.prog-wrap{display:flex;align-items:center;gap:7px}
+.prog-wrap .pct{font-size:11px;color:var(--muted);width:32px;text-align:right}
+.empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:10px}
+.legend{margin-top:22px;font-size:11px;color:var(--muted);line-height:1.7}
+@media (max-width:1080px){
+  .thead{display:none}
+  .row{grid-template-columns:1fr 1fr;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>SatuInbox Roadmap — Milestone &amp; Breakdown</h1>
+    <p class="sub">Sumber: Roadmap QA Browser (snapshot <code>.roadmap-seed.json</code>, 95 task) + OpenProject SatuInbox versi <b>prod-2.8.3</b> (59 WP) — digabung, diturunkan jadi milestone, lalu di-breakdown. Klik milestone untuk melihat detail task-nya.</p>
+    <div class="hdr-chips" id="hdrChips"></div>
+  </div>
+  <div class="hdr-chips">
+    <span class="chip">Generated <b>12 Okt 2026</b></span>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div id="msTable"></div>
+
+<details class="method">
+  <summary>Metodologi penurunan milestone + assessment task bertipe "Milestone" di OP</summary>
+  <div class="body">
+    <p><b>1. Sumber data digabung dulu.</b> 95 task roadmap di-merge dengan 1.510 work package OpenProject via <code>opId</code> (66 task roadmap ter-link; sisanya task roadmap-only atau WP OP-only). Total baris unik: <b id="mRowCount">…</b>.</p>
+    <p><b>2. Kandidat milestone diturunkan dari 4 sinyal:</b> (a) seri fase eksplisit — SuperAdmin Phase 1–3, Advance Export Phase A–D, Open API 1A–10A; (b) task hub di dependency roadmap (t01, t04, t07, t13/t18, t16, t23, t28); (c) siklus rilis (v2.2.x → v2.8.x di OP); (d) klaster tema/domain dari sisa task (keyword + fallback per tipe: Bug → Stabilization, sisanya → Ops/BAU). Setiap task masuk tepat satu milestone; badge <i>asal rule</i> ada di tooltip tiap baris.</p>
+    <p><b>3. Task bertipe "Milestone" di OP dinilai ulang</b> — tipe OP tidak selalu dipakai konsisten, jadi kelayakan sebagai milestone dinilai dari isi, bukan label:</p>
+    <table id="verdictTable">
+      <thead><tr><th>OP WP</th><th>Judul</th><th>Status</th><th>Verdict</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p style="margin-top:10px"><b>4. Dependency antar task roadmap</b> (rantaian yang membentuk urutan milestone breakdown):</p>
+    <div class="chains" id="chains"></div>
+  </div>
+</details>
+
+<section>
+  <div class="sec-head">
+    <h2>Milestone <span style="color:var(--muted);font-weight:400;font-size:12px">— klik kartu untuk membuka breakdown-nya</span></h2>
+    <button class="btn on" id="showAll">Tampilkan semua breakdown</button>
+  </div>
+  <div class="ms-grid" id="msGrid"></div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>Breakdown task <span style="color:var(--muted);font-weight:400;font-size:12px" id="brkLabel"></span></h2>
+    <div class="filters">
+      <input id="q" type="search" placeholder="Cari judul / deskripsi…">
+      <button class="btn on" data-st="active">Aktif &amp; rencana</button>
+      <button class="btn" data-st="all">Semua status</button>
+      <button class="btn" data-st="done">Selesai</button>
+      <button class="btn" data-st="blocked">Terblokir</button>
+    </div>
+  </div>
+  <div id="breakdown"></div>
+</section>
+
+<div class="legend">
+  <b>Legend.</b> Metric = Impact / Effort / Testing (H/M/L dari roadmap) atau estimasi jam OP bila tidak ada metrik roadmap.
+  Status = nilai asli dari roadmap/OP (warna per grup: hijau selesai, biru berjalan, merah terblokir, abu rencana).
+  Progress = <code>progress</code> roadmap atau <code>percentageDone</code> OP. Prio = P0–P3 roadmap (dinormalkan ke Urgent/High/Normal/Low) atau prioritas OP.
+  Statistik di atas selalu dihitung dari task yang sedang terlihat (mengikuti milestone terpilih + filter status + pencarian).
+</div>
+
+<script>
+const DATA = {"milestones":[{"id":"superadmin","tier":"primary","title":"SuperAdmin Global Company Access","desc":"Kontrol pusat SuperAdmin lintas tenant: Phase 1 company list/search + onboarding approval, Phase 2 tenant impersonation read-only + audit trail, Phase 3 controlled write mode + quick admin actions."},{"id":"export","tier":"primary","title":"Advanced Offline Export Suite","desc":"Suite export offline 4 fase: Phase-A Row-Level Collections + Zero-Impact Sync Pipeline, Phase-B Column Registry, Phase-C Broadcast Export (recipient + campaign), Phase-D SAP Template Preset 4-sheet."},{"id":"api","tier":"primary","title":"Open API & Integration Platform","desc":"Program integrasi pihak ketiga 1A-10A: ticket grouping custom attribute, link chat-ticket via API, bulk ticket update, broadcast via API/deep link, channel expansion + attachment, broadcast status/history/retry, webhook two-way sync, team inbox API, dokumentasi integration identifiers."},{"id":"release","tier":"primary","title":"Release Engineering v2.8.x","desc":"Siklus rilis: technical analysis v2.8.1/2/3, alignment repo & branch, deployment v2.8.0-2.8.3, monitoring post-release, dan release tag sampai cleanup legacy."},{"id":"sales","tier":"primary","title":"Sales Module Revamp & Leads","desc":"PRD + P0 fixes sales module (security scope, transition guard, team transfer), revamp UI/workflow, create prospect from conversation, leads realtime sync, alignment requirement BD."},{"id":"conversation","tier":"primary","title":"Conversation & Inbox Experience","desc":"Redesign pengalaman conversation & inbox: audit UX -> implementasi, utility message, grouping contact lintas channel, internal notes, team inbox, global search, alignment mobile-web."},{"id":"ticket","tier":"primary","title":"Ticketing & Post-Sales Flow","desc":"Ticketing: KPI card + dynamic status, reminder system conversation & ticket, auto-closure rule, auto follow-up CSAT rendah, custom attribute & ticket type, post-survey flow."},{"id":"channels","tier":"primary","title":"Channel Expansion & WhatsApp Web","desc":"Ekspansi channel: Telegram (resume), Shopee, TikTok, WA official pricing & 24h time-window, WA Web pools/rotation/import modes, stabilitas baileys, temporary banned, history sync group."},{"id":"broadcast","tier":"primary","title":"Broadcast & Anti-Spam Engine","desc":"Broadcast: auto split untuk pesan natural anti-spam, broadcast email + redirect livechat, grouping WAG by tags, history & retry, time scope, aturan outbound."},{"id":"analytics","tier":"primary","title":"Analytics & Reporting","desc":"Analytics: MUV unique inbound clients per channel, statistics interactive improvement, dropdown field analytics, perbaikan responsiveness/Ketanggapan (FRT, SLA, attribution), laporan offline."},{"id":"ai","tier":"primary","title":"AI, Automation & Notification","desc":"AI & automation: chat bot auto response + eskalasi human, conversation AI summary, email summary report, auto-tagging, auto-reply template, auto-assign/follow-up/closure, improvement notifikasi."},{"id":"widget","tier":"primary","title":"Widget & Self-Serve Onboarding","desc":"Widget & onboarding: widget module/app + domain topic filter, widget chat V2, wizard setting onboarding, simplicity settings redesign, FAQ in-app, landing & loading UX."},{"id":"growth","tier":"primary","title":"Growth, GTM & Demo Readiness","desc":"Growth & go-to-market: GTM marketing SatuInbox, demo database kandidat, demo form landing page, research strategy, weekly demo readiness."},{"id":"sap","tier":"primary","title":"SAP & Lincah Enterprise Rollout","desc":"Rollout enterprise SAP/Lincah: flow autoclose AWB, re-broadcast AWB, diskusi & sosialisasi SAP, monitoring SAP & Lincah, verified user di Lincah."},{"id":"infra","tier":"supporting","title":"Infra, Performance & Security Hardening","desc":"Hardening: MongoDB M50 upgrade + read preference & index, RMQ issue, API gateway scaling & OOM fix, WebSocket auth fast-path, RBAC/roles refine, cluster staging, security proven upload file & anti-hijack."},{"id":"billing","tier":"supporting","title":"Billing, Subscription & Fraud","desc":"Monetisasi & proteksi: subscription/payment QRIS & e-wallet, voucher & top-up, invoice, fraud dashboard invoice via broadcast + integrasi Lincah, cost simulation WA official."},{"id":"stab","tier":"supporting","title":"Production Stabilization - Incidents & Bugfix","desc":"RCA incident berulang (AuthService JWT, MongoDB timeout analytics, WebhookService delivery, CompassWeb auth header, RabbitMQ handshake) + bugfix produksi yang tidak terikat milestone fitur."},{"id":"ops","tier":"supporting","title":"Ops, QA & BAU","desc":"Operasional: meeting/brainstorming/gathering, riset & audit, dokumentasi & tutorial, test case & automation, monitoring, daily/weekly task."}],"rows":[{"key":"rm-t01","rmId":"t01","opId":2332,"title":"SuperAdmin Global Company Access — Phase 2: Tenant Impersonation (Read-Only) + Audit","desc":"TECHNICAL REQUIREMENT DOCUMENT (TRD) — Phase 2 Feature : SuperAdmin Global Company Access — Phase 2: Tenant Impersonation (Read-Only) + Audit Source PRD : prd/prd-superadmin-global-access.md (v1.0) — §5 US-005/006, §6 FR-015..022, §7 EH-004/005, §17 rows 3–4, §19 rows 4–5, §20 P…","impact":"M","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":0,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Growth & Internal Ops","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"superadmin","msWhy":"explicit roadmap mapping"},{"key":"rm-t02","rmId":"t02","opId":2366,"title":"GTM Marketing untuk satuinbox","desc":"Sumber: PRD lengkap di repo PRDanalisis. Prototype: prototypes/GTM-dashboard.html PRODUCT REQUIREMENT DOCUMENT Feature : GTM Marketing Dashboard — Phase 1: UTM Attribution & Registration Funnel Product Manager : Dany Christian Engineering Lead : Naftal Yunior Design Lead : TBD -…","impact":"M","effort":"M","testing":"L","estimate":0,"status":"Specified","statusGroup":"Planned","prio":"Normal","prioRaw":"P2","assignee":"Naftal Yunior","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":["t01"],"area":"Growth & Internal Ops","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"growth","msWhy":"explicit roadmap mapping"},{"key":"rm-t03","rmId":"t03","opId":null,"title":"demo data base and dashboard (kandidat request demo)","desc":"Satu paket superadmin internal; data internal, testing rendah.","impact":"M","effort":"M","testing":"L","estimate":0,"status":"active","statusGroup":"In Progress","prio":"High","prioRaw":"P1","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Growth & Internal Ops","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"growth","msWhy":"explicit roadmap mapping"},{"key":"rm-t04","rmId":"t04","opId":666,"title":"wa official adujstmen research (perubahan pricing Meta)","desc":"LHL murni. Output = decision memo pricing per-message; prasyarat cost simulation.","impact":"H","effort":"L","testing":"L","estimate":0,"status":"active","statusGroup":"In Progress","prio":"High","prioRaw":"P1","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-t05","rmId":"t05","opId":null,"title":"infra stability — slice 1: SLO + top incident fixes","desc":"Stability 50% = impact tertinggi. Mulai sebagai track bulanan ber-slice, bukan redesign big-bang.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Growth & Internal Ops","schedule":null,"ms":"infra","msWhy":"explicit roadmap mapping"},{"key":"rm-t06","rmId":"t06","opId":2697,"title":"Notification Service Improvement","desc":"PRODUCT REQUIREMENT DOCUMENT - Feature : Notification Recipient & Channel Expansion - Product Manager : Dany Christian - Engineering Lead : Naftal Yunior - Design Lead : TBD - Version : v0.3 - Status : Draft — 11 open questions closed; ready for review --- 1. Revision History Ve…","impact":"H","effort":"M","testing":"H","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"Naftal Yunior","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Notification","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ai","msWhy":"explicit roadmap mapping"},{"key":"rm-t07","rmId":"t07","opId":null,"title":"sales module — PRD + P0 fixes (security scope, transition guard, team transfer)","desc":"P0 dari assessment existing (GAP-002/003/004, transition guard) dulu; revamp UI/workflow belakangan.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"High","prioRaw":"P1","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Sales","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-t08","rmId":"t08","opId":null,"title":"cost simulation WA official + guarding","desc":"Build setelah research 4. Guarding menyentuh send path → test hati-hati.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":["t04"],"area":"Payment","schedule":{"start":{"month":"Oct","week":3},"end":{"month":"Oct","week":4}},"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-t09","rmId":"t09","opId":2909,"title":"Advanced Offline Export","desc":"Advanced Offline Export Sistem export configurable untuk data analytics SatuInbox. 3 tab di halaman Statistik Laporan Offline: \u003cfigure class=\"table op-uc-figure align-center op-uc-figure\" \u003ctable class=\"op-uc-table\" \u003cthead class=\"op-uc-table--head\" \u003ctr class=\"op-uc-table--row\" \u003ct…","impact":"H","effort":"H","testing":"M","estimate":0,"status":"Specified","statusGroup":"Planned","prio":"High","prioRaw":"P1","assignee":"agung d","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Analytics","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"export","msWhy":"explicit roadmap mapping"},{"key":"rm-t10","rmId":"t10","opId":null,"title":"informative utilities (deskripsi fitur + utility message conversation)","desc":"Menurunkan kebingungan user; mostly FE + copy, testing sedang.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Nov","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-t11","rmId":"t11","opId":null,"title":"faq (halaman FAQ in-app)","desc":"Quick win filler; konten sudah ada di landing page.","impact":"M","effort":"L","testing":"L","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Tools / Add-ons","schedule":null,"ms":"widget","msWhy":"explicit roadmap mapping"},{"key":"rm-t12","rmId":"t12","opId":null,"title":"ticketing KPI card + dynamic status","desc":"Improvement UI halaman ticket; dynamic status config butuh test per-tenant.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Ticket","schedule":{"start":{"month":"Nov","week":1},"end":{"month":"Nov","week":2}},"ms":"ticket","msWhy":"explicit roadmap mapping"},{"key":"rm-t13","rmId":"t13","opId":null,"title":"simplicity settings (redesign + guidance)","desc":"UI redesign settings; regression lintas settings tinggi.","impact":"H","effort":"M","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Tools / Add-ons","schedule":{"start":{"month":"Dec","week":1},"end":{"month":"Dec","week":2}},"ms":"widget","msWhy":"explicit roadmap mapping"},{"key":"rm-t14","rmId":"t14","opId":null,"title":"grouping contact (unifikasi contact lintas channel)","desc":"Identity merge = blast radius besar (broadcast, visibility, duplicate merge race). Wajib PRD + migration/dedupe plan dulu.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":{"start":{"month":"Nov","week":3},"end":{"month":"Dec","week":2}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-t15","rmId":"t15","opId":null,"title":"create prospect from conversation","desc":"Interconnection conversation→sales; jalan setelah sales PRD/P0 ( 7).","impact":"H","effort":"M","testing":"L","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":["t07"],"area":"Omnichannel Chat","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-t16","rmId":"t16","opId":null,"title":"UI conversation redesign — audit UX","desc":"Audit dulu (reuse Track B uiux existing), implementasi di D.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-t17","rmId":"t17","opId":null,"title":"UI conversation redesign — implementasi","desc":"Eksekusi hasil audit 16; scope dari pain-point list, bukan full rewrite.","impact":"H","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":["t16"],"area":"Omnichannel Chat","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Nov","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-t18","rmId":"t18","opId":null,"title":"wizard setting onboarding (quick guide sekali muncul)","desc":"FE-only; P1 requirement replay guide masuk fase ini juga.","impact":"M","effort":"M","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Tools / Add-ons","schedule":{"start":{"month":"Dec","week":1},"end":{"month":"Apr","week":4}},"ms":"widget","msWhy":"explicit roadmap mapping"},{"key":"rm-t19","rmId":"t19","opId":2908,"title":"widget module (UI/UX + workflow + domain per widget)","desc":"Improvement widget existing; jalan setelah settings/onboarding beres.","impact":"M","effort":"M","testing":"M","estimate":12.0,"status":"Specified","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":"agung d","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":["t13","t18"],"area":"Tools / Add-ons","schedule":{"start":{"month":"Dec","week":1},"end":{"month":"Dec","week":4}},"ms":"widget","msWhy":"explicit roadmap mapping"},{"key":"rm-t20","rmId":"t20","opId":null,"title":"sales module — revamp UI/workflow","desc":"Fase 2 setelah PRD+P0 ( 7) stabil.","impact":"H","effort":"H","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":["t07"],"area":"Sales","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-t21","rmId":"t21","opId":null,"title":"DB topology HOT/WARM/COLD (+ exclude conversation group)","desc":"Assessment existing: HOLD FEATURE (audit/database). Butuh RCA/perf evidence + keputusan exclude-group sebelum maju.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"hold","statusGroup":"Blocked","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":null,"ms":"infra","msWhy":"explicit roadmap mapping"},{"key":"rm-t22","rmId":"t22","opId":null,"title":"fraud dashboard (invoice fraud via broadcast + integrasi Lincah)","desc":"Blocked: menunggu final requirement user fraud & Lincah. Jangan masuk bulan delivery.","impact":"H","effort":"H","testing":"M","estimate":0,"status":"hold","statusGroup":"Blocked","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Broadcast","schedule":null,"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-t23","rmId":"t23","opId":null,"title":"chat bot auto response (AI agent + eskalasi human)","desc":"Feature besar; butuh PRD, guard, SLA/escalation design.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"AI","schedule":null,"ms":"ai","msWhy":"explicit roadmap mapping"},{"key":"rm-t24","rmId":"t24","opId":2910,"title":"converesation AI summary","desc":"Menyusul setelah AI agent foundation ( 23).","impact":"H","effort":"M","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":["t23"],"area":"AI","schedule":null,"ms":"ai","msWhy":"explicit roadmap mapping"},{"key":"rm-t25","rmId":"t25","opId":2449,"title":"chat tools API (communication layer pihak ketiga)","desc":"Public API: auth, tenant isolation, versioning — butuh design dulu.","impact":"H","effort":"H","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Open API","schedule":null,"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-t26","rmId":"t26","opId":null,"title":"widget app (web/mobile app, Google login)","desc":"Produk baru; discovery dulu.","impact":"H","effort":"H","testing":"M","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Tools / Add-ons","schedule":null,"ms":"widget","msWhy":"explicit roadmap mapping"},{"key":"rm-t27","rmId":"t27","opId":168,"title":"telegram channel (resume pending dev)","desc":"Resume saat kapasitas ada; estimasi lama 18 FS-days (impact matrix 168).","impact":"H","effort":"H","testing":"H","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":null,"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-t28","rmId":"t28","opId":2183,"title":"shopee chat","desc":"Blocked: menunggu seller test account.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"blocked","statusGroup":"Blocked","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":[],"area":"Omnichannel Chat","schedule":null,"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-t29","rmId":"t29","opId":2830,"title":"tiktok chat","desc":"Setelah shopee/foundation channel marketplace.","impact":"H","effort":"H","testing":"H","estimate":0,"status":"backlog","statusGroup":"Planned","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Task","opMilestone":false,"deps":["t28"],"area":"Omnichannel Chat","schedule":null,"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-tmtwdn18t","rmId":"tmtwdn18t","opId":2910,"title":"Email summary","desc":"summarize conversation and send it to customer email","impact":"M","effort":"L","testing":"M","estimate":0,"status":"backlog","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":"DC","progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":["t23"],"area":"Omnichannel Chat","schedule":null,"ms":"ai","msWhy":"explicit roadmap mapping"},{"key":"rm-tmucfgez3","rmId":"tmucfgez3","opId":4371,"title":"MUV - monthly unique visitor","desc":"Menghitung jumlah inbound pertama kali yang masuk ke setiap channel terhubung di SatuInbox. Metric ini mengukur volume first-contact inbound per channel integration (WhatsApp, Email, dsb.) sebagai baseline untuk analisis beban operasional dan perencanaan kapasitas agent. Impleme…","impact":"H","effort":"M","testing":"L","estimate":0,"status":"New","statusGroup":"Planned","prio":"Urgent","prioRaw":"P0","assignee":null,"progress":0,"source":"roadmap+op","type":"Milestone","opMilestone":true,"deps":[],"area":"Analytics","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3844","rmId":"op-3844","opId":3844,"title":"satuinbox product presentation 01-10-2026","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3977","rmId":"op-3977","opId":3977,"title":"gathering UI/UX + QA flow","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3973","rmId":"op-3973","opId":3973,"title":"WA Web Multi-Library: whatsmeow Connector Architecture Brief","desc":"dany christian · New","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"Naftal Yunior","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3912","rmId":"op-3912","opId":3912,"title":"meeting satuinbox x lion parcel","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3889","rmId":"op-3889","opId":3889,"title":"quick brief satuinbox 29-09-2026","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3843","rmId":"op-3843","opId":3843,"title":"all product meeting 29-09-2026","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3868","rmId":"op-3868","opId":3868,"title":"Brainstorming Bad decrypt (lion parcel issue)","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3732","rmId":"op-3732","opId":3732,"title":"[Analytics] Unique Inbound Clients per Channel (MUV)","desc":"dany christian · In specification","impact":"","effort":"","testing":"","estimate":0,"status":"In specification","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"dany christian","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3192","rmId":"op-3192","opId":3192,"title":"Phase-D advance export - SAP Template Preset (4-Sheet Export)","desc":"agung d · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"agung d","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"export","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3191","rmId":"op-3191","opId":3191,"title":"Phase-C advance export - Broadcast Export (Recipient + Campaign Level)","desc":"agung d · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"agung d","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"export","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3190","rmId":"op-3190","opId":3190,"title":"Phase-B advance export - Column Registry + Configurable Column Export","desc":"agung d · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"agung d","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"export","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3189","rmId":"op-3189","opId":3189,"title":"Phase-A advance export - Export Row-Level Collections + Zero-Impact Sync Pipeline","desc":"agung d · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"agung d","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"export","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3799","rmId":"op-3799","opId":3799,"title":"Align Repo and create branch v2.8.3","desc":"Naftal Yunior · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"Naftal Yunior","progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"release","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3788","rmId":"op-3788","opId":3788,"title":"brainstorming workflow conversation breakdown qa","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3774","rmId":"op-3774","opId":3774,"title":"Conversation - Whatsapp API - late message from webhook","desc":"· Confirmed","impact":"","effort":"","testing":"","estimate":0,"status":"Confirmed","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3762","rmId":"op-3762","opId":3762,"title":"brainstorming UIUX n QA flow","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3734","rmId":"op-3734","opId":3734,"title":"monitoring release v2.8.2","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"release","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3731","rmId":"op-3731","opId":3731,"title":"brainstorm satuinbox x lincah (rayyan)","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3733","rmId":"op-3733","opId":3733,"title":"[WA Web] Geography-Based Entitlement Exclusion (Indonesia-only)","desc":"dany christian · In specification","impact":"","effort":"","testing":"","estimate":0,"status":"In specification","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"dany christian","progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3727","rmId":"op-3727","opId":3727,"title":"Sales Modul improvement","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-op-2901","rmId":"op-2901","opId":2901,"title":"MongoDB read preference: per-service/per-query overrides + secondaryPreferred on analytics-exclusive aggregations","desc":"agung d · Waiting Merge Request","impact":"","effort":"","testing":"","estimate":6.0,"status":"Waiting Merge Request","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"agung d","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"infra","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3305","rmId":"op-3305","opId":3305,"title":"Research strategy satuinbox - Audit","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"growth","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3275","rmId":"op-3275","opId":3275,"title":"Shopee seller research","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-2970","rmId":"op-2970","opId":2970,"title":"Requirement Allignment Sales modul ( BD )","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-op-2965","rmId":"op-2965","opId":2965,"title":"mapping automation satuinbox","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-2135","rmId":"op-2135","opId":2135,"title":"Whatsapp web - handle temporary banned (on whatsapp web and mobile)","desc":"· Confirmed","impact":"","effort":"","testing":"","estimate":0,"status":"Confirmed","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-op-1836","rmId":"op-1836","opId":1836,"title":"Leads - Lead Assignee Update Does Not Realtime Sync to Assigned Agent","desc":"· Confirmed","impact":"","effort":"","testing":"","estimate":0,"status":"Confirmed","statusGroup":"Planned","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"sales","msWhy":"explicit roadmap mapping"},{"key":"rm-op-1271","rmId":"op-1271","opId":1271,"title":"Settings- Subs - Payment - QRIS/ All Vendor E-Wallet Payment Fails to Load in Pay Invoice Modal","desc":"· Confirmed","impact":"","effort":"","testing":"","estimate":0,"status":"Confirmed","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3327","rmId":"op-3327","opId":3327,"title":"Non aktifkan user prod yang sudah end subs nya","desc":"dany christian · New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":"dany christian","progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3281","rmId":"op-3281","opId":3281,"title":"Research broadcast whatsapp web","desc":"dany christian · New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":"dany christian","progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3183","rmId":"op-3183","opId":3183,"title":"demo form landing page","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"growth","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3161","rmId":"op-3161","opId":3161,"title":"Technical Analysis v2.8.1/2/3","desc":"Naftal Yunior · New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":"Naftal Yunior","progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"release","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3146","rmId":"op-3146","opId":3146,"title":"Feature alignment conversation mobile and web","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3711","rmId":"op-3711","opId":3711,"title":"Analytics - Responsiveness (ketanggapan) section - Inverted Agent Attribution in RLT Average Metric Aggregation","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3709","rmId":"op-3709","opId":3709,"title":"Analytics - Responsiveness (Ketanggapan) section - FRT Detail View Queries Initial Assignee ID Instead of First Message Sender","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3708","rmId":"op-3708","opId":3708,"title":"Analytics - Responsiveness (Ketanggapan) section - Cross-Agent SLA Synchronization Leak Across Multi-Assignee Conversations","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3691","rmId":"op-3691","opId":3691,"title":"Analytics UI/UX-Polish - Unformatted Floating-Point Numbers in Chart Hover Tooltips","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"analytics","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3214","rmId":"op-3214","opId":3214,"title":"Global Search Suggestion - Search typo tolerance was not working in production version","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3199","rmId":"op-3199","opId":3199,"title":"Broadcast - WAPI - broadcast wapi not follow broadcast hour","desc":"· In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"broadcast","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3006","rmId":"op-3006","opId":3006,"title":"Global Search Suggestion - No toast message when release relation label on conversation/ticket detail","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"Backlog","assignee":null,"progress":20,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-op-2331","rmId":"op-2331","opId":2331,"title":"SuperAdmin Global Company Access — Phase 1: Company List/Search + Onboarding Approval","desc":"Naftal Yunior · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"Naftal Yunior","progress":0,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"superadmin","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3400","rmId":"op-3400","opId":3400,"title":"Fraud team request (Hafizh)","desc":"· In specification","impact":"","effort":"","testing":"","estimate":0,"status":"In specification","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"billing","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3520","rmId":"op-3520","opId":3520,"title":"Call log from whatsapp","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"channels","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3394","rmId":"op-3394","opId":3394,"title":"Improvement RMQ issue","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"infra","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3200","rmId":"op-3200","opId":3200,"title":"browser compability (flacky)","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"infra","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3194","rmId":"op-3194","opId":3194,"title":"research root cause delay email, disconnected email","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"stab","msWhy":"explicit roadmap mapping"},{"key":"rm-op-3201","rmId":"op-3201","opId":3201,"title":"global search logic improvements","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Feature","opMilestone":false,"deps":[],"area":"Feature","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4116","rmId":"op-4116","opId":4116,"title":"satuinbox presentation 06-10-2026","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4115","rmId":"op-4115","opId":4115,"title":"all product meeting 06-10-2026","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4154","rmId":"op-4154","opId":4154,"title":"realign task v2.8.3","desc":"dany christian · In progress","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Low","prioRaw":"P3","assignee":"dany christian","progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"release","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4289","rmId":"op-4289","opId":4289,"title":"QA product meeting - audit converseation","desc":"· New","impact":"","effort":"","testing":"","estimate":0,"status":"New","statusGroup":"Planned","prio":"Low","prioRaw":"P3","assignee":null,"progress":null,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4282","rmId":"op-4282","opId":4282,"title":"meeting detail GTM","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"growth","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4155","rmId":"op-4155","opId":4155,"title":"meeting satuinbox x lincah","desc":"· Closed","impact":"","effort":"","testing":"","estimate":0,"status":"Closed","statusGroup":"Done","prio":"Low","prioRaw":"P3","assignee":null,"progress":100,"source":"roadmap+op","type":"Task","opMilestone":false,"deps":[],"area":"Task","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"ops","msWhy":"explicit roadmap mapping"},{"key":"rm-op-4128","rmId":"op-4128","opId":4128,"title":"Conversation - room - issue related to message","desc":"· Confirmed","impact":"","effort":"","testing":"","estimate":0,"status":"In progress","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":"agung d","progress":null,"source":"roadmap+op","type":"Bug","opMilestone":false,"deps":[],"area":"Bug","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"conversation","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na0","rmId":"tmv4r29na0","opId":null,"title":"1A — Ticket Grouping by Custom Attribute","desc":"Area: Ticket Priority: P1 Source: Brief Lincah §1A SatuInbox perlu mendukung grouping ticket berdasarkan Custom Attribute/Property yang configurable. Attribute untuk grouping harus configurable sesuai use case (contoh: Seller, AWB), tidak hardcoded. Effort: 3d dev, 2d QA Gap: Ti…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na1","rmId":"tmv4r29na1","opId":null,"title":"2A — Link Chat to Ticket via Open API","desc":"Area: Omnichannel Priority: P1 Source: Brief Lincah §2A Sediakan Open API untuk menghubungkan chat/conversation dengan ticket tertentu. Satu contact/nomor telepon bisa terhubung ke lebih dari satu ticket (kasus: 1 customer, beberapa shipment sekaligus). Relasi harus bisa dibuat…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na2","rmId":"tmv4r29na2","opId":null,"title":"3A — Bulk Ticket Update","desc":"Area: Ticket Priority: P0 Source: Brief Lincah §3A Bulk update ticket terhadap beberapa ticket sekaligus, termasuk Custom Properties. User bisa Select All pada filter aktif. Supported field: Selection, Text, Date, Image, Gallery (multiple images), File. Satu value diterapkan ke…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na3","rmId":"tmv4r29na3","opId":null,"title":"4A — Broadcast Create via Open API with Attachment","desc":"Area: Broadcast Priority: P1 Source: Brief Lincah §4A Buat broadcast via Open API dengan payload: title/reference, channel, audience, message, attachment/file, custom properties, team inbox, reference data dari Lincah. Response harus return broadcast id , status, created at , ti…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na4","rmId":"tmv4r29na4","opId":null,"title":"5A — Create Broadcast via Deep Link","desc":"Area: Broadcast Priority: P2 Status: deferred Source: Brief Lincah §5A Deep link dari dashboard Lincah ke halaman Create Broadcast SatuInbox dengan predefined parameters (title, recipient, channel, message, attachment, custom properties, reference ID). User review sebelum kirim.…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na5","rmId":"tmv4r29na5","opId":null,"title":"6A — Broadcast Channel Expansion + Attachment Types","desc":"Area: Broadcast Priority: P1 Source: Brief Lincah §6A Broadcast perlu dukung WhatsApp Group dan attachment types lengkap (Excel, PDF, Image, DOC, file umum, link report). Attachment bisa bersama text atau sebagai content utama. Juga support scheduled report broadcast dari Lincah…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na6","rmId":"tmv4r29na6","opId":null,"title":"7A — Broadcast Status, History & Retry","desc":"Area: Broadcast Priority: P1 Source: Brief Lincah §7A Expose broadcast status per-recipient dan retry mechanism via Open API. Lincah perlu: check status → identify failed → retry only failed recipients. Deep link per broadcast ke detail page. Effort: 2d dev, 1d QA Gap: GET /open…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na7","rmId":"tmv4r29na7","opId":null,"title":"8A — Ticket Webhook Enhancement + Two-Way Sync","desc":"Area: Ticket Priority: P1 Source: Brief Lincah §8A Enhance webhook untuk field-level change tracking. Webhook harus fire untuk: status, assignment, team inbox, custom property, resolved/reopened, conversation-linkage changes. Delivery status: Success, Failed, Retrying, Retry Exh…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na8","rmId":"tmv4r29na8","opId":null,"title":"9A — Update Team Inbox via Open API","desc":"Area: Ticket Priority: P2 Source: Brief Lincah §9A Team Inbox dari conversation/contact harus bisa diubah via Open API. Perubahan: langsung reflected, maintain linkage, audit trail, webhook ke Lincah. Effort: 1d dev, 1d QA Gap: PATCH /open-api/ticket/:id/team sudah ada. Verify:…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"},{"key":"rm-tmv4r29na9","rmId":"tmv4r29na9","opId":null,"title":"10A — Integration Identifiers Documentation","desc":"Area: Growth Priority: P3 Source: Brief Lincah §10A Dokumentasi identifier utama integrasi Lincah ↔ SatuInbox: seller id, awb, contact id, conversation id, ticket id, broadcast id, team inbox id. Effort: 1d Gap: Documentation only. seller id dan awb = custom attribute keys, buka…","impact":"","effort":"","testing":"","estimate":0,"status":"active","statusGroup":"In Progress","prio":"Normal","prioRaw":"P2","assignee":null,"progress":null,"source":"roadmap","type":"Feature","opMilestone":false,"deps":[],"area":"","schedule":{"start":{"month":"Oct","week":1},"end":{"month":"Oct","week":4}},"ms":"api","msWhy":"explicit roadmap mapping"}],"meta":{"rowCount":95,"headerChips":[["Roadmap","95 task"],["OP v2.8.3","59 WP"],["Baris unik","95"],["Milestone","17"]],"verdicts":[{"id":4371,"title":"MUV - monthly unique visitor","status":"New","verdict":"Kandidat lemah sebagai milestone mandiri — MUV adalah deliverable analytics, lebih tepat bagian dari milestone Analytics & Reporting."}],"chains":[["SuperAdmin Global Company Access — Pha","GTM Marketing untuk satuinbox"],["wa official adujstmen research (peruba","cost simulation WA official + guarding"],["sales module — PRD + P0 fixes (securit","create prospect from conversation"],["UI conversation redesign — audit UX","UI conversation redesign — implementas"],["simplicity settings (redesign + guidan","widget module (UI/UX + workflow + doma"],["wizard setting onboarding (quick guide","widget module (UI/UX + workflow + doma"],["sales module — PRD + P0 fixes (securit","sales module — revamp UI/workflow"],["chat bot auto response (AI agent + esk","converesation AI summary"],["shopee chat","tiktok chat"],["chat bot auto response (AI agent + esk","Email summary"]]}};
+</script>
+<script>
+(function(){
+"use strict";
+const MS = DATA.milestones, ROWS = DATA.rows;
+const byMs = {};
+MS.forEach(m => byMs[m.id] = []);
+ROWS.forEach(r => byMs[r.ms] && byMs[r.ms].push(r));
+
+const state = { sel: null, status: "active", q: "", sortKey: "prio", sortDir: 1 };
+
+const PRIO_W = { Urgent: 0, High: 1, Normal: 2, Low: 3 };
+const ST_W = { "In Progress": 0, Blocked: 1, Planned: 2, Done: 3 };
+const PRIO_CLS = { Urgent: "u", High: "h", Normal: "n", Low: "l" };
+const ST_CLS = { Done: "done", "In Progress": "prog", Blocked: "blocked", Planned: "planned" };
+
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function initials(name){
+  return name.split(/\s+/).slice(0,2).map(w => w[0] || "").join("").toUpperCase();
+}
+function hue(name){
+  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 360;
+  return h;
+}
+function whoHtml(name){
+  if (!name) return '<span class="who" style="color:var(--muted)">—</span>';
+  return '<span class="who"><span class="av" style="background:hsl(' + hue(name) + ',55%,42%)">' + esc(initials(name)) + '</span>' + esc(name) + '</span>';
+}
+function prioPill(p){
+  return '<span class="pill ' + (PRIO_CLS[p] || "n") + '">' + esc(p || "Normal") + '</span>';
+}
+function stPill(st, raw){
+  return '<span class="pill ' + (ST_CLS[st] || "planned") + '" title="status asli: ' + esc(raw || st) + '">' + esc(raw || st) + '</span>';
+}
+function metricHtml(r){
+  let out = "";
+  const lv = v => v ? '<span class="mchip">I:<b class="' + v.toLowerCase() + '">' + esc(v) + '</b></span>' : "";
+  const le = v => v ? '<span class="mchip">E:<b class="' + v.toLowerCase() + '">' + esc(v) + '</b></span>' : "";
+  const lt = v => v ? '<span class="mchip">T:<b class="' + v.toLowerCase() + '">' + esc(v) + '</b></span>' : "";
+  out += lv(r.impact) + le(r.effort) + lt(r.testing);
+  if (!out && r.estimate) out = '<span class="mchip">Est <b class="m">' + r.estimate + 'j</b></span>';
+  if (!out) out = '<span class="mchip">—</span>';
+  return out;
+}
+function progHtml(p){
+  const v = (p == null || isNaN(p)) ? 0 : Math.max(0, Math.min(100, p));
+  const label = (p == null || isNaN(p)) ? "n/a" : v + "%";
+  return '<div class="prog-wrap"><div class="bar"><i style="width:' + v + '%"></i></div><span class="pct">' + label + '</span></div>';
+}
+
+/* ---- aggregate a row set (milestone card + stats) ---- */
+function agg(list){
+  const a = { n: list.length, done: 0, prog: 0, blocked: 0, planned: 0, progSum: 0, progN: 0, est: 0,
+    prio: "Low", prioW: 3, people: {}, im: "", em: "", tm: "" };
+  const LV = { H: 3, M: 2, L: 1 };
+  list.forEach(r => {
+    if (r.statusGroup === "Done") a.done++;
+    else if (r.statusGroup === "In Progress") a.prog++;
+    else if (r.statusGroup === "Blocked") a.blocked++;
+    else a.planned++;
+    if (r.progress != null && !isNaN(r.progress)) { a.progSum += r.progress; a.progN++; }
+    a.est += r.estimate || 0;
+    const w = PRIO_W[r.prio] != null ? PRIO_W[r.prio] : 3;
+    if (w < a.prioW) { a.prioW = w; a.prio = r.prio; }
+    if (r.assignee) a.people[r.assignee] = (a.people[r.assignee] || 0) + 1;
+    if (LV[r.impact] > (LV[a.im] || 0)) a.im = r.impact;
+    if (LV[r.effort] > (LV[a.em] || 0)) a.em = r.effort;
+    if (LV[r.testing] > (LV[a.tm] || 0)) a.tm = r.testing;
+  });
+  a.avgProg = a.progN ? Math.round(a.progSum / a.progN) : null;
+  a.owner = Object.keys(a.people).sort((x, y) => a.people[y] - a.people[x])[0] || null;
+  return a;
+}
+
+/* ---- visible rows (selection + status filter + search) ---- */
+function visibleRows(){
+  const q = state.q.trim().toLowerCase();
+  return ROWS.filter(r => {
+    if (state.sel && r.ms !== state.sel) return false;
+    if (state.status === "active" && r.statusGroup === "Done") return false;
+    if (state.status === "done" && r.statusGroup !== "Done") return false;
+    if (state.status === "blocked" && r.statusGroup !== "Blocked") return false;
+    if (q && !(r.title || "").toLowerCase().includes(q) && !(r.desc || "").toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function sortRows(list){
+  const k = state.sortKey, d = state.sortDir;
+  return list.slice().sort((a, b) => {
+    let va, vb;
+    if (k === "title") { va = (a.title || "").toLowerCase(); vb = (b.title || "").toLowerCase(); return va < vb ? -d : va > vb ? d : 0; }
+    if (k === "status") { va = ST_W[a.statusGroup]; vb = ST_W[b.statusGroup]; }
+    else if (k === "prio") { va = PRIO_W[a.prio] != null ? PRIO_W[a.prio] : 3; vb = PRIO_W[b.prio] != null ? PRIO_W[b.prio] : 3; }
+    else if (k === "progress") { va = a.progress == null ? -1 : a.progress; vb = b.progress == null ? -1 : b.progress; }
+    else if (k === "assignee") { va = (a.assignee || "~").toLowerCase(); vb = (b.assignee || "~").toLowerCase(); return va < vb ? -d : va > vb ? d : 0; }
+    if (va !== vb) return (va - vb) * d;
+    return (a.title || "").localeCompare(b.title || "");
+  });
+}
+
+/* ---- stats bar (over visible rows) ---- */
+function renderStats(){
+  const vis = visibleRows();
+  const a = agg(vis);
+  const scope = state.sel ? (MS.find(m => m.id === state.sel) || {}).title : "Semua milestone";
+  const pct = n => a.n ? Math.round(n / a.n * 100) : 0;
+  document.getElementById("stats").innerHTML = [
+    '<div class="stat"><div class="lbl">Task terlihat</div><div class="val">' + a.n + '</div><div class="sub2">' + esc(scope) + ' · ' + (state.status === "active" ? "tanpa closed" : state.status === "done" ? "hanya selesai" : state.status === "blocked" ? "hanya terblokir" : "semua status") + '</div></div>',
+    '<div class="stat"><div class="lbl">Progress rata-rata</div><div class="val">' + (a.avgProg == null ? "n/a" : a.avgProg + "%") + '</div><div class="sub2">dari ' + a.progN + ' task yang punya nilai progress</div></div>',
+    '<div class="stat"><div class="lbl">Selesai</div><div class="val" style="color:var(--ok)">' + a.done + '</div><div class="sub2">' + pct(a.done) + '% dari task terlihat</div></div>',
+    '<div class="stat"><div class="lbl">Berjalan</div><div class="val" style="color:var(--info)">' + a.prog + '</div><div class="sub2">terblokir: <b style="color:var(--bad)">' + a.blocked + '</b> · rencana: ' + a.planned + '</div></div>',
+    '<div class="stat"><div class="lbl">Estimasi effort</div><div class="val">' + (Math.round(a.est * 10) / 10) + 'j</div><div class="sub2">Σ estimatedTime OP pada task terlihat</div></div>',
+    '<div class="stat"><div class="lbl">Prioritas tertinggi</div><div class="val">' + esc(a.prio) + '</div><div class="sub2">Urgent ' + vis.filter(r => r.prio === "Urgent").length + ' · High ' + vis.filter(r => r.prio === "High").length + ' · Normal ' + vis.filter(r => r.prio === "Normal").length + '</div>' +
+      '<div class="stackbar">' +
+        '<i style="width:' + pct(vis.filter(r => r.statusGroup === "Done").length) + '%;background:var(--ok)"></i>' +
+        '<i style="width:' + pct(vis.filter(r => r.statusGroup === "In Progress").length) + '%;background:var(--info)"></i>' +
+        '<i style="width:' + pct(vis.filter(r => r.statusGroup === "Blocked").length) + '%;background:var(--bad)"></i>' +
+        '<i style="width:' + pct(vis.filter(r => r.statusGroup === "Planned").length) + '%;background:var(--muted)"></i>' +
+      '</div></div>'
+  ].join("");
+}
+
+/* ---- milestone cards ---- */
+function renderMs(){
+  const activeMs = MS.filter(m => (byMs[m.id] || []).length > 0);
+  document.getElementById("msGrid").innerHTML = activeMs.map(m => {
+    const list = byMs[m.id] || [];
+    const a = agg(list);
+    const st = a.done === a.n && a.n > 0 ? ["done", "Selesai"] : a.prog > 0 ? ["prog", "Berjalan"] : a.n === 0 ? ["planned", "Kosong"] : ["planned", "Rencana"];
+    const desc = m.desc;
+    return '<button class="ms-card' + (state.sel === m.id ? " sel" : "") + '" data-ms="' + m.id + '">' +
+      '<div class="ms-top"><span class="tier ' + m.tier + '">' + (m.tier === "primary" ? "MILESTONE" : "SUPPORTING") + '</span>' +
+      '<span class="chip"><b>' + a.n + '</b> task</span></div>' +
+      '<h3>' + esc(m.title) + '</h3>' +
+      '<p class="ms-desc">' + esc(desc) + '</p>' +
+      '<div class="ms-fields">' +
+        '<div><span class="lbl">Metric</span>' + metricHtml({ impact: a.im, effort: a.em, testing: a.tm, estimate: Math.round(a.est * 10) / 10 }) + '</div>' +
+        '<div><span class="lbl">Status</span><span class="pill ' + st[0] + '">' + st[1] + '</span></div>' +
+        '<div><span class="lbl">Assignee</span>' + whoHtml(a.owner) + '</div>' +
+        '<div><span class="lbl">Prio</span>' + prioPill(a.prio) + '</div>' +
+      '</div>' +
+      '<div class="ms-prog"><div class="bar"><i style="width:' + (a.avgProg || 0) + '%"></i></div><b style="font-size:11.5px">' + (a.avgProg == null ? "n/a" : a.avgProg + "%") + '</b></div>' +
+      '<div class="ms-stats"><span><b>' + a.done + '</b> selesai</span><span><b>' + a.prog + '</b> berjalan</span><span><b>' + a.blocked + '</b> blokir</span><span><b>' + a.planned + '</b> rencana</span><span>est <b>' + (Math.round(a.est * 10) / 10) + 'j</b></span></div>' +
+      '</button>';
+  }).join("");
+  document.querySelectorAll(".ms-card").forEach(el => el.addEventListener("click", () => {
+    const id = el.getAttribute("data-ms");
+    state.sel = (state.sel === id) ? null : id;
+    renderAll();
+    if (state.sel) document.getElementById("breakdown").scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+}
+
+/* ---- breakdown table ---- */
+function rowHtml(r, showMs){
+  return '<div class="row" title="asal pengelompokan: ' + esc(r.msWhy || "-") + '">' +
+    '<div class="c-title"><button class="exp">▸</button><div>' +
+      '<div class="t">' + esc(r.title) + '</div>' +
+      '<div class="badges">' +
+        (r.source === "roadmap" ? '<span class="badge rm">ROADMAP</span>' : r.source === "op" ? '<span class="badge op">OP</span>' : '<span class="badge rm">ROADMAP</span><span class="badge op">OP</span>') +
+        (r.opId ? '<span class="badge">#OP-' + r.opId + '</span>' : "") +
+        '<span class="badge">' + esc(r.type || "Task") + '</span>' +
+        (showMs ? '<span class="badge">' + esc((MS.find(m => m.id === r.ms) || {}).title || "") + '</span>' : "") +
+        (r.deps && r.deps.length ? '<span class="badge">deps: ' + esc(r.deps.join(", ")) + '</span>' : "") +
+      '</div>' +
+      '<div class="desc">' + esc(r.desc || "(tanpa deskripsi)") + '</div>' +
+    '</div></div>' +
+    '<div>' + metricHtml(r) + '</div>' +
+    '<div>' + stPill(r.statusGroup, r.status) + '</div>' +
+    '<div>' + whoHtml(r.assignee) + '</div>' +
+    '<div>' + prioPill(r.prio) + '</div>' +
+    '<div>' + progHtml(r.progress) + '</div>' +
+  '</div>';
+}
+function tableHtml(list, showMs){
+  const ar = k => state.sortKey === k ? '<span class="ar">' + (state.sortDir === 1 ? "▲" : "▼") + "</span>" : "";
+  return '<div class="tbl">' +
+    '<div class="thead"><span data-sk="title">Judul &amp; deskripsi ' + ar("title") + '</span><span>Metric</span>' +
+    '<span data-sk="status">Status ' + ar("status") + '</span><span data-sk="assignee">Assignee ' + ar("assignee") + '</span>' +
+    '<span data-sk="prio">Prio ' + ar("prio") + '</span><span data-sk="progress">Progress ' + ar("progress") + '</span></div>' +
+    list.map(r => rowHtml(r, showMs)).join("") + '</div>';
+}
+function renderBreakdown(){
+  const vis = sortRows(visibleRows());
+  const el = document.getElementById("breakdown");
+  const label = document.getElementById("brkLabel");
+  if (!vis.length) {
+    el.innerHTML = '<div class="empty">Tidak ada task yang cocok dengan filter saat ini.</div>';
+    label.textContent = "(0 task)";
+    return;
+  }
+  if (state.sel) {
+    label.textContent = "— " + ((MS.find(m => m.id === state.sel) || {}).title || "") + " (" + vis.length + " task)";
+    el.innerHTML = tableHtml(vis, false);
+  } else {
+    label.textContent = "(" + vis.length + " task, dikelompokkan per milestone)";
+    let out = "";
+    MS.forEach(m => {
+      const list = vis.filter(r => r.ms === m.id);
+      if (!list.length) return;
+      const a = agg(list);
+      out += '<div class="group-head"><span class="tier ' + m.tier + '">' + (m.tier === "primary" ? "MILESTONE" : "SUPPORTING") + '</span>' +
+        '<span class="gt">' + esc(m.title) + '</span>' +
+        '<span class="gm"><span>' + list.length + ' task</span><span>progress ' + (a.avgProg == null ? "n/a" : a.avgProg + "%") + '</span><span>' + a.done + ' selesai</span></span></div>';
+      out += tableHtml(sortRows(list), true);
+    });
+    el.innerHTML = out;
+  }
+  el.querySelectorAll(".exp").forEach(b => b.addEventListener("click", () => {
+    b.closest(".row").classList.toggle("open");
+  }));
+  el.querySelectorAll(".thead span[data-sk]").forEach(s => s.addEventListener("click", () => {
+    const k = s.getAttribute("data-sk");
+    if (state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = 1; }
+    renderBreakdown();
+  }));
+}
+
+/* ---- milestone totals table ---- */
+function renderMsTable(){
+  const rows = [];
+  let totN=0,totDone=0,totProg=0,totBlock=0,totPlan=0,totProgN=0,totProgSum=0,totEst=0;
+  const activeMs = MS.filter(m => (byMs[m.id] || []).length > 0);
+  activeMs.forEach(m => {
+    const list = byMs[m.id] || [];
+    const a = agg(list);
+    rows.push(m, a);
+    totN+=a.n; totDone+=a.done; totProg+=a.prog; totBlock+=a.blocked; totPlan+=a.planned;
+    totProgN+=a.progN; totProgSum+=a.progSum; totEst+=a.est;
+  });
+  const totAvg = totProgN ? Math.round(totProgSum/totProgN) : null;
+  let h = '<table class="ms-tbl"><thead><tr><th>Milestone</th><th>Tier</th><th>Total</th><th>Selesai</th><th>Berjalan</th><th>Blokir</th><th>Rencana</th><th>Progress</th><th>Est</th></tr></thead><tbody>';
+  for(let i=0;i<rows.length;i+=2){
+    const m=rows[i], a=rows[i+1];
+    const avg = a.progN ? Math.round(a.progSum/a.progN) : null;
+    h += '<tr class="ms-row"><td><b>'+esc(m.title)+'</b></td><td><span class="tier '+m.tier+'">'+(m.tier==="primary"?"MILESTONE":"SUPPORTING")+'</span></td>'
+      + '<td>'+a.n+'</td><td style="color:var(--ok)">'+a.done+'</td><td style="color:var(--info)">'+a.prog+'</td><td style="color:var(--bad)">'+a.blocked+'</td><td>'+a.planned+'</td>'
+      + '<td>'+progHtml(avg)+'</td><td>'+((Math.round(a.est*10)/10)||'—')+'j</td></tr>';
+  }
+  h += '<tr class="ms-sub"><td>TOTAL</td><td></td><td>'+totN+'</td><td style="color:var(--ok)">'+totDone+'</td>'
+    + '<td style="color:var(--info)">'+totProg+'</td><td style="color:var(--bad)">'+totBlock+'</td><td>'+totPlan+'</td>'
+    + '<td>'+progHtml(totAvg)+'</td><td>'+(Math.round(totEst*10)/10)+'j</td></tr>';
+  h += '</tbody></table>';
+  document.getElementById("msTable").innerHTML = h;
+}
+
+function renderAll(){ renderStats(); renderMsTable(); renderMs(); renderBreakdown(); }
+
+/* ---- static extras: header chips, verdicts, chains ---- */
+document.getElementById("hdrChips").innerHTML = DATA.meta.headerChips.map(c => '<span class="chip">' + c[0] + ' <b>' + c[1] + '</b></span>').join("");
+document.getElementById("mRowCount").textContent = DATA.meta.rowCount;
+document.querySelector("#verdictTable tbody").innerHTML = DATA.meta.verdicts.map(v =>
+  "<tr><td>#" + v.id + "</td><td>" + esc(v.title) + "</td><td>" + esc(v.status) + "</td><td>" + esc(v.verdict) + "</td></tr>").join("");
+document.getElementById("chains").innerHTML = DATA.meta.chains.map(ch =>
+  '<div class="chain">' + ch.map((t, i) => (i ? '<span class="arw">→</span>' : "") + '<span class="node">' + esc(t) + '</span>').join("") + '</div>').join("");
+
+/* ---- events ---- */
+document.getElementById("showAll").addEventListener("click", () => {
+  state.sel = null; renderAll();
+});
+document.getElementById("q").addEventListener("input", e => {
+  state.q = e.target.value; renderStats(); renderBreakdown();
+});
+document.querySelectorAll(".filters .btn[data-st]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".filters .btn[data-st]").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  state.status = b.getAttribute("data-st");
+  renderAll();
+}));
+
+renderAll();
+})();
+</script>
+</body>
+</html>

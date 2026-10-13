@@ -106,7 +106,7 @@
       "impact": "H",
       "testing": "L",
       "priority": "P1",
-      "current": false,
+      "current": true,
       "schedule": {
         "start": {
           "month": "Oct",
@@ -771,7 +771,7 @@
       "priority": "P2",
       "current": false,
       "schedule": null,
-      "status": "active",
+      "status": "backlog",
       "dependency": [
         "t28"
       ],
@@ -791,18 +791,9 @@
       "impact": "M",
       "testing": "M",
       "priority": "P3",
-      "current": true,
-      "schedule": {
-        "start": {
-          "month": "Oct",
-          "week": 1
-        },
-        "end": {
-          "month": "Oct",
-          "week": 4
-        }
-      },
-      "status": "active",
+      "current": false,
+      "schedule": null,
+      "status": "backlog",
       "dependency": [
         "t23"
       ],
@@ -2786,6 +2777,266 @@
       "_opAssignee": "",
       "_opProgress": 0,
       "_opDue": ""
+    },
+    {
+      "id": "tmv4r29na0",
+      "rank": 32,
+      "task": "1A — Ticket Grouping by Custom Attribute",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Ticket\n**Priority:** P1\n**Source:** Brief Lincah §1A\nSatuInbox perlu mendukung grouping ticket berdasarkan Custom Attribute/Property yang configurable. Attribute untuk grouping harus configurable sesuai use case (contoh: Seller, AWB), tidak hardcoded.\n**Effort:** 3d dev, 2d QA\n**Gap:** Ticket list view butuh group-by dropdown yang pakai existing `relationLabels` untuk visual grouping. BE sudah ready (`bulkApplyRelationLabel`, `relationLabelKey` filter).\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na1",
+      "rank": 33,
+      "task": "2A — Link Chat to Ticket via Open API",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Omnichannel\n**Priority:** P1\n**Source:** Brief Lincah §2A\nSediakan Open API untuk menghubungkan chat/conversation dengan ticket tertentu. Satu contact/nomor telepon bisa terhubung ke lebih dari satu ticket (kasus: 1 customer, beberapa shipment sekaligus). Relasi harus bisa dibuat dan dibaca kembali via API.\n**Effort:** 2d dev, 1d QA\n**Gap:** `conversationId` bisa di-set saat create, tapi tidak ada endpoint untuk link existing conversation ke existing ticket. Butuh `POST /open-api/ticket/:id/link-conversation`. Pastikan relasi contact → multiple tickets readable.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na2",
+      "rank": 34,
+      "task": "3A — Bulk Ticket Update",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Ticket\n**Priority:** P0\n**Source:** Brief Lincah §3A\nBulk update ticket terhadap beberapa ticket sekaligus, termasuk Custom Properties. User bisa Select All pada filter aktif. Supported field: Selection, Text, Date, Image, Gallery (multiple images), File. Satu value diterapkan ke semua selected. Bulk update ikuti permission user.\n**Effort:** 5d dev, 3d QA\n**Gap:** New `POST /open-api/ticket/bulk-update` — accept ticket IDs + field updates. Validasi `customAttributes` per ticket type. V1 = same type only. Reuse existing bulk infra (`bulk-job.schema`, `TICKET_BULK_LIMIT=100`).\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na3",
+      "rank": 35,
+      "task": "4A — Broadcast Create via Open API with Attachment",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Broadcast\n**Priority:** P1\n**Source:** Brief Lincah §4A\nBuat broadcast via Open API dengan payload: title/reference, channel, audience, message, attachment/file, custom properties, team inbox, reference data dari Lincah. Response harus return `broadcast_id`, status, `created_at`, title.\n**Effort:** 3d dev, 2d QA\n**Gap:** `OpenApiBroadcastDto` tidak punya attachment field. Tambah `attachment` field (file URL atau media ID). Handle media upload/download di broadcast service.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na4",
+      "rank": 36,
+      "task": "5A — Create Broadcast via Deep Link",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Broadcast\n**Priority:** P2\n**Status:** deferred\n**Source:** Brief Lincah §5A\nDeep link dari dashboard Lincah ke halaman Create Broadcast SatuInbox dengan predefined parameters (title, recipient, channel, message, attachment, custom properties, reference ID). User review sebelum kirim.\n**Assessment decision:** Covered by 4A (Open API). Deep link = nice-to-have. Deferred sampai 4A live.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na5",
+      "rank": 37,
+      "task": "6A — Broadcast Channel Expansion + Attachment Types",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Broadcast\n**Priority:** P1\n**Source:** Brief Lincah §6A\nBroadcast perlu dukung WhatsApp Group dan attachment types lengkap (Excel, PDF, Image, DOC, file umum, link report). Attachment bisa bersama text atau sebagai content utama. Juga support scheduled report broadcast dari Lincah (per jam/per hari).\n**Effort:** 2d dev, 1d QA\n**Gap:** Tambah `WHATSAPP_GROUP` ke `BroadcastPlatformEnum`. Handle group delivery semantics (beda dari 1:1). Email channel = P2 deferred.\n**Effort:** 3d dev, 2d QA\n**Gap:** Broadcast service harus support attachment types (Excel/PDF/Image/DOC/file/link). Scheduled report: Lincah generate → Create Broadcast API → delivery. SatuInbox = delivery channel.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na6",
+      "rank": 38,
+      "task": "7A — Broadcast Status, History & Retry",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Broadcast\n**Priority:** P1\n**Source:** Brief Lincah §7A\nExpose broadcast status per-recipient dan retry mechanism via Open API. Lincah perlu: check status → identify failed → retry only failed recipients. Deep link per broadcast ke detail page.\n**Effort:** 2d dev, 1d QA\n**Gap:** `GET /open-api/broadcast/:id/status` — per-recipient status (Pending/Queued/Sent/Failed/Cancelled) + failure reason + timestamp. Response: overall status + per-recipient breakdown.\n**Effort:** 1d dev, 1d QA\n**Gap:** `GET /open-api/broadcast/:id` — broadcast detail. Tiap broadcast punya deep link ke SatuInbox detail page.\n**Effort:** 2d dev, 1d QA\n**Gap:** `POST /open-api/broadcast/:id/retry` — retry all atau failed only. Result linked ke original broadcast. Internal `BroadcastRetryProcessor` sudah ada, gap = API exposure.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na7",
+      "rank": 39,
+      "task": "8A — Ticket Webhook Enhancement + Two-Way Sync",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Ticket\n**Priority:** P1\n**Source:** Brief Lincah §8A\nEnhance webhook untuk field-level change tracking. Webhook harus fire untuk: status, assignment, team inbox, custom property, resolved/reopened, conversation-linkage changes. Delivery status: Success, Failed, Retrying, Retry Exhausted. Two-way sync: Lincah→SI via API, SI→Lincah via webhook.\n**Effort:** 3d dev, 2d QA\n**Gap:** `TicketUpdateContext` cuma punya `prevStatus`/`prevStageId` — butuh field-level diff. Tambah `RETRY_EXHAUSTED` ke `WebhookLogStatusEnum`. Tambah trigger untuk conversation-ticket linkage change.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na8",
+      "rank": 40,
+      "task": "9A — Update Team Inbox via Open API",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Ticket\n**Priority:** P2\n**Source:** Brief Lincah §9A\nTeam Inbox dari conversation/contact harus bisa diubah via Open API. Perubahan: langsung reflected, maintain linkage, audit trail, webhook ke Lincah.\n**Effort:** 1d dev, 1d QA\n**Gap:** `PATCH /open-api/ticket/:id/team` sudah ada. Verify: conversation-level update, audit trail logging, webhook emission. Kemungkinan no new endpoint.\n---",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
+    },
+    {
+      "id": "tmv4r29na9",
+      "rank": 41,
+      "task": "10A — Integration Identifiers Documentation",
+      "strategicArea": "",
+      "sourceColumn": "FEATURE",
+      "type": 2,
+      "desc": "**Area:** Growth\n**Priority:** P3\n**Source:** Brief Lincah §10A\nDokumentasi identifier utama integrasi Lincah ↔ SatuInbox: seller_id, awb, contact_id, conversation_id, ticket_id, broadcast_id, team_inbox_id.\n**Effort:** 1d\n**Gap:** Documentation only. `seller_id` dan `awb` = custom attribute keys, bukan system IDs. Buat integration identifiers reference doc.",
+      "effort": "",
+      "impact": "",
+      "testing": "",
+      "priority": "P2",
+      "current": false,
+      "schedule": {
+        "start": {
+          "month": "Oct",
+          "week": 1
+        },
+        "end": {
+          "month": "Oct",
+          "week": 4
+        }
+      },
+      "status": "active",
+      "dependency": []
     }
   ],
   "roadmap_quarters_v1": [

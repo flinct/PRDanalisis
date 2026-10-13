@@ -101,6 +101,10 @@ Gunakan `Assessments/reference/` untuk reusable PRD analysis berikut:
 ### `Assessments/reference/contact-context-visibility.md`
 - Reference RBAC / visibility scope untuk Contact list, detail, dan picker
 
+### `Assessments/reference/roadmap-calendar-timeline.md`
+- Plan + scheduling logic + adaptation map untuk auto-schedule roadmap QA Browser (estimasi L/M/H → tanggal → kalender Week/Month view)
+- Mockup di `roadmap.pen` frame `CAL-M` / `CAL-W`
+
 ## Companion Artifacts Outside Memory
 
 ### `Assessments/`

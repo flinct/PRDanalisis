@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap Calendar Timeline — Prototype</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0B0F14;--card:#121820;--hdr:#151B23;--panel:#0F172A;--border:#263244;
+--t1:#E6EAF1;--t2:#A7B1C2;--t3:#6B7280;--info:#3B82F6;--grn:#22C55E;
+--org:#F59E0B;--red:#EF4444;--pur:#8B5CF6;--we:#0E141B;--cyan:#06B6D4;
+--p0:#EF4444;--p1:#F59E0B;--p2:#A78BFA;--p3:#475569;--bl:#64748B;
+--p0bg:#3B1618;--p1bg:#3A2A10;--p2bg:#2C2246;--p3bg:#222B36;--blbg:#1E293B}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+#app{flex:1;display:flex;flex-direction:column;max-width:1440px;width:100%;margin:0 auto}
+.header{background:var(--hdr);padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.header h1{font-size:17px;font-weight:700;white-space:nowrap}
+.header .badge{background:#1E3A8A;padding:2px 8px;border-radius:6px;font-size:10px;color:#93C5FD}
+.controls{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.view-toggle,.week-toggle{display:flex;background:var(--panel);border-radius:8px;padding:3px;gap:2px}
+.view-btn,.wk-btn{padding:4px 12px;border:none;border-radius:6px;background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.view-btn.active,.wk-btn.active{background:#1D4ED8;color:#fff}
+.nav-group{display:flex;align-items:center;gap:6px}
+.nav-btn{background:none;border:none;color:var(--t2);font-size:18px;font-weight:700;cursor:pointer;padding:3px 6px;border-radius:4px}
+.nav-btn:hover{background:var(--panel)}
+.nav-label{font-size:12px;font-weight:700;min-width:160px;text-align:center}
+.btn{padding:4px 12px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-today{background:var(--card);color:var(--t1);border:1px solid var(--border)}
+.btn-compute{background:var(--org);color:#0B0F14}
+.btn-apply{background:var(--grn);color:#0B0F14}
+.btn-discard{background:var(--red);color:#fff}
+.btn:disabled{opacity:0.4;cursor:default}
+.info-strip{background:var(--panel);padding:5px 20px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--t3);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.info-strip .legend{display:flex;gap:10px;margin-left:auto}
+.legend-item{display:flex;align-items:center;gap:3px}
+.legend-dot{width:7px;height:7px;border-radius:50%}
+.stats{display:flex;gap:6px;padding:6px 20px;background:var(--bg);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stat{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:600}
+.cal-container{flex:1;display:flex;overflow:auto;min-height:0}
+.cal-main{flex:1;padding:12px;min-width:0;overflow:auto}
+
+/* Month grid */
+.month-grid{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.weekday-row{display:flex;gap:0}
+.weekday-cell{flex:1;text-align:center;padding:7px 0;font-size:10px;font-weight:600;color:var(--t2);background:var(--hdr);border-right:1px solid var(--border)}
+.weekday-cell:last-child{border-right:none}
+.weekday-cell.we{color:var(--t3);background:var(--we)}
+.week-row{display:flex;gap:0;border-top:1px solid var(--border)}
+.week-row:first-of-type{border-top:none}
+.day-cell{flex:1;min-height:100px;padding:5px;border-right:1px solid var(--border);background:var(--card);cursor:pointer;position:relative;transition:background .15s}
+.day-cell:last-child{border-right:none}
+.day-cell:hover{background:#16202B}
+.day-cell.we{background:var(--we)}
+.day-cell.out{opacity:0.35}
+.day-cell.today{box-shadow:inset 0 0 0 2px var(--info);z-index:1}
+.day-cell.overload{box-shadow:inset 0 0 0 2px var(--red)}
+.day-num{font-size:10px;font-weight:700;margin-bottom:3px}
+.day-num.today{color:var(--info)}
+.day-num.out{color:var(--t3)}
+.day-chips{display:flex;flex-direction:column;gap:2px}
+.chip{display:flex;align-items:center;gap:4px;padding:2px 5px;border-radius:4px;font-size:8px;height:18px;cursor:pointer;transition:filter .15s;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.chip:hover{filter:brightness(1.3)}
+.chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.chip-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.more-chip{font-size:7px;color:var(--t3);padding:0 3px}
+
+/* Week view (1W/2W/3W) */
+.week-span-area{position:relative;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.week-span-label{font-size:8px;color:var(--t3);padding:3px 8px;position:relative;z-index:1}
+.span-pill{position:absolute;height:22px;border-radius:5px;display:flex;align-items:center;padding:0 8px;gap:4px;font-size:9px;font-weight:700;color:#fff;cursor:pointer;transition:filter .15s;overflow:hidden;white-space:nowrap}
+.span-pill:hover{filter:brightness(1.2)}
+.week-grid{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.week-col{flex:1;border-right:1px solid var(--border);background:var(--card);min-height:260px;display:flex;flex-direction:column}
+.week-col:last-child{border-right:none}
+.week-col.today{background:#0E1A2D}
+.week-col.we{background:var(--we)}
+.week-col-hdr{padding:6px 4px;text-align:center;font-size:10px;font-weight:700;border-bottom:1px solid var(--border);color:var(--t2)}
+.week-col-hdr.today{color:var(--info);background:#0D1B30}
+.week-col-hdr .date{font-size:16px;display:block;margin-top:1px;color:var(--t1)}
+.week-col-hdr.today .date{color:var(--info)}
+.week-col-hdr .dayname{font-size:8px;color:var(--t3);display:block}
+.cap-meter{padding:4px 6px;border-bottom:1px solid var(--border);background:var(--hdr)}
+.cap-line{display:flex;align-items:center;gap:3px;font-size:8px;color:var(--t3);margin-bottom:1px}
+.cap-bar{height:3px;border-radius:2px;background:#222B36;flex:1;overflow:hidden}
+.cap-fill{height:100%;border-radius:2px;transition:width .3s}
+.day-cards{flex:1;padding:4px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.day-card{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:5px 6px;cursor:pointer;transition:border-color .15s}
+.day-card:hover{border-color:var(--info)}
+.card-hdr{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.card-badge{padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;color:#fff}
+.card-phase{font-size:8px;font-weight:600;display:flex;align-items:center;gap:2px}
+.card-phase .dot{width:5px;height:5px;border-radius:50%}
+.card-title{font-size:9px;color:var(--t1);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.weekend-placeholder{text-align:center;color:var(--t3);font-size:9px;padding:20px 8px;line-height:1.4}
+
+/* Detail */
+.detail-panel{width:300px;background:var(--hdr);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-shrink:0}
+.detail-panel.open{display:block}
+.detail-header{padding:12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px}
+.detail-header h3{font-size:13px;font-weight:700;flex:1;line-height:1.3}
+.detail-close{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:2px}
+.detail-body{padding:12px;display:flex;flex-direction:column;gap:10px}
+.detail-section h5{font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0}
+.detail-label{color:var(--t3)}
+.detail-value{font-weight:600}
+.estimate-box{background:#3B82F60A;border:1px solid #3B82F620;border-radius:6px;padding:7px 8px;font-size:11px}
+.estimate-box .main{font-weight:700;margin-bottom:2px}
+.estimate-box .sub{font-size:9px;color:var(--t3);line-height:1.4}
+.dep-chip{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600;background:#A78BFA22;color:#A78BFA;border:1px solid #A78BFA44;cursor:pointer;margin:1px}
+.dep-chip:hover{background:#A78BFA33}
+.footer{background:var(--hdr);padding:6px 20px;font-size:9px;color:var(--t3);border-top:1px solid var(--border);display:flex;justify-content:space-between}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <h1>📅 Roadmap — Calendar</h1>
+    <span class="badge">auto-schedule · prototype</span>
+    <div class="controls">
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="month" onclick="setView('month')">Month</button>
+        <button class="view-btn" data-view="week" onclick="setView('week')">Week</button>
+      </div>
+      <div id="weekToggles" style="display:none" class="week-toggle">
+        <button class="wk-btn active" data-wk="1" onclick="setWeekSpan(1)">1W</button>
+        <button class="wk-btn" data-wk="2" onclick="setWeekSpan(2)">2W</button>
+        <button class="wk-btn" data-wk="3" onclick="setWeekSpan(3)">3W</button>
+      </div>
+      <div class="nav-group">
+        <button class="nav-btn" onclick="navPrev()">‹</button>
+        <span class="nav-label" id="navLabel">October 2026</span>
+        <button class="nav-btn" onclick="navNext()">›</button>
+      </div>
+      <button class="btn btn-today" onclick="goToday()">Today</button>
+      <button class="btn btn-compute" id="btnCompute" onclick="doCompute()">⚡ Compute</button>
+      <button class="btn btn-apply" id="btnApply" onclick="doApply()" style="display:none">✓ Apply</button>
+      <button class="btn btn-discard" id="btnDiscard" onclick="doDiscard()" style="display:none">✕ Discard</button>
+    </div>
+  </div>
+  <div class="info-strip">
+    <span>Dev {L:10 M:20 H:40}d · QA {L:5 M:10 H:15}d × risk ÷ cap · Mon–Fri · anchor = Senin 12 Okt 2026</span>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--info)"></div>Dev</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--grn)"></div>QA</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--p0)"></div>P0</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--p1)"></div>P1</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--p2)"></div>P2</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--p3)"></div>P3</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bl)"></div>Backlog</div>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="cal-container">
+    <div class="cal-main" id="calMain"></div>
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-header">
+        <h3 id="detailTitle">—</h3>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="detail-body" id="detailBody"></div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Prototype · data dari roadmap seed (103 tasks) + OP + synthetic · greedy list-scheduling → tanggal</span>
+    <span id="footerInfo">—</span>
+  </div>
+</div>
+<script>
+'use strict';
+var TASKS = [{"id": "s01", "title": "Hotfix: login redirect bug", "fullTitle": "Hotfix: login redirect bug", "area": "Auth", "effort": "L", "impact": "H", "testing": "L", "priority": "P0", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 1}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s02", "title": "WA template message validation", "fullTitle": "WA template message validation", "area": "Omnichannel Chat", "effort": "L", "impact": "M", "testing": "M", "priority": "P1", "current": true, "schedule": {"start": {"month": "Oct", "week": 2}, "end": {"month": "Oct", "week": 3}}, "status": "active", "dependency": ["s01"], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s03", "title": "Dashboard KPI widget v2", "fullTitle": "Dashboard KPI widget v2", "area": "Analytics", "effort": "M", "impact": "M", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Nov", "week": 1}, "end": {"month": "Nov", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s04", "title": "Contact CSV import hotfix", "fullTitle": "Contact CSV import hotfix", "area": "Contact", "effort": "L", "impact": "M", "testing": "L", "priority": "P1", "current": true, "schedule": {"start": {"month": "Oct", "week": 3}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 0.8, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s05", "title": "SLA escalation notification", "fullTitle": "SLA escalation notification", "area": "Notification", "effort": "M", "impact": "H", "testing": "M", "priority": "P0", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": ["s01"], "risk": 1.2, "pm_front_weeks": 0, "opId": "2697", "rank": 0, "opStatus": "In Progress"}, {"id": "s06", "title": "Ticket auto-assign round-robin", "fullTitle": "Ticket auto-assign round-robin", "area": "Ticket", "effort": "H", "impact": "M", "testing": "M", "priority": "P1", "current": false, "schedule": {"start": {"month": "Nov", "week": 1}, "end": {"month": "Nov", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s07", "title": "Widget embed script优化", "fullTitle": "Widget embed script优化", "area": "Widget", "effort": "L", "impact": "L", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Dec", "week": 1}, "end": {"month": "Dec", "week": 2}}, "status": "active", "dependency": [], "risk": 0.7, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "s08", "title": "Broadcast rate limiter", "fullTitle": "Broadcast rate limiter", "area": "Broadcast", "effort": "M", "impact": "M", "testing": "H", "priority": "P2", "current": false, "schedule": {"start": {"month": "Nov", "week": 3}, "end": {"month": "Dec", "week": 2}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 0, "opStatus": ""}, {"id": "t01", "title": "SuperAdmin Global Company Access — Phase 2: Tenant…", "fullTitle": "SuperAdmin Global Company Access — Phase 2: Tenant Impersonation (Read-Only) + Audit", "area": "Growth & Internal Ops", "effort": "M", "impact": "M", "testing": "M", "priority": "P2", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2332", "rank": 1, "opStatus": ""}, {"id": "t02", "title": "GTM Marketing untuk satuinbox", "fullTitle": "GTM Marketing untuk satuinbox", "area": "Growth & Internal Ops", "effort": "M", "impact": "M", "testing": "L", "priority": "P2", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": ["t01"], "risk": 1, "pm_front_weeks": 0, "opId": "2366", "rank": 2, "opStatus": "In Progress"}, {"id": "t03", "title": "demo data base and dashboard (kandidat request dem…", "fullTitle": "demo data base and dashboard (kandidat request demo)", "area": "Growth & Internal Ops", "effort": "M", "impact": "M", "testing": "L", "priority": "P1", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 3, "opStatus": ""}, {"id": "t04", "title": "wa official adujstmen research (perubahan pricing …", "fullTitle": "wa official adujstmen research (perubahan pricing Meta)", "area": "Omnichannel Chat", "effort": "L", "impact": "H", "testing": "L", "priority": "P1", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "666", "rank": 4, "opStatus": ""}, {"id": "t05", "title": "infra stability — slice 1: SLO + top incident fixe…", "fullTitle": "infra stability — slice 1: SLO + top incident fixes", "area": "Growth & Internal Ops", "effort": "M", "impact": "H", "testing": "M", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 5, "opStatus": ""}, {"id": "t06", "title": "Notification Service Improvement", "fullTitle": "Notification Service Improvement", "area": "Notification", "effort": "M", "impact": "H", "testing": "H", "priority": "P2", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2697", "rank": 6, "opStatus": "In Progress"}, {"id": "t07", "title": "sales module — PRD + P0 fixes (security scope, tra…", "fullTitle": "sales module — PRD + P0 fixes (security scope, transition guard, team transfer)", "area": "Sales", "effort": "M", "impact": "H", "testing": "M", "priority": "P1", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 7, "opStatus": ""}, {"id": "t08", "title": "cost simulation WA official + guarding", "fullTitle": "cost simulation WA official + guarding", "area": "Payment", "effort": "M", "impact": "H", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 3}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": ["t04"], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 8, "opStatus": ""}, {"id": "t09", "title": "Advanced Offline Export", "fullTitle": "Advanced Offline Export", "area": "Analytics", "effort": "H", "impact": "H", "testing": "M", "priority": "P1", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2909", "rank": 9, "opStatus": "In Progress"}, {"id": "t10", "title": "informative utilities (deskripsi fitur + utility m…", "fullTitle": "informative utilities (deskripsi fitur + utility message conversation)", "area": "Omnichannel Chat", "effort": "M", "impact": "H", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Nov", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 10, "opStatus": ""}, {"id": "t11", "title": "faq (halaman FAQ in-app)", "fullTitle": "faq (halaman FAQ in-app)", "area": "Tools / Add-ons", "effort": "L", "impact": "M", "testing": "L", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 11, "opStatus": ""}, {"id": "t12", "title": "ticketing KPI card + dynamic status", "fullTitle": "ticketing KPI card + dynamic status", "area": "Ticket", "effort": "M", "impact": "H", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Nov", "week": 1}, "end": {"month": "Nov", "week": 2}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 12, "opStatus": ""}, {"id": "t13", "title": "simplicity settings (redesign + guidance)", "fullTitle": "simplicity settings (redesign + guidance)", "area": "Tools / Add-ons", "effort": "M", "impact": "H", "testing": "H", "priority": "P2", "current": false, "schedule": {"start": {"month": "Dec", "week": 1}, "end": {"month": "Dec", "week": 2}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 13, "opStatus": ""}, {"id": "t14", "title": "grouping contact (unifikasi contact lintas channel…", "fullTitle": "grouping contact (unifikasi contact lintas channel)", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "P2", "current": false, "schedule": {"start": {"month": "Nov", "week": 3}, "end": {"month": "Dec", "week": 2}}, "status": "active", "dependency": [], "risk": 1.3, "pm_front_weeks": 0, "opId": "", "rank": 14, "opStatus": ""}, {"id": "t15", "title": "create prospect from conversation", "fullTitle": "create prospect from conversation", "area": "Omnichannel Chat", "effort": "M", "impact": "H", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": ["t07"], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 15, "opStatus": ""}, {"id": "t16", "title": "UI conversation redesign — audit UX", "fullTitle": "UI conversation redesign — audit UX", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "P2", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 16, "opStatus": ""}, {"id": "t17", "title": "UI conversation redesign — implementasi", "fullTitle": "UI conversation redesign — implementasi", "area": "Omnichannel Chat", "effort": "M", "impact": "H", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Nov", "week": 4}}, "status": "active", "dependency": ["t16"], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 17, "opStatus": ""}, {"id": "t18", "title": "wizard setting onboarding (quick guide sekali munc…", "fullTitle": "wizard setting onboarding (quick guide sekali muncul)", "area": "Tools / Add-ons", "effort": "M", "impact": "M", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Dec", "week": 1}, "end": {"month": "Apr", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 18, "opStatus": ""}, {"id": "t19", "title": "widget module (UI/UX + workflow + domain per widge…", "fullTitle": "widget module (UI/UX + workflow + domain per widget)", "area": "Tools / Add-ons", "effort": "M", "impact": "M", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Dec", "week": 1}, "end": {"month": "Dec", "week": 4}}, "status": "active", "dependency": ["t13", "t18"], "risk": 1, "pm_front_weeks": 0, "opId": "2908", "rank": 19, "opStatus": "In Progress"}, {"id": "t20", "title": "sales module — revamp UI/workflow", "fullTitle": "sales module — revamp UI/workflow", "area": "Sales", "effort": "H", "impact": "H", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": ["t07"], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 20, "opStatus": ""}, {"id": "t21", "title": "DB topology HOT/WARM/COLD (+ exclude conversation …", "fullTitle": "DB topology HOT/WARM/COLD (+ exclude conversation group)", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "Backlog", "current": false, "schedule": null, "status": "hold", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 21, "opStatus": ""}, {"id": "t22", "title": "fraud dashboard (invoice fraud via broadcast + int…", "fullTitle": "fraud dashboard (invoice fraud via broadcast + integrasi Lincah)", "area": "Broadcast", "effort": "H", "impact": "H", "testing": "M", "priority": "Backlog", "current": false, "schedule": null, "status": "hold", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 22, "opStatus": ""}, {"id": "t23", "title": "chat bot auto response (AI agent + eskalasi human)", "fullTitle": "chat bot auto response (AI agent + eskalasi human)", "area": "AI", "effort": "H", "impact": "H", "testing": "H", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 23, "opStatus": ""}, {"id": "t24", "title": "converesation AI summary", "fullTitle": "converesation AI summary", "area": "AI", "effort": "M", "impact": "H", "testing": "H", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": ["t23"], "risk": 1, "pm_front_weeks": 0, "opId": "2910", "rank": 24, "opStatus": ""}, {"id": "t25", "title": "chat tools API (communication layer pihak ketiga)", "fullTitle": "chat tools API (communication layer pihak ketiga)", "area": "Open API", "effort": "H", "impact": "H", "testing": "M", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2449", "rank": 25, "opStatus": ""}, {"id": "t26", "title": "widget app (web/mobile app, Google login)", "fullTitle": "widget app (web/mobile app, Google login)", "area": "Tools / Add-ons", "effort": "H", "impact": "H", "testing": "M", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 26, "opStatus": ""}, {"id": "t27", "title": "telegram channel (resume pending dev)", "fullTitle": "telegram channel (resume pending dev)", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "Backlog", "current": false, "schedule": null, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "168", "rank": 27, "opStatus": ""}, {"id": "t28", "title": "shopee chat", "fullTitle": "shopee chat", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "Backlog", "current": false, "schedule": null, "status": "blocked", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2183", "rank": 28, "opStatus": ""}, {"id": "t29", "title": "tiktok chat", "fullTitle": "tiktok chat", "area": "Omnichannel Chat", "effort": "H", "impact": "H", "testing": "H", "priority": "P2", "current": false, "schedule": null, "status": "backlog", "dependency": ["t28"], "risk": 1, "pm_front_weeks": 0, "opId": "2830", "rank": 29, "opStatus": ""}, {"id": "tmtwdn18t", "title": "Email summary", "fullTitle": "Email summary", "area": "Omnichannel Chat", "effort": "L", "impact": "M", "testing": "M", "priority": "P3", "current": false, "schedule": null, "status": "backlog", "dependency": ["t23"], "risk": 1, "pm_front_weeks": 0, "opId": "2910", "rank": 30, "opStatus": ""}, {"id": "tmucfgez3", "title": "MUV - monthly unique visitor", "fullTitle": "MUV - monthly unique visitor", "area": "Analytics", "effort": "M", "impact": "H", "testing": "L", "priority": "P0", "current": true, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "done", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4371", "rank": 31, "opStatus": ""}, {"id": "op-3844", "title": "satuinbox product presentation 01-10-2026", "fullTitle": "satuinbox product presentation 01-10-2026", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3844", "rank": 0, "opStatus": "Closed"}, {"id": "op-3977", "title": "gathering UI/UX + QA flow", "fullTitle": "gathering UI/UX + QA flow", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3977", "rank": 0, "opStatus": "Closed"}, {"id": "op-3973", "title": "WA Web Multi-Library: whatsmeow Connector Architec…", "fullTitle": "WA Web Multi-Library: whatsmeow Connector Architecture Brief", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3973", "rank": 0, "opStatus": "New"}, {"id": "op-3912", "title": "meeting satuinbox x lion parcel", "fullTitle": "meeting satuinbox x lion parcel", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3912", "rank": 0, "opStatus": "Closed"}, {"id": "op-3889", "title": "quick brief satuinbox 29-09-2026", "fullTitle": "quick brief satuinbox 29-09-2026", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3889", "rank": 0, "opStatus": "Closed"}, {"id": "op-3843", "title": "all product meeting 29-09-2026", "fullTitle": "all product meeting 29-09-2026", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3843", "rank": 0, "opStatus": "Closed"}, {"id": "op-3868", "title": "Brainstorming Bad decrypt (lion parcel issue)", "fullTitle": "Brainstorming Bad decrypt (lion parcel issue)", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3868", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3732", "title": "[Analytics] Unique Inbound Clients per Channel (MU…", "fullTitle": "[Analytics] Unique Inbound Clients per Channel (MUV)", "area": "Feature", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3732", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3192", "title": "Phase-D advance export - SAP Template Preset (4-Sh…", "fullTitle": "Phase-D advance export - SAP Template Preset (4-Sheet Export)", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3192", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3191", "title": "Phase-C advance export - Broadcast Export (Recipie…", "fullTitle": "Phase-C advance export - Broadcast Export (Recipient + Campaign Level)", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3191", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3190", "title": "Phase-B advance export - Column Registry + Configu…", "fullTitle": "Phase-B advance export - Column Registry + Configurable Column Export", "area": "Feature", "effort": "M", "impact": "", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3190", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3189", "title": "Phase-A advance export - Export Row-Level Collecti…", "fullTitle": "Phase-A advance export - Export Row-Level Collections + Zero-Impact Sync Pipeline", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3189", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3799", "title": "Align Repo and create branch v2.8.3", "fullTitle": "Align Repo and create branch v2.8.3", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3799", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3788", "title": "brainstorming workflow conversation breakdown qa", "fullTitle": "brainstorming workflow conversation breakdown qa", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3788", "rank": 0, "opStatus": "Closed"}, {"id": "op-3774", "title": "Conversation - Whatsapp API - late message from we…", "fullTitle": "Conversation - Whatsapp API - late message from webhook", "area": "Bug", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3774", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3762", "title": "brainstorming UIUX n QA flow", "fullTitle": "brainstorming UIUX n QA flow", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3762", "rank": 0, "opStatus": "Closed"}, {"id": "op-3734", "title": "monitoring release v2.8.2", "fullTitle": "monitoring release v2.8.2", "area": "Task", "effort": "M", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3734", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3731", "title": "brainstorm satuinbox x lincah (rayyan)", "fullTitle": "brainstorm satuinbox x lincah (rayyan)", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3731", "rank": 0, "opStatus": "Closed"}, {"id": "op-3733", "title": "[WA Web] Geography-Based Entitlement Exclusion (In…", "fullTitle": "[WA Web] Geography-Based Entitlement Exclusion (Indonesia-only)", "area": "Feature", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3733", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3727", "title": "Sales Modul improvement", "fullTitle": "Sales Modul improvement", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3727", "rank": 0, "opStatus": "New"}, {"id": "op-2901", "title": "MongoDB read preference: per-service/per-query ove…", "fullTitle": "MongoDB read preference: per-service/per-query overrides + secondaryPreferred on analytics-exclusive aggregations", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2901", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3305", "title": "Research strategy satuinbox - Audit", "fullTitle": "Research strategy satuinbox - Audit", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3305", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3275", "title": "Shopee seller research", "fullTitle": "Shopee seller research", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3275", "rank": 0, "opStatus": "In Progress"}, {"id": "op-2970", "title": "Requirement Allignment Sales modul ( BD )", "fullTitle": "Requirement Allignment Sales modul ( BD )", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2970", "rank": 0, "opStatus": "In Progress"}, {"id": "op-2965", "title": "mapping automation satuinbox", "fullTitle": "mapping automation satuinbox", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2965", "rank": 0, "opStatus": "In Progress"}, {"id": "op-2135", "title": "Whatsapp web - handle temporary banned (on whatsap…", "fullTitle": "Whatsapp web - handle temporary banned (on whatsapp web and mobile)", "area": "Bug", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2135", "rank": 0, "opStatus": "In Progress"}, {"id": "op-1836", "title": "Leads - Lead Assignee Update Does Not Realtime Syn…", "fullTitle": "Leads - Lead Assignee Update Does Not Realtime Sync to Assigned Agent", "area": "Bug", "effort": "H", "impact": "", "testing": "M", "priority": "Backlog", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "1836", "rank": 0, "opStatus": "In Progress"}, {"id": "op-1271", "title": "Settings- Subs - Payment - QRIS/ All Vendor E-Wall…", "fullTitle": "Settings- Subs - Payment - QRIS/ All Vendor E-Wallet Payment Fails to Load in Pay Invoice Modal", "area": "Bug", "effort": "M", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "1271", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3327", "title": "Non aktifkan user prod yang sudah end subs nya", "fullTitle": "Non aktifkan user prod yang sudah end subs nya", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3327", "rank": 0, "opStatus": "New"}, {"id": "op-3281", "title": "Research broadcast whatsapp web", "fullTitle": "Research broadcast whatsapp web", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3281", "rank": 0, "opStatus": "New"}, {"id": "op-3183", "title": "demo form landing page", "fullTitle": "demo form landing page", "area": "Feature", "effort": "M", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3183", "rank": 0, "opStatus": "New"}, {"id": "op-3161", "title": "Technical Analysis v2.8.1/2/3", "fullTitle": "Technical Analysis v2.8.1/2/3", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3161", "rank": 0, "opStatus": "New"}, {"id": "op-3146", "title": "Feature alignment conversation mobile and web", "fullTitle": "Feature alignment conversation mobile and web", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3146", "rank": 0, "opStatus": "New"}, {"id": "op-3711", "title": "Analytics - Responsiveness (ketanggapan) section -…", "fullTitle": "Analytics - Responsiveness (ketanggapan) section - Inverted Agent Attribution in RLT Average Metric Aggregation", "area": "Bug", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3711", "rank": 0, "opStatus": "New"}, {"id": "op-3709", "title": "Analytics - Responsiveness (Ketanggapan) section -…", "fullTitle": "Analytics - Responsiveness (Ketanggapan) section - FRT Detail View Queries Initial Assignee ID Instead of First Message Sender", "area": "Bug", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3709", "rank": 0, "opStatus": "New"}, {"id": "op-3708", "title": "Analytics - Responsiveness (Ketanggapan) section -…", "fullTitle": "Analytics - Responsiveness (Ketanggapan) section - Cross-Agent SLA Synchronization Leak Across Multi-Assignee Conversations", "area": "Bug", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3708", "rank": 0, "opStatus": "New"}, {"id": "op-3691", "title": "Analytics UI/UX-Polish  - Unformatted Floating-Poi…", "fullTitle": "Analytics UI/UX-Polish  - Unformatted Floating-Point Numbers in Chart Hover Tooltips", "area": "Bug", "effort": "H", "impact": "", "testing": "M", "priority": "Backlog", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3691", "rank": 0, "opStatus": "New"}, {"id": "op-3214", "title": "Global Search Suggestion - Search typo tolerance w…", "fullTitle": "Global Search Suggestion - Search typo tolerance was not working in production version", "area": "Bug", "effort": "H", "impact": "", "testing": "H", "priority": "Backlog", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3214", "rank": 0, "opStatus": "New"}, {"id": "op-3199", "title": "Broadcast - WAPI - broadcast wapi not follow broad…", "fullTitle": "Broadcast - WAPI - broadcast wapi not follow broadcast hour", "area": "Bug", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3199", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3006", "title": "Global Search Suggestion - No toast message when r…", "fullTitle": "Global Search Suggestion - No toast message when release relation label on conversation/ticket detail", "area": "Bug", "effort": "H", "impact": "", "testing": "H", "priority": "Backlog", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3006", "rank": 0, "opStatus": "New"}, {"id": "op-2331", "title": "SuperAdmin Global Company Access — Phase 1: Compan…", "fullTitle": "SuperAdmin Global Company Access — Phase 1: Company List/Search + Onboarding Approval", "area": "Feature", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "2331", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3400", "title": "Fraud team request (Hafizh)", "fullTitle": "Fraud team request (Hafizh)", "area": "Feature", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3400", "rank": 0, "opStatus": "In Progress"}, {"id": "op-3520", "title": "Call log from whatsapp", "fullTitle": "Call log from whatsapp", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3520", "rank": 0, "opStatus": "New"}, {"id": "op-3394", "title": "Improvement RMQ issue", "fullTitle": "Improvement RMQ issue", "area": "Feature", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3394", "rank": 0, "opStatus": "New"}, {"id": "op-3200", "title": "browser compability (flacky)", "fullTitle": "browser compability (flacky)", "area": "Bug", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3200", "rank": 0, "opStatus": "New"}, {"id": "op-3194", "title": "research root cause delay email, disconnected emai…", "fullTitle": "research root cause delay email, disconnected email", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3194", "rank": 0, "opStatus": "New"}, {"id": "op-3201", "title": "global search logic improvements", "fullTitle": "global search logic improvements", "area": "Feature", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "3201", "rank": 0, "opStatus": "New"}, {"id": "op-4116", "title": "satuinbox presentation 06-10-2026", "fullTitle": "satuinbox presentation 06-10-2026", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4116", "rank": 0, "opStatus": "Closed"}, {"id": "op-4115", "title": "all product meeting 06-10-2026", "fullTitle": "all product meeting 06-10-2026", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4115", "rank": 0, "opStatus": "Closed"}, {"id": "op-4154", "title": "realign task v2.8.3 ", "fullTitle": "realign task v2.8.3 ", "area": "Task", "effort": "M", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4154", "rank": 0, "opStatus": "In Progress"}, {"id": "op-4289", "title": "QA product meeting - audit converseation", "fullTitle": "QA product meeting - audit converseation", "area": "Task", "effort": "L", "impact": "", "testing": "M", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4289", "rank": 0, "opStatus": "New"}, {"id": "op-4282", "title": "meeting detail GTM", "fullTitle": "meeting detail GTM", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4282", "rank": 0, "opStatus": "Closed"}, {"id": "op-4155", "title": "meeting satuinbox x lincah", "fullTitle": "meeting satuinbox x lincah", "area": "Task", "effort": "L", "impact": "", "testing": "L", "priority": "P3", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4155", "rank": 0, "opStatus": "Closed"}, {"id": "op-4128", "title": "Conversation - room -  issue related to message", "fullTitle": "Conversation - room -  issue related to message", "area": "Bug", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "4128", "rank": 0, "opStatus": "In Progress"}, {"id": "tmv4r29na0", "title": "1A — Ticket Grouping by Custom Attribute", "fullTitle": "1A — Ticket Grouping by Custom Attribute", "area": "", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 32, "opStatus": ""}, {"id": "tmv4r29na1", "title": "2A — Link Chat to Ticket via Open API", "fullTitle": "2A — Link Chat to Ticket via Open API", "area": "", "effort": "L", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 33, "opStatus": ""}, {"id": "tmv4r29na2", "title": "3A — Bulk Ticket Update", "fullTitle": "3A — Bulk Ticket Update", "area": "", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 34, "opStatus": ""}, {"id": "tmv4r29na3", "title": "4A — Broadcast Create via Open API with Attachment", "fullTitle": "4A — Broadcast Create via Open API with Attachment", "area": "", "effort": "M", "impact": "", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 35, "opStatus": ""}, {"id": "tmv4r29na4", "title": "5A — Create Broadcast via Deep Link", "fullTitle": "5A — Create Broadcast via Deep Link", "area": "", "effort": "L", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 36, "opStatus": ""}, {"id": "tmv4r29na5", "title": "6A — Broadcast Channel Expansion + Attachment Type…", "fullTitle": "6A — Broadcast Channel Expansion + Attachment Types", "area": "", "effort": "M", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 37, "opStatus": ""}, {"id": "tmv4r29na6", "title": "7A — Broadcast Status, History & Retry", "fullTitle": "7A — Broadcast Status, History & Retry", "area": "", "effort": "L", "impact": "", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 38, "opStatus": ""}, {"id": "tmv4r29na7", "title": "8A — Ticket Webhook Enhancement + Two-Way Sync", "fullTitle": "8A — Ticket Webhook Enhancement + Two-Way Sync", "area": "", "effort": "L", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 39, "opStatus": ""}, {"id": "tmv4r29na8", "title": "9A — Update Team Inbox via Open API", "fullTitle": "9A — Update Team Inbox via Open API", "area": "", "effort": "L", "impact": "", "testing": "L", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 40, "opStatus": ""}, {"id": "tmv4r29na9", "title": "10A — Integration Identifiers Documentation", "fullTitle": "10A — Integration Identifiers Documentation", "area": "", "effort": "M", "impact": "", "testing": "M", "priority": "P2", "current": false, "schedule": {"start": {"month": "Oct", "week": 1}, "end": {"month": "Oct", "week": 4}}, "status": "active", "dependency": [], "risk": 1, "pm_front_weeks": 0, "opId": "", "rank": 41, "opStatus": ""}];
+var CAL={DEV_DAYS:{L:10,M:20,H:40},QA_DAYS:{L:5,M:10,H:15},DEFAULT_CAP:0.8};
+var CFG={dev:4,qa:2,cap:0.8};
+var PRIO_COL={P0:'#EF4444',P1:'#F59E0B',P2:'#A78BFA',P3:'#475569',Backlog:'#64748B'};
+var PRIO_TINT={P0:'#3B1618',P1:'#3A2A10',P2:'#2C2246',P3:'#222B36',Backlog:'#1E293B'};
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var ANCHOR='2026-10-12';
+var DAY_MS=86400000;
+
+var currentView='month', weekSpan=1;
+var cursorDate=new Date('2026-10-01T00:00:00Z');
+var scheduleResult=null, previewActive=false, selectedTaskId=null;
+
+function iso(d){return d.toISOString().slice(0,10)}
+function parseISO(s){return new Date(s+'T00:00:00Z')}
+function isWorkday(d){var wd=d.getUTCDay();return wd>=1&&wd<=5}
+function nthWorkday(startISO,n){var d=parseISO(startISO),count=0;while(count<n){if(isWorkday(d))count++;if(count<n)d=new Date(d.getTime()+DAY_MS)}return iso(d)}
+function nextWorkday(dateISO){var d=new Date(parseISO(dateISO).getTime()+DAY_MS);while(!isWorkday(d))d=new Date(d.getTime()+DAY_MS);return iso(d)}
+function workdaysBetween(fromISO,toISO){var out=[],d=parseISO(fromISO),end=parseISO(toISO);while(d<=end){if(isWorkday(d))out.push(iso(d));d=new Date(d.getTime()+DAY_MS)}return out}
+function phaseDays(level,kind,risk,cap){var base=(kind==='dev'?CAL.DEV_DAYS:CAL.QA_DAYS)[level]||(kind==='dev'?20:10);return Math.max(1,Math.round(base*risk/(cap||CAL.DEFAULT_CAP)))}
+function startOfWeek(d){d=new Date(d);var wd=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-wd);return iso(d)}
+function maxISO(arr){return arr.slice().sort().pop()}
+function addDays(d,n){return new Date(d.getTime()+n*DAY_MS)}
+function daysInMonth(y,m){return new Date(y,m+1,0).getUTCDate()}
+function taskById(id){for(var i=0;i<TASKS.length;i++){if(TASKS[i].id===id)return TASKS[i]}return null}
+
+function computeScheduleDates(tasks,cfg,anchor){
+  var cap=cfg.cap>0?cfg.cap:CAL.DEFAULT_CAP,nDev=Math.max(1,cfg.dev|0),nQa=Math.max(1,cfg.qa|0);
+  var byId={};tasks.forEach(function(t){byId[t.id]=t});
+  var isHold=function(t){return t.status==='hold'};
+  var isBlocked=function(t){return t.status==='blocked'};
+  var sectionOf=function(t){return t.current?'current':t.schedule?'next':'backlog'};
+  var SECT={current:2,next:1,backlog:0},IMPW={H:3,M:2,L:1},EFFINV={L:3,M:2,H:1};
+  var prioScore=function(t){var P={P0:4,P1:3,P2:2,P3:1,Backlog:0}[t.priority]||0;return P*1000+(IMPW[t.impact]||0)*100+(EFFINV[t.effort]||0)*10+({L:3,M:2,H:1}[t.testing]||0)};
+  var active=tasks.filter(function(t){return !isHold(t)&&!isBlocked(t)&&sectionOf(t)!=='backlog'});
+  var blockedIds=new Set(tasks.filter(isBlocked).map(function(t){return t.id}));
+  var depsOf=function(t){return Array.isArray(t.dependency)?t.dependency:t.dependency?[t.dependency]:[]};
+  var remaining=new Set(active.map(function(t){return t.id}));
+  var done={},result={},devFree=new Array(nDev).fill(anchor),qaFree=new Array(nQa).fill(anchor);
+  var depOk=function(t){for(var i=0;i<depsOf(t).length;i++){var d=depsOf(t)[i];if(blockedIds.has(d))return false;var dt=byId[d];if(!dt||isHold(dt))continue;if(remaining.has(d))return false}return true};
+  var guard=0;
+  while(remaining.size&&guard++<2000){
+    var ready=active.filter(function(t){return remaining.has(t.id)&&depOk(t)});
+    if(!ready.length)break;
+    ready.sort(function(a,b){return SECT[sectionOf(b)]-SECT[sectionOf(a)]||prioScore(b)-prioScore(a)||(a.rank||0)-(b.rank||0)});
+    var t=ready[0];
+    var depEnds=depsOf(t).map(function(d){return done[d]||anchor});
+    var pmStart=t.pm_front_weeks?nthWorkday(anchor,Math.round(t.pm_front_weeks*5)):anchor;
+    var dl=devFree.indexOf(devFree.slice().sort()[0]);
+    var devStart=maxISO([devFree[dl]].concat(depEnds,[pmStart]));
+    var devEnd=nthWorkday(devStart,phaseDays(t.effort,'dev',t.risk||1,cap));
+    devFree[dl]=nextWorkday(devEnd);
+    var ql=qaFree.indexOf(qaFree.slice().sort()[0]);
+    var qaStart=maxISO([qaFree[ql],nextWorkday(devEnd)]);
+    var qaEnd=nthWorkday(qaStart,phaseDays(t.testing,'qa',1,cap));
+    qaFree[ql]=nextWorkday(qaEnd);
+    done[t.id]=qaEnd;
+    result[t.id]={devStart:devStart,devEnd:devEnd,qaStart:qaStart,qaEnd:qaEnd,start:devStart,end:qaEnd};
+    remaining.delete(t.id);
+  }
+  return {result:result,deferred:Array.from(remaining)};
+}
+
+function buildDayMap(tasks,result,rangeStart,rangeEnd){
+  var map={};
+  for(var id in result){var r=result[id],t=taskById(id);if(!t)continue;
+    workdaysBetween(r.devStart,r.devEnd).forEach(function(d,i){if(d>=rangeStart&&d<=rangeEnd){if(!map[d])map[d]=[];map[d].push({id:id,title:t.title,phase:'Dev',prio:t.priority,d:i+1,total:workdaysBetween(r.devStart,r.devEnd).length})}});
+    workdaysBetween(r.qaStart,r.qaEnd).forEach(function(d,i){if(d>=rangeStart&&d<=rangeEnd){if(!map[d])map[d]=[];map[d].push({id:id,title:t.title,phase:'QA',prio:t.priority,d:i+1,total:workdaysBetween(r.qaStart,r.qaEnd).length})}});
+  }return map;
+}
+
+function buildSpans(tasks,result,weekStartISO,numWeeks){
+  var weekEnd=addDays(parseISO(weekStartISO),numWeeks*7-1);
+  var weekEndISO=iso(weekEnd),spans=[];
+  for(var id in result){var r=result[id],t=taskById(id);if(!t)continue;
+    [['Dev',r.devStart,r.devEnd],['QA',r.qaStart,r.qaEnd]].forEach(function(arr){
+      var phase=arr[0],from=arr[1],to=arr[2];
+      if(to<weekStartISO||from>weekEndISO)return;
+      spans.push({id:id,title:t.title,phase:phase,prio:t.priority,from:from,to:to,
+        fromClipped:from<weekStartISO,toClipped:to>weekEndISO});
+    });
+  }return spans.sort(function(a,b){return a.from<b.from?-1:1});
+}
+
+// ── Renderers ────────────────────────────────────────────────────────────
+function renderStats(){
+  var el=document.getElementById('stats');
+  var n=0,s=0,b=0,schedN=Object.keys(scheduleResult?scheduleResult.result:{}).length;
+  TASKS.forEach(function(t){if(t.current)n++;else if(t.schedule)s++;else b++});
+  el.innerHTML='<span class="stat" style="background:#1D4ED822;color:#60A5FA">● NOW: '+n+'</span>'+
+    '<span class="stat" style="background:#22C55E22;color:#4ADE80">● NEXT: '+s+'</span>'+
+    '<span class="stat" style="background:#64748B22;color:#94A3B8">● Backlog: '+b+'</span>'+
+    '<span class="stat" style="background:var(--card);color:var(--t1)">Total: '+TASKS.length+'</span>'+
+    (schedN?'<span class="stat" style="background:#F59E0B22;color:#FCD34D">⚡ Scheduled: '+schedN+'</span>':'');
+}
+
+function escQ(s){return s.replace(/'/g,"&#39;").replace(/"/g,"&quot;")}
+
+function renderMonthView(){
+  var el=document.getElementById('calMain');
+  var y=cursorDate.getUTCFullYear(),m=cursorDate.getUTCMonth();
+  document.getElementById('navLabel').textContent=MONTHS[m]+' '+y;
+  var first=new Date(Date.UTC(y,m,1));
+  var startDow=(first.getUTCDay()+6)%7;
+  var startDate=addDays(first,-startDow);
+  var sd=scheduleResult?scheduleResult.result:null;
+  var todayISO=iso(new Date());
+  var rangeStart=iso(startDate),rangeEnd=iso(addDays(startDate,41));
+  var dayMap=sd?buildDayMap(TASKS,sd,rangeStart,rangeEnd):{};
+  var html='<div class="month-grid"><div class="weekday-row">';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d,i){
+    html+='<div class="weekday-cell'+(i>=5?' we':'')+'">'+d+'</div>'});
+  html+='</div>';
+  for(var w=0;w<6;w++){
+    var rowDate=addDays(startDate,w*7);
+    if(w>0&&rowDate.getUTCMonth()!==m&&rowDate.getUTCDate()>7)break;
+    html+='<div class="week-row">';
+    for(var d=0;d<7;d++){
+      var cd=addDays(rowDate,d),ciso=iso(cd);
+      var isWe=d>=5,isOut=cd.getUTCMonth()!==m,isToday=ciso===todayISO;
+      var chips=dayMap[ciso]||[];
+      var devActive=chips.filter(function(c){return c.phase==='Dev'}).length;
+      var cls='day-cell'+(isWe?' we':'')+(isOut?' out':'')+(isToday?' today':'')+(devActive>CFG.dev?' overload':'');
+      html+='<div class="'+cls+'" onclick="jumpToWeek(\''+ciso+'\')">';
+      html+='<div class="day-num'+(isToday?' today':'')+(isOut?' out':'')+'">'+cd.getUTCDate()+'</div>';
+      html+='<div class="day-chips">';
+      chips.slice(0,3).forEach(function(c){
+        html+='<div class="chip" style="background:'+PRIO_TINT[c.prio]+';border-left:3px solid '+(c.phase==='Dev'?'var(--info)':'var(--grn)')+'" onclick="event.stopPropagation();showDetail(\''+c.id+'\')">';
+        html+='<span class="chip-dot" style="background:'+(c.phase==='Dev'?'var(--info)':'var(--grn)')+'"></span>';
+        html+='<span class="chip-txt">'+c.title+' · '+c.phase+' d'+c.d+'/'+c.total+'</span></div>'});
+      if(chips.length>3)html+='<div class="more-chip">+'+(chips.length-3)+' more</div>';
+      html+='</div></div>'}
+    html+='</div>'}
+  html+='</div>';
+  el.innerHTML=html;
+  updateFooter('Month');
+}
+
+function renderWeekView(){
+  var el=document.getElementById('calMain');
+  var ws=parseISO(startOfWeek(cursorDate));
+  var numDays=weekSpan*7;
+  var we=addDays(ws,numDays-1);
+  var wsISO=iso(ws),weISO=iso(we);
+  var todayISO=iso(new Date());
+  document.getElementById('navLabel').textContent=wsISO+' — '+weISO+(weekSpan>1?' ('+weekSpan+'W)':'');
+  var sd=scheduleResult?scheduleResult.result:null;
+  if(!sd){el.innerHTML='<div style="padding:60px;text-align:center;color:var(--t3)">Klik ⚡ Compute untuk generate jadwal otomatis</div>';return}
+  var spans=buildSpans(TASKS,sd,wsISO,weekSpan);
+  var COL=100/numDays;
+  // Span area
+  var spanRows=[];
+  spans.forEach(function(s){
+    var sFrom=s.from<wsISO?wsISO:s.from,sTo=s.to>weISO?weISO:s.to;
+    var fromDay=Math.round((parseISO(sFrom)-ws)/DAY_MS),toDay=Math.round((parseISO(sTo)-ws)/DAY_MS);
+    fromDay=Math.max(0,fromDay);toDay=Math.min(numDays-1,toDay);
+    var row=-1;
+    for(var r=0;r<spanRows.length;r++){var ok=true;spanRows[r].forEach(function(p){if(!(toDay<p.fromDay||fromDay>p.toDay))ok=false});if(ok){row=r;break}}
+    if(row<0){row=spanRows.length;spanRows.push([])}
+    spanRows[row].push({fromDay:fromDay,toDay:toDay,span:s});
+  });
+  var spanH=26+spanRows.length*28;
+  var html='<div class="week-span-area" style="height:'+spanH+'px">';
+  html+='<div class="week-span-label">SPAN — Dev biru / QA hijau · ▸ = lanjut · klik = detail</div>';
+  // Today tint
+  var todayDay=Math.round((parseISO(todayISO)-ws)/DAY_MS);
+  if(todayDay>=0&&todayDay<numDays){
+    html+='<div style="position:absolute;left:'+(todayDay*COL)+'%;top:0;width:'+COL+'%;height:100%;background:#12233F;z-index:0"></div>'}
+  spanRows.forEach(function(row,ri){
+    row.forEach(function(p){
+      var left=p.fromDay*COL+0.2,width=(p.toDay-p.fromDay+1)*COL-0.4;
+      var color=p.span.phase==='Dev'?'var(--info)':'var(--grn)';
+      html+='<div class="span-pill" style="left:'+left+'%;top:'+(20+ri*28)+'px;width:'+width+'%;background:'+color+'" onclick="showDetail(\''+p.span.id+'\')">';
+      html+=escQ(p.span.title)+' · '+p.span.phase;
+      if(p.span.toClipped)html+=' <span style="margin-left:auto;opacity:0.7">▸</span>';
+      html+='</div>'});
+  });
+  html+='</div>';
+  // Day columns
+  html+='<div class="week-grid">';
+  var dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  for(var d=0;d<numDays;d++){
+    var cd=addDays(ws,d),ciso=iso(cd),isToday=ciso===todayISO,isWe=cd.getUTCDay()===0||cd.getUTCDay()===6;
+    var chips=buildDayMap(TASKS,sd,ciso,ciso)[ciso]||[];
+    var devA=chips.filter(function(c){return c.phase==='Dev'}).length;
+    var qaA=chips.filter(function(c){return c.phase==='QA'}).length;
+    var dn=dayNames[cd.getUTCDay()===0?6:cd.getUTCDay()-1];
+    html+='<div class="week-col'+(isToday?' today':'')+(isWe?' we':'')+'">';
+    html+='<div class="week-col-hdr'+(isToday?' today':'')+'"><span class="dayname">'+dn+'</span><span class="date">'+cd.getUTCDate()+'</span></div>';
+    html+='<div class="cap-meter">';
+    html+='<div class="cap-line"><span style="color:var(--info)">D</span><div class="cap-bar"><div class="cap-fill" style="width:'+Math.min(100,devA/CFG.dev*100)+'%;background:'+(devA>CFG.dev?'var(--red)':'var(--info)')+'"></div></div><span>'+devA+'/'+CFG.dev+'</span></div>';
+    html+='<div class="cap-line"><span style="color:var(--grn)">Q</span><div class="cap-bar"><div class="cap-fill" style="width:'+Math.min(100,qaA/CFG.qa*100)+'%;background:'+(qaA>CFG.qa?'var(--red)':'var(--grn)')+'"></div></div><span>'+qaA+'/'+CFG.qa+'</span></div>';
+    html+='</div>';
+    html+='<div class="day-cards">';
+    if(isWe&&chips.length===0){html+='<div class="weekend-placeholder">Weekend<br>Tidak ada eksekusi<br>(Mon–Fri)</div>'}
+    else if(!isWe&&chips.length===0){html+='<div style="text-align:center;color:var(--t3);font-size:8px;padding:8px">—</div>'}
+    chips.forEach(function(c){
+      var prioCol=PRIO_COL[c.prio]||'var(--t3)';
+      html+='<div class="day-card" onclick="showDetail(\''+c.id+'\')">';
+      html+='<div class="card-hdr"><span class="card-badge" style="background:'+prioCol+'">'+(c.prio==='Backlog'?'BL':c.prio)+'</span>';
+      html+='<span class="card-phase" style="color:'+(c.phase==='Dev'?'var(--info)':'var(--grn)')+'"><span class="dot" style="background:'+(c.phase==='Dev'?'var(--info)':'var(--grn)')+'"></span>'+c.phase+' d'+c.d+'/'+c.total+'</span></div>';
+      html+='<div class="card-title">'+escQ(c.title)+'</div>';
+      html+='</div>'});
+    html+='</div></div>'}
+  html+='</div>';
+  el.innerHTML=html;
+  updateFooter('Week '+weekSpan+'W');
+}
+
+function updateFooter(label){
+  var sd=scheduleResult?scheduleResult.result:{};
+  var n=Object.keys(sd).length;
+  // Find max date
+  var maxD='—';
+  for(var id in sd){if(sd[id].end>maxD)maxD=sd[id].end}
+  document.getElementById('footerInfo').textContent=label+' · '+n+' tasks scheduled · extends to '+maxD;
+}
+
+function render(){renderStats();if(currentView==='month')renderMonthView();else renderWeekView()}
+
+// ── Interaction ──────────────────────────────────────────────────────────
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.view-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view===v)});
+  document.getElementById('weekToggles').style.display=v==='week'?'':'none';
+  render();
+}
+function setWeekSpan(n){
+  weekSpan=n;
+  document.querySelectorAll('.wk-btn').forEach(function(b){b.classList.toggle('active',b.dataset.wk==n)});
+  render();
+}
+function navPrev(){
+  if(currentView==='month')cursorDate=new Date(Date.UTC(cursorDate.getUTCFullYear(),cursorDate.getUTCMonth()-1,1));
+  else cursorDate=addDays(cursorDate,-weekSpan*7);
+  render();
+}
+function navNext(){
+  if(currentView==='month')cursorDate=new Date(Date.UTC(cursorDate.getUTCFullYear(),cursorDate.getUTCMonth()+1,1));
+  else cursorDate=addDays(cursorDate,weekSpan*7);
+  render();
+}
+function goToday(){
+  var now=new Date();
+  if(currentView==='month')cursorDate=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1));
+  else cursorDate=new Date(parseISO(startOfWeek(now)));
+  render();
+}
+function jumpToWeek(dateISO){
+  cursorDate=parseISO(dateISO);
+  setView('week');
+}
+function doCompute(){
+  scheduleResult=computeScheduleDates(TASKS,CFG,ANCHOR);
+  previewActive=true;
+  document.getElementById('btnApply').style.display='';
+  document.getElementById('btnDiscard').style.display='';
+  document.getElementById('btnCompute').disabled=true;
+  render();
+}
+function doApply(){previewActive=false;document.getElementById('btnApply').style.display='none';document.getElementById('btnDiscard').style.display='none';document.getElementById('btnCompute').disabled=false;render()}
+function doDiscard(){scheduleResult=null;previewActive=false;document.getElementById('btnApply').style.display='none';document.getElementById('btnDiscard').style.display='none';document.getElementById('btnCompute').disabled=false;render()}
+function showDetail(id){
+  selectedTaskId=id;var t=taskById(id);if(!t)return;
+  var panel=document.getElementById('detailPanel');panel.classList.add('open');
+  document.getElementById('detailTitle').textContent=t.fullTitle||t.title;
+  var html='<div class="detail-section"><h5>Info</h5>';
+  html+='<div class="detail-row"><span class="detail-label">Priority</span><span class="detail-value" style="color:'+(PRIO_COL[t.priority]||'var(--t1)')+'">'+t.priority+'</span></div>';
+  html+='<div class="detail-row"><span class="detail-label">Section</span><span class="detail-value">'+(t.current?'NOW':t.schedule?'NEXT':'BACKLOG')+'</span></div>';
+  html+='<div class="detail-row"><span class="detail-label">Area</span><span class="detail-value">'+t.area+'</span></div>';
+  if(t.opId)html+='<div class="detail-row"><span class="detail-label">OP #</span><span class="detail-value" style="color:var(--info)">'+t.opId+(t.opStatus?' · '+t.opStatus:'')+'</span></div>';
+  html+='</div><div class="detail-section"><h5>Estimasi</h5>';
+  html+='<div class="detail-row"><span class="detail-label">Dev Effort</span><span class="detail-value">'+t.effort+' → '+CAL.DEV_DAYS[t.effort]+'d (kerja)</span></div>';
+  html+='<div class="detail-row"><span class="detail-label">QA Testing</span><span class="detail-value">'+t.testing+' → '+CAL.QA_DAYS[t.testing]+'d (kerja)</span></div>';
+  html+='<div class="detail-row"><span class="detail-label">Impact</span><span class="detail-value">'+t.impact+'</span></div>';
+  html+='<div class="detail-row"><span class="detail-label">Risk</span><span class="detail-value">'+t.risk+'×</span></div>';
+  var dd=phaseDays(t.effort,'dev',t.risk||1,CFG.cap),qd=phaseDays(t.testing,'qa',1,CFG.cap);
+  html+='<div class="estimate-box"><div class="main">Dev '+dd+'d + QA '+qd+'d = '+(dd+qd)+' hari kerja</div>';
+  if(scheduleResult&&scheduleResult.result[id]){var r=scheduleResult.result[id];
+    html+='<div class="sub">📅 Dev: '+r.devStart+' → '+r.devEnd+'<br>📅 QA: '+r.qaStart+' → '+r.qaEnd+'</div>'}
+  else{html+='<div class="sub">×risk÷cap (cap='+CFG.cap+')</div>'}
+  html+='</div></div>';
+  if(t.dependency&&t.dependency.length){
+    html+='<div class="detail-section"><h5>Dependency ('+t.dependency.length+')</h5><div>';
+    t.dependency.forEach(function(did){var dt=taskById(did);html+='<span class="dep-chip" onclick="showDetail(\''+did+'\')">'+(dt?dt.title.substring(0,30):did)+'</span>'});
+    html+='</div></div>'}
+  document.getElementById('detailBody').innerHTML=html;
+}
+function closeDetail(){document.getElementById('detailPanel').classList.remove('open');selectedTaskId=null}
+
+// ── Init ── auto-compute + render ─────────────────────────────────────────
+doCompute();
+</script>
+</body>
+</html>

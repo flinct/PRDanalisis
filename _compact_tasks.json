@@ -1,0 +1,2478 @@
+[
+  {
+    "id": "t01",
+    "task": "SuperAdmin Global Company Access \u2014 **Phase 2: Tenant Impersonation (Read-Only) + Audit**",
+    "area": "Growth & Internal Ops",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P2",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2332",
+    "rank": 1,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t02",
+    "task": "GTM Marketing untuk satuinbox",
+    "area": "Growth & Internal Ops",
+    "effort": "M",
+    "impact": "M",
+    "testing": "L",
+    "priority": "P2",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t01"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2366",
+    "rank": 2,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "t03",
+    "task": "demo data base and dashboard (kandidat request demo)",
+    "area": "Growth & Internal Ops",
+    "effort": "M",
+    "impact": "M",
+    "testing": "L",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 3,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t04",
+    "task": "wa official adujstmen research (perubahan pricing Meta)",
+    "area": "Omnichannel Chat",
+    "effort": "L",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "666",
+    "rank": 4,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t05",
+    "task": "infra stability \u2014 slice 1: SLO + top incident fixes",
+    "area": "Growth & Internal Ops",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 5,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t06",
+    "task": "Notification Service Improvement",
+    "area": "Notification",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2697",
+    "rank": 6,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "t07",
+    "task": "sales module \u2014 PRD + P0 fixes (security scope, transition guard, team transfer)",
+    "area": "Sales",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P1",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 7,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t08",
+    "task": "cost simulation WA official + guarding",
+    "area": "Payment",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 3
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t04"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 8,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t09",
+    "task": "Advanced Offline Export",
+    "area": "Analytics",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P1",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2909",
+    "rank": 9,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "t10",
+    "task": "informative utilities (deskripsi fitur + utility message conversation)",
+    "area": "Omnichannel Chat",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 10,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t11",
+    "task": "faq (halaman FAQ in-app)",
+    "area": "Tools / Add-ons",
+    "effort": "L",
+    "impact": "M",
+    "testing": "L",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 11,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t12",
+    "task": "ticketing KPI card + dynamic status",
+    "area": "Ticket",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 2
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 12,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t13",
+    "task": "simplicity settings (redesign + guidance)",
+    "area": "Tools / Add-ons",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 2
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 13,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t14",
+    "task": "grouping contact (unifikasi contact lintas channel)",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Nov",
+        "week": 3
+      },
+      "end": {
+        "month": "Dec",
+        "week": 2
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1.3,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 14,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t15",
+    "task": "create prospect from conversation",
+    "area": "Omnichannel Chat",
+    "effort": "M",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t07"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 15,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t16",
+    "task": "UI conversation redesign \u2014 audit UX",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 16,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t17",
+    "task": "UI conversation redesign \u2014 implementasi",
+    "area": "Omnichannel Chat",
+    "effort": "M",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Nov",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t16"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 17,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t18",
+    "task": "wizard setting onboarding (quick guide sekali muncul)",
+    "area": "Tools / Add-ons",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Apr",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 18,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t19",
+    "task": "widget module (UI/UX + workflow + domain per widget)",
+    "area": "Tools / Add-ons",
+    "effort": "M",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Dec",
+        "week": 1
+      },
+      "end": {
+        "month": "Dec",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t13",
+      "t18"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2908",
+    "rank": 19,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "t20",
+    "task": "sales module \u2014 revamp UI/workflow",
+    "area": "Sales",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [
+      "t07"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 20,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t21",
+    "task": "DB topology HOT/WARM/COLD (+ exclude conversation group)",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "hold",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 21,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t22",
+    "task": "fraud dashboard (invoice fraud via broadcast + integrasi Lincah)",
+    "area": "Broadcast",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "hold",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 22,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t23",
+    "task": "chat bot auto response (AI agent + eskalasi human)",
+    "area": "AI",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 23,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t24",
+    "task": "converesation AI summary",
+    "area": "AI",
+    "effort": "M",
+    "impact": "H",
+    "testing": "H",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [
+      "t23"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2910",
+    "rank": 24,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t25",
+    "task": "chat tools API (communication layer pihak ketiga)",
+    "area": "Open API",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2449",
+    "rank": 25,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t26",
+    "task": "widget app (web/mobile app, Google login)",
+    "area": "Tools / Add-ons",
+    "effort": "H",
+    "impact": "H",
+    "testing": "M",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 26,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t27",
+    "task": "telegram channel (resume pending dev)",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "168",
+    "rank": 27,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t28",
+    "task": "shopee chat",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": null,
+    "status": "blocked",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2183",
+    "rank": 28,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "t29",
+    "task": "tiktok chat",
+    "area": "Omnichannel Chat",
+    "effort": "H",
+    "impact": "H",
+    "testing": "H",
+    "priority": "P2",
+    "current": false,
+    "schedule": null,
+    "status": "backlog",
+    "dependency": [
+      "t28"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2830",
+    "rank": 29,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmtwdn18t",
+    "task": "Email summary",
+    "area": "Omnichannel Chat",
+    "effort": "L",
+    "impact": "M",
+    "testing": "M",
+    "priority": "P3",
+    "current": false,
+    "schedule": null,
+    "status": "backlog",
+    "dependency": [
+      "t23"
+    ],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2910",
+    "rank": 30,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmucfgez3",
+    "task": "MUV - monthly unique visitor",
+    "area": "Analytics",
+    "effort": "M",
+    "impact": "H",
+    "testing": "L",
+    "priority": "P0",
+    "current": true,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "done",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4371",
+    "rank": 31,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "op-3844",
+    "task": "satuinbox product presentation 01-10-2026",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3844",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3977",
+    "task": "gathering UI/UX + QA flow",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3977",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3973",
+    "task": "WA Web Multi-Library: whatsmeow Connector Architecture Brief",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3973",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3912",
+    "task": "meeting satuinbox x lion parcel",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3912",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3889",
+    "task": "quick brief satuinbox 29-09-2026",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3889",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3843",
+    "task": "all product meeting 29-09-2026",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3843",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3868",
+    "task": "Brainstorming Bad decrypt (lion parcel issue)",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3868",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3732",
+    "task": "[Analytics] Unique Inbound Clients per Channel (MUV)",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3732",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3192",
+    "task": "Phase-D advance export - SAP Template Preset (4-Sheet Export)",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3192",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3191",
+    "task": "Phase-C advance export - Broadcast Export (Recipient + Campaign Level)",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3191",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3190",
+    "task": "Phase-B advance export - Column Registry + Configurable Column Export",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3190",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3189",
+    "task": "Phase-A advance export - Export Row-Level Collections + Zero-Impact Sync Pipeline",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3189",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3799",
+    "task": "Align Repo and create branch v2.8.3",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3799",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3788",
+    "task": "brainstorming workflow conversation breakdown qa",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3788",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3774",
+    "task": "Conversation - Whatsapp API - late message from webhook",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3774",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3762",
+    "task": "brainstorming UIUX n QA flow",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3762",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3734",
+    "task": "monitoring release v2.8.2",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3734",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3731",
+    "task": "brainstorm satuinbox x lincah (rayyan)",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3731",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-3733",
+    "task": "[WA Web] Geography-Based Entitlement Exclusion (Indonesia-only)",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3733",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3727",
+    "task": "Sales Modul improvement",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3727",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-2901",
+    "task": "MongoDB read preference: per-service/per-query overrides + secondaryPreferred on analytics-exclusive aggregations",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2901",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3305",
+    "task": "Research strategy satuinbox - Audit",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3305",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3275",
+    "task": "Shopee seller research",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3275",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-2970",
+    "task": "Requirement Allignment Sales modul ( BD )",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2970",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-2965",
+    "task": "mapping automation satuinbox",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2965",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-2135",
+    "task": "Whatsapp web - handle temporary banned (on whatsapp web and mobile)",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2135",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-1836",
+    "task": "Leads - Lead Assignee Update Does Not Realtime Sync to Assigned Agent",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "1836",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-1271",
+    "task": "Settings- Subs - Payment - QRIS/ All Vendor E-Wallet Payment Fails to Load in Pay Invoice Modal",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "1271",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3327",
+    "task": "Non aktifkan user prod yang sudah end subs nya",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3327",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3281",
+    "task": "Research broadcast whatsapp web",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3281",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3183",
+    "task": "demo form landing page",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3183",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3161",
+    "task": "Technical Analysis v2.8.1/2/3",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3161",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3146",
+    "task": "Feature alignment conversation mobile and web",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3146",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3711",
+    "task": "Analytics - Responsiveness (ketanggapan) section - Inverted Agent Attribution in RLT Average Metric Aggregation",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3711",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3709",
+    "task": "Analytics - Responsiveness (Ketanggapan) section - FRT Detail View Queries Initial Assignee ID Instead of First Message Sender",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3709",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3708",
+    "task": "Analytics - Responsiveness (Ketanggapan) section - Cross-Agent SLA Synchronization Leak Across Multi-Assignee Conversations",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3708",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3691",
+    "task": "Analytics UI/UX-Polish  - Unformatted Floating-Point Numbers in Chart Hover Tooltips",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3691",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3214",
+    "task": "Global Search Suggestion - Search typo tolerance was not working in production version",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3214",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3199",
+    "task": "Broadcast - WAPI - broadcast wapi not follow broadcast hour",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3199",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3006",
+    "task": "Global Search Suggestion - No toast message when release relation label on conversation/ticket detail",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "Backlog",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3006",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-2331",
+    "task": "SuperAdmin Global Company Access \u2014 **Phase 1: Company List/Search + Onboarding Approval**",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "2331",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3400",
+    "task": "Fraud team request (Hafizh)",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3400",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-3520",
+    "task": "Call log from whatsapp",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3520",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3394",
+    "task": "Improvement RMQ issue",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3394",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3200",
+    "task": "browser compability (flacky)",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3200",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3194",
+    "task": "research root cause delay email, disconnected email",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3194",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-3201",
+    "task": "global search logic improvements",
+    "area": "Feature",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "3201",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-4116",
+    "task": "satuinbox presentation 06-10-2026",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4116",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-4115",
+    "task": "all product meeting 06-10-2026",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4115",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-4154",
+    "task": "realign task v2.8.3 ",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4154",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "op-4289",
+    "task": "QA product meeting - audit converseation",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4289",
+    "rank": 0,
+    "_opStatusMapped": "New"
+  },
+  {
+    "id": "op-4282",
+    "task": "meeting detail GTM",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4282",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-4155",
+    "task": "meeting satuinbox x lincah",
+    "area": "Task",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P3",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4155",
+    "rank": 0,
+    "_opStatusMapped": "Closed"
+  },
+  {
+    "id": "op-4128",
+    "task": "Conversation - room -  issue related to message",
+    "area": "Bug",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "4128",
+    "rank": 0,
+    "_opStatusMapped": "In Progress"
+  },
+  {
+    "id": "tmv4r29na0",
+    "task": "1A \u2014 Ticket Grouping by Custom Attribute",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 32,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na1",
+    "task": "2A \u2014 Link Chat to Ticket via Open API",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 33,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na2",
+    "task": "3A \u2014 Bulk Ticket Update",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 34,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na3",
+    "task": "4A \u2014 Broadcast Create via Open API with Attachment",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 35,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na4",
+    "task": "5A \u2014 Create Broadcast via Deep Link",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 36,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na5",
+    "task": "6A \u2014 Broadcast Channel Expansion + Attachment Types",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 37,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na6",
+    "task": "7A \u2014 Broadcast Status, History & Retry",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 38,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na7",
+    "task": "8A \u2014 Ticket Webhook Enhancement + Two-Way Sync",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 39,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na8",
+    "task": "9A \u2014 Update Team Inbox via Open API",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 40,
+    "_opStatusMapped": ""
+  },
+  {
+    "id": "tmv4r29na9",
+    "task": "10A \u2014 Integration Identifiers Documentation",
+    "area": "",
+    "effort": "",
+    "impact": "",
+    "testing": "",
+    "priority": "P2",
+    "current": false,
+    "schedule": {
+      "start": {
+        "month": "Oct",
+        "week": 1
+      },
+      "end": {
+        "month": "Oct",
+        "week": 4
+      }
+    },
+    "status": "active",
+    "dependency": [],
+    "risk": 1,
+    "pm_front_weeks": 0,
+    "opId": "",
+    "rank": 41,
+    "_opStatusMapped": ""
+  }
+]
