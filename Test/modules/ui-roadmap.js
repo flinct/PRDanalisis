@@ -1392,8 +1392,6 @@ function RoadmapPage() {
               {mvOp.loading && <span style={{ fontSize: 10, color: "#64748b" }}>sync…</span>}
               <div style={{width:1,height:18,background:"#1e293b"}} />
               <div id="cap-month-pills" style={{display:"inline-flex",alignItems:"center",gap:5}}></div>
-              {saveCd > 0 && <span style={{fontSize:10,fontWeight:600,color:"#f59e0b",marginLeft:8,opacity:0.9}}>saving in {saveCd}s</span>}
-              {savedFlash && <span style={{fontSize:10,fontWeight:600,color:"#22c55e",marginLeft:8,opacity:0.9}}>✓ saved</span>}
             </div>);
           })()}
           <div id="cap-month-panel"></div>
