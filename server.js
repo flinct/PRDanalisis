@@ -198,17 +198,18 @@ async function fetchOpenProjectCollection(apiPath, collectionKey) {
 
 async function fetchAllOpenProjectWorkPackages(filters, sort) {
   const pageSize = 200;
-  let offset = 0;
+  // OP v3 API: `offset` is the 1-based PAGE NUMBER, not a row index. pageSize = rows/page.
+  let pageNum = 1;
   let total = null;
   const rows = [];
-  while (total == null || offset < total) {
-    const apiPath = `/api/v3/work_packages?offset=${offset}&pageSize=${pageSize}&filters=${encodeURIComponent(JSON.stringify(filters))}&sortBy=${encodeURIComponent(buildOpenProjectSort(sort))}`;
+  while (total == null || rows.length < total) {
+    const apiPath = `/api/v3/work_packages?offset=${pageNum}&pageSize=${pageSize}&filters=${encodeURIComponent(JSON.stringify(filters))}&sortBy=${encodeURIComponent(buildOpenProjectSort(sort))}`;
     const data = await openProjectRequest(apiPath);
     const batch = Array.isArray(data._embedded?.elements) ? data._embedded.elements : [];
     rows.push(...batch.map(normalizeWorkPackage));
     total = Number(data.total) || rows.length;
     if (!batch.length) break;
-    offset += pageSize;
+    pageNum += 1;
   }
   return { total: total || rows.length, rows };
 }
@@ -221,9 +222,14 @@ function buildOpenProjectWpFilters(qs) {
     .map((v) => toIntOrNull(v))
     .filter((v) => Number.isFinite(v) && v > 0)
     .map(String);
-  if (!versionIds.length) throw new Error("versionId required");
+  // all=1 → fetch every WP in the project (no version scope). Roadmap v2 cache uses this.
+  const fetchAll = String(qs.all || "") === "1" || String(qs.all || "") === "true";
+  if (!fetchAll && !versionIds.length) throw new Error("versionId required");
   filters.push({ project: { operator: "=", values: [String(projectId)] } });
-  filters.push({ version: { operator: "=", values: versionIds } });
+  if (!fetchAll) filters.push({ version: { operator: "=", values: versionIds } });
+  // includeClosed=1 → status "*" (all statuses incl. closed); OP default hides closed.
+  if (String(qs.includeClosed || "") === "1" || String(qs.includeClosed || "") === "true")
+    filters.push({ status: { operator: "*", values: [] } });
   const map = [
     ["statusId", "status_id"],
     ["typeId", "type_id"],
@@ -261,9 +267,12 @@ function normalizeWorkPackage(wp) {
   const priorityHref = pickHref(wp, "priority");
   const assigneeHref = pickHref(wp, "assignee");
   const versionHref = pickHref(wp, "version");
+  const parentHref = pickHref(wp, "parent");
   return {
     id: wp.id,
     subject: decodeHtml(wp.subject || ""),
+    parentId: parseIdFromHref(parentHref),
+    parentName: wp._links?.parent?.title || "",
     description: decodeHtml(
       (wp.description &&
         (wp.description.raw || wp.description.html || wp.description)) ||
@@ -914,10 +923,18 @@ app.patch("/api/dashboard/openproject/work-package/:id", async (req, res) => {
       links.responsible = toIntOrNull(req.body.responsibleId) ? { href: `/api/v3/users/${toIntOrNull(req.body.responsibleId)}` } : { href: null };
     if (req.body.versionId !== undefined)
       links.version = toIntOrNull(req.body.versionId) ? { href: `/api/v3/versions/${toIntOrNull(req.body.versionId)}` } : { href: null };
+    // parentId: re-parent WP, or explicit null to detach. ("" / undefined = leave unchanged)
+    if (req.body.parentId !== undefined)
+      links.parent = toIntOrNull(req.body.parentId) ? { href: `/api/v3/work_packages/${toIntOrNull(req.body.parentId)}` } : { href: null };
     // ponytail: customField3 = QA Assignee (multi-user)
     if (Array.isArray(req.body.qaAssigneeIds))
       links.customField3 = req.body.qaAssigneeIds.map(id => ({ href: `/api/v3/users/${id}` }));
     if (Object.keys(links).length) body._links = links;
+    // startDate / dueDate: ISO "YYYY-MM-DD" to set, explicit null to clear. ("" / undefined = leave unchanged)
+    if (req.body.startDate !== undefined)
+      body.startDate = req.body.startDate ? String(req.body.startDate) : null;
+    if (req.body.dueDate !== undefined)
+      body.dueDate = req.body.dueDate ? String(req.body.dueDate) : null;
     const pctDone = toIntOrNull(req.body.percentageDone);
     if (pctDone != null) body.percentageDone = Math.min(100, Math.max(0, pctDone));
     if (Object.keys(body).length < 2)
@@ -961,6 +978,9 @@ app.post("/api/dashboard/openproject/work-package", async (req, res) => {
     if (responsibleId) body._links.responsible = { href: `/api/v3/users/${responsibleId}` };
     const versionId = toIntOrNull(req.body.versionId);
     if (versionId) body._links.version = { href: `/api/v3/versions/${versionId}` };
+    // parentId → parent-child WP hierarchy (Feature child of Milestone). Roadmap v2 breakdown.
+    const parentId = toIntOrNull(req.body.parentId);
+    if (parentId) body._links.parent = { href: `/api/v3/work_packages/${parentId}` };
     // ponytail: customField3 = QA Assignee (multi-user)
     if (Array.isArray(req.body.qaAssigneeIds))
       body._links.customField3 = req.body.qaAssigneeIds.map(id => ({ href: `/api/v3/users/${id}` }));
@@ -975,6 +995,97 @@ app.post("/api/dashboard/openproject/work-package", async (req, res) => {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
+
+// Delete a work package. Used by roadmap to remove test/garbage WPs. Hard delete via OP API.
+app.delete("/api/dashboard/openproject/work-package/:id", async (req, res) => {
+  try {
+    const id = toIntOrNull(req.params.id);
+    if (!id) return res.status(400).json({ ok: false, error: "invalid id" });
+    await openProjectRequest(`/api/v3/work_packages/${id}`, { method: "DELETE" });
+    res.json({ ok: true, id });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ── OP relations (Roadmap v2 dependency / breakdown linkage) ──
+// OP v3 relation types: relates, duplicates, duplicated, blocks, blocked, precedes,
+// follows, includes, partof, requires, required. "follows" = this WP follows (depends on) `to`.
+const OP_RELATION_TYPES = new Set([
+  "relates", "duplicates", "duplicated", "blocks", "blocked",
+  "precedes", "follows", "includes", "partof", "requires", "required",
+]);
+
+function normalizeRelation(r) {
+  if (!r) return null;
+  const fromHref = r._links?.from?.href || "";
+  const toHref = r._links?.to?.href || "";
+  const idFrom = (fromHref.match(/(\d+)$/) || [])[1];
+  const idTo = (toHref.match(/(\d+)$/) || [])[1];
+  return {
+    id: r.id,
+    type: r.type || r._links?.type?.href?.split("/").pop() || "relates",
+    reverseType: r.reverseType || null,
+    description: r.description || "",
+    fromId: idFrom ? Number(idFrom) : null,
+    toId: idTo ? Number(idTo) : null,
+    fromName: r._links?.from?.title || "",
+    toName: r._links?.to?.title || "",
+  };
+}
+
+// List relations for a work package.
+app.get("/api/dashboard/openproject/work-package/:id/relations", async (req, res) => {
+  try {
+    const id = toIntOrNull(req.params.id);
+    if (!id) return res.status(400).json({ ok: false, error: "invalid id" });
+    // OP deprecated /work_packages/:id/relations (308) → use /relations with involved filter.
+    const filters = encodeURIComponent(JSON.stringify([{ involved: { operator: "=", values: [String(id)] } }]));
+    const data = await openProjectRequest(`/api/v3/relations?filters=${filters}&pageSize=100`);
+    const els = Array.isArray(data._embedded?.elements) ? data._embedded.elements : [];
+    res.json({ ok: true, relations: els.map(normalizeRelation).filter(Boolean) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message, relations: [] });
+  }
+});
+
+// Create a relation FROM :id TO toId with a given type (default "relates").
+app.post("/api/dashboard/openproject/work-package/:id/relations", async (req, res) => {
+  try {
+    const id = toIntOrNull(req.params.id);
+    const toId = toIntOrNull(req.body.toId);
+    const type = String(req.body.type || "relates").trim().toLowerCase();
+    if (!id || !toId) return res.status(400).json({ ok: false, error: "id and toId required" });
+    if (id === toId) return res.status(400).json({ ok: false, error: "cannot relate a WP to itself" });
+    if (!OP_RELATION_TYPES.has(type)) return res.status(400).json({ ok: false, error: `invalid relation type: ${type}` });
+    const body = {
+      type,
+      _links: { to: { href: `/api/v3/work_packages/${toId}` } },
+    };
+    if (typeof req.body.description === "string" && req.body.description.trim())
+      body.description = req.body.description.trim();
+    const created = await openProjectRequest(`/api/v3/work_packages/${id}/relations`, {
+      method: "POST",
+      body,
+    });
+    res.json({ ok: true, relation: normalizeRelation(created) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// Delete a relation by its relation id.
+app.delete("/api/dashboard/openproject/relation/:relId", async (req, res) => {
+  try {
+    const relId = toIntOrNull(req.params.relId);
+    if (!relId) return res.status(400).json({ ok: false, error: "invalid relId" });
+    await openProjectRequest(`/api/v3/relations/${relId}`, { method: "DELETE" });
+    res.json({ ok: true, id: relId });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 
 // Available assignees for the project (users assignable to work packages).
 // The flat /users endpoint is unauthorized for this token; available_assignees usually is not.
