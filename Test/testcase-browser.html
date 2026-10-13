@@ -1943,11 +1943,27 @@
         if (_rmUnpackDone) await _rmUnpackDone; // wait for unpack to complete before reading
         try {
           const db = await openIDB();
-          return new Promise((res) => {
+          const result = await new Promise((res) => {
             const r = db.transaction("handles", "readonly").objectStore("handles").get(key);
             r.onsuccess = () => res(r.result || null);
             r.onerror = () => res(null);
           });
+          // On-load category migration (NON-DESTRUKTIF): fill empty category via suggestCategory.
+          // Only roadmap_v1; only tasks missing a category; existing values untouched.
+          if (key === "roadmap_v1" && Array.isArray(result) && typeof window.rmSuggestCategory === "function") {
+            let changed = 0;
+            for (const t of result) {
+              if (t && !t.category) { t.category = window.rmSuggestCategory(t.task, t.desc); changed++; }
+            }
+            if (changed > 0) {
+              try {
+                const db2 = await openIDB();
+                db2.transaction("handles", "readwrite").objectStore("handles").put(result, "roadmap_v1");
+                console.log("[RM] category migration: filled " + changed + " task(s)");
+              } catch (_) {}
+            }
+          }
+          return result;
         } catch { return null; }
       }
 

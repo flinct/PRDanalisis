@@ -1,6 +1,78 @@
 // ui-roadmap.js — Dashboard v2 Roadmap page + support cluster. Extracted 2026-10-13.
 // Reads roadmap IDB helpers + RM_SEED_PATH from window. Exports RoadmapPage + roadmapAddQ bridge.
 window.RoadmapV2Module = (function () {
+// ═══════════════════════════════════════════════════════════════════════════
+// KATEGORI MILESTONE (Fase 1+2) — vocab dinamis + auto-suggest engine.
+// Prinsip: objek menentukan kategori, bukan jenis aktivitas. ops = last-resort.
+// Parity 95/95 dengan build_milestones.py (Assessments/reference/roadmap-milestone-categories.md).
+// ═══════════════════════════════════════════════════════════════════════════
+const RM_CATEGORY_DEFAULTS = [
+  { slug: 'superadmin',   name: 'SuperAdmin Global Company Access', tier: 'primary' },
+  { slug: 'export',       name: 'Advanced Offline Export Suite',    tier: 'primary' },
+  { slug: 'release',      name: 'Release Engineering',              tier: 'primary' },
+  { slug: 'sales',        name: 'Sales Module & Leads',            tier: 'primary' },
+  { slug: 'conversation', name: 'Conversation & Inbox Experience',  tier: 'primary' },
+  { slug: 'ticket',       name: 'Ticketing & Post-Sales Flow',      tier: 'primary' },
+  { slug: 'channels',     name: 'Channel Expansion & WhatsApp Web', tier: 'primary' },
+  { slug: 'broadcast',    name: 'Broadcast & Anti-Spam Engine',     tier: 'primary' },
+  { slug: 'analytics',    name: 'Analytics & Reporting',            tier: 'primary' },
+  { slug: 'ai',           name: 'AI & Automation',                  tier: 'primary' },
+  { slug: 'notification', name: 'Notification Service',             tier: 'primary' },
+  { slug: 'widget',       name: 'Widget Platform',                  tier: 'primary' },
+  { slug: 'setting',      name: 'Settings & Onboarding',            tier: 'primary' },
+  { slug: 'growth',       name: 'Growth, GTM & Demo Readiness',     tier: 'primary' },
+  { slug: 'infra',        name: 'Infra, Performance & Security',    tier: 'supporting' },
+  { slug: 'billing',      name: 'Billing, Subscription & Fraud',    tier: 'supporting' },
+  { slug: 'stab',         name: 'Production Stabilization',         tier: 'supporting' },
+  { slug: 'ops',          name: 'Ops, QA & BAU',                    tier: 'supporting' },
+];
+// vocab = config override ∪ defaults (defaults dulu, lalu slug baru dari config). Dynamic.
+function mergeCategoryVocab(cfgVocab) {
+  const out = RM_CATEGORY_DEFAULTS.slice();
+  const seen = new Set(out.map((c) => c.slug));
+  (cfgVocab || []).forEach((c) => { if (c && c.slug && !seen.has(c.slug)) { out.push(c); seen.add(c.slug); } });
+  return out;
+}
+function categoryMeta(slug, vocab) { return (vocab || RM_CATEGORY_DEFAULTS).find((c) => c.slug === slug) || null; }
+const RM_CAT_COLOR = { primary: '#6c8cff', supporting: '#94a3b8' };
+function categoryColor(slug, vocab) { const m = categoryMeta(slug, vocab); return m ? RM_CAT_COLOR[m.tier] : '#64748b'; }
+
+// ── Auto-suggest keyword engine (ordered rules; port of build_milestones.py) ──
+const RM_CAT_RULES = [
+  ['stab', /^\[(?:[^\]]*service|auth|redash|webhook|compass|mongodb|nestjs|rabbit|grpc|fastify|api[ -]?gateway|auth-failures|mongodb-timeout|webhook-delivery|widget-settings)|occurrence|oomkilled|oom killed|memory leak|network ?timeout|root cause|investigasi|v2\.8\.[0-9] regression|regression:|degraded channel|silently drops|bad decrypt/i],
+  ['ops', /template-tmp|rules to create|adjusting regression/i],
+  ['infra', /cicd|ci\/cd/i],
+  ['superadmin', /superadmin|super admin|global company/i],
+  ['export', /advance export|advanced offline export|export row-level|row-level collection|column registry|sap template|zero-impact sync/i],
+  ['infra', /public api|api platform|api gateway|tenant isolation|api versioning|chat tools api/i],
+  ['release', /release|deploy|branch v|align repo|realign|remove legacy|set v2 as default|version v2|v2\.[0-9]|mapping automation|sprint planing|sprint planning|tech(nical)? analysis|grooming|workflow .*qa|uiux.*qa|ui\/ux \+ qa|qa flow|qa product meeting/i],
+  ['growth', /\bgtm\b|marketing|demo form|kandidat|weekly demo|email blast|research strategy/i],
+  ['sales', /sales|leads?\b|prospect/i],
+  ['broadcast', /broadcast|re-broadcast|email blast/i],
+  ['channels', /whatsapp|whatsmeow|baileys|telegram|shopee|tiktok|wapi|\bwag\b|instagram|messenger|channel|saluran|outbound|outbond|call log|call history|history[- ]sync|phone number|chat import|account pool|rotation|edit & delete|lion parcel|\bawb\b/i],
+  ['notification', /notification|notifikasi|\bnotif\b|reminder (missing|interaction)/i],
+  ['ai', /auto[- ]?(tagging|reply|assign|closure|follow|pull|split)|automation|chat bot|ai summary|email summary|summary report|3x broadcast/i],
+  ['widget', /\bwidget\b|faq|landing|loading stage/i],
+  ['infra', /mongodb|mongo\b|rmq|rabbitmq|kubernetes|k8s|eks\b|cluster|node group|gateway|horizontal|topology|read preference|index|database|migrasi|selfhosted|self-hosted|performance|stability|cloudflare|auth|rbac|roles?|security|hijack|socket|websocket|\bses\b|dns|ses |connection|reconnect/i],
+  ['analytics', /analityc|analytic|statistic|laporan|report|\bmuv\b|unique (inbound )?client|ketanggapan|responsiveness|chart|kpi|dashboard/i],
+  ['ticket', /ticket|tiket/i],
+  ['conversation', /conversation|inbox|global search|contact|bubble|room|notes?|mention|collaborator|drawer|mobile|photo|name and photo/i],
+  ['billing', /subscription|\bsubs\b|payment|qris|invoice|voucher|top ?up|billing|e-wallet|ewallet|\btoken\b|pricing|cost simulation|fraud|npwp|add-on/i],
+  ['setting', /simplicity settings|wizard|onboarding|guidance|sidebar|menu state|navigation|preferensi|preference|setting redesign/i],
+  ['ops', /test|testing|test case|create test|create acceptance|verifikasi|re ?check|recheck|check fixed|create automation|tcl|list todo|list fixed|monitoring number|response console|setup mac|sosialisasi|diskusi|gathering|brainstorm|meeting|daily|weekly|sprint|presentation|presentasi|brief|documentation|manual|tutorial|user guide|guide book|research|audit|monitoring|setup|access|draft/i],
+];
+function suggestCategory(title, desc) {
+  const s = ((title || '') + ' ' + (desc || '')).toLowerCase();
+  for (let i = 0; i < RM_CAT_RULES.length; i++) if (RM_CAT_RULES[i][1].test(s)) return RM_CAT_RULES[i][0];
+  return 'ops'; // last-resort
+}
+// expose for RoadmapView (testcase-browser.html) on-load migration + debugging
+if (typeof window !== 'undefined') {
+  window.RM_CATEGORY_DEFAULTS = RM_CATEGORY_DEFAULTS;
+  window.rmSuggestCategory = suggestCategory;
+  window.rmMergeCategoryVocab = mergeCategoryVocab;
+}
+
 // ── RoadmapPage: pixel replica of pen export 'Roadmap — All View (4Q)' ──
 // ponytail: ported 1:1 from roadmap-export.html. flex+fixed px (not grid). Per-month pill cells
 // (active = prio color @50, inactive = #1e293b). Status = pill rounded-12. Avatars overlap -6 + ring.
@@ -235,8 +307,10 @@ function RoadmapPage() {
   const [qPopup, setQPopup] = React.useState(null); // { label, x, y }
   const [monthView, setMonthView] = React.useState(null); // null | { qLabel, mi } (mi 0..2 within quarter)
   const [addModal, setAddModal] = React.useState(null); // null | 'single' | 'multi' | 'import'
+  const [groupMode, setGroupMode] = React.useState('status'); // Fase 3: 'status' (default) | 'category' — All View grouping
+  const [catFilter, setCatFilter] = React.useState(''); // Fase 3: '' = semua, atau slug kategori
   // ── Milestone intake (Fase 4): 1 request → 1 Milestone WP in OP. Supporting docs stay LOCAL (analysis only, never pushed). ──
-  const MS_FORM_INIT = { title: '', desc: '', area: '', prio: 'P2', typeName: 'Milestone', docs: [], checkResult: null, checking: false };
+  const MS_FORM_INIT = { title: '', desc: '', area: '', category: '', categoryTouched: false, prio: 'P2', typeName: 'Milestone', docs: [], checkResult: null, checking: false };
   const [msForm, setMsForm] = React.useState(MS_FORM_INIT);
   const [msState, setMsState] = React.useState({ saving: false, error: '' });
   const [msDocDraft, setMsDocDraft] = React.useState({ label: '', ref: '', note: '' }); // one doc-entry being typed
@@ -367,6 +441,9 @@ function RoadmapPage() {
   React.useEffect(() => { (async () => { const v = await loadRoadmapIDB("roadmap_op_edits_v1"); if (v && typeof v === "object") setOpEdits(v); opEditsLoaded.current = true; })(); }, []);
   React.useEffect(() => { if (opEditsLoaded.current) saveRoadmapIDB(opEdits, "roadmap_op_edits_v1"); }, [opEdits]);
   const setOpEdit = (wpId, field, val) => setOpEdits((p) => ({ ...p, [wpId]: { ...(p[wpId] || {}), [field]: val } }));
+  // category vocab (Fase 1+2): config override ∪ defaults. Loaded from roadmap_cfg_v1.categoryVocab.
+  const [msVocab, setMsVocab] = React.useState(RM_CATEGORY_DEFAULTS);
+  React.useEffect(() => { (async () => { try { const cfg = await loadRoadmapIDB("roadmap_cfg_v1"); const v = cfg && cfg.categoryVocab; setMsVocab(mergeCategoryVocab(Array.isArray(v) ? v : [])); } catch (_) {} })(); }, []);
   // Month View OP rows = cache filtered by the Q's linked version(s). Source = opCache (OP = source of truth), no per-version fetch.
   const mvLink = monthView ? qLink[monthView.qLabel] : null;
   const mvVerIds = qlVerIds(mvLink);
@@ -420,6 +497,22 @@ function RoadmapPage() {
     const b = { now: [], next: [], backlog: [], done: [] };
     (rows || []).forEach((wp) => { (b[opBucketOf(wp)] || b.backlog).push(wp); });
     return OP_BUCKET_META.map(([k, label, color]) => [k, label, color, b[k]]).filter(([, , , r]) => r.length > 0);
+  };
+  // ── Fase 3: WP → category. Local override (msDocs[wpId].category) wins over keyword suggest. ──
+  // OP has no native category field; category is LOCAL (Fase 1+2 decision). Falls back to suggestCategory.
+  const wpCategoryOf = (wp) => {
+    const loc = msDocs[wp.id] && msDocs[wp.id].category;
+    if (loc) return loc;
+    return suggestCategory(wp.subject || wp.typeName || "", wp.description || "");
+  };
+  // group WP by category, ordered by vocab (primary first, then supporting), empty categories hidden.
+  const groupOpByCategory = (rows) => {
+    const byCat = {};
+    (rows || []).forEach((wp) => { const c = wpCategoryOf(wp); (byCat[c] = byCat[c] || []).push(wp); });
+    const ordered = (msVocab || RM_CATEGORY_DEFAULTS).map((c) => [c.slug, c.name, categoryColor(c.slug, msVocab), byCat[c.slug] || []]);
+    // any category slug not in vocab (shouldn't happen) appended last
+    Object.keys(byCat).forEach((slug) => { if (!(msVocab || RM_CATEGORY_DEFAULTS).some((c) => c.slug === slug)) ordered.push([slug, slug, "#64748b", byCat[slug]]); });
+    return ordered.filter(([, , , r]) => r.length > 0);
   };
   // OP timeline = WHEN worked (which week), from the work package's start/due dates intersected with the viewed month.
   // roadmap fiscal year starts Oct (monthAbs 0 = Oct of the first quarter's year). returns [w1,w4] 1-based, or null if no date in this month.
@@ -523,11 +616,11 @@ function RoadmapPage() {
       const d = await r.json();
       if (!d.ok) throw new Error(d.error || 'create gagal');
       const newId = d.workPackage && d.workPackage.id;
-      // supporting docs → LOCAL only (IDB roadmap_ms_docs_v1), keyed by OP id. Also keep area (OP has no native field for it).
-      if (newId && (msForm.docs.length || msForm.area)) {
+      // supporting docs → LOCAL only (IDB roadmap_ms_docs_v1), keyed by OP id. Keep area (legacy) + category (Fase 1+2, LOCAL — tidak dikirim ke OP).
+      if (newId && (msForm.docs.length || msForm.area || msForm.category)) {
         try {
           const store = (await loadRoadmapIDB('roadmap_ms_docs_v1')) || {};
-          store[newId] = { area: msForm.area || '', docs: msForm.docs, createdAt: Date.now() };
+          store[newId] = { area: msForm.area || '', category: msForm.category || '', docs: msForm.docs, createdAt: Date.now() };
           await saveRoadmapIDB(store, 'roadmap_ms_docs_v1');
           setMsDocs(store);
         } catch (_) {}
@@ -1058,12 +1151,15 @@ function RoadmapPage() {
           {addModal === 'milestone' && (
             <>
               <div style={{fontSize:10,color:'#64748b',lineHeight:1.4}}>1 request → 1 Milestone (dibuat sebagai <b style={{color:'#a78bfa'}}>Epic</b> di OpenProject, agar bisa punya breakdown Feature). Submit → create di OP, lalu roadmap di-refresh. Dokumen pendukung disimpan lokal (analisa awal) — tidak dikirim ke OP.</div>
-              <input value={msForm.title} onChange={(e) => setMsForm(f => ({...f, title: e.target.value, checkResult:null}))} placeholder="Judul milestone / request…" style={{background:'#111827',color:'#e5e7eb',border:'1px solid #1e293b',borderRadius:5,padding:'6px 9px',fontSize:13,outline:'none',fontFamily:'inherit'}} />
-              <textarea value={msForm.desc} onChange={(e) => setMsForm(f => ({...f, desc: e.target.value}))} placeholder="Deskripsi / konteks request…" rows={3} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:5,padding:'6px 9px',fontSize:11,outline:'none',resize:'vertical',fontFamily:'inherit'}} />
+              <input value={msForm.title} onChange={(e) => setMsForm(f => ({...f, title: e.target.value, checkResult:null, category: f.categoryTouched ? f.category : suggestCategory(e.target.value, f.desc)}))} placeholder="Judul milestone / request…" style={{background:'#111827',color:'#e5e7eb',border:'1px solid #1e293b',borderRadius:5,padding:'6px 9px',fontSize:13,outline:'none',fontFamily:'inherit'}} />
+              <textarea value={msForm.desc} onChange={(e) => setMsForm(f => ({...f, desc: e.target.value, category: f.categoryTouched ? f.category : suggestCategory(f.title, e.target.value)}))} placeholder="Deskripsi / konteks request…" rows={3} style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:5,padding:'6px 9px',fontSize:11,outline:'none',resize:'vertical',fontFamily:'inherit'}} />
               <div style={{display:'flex',gap:8}}>
                 <div style={{flex:1,display:'flex',flexDirection:'column',gap:3}}>
-                  <span style={{fontSize:10,color:'#64748b'}}>Area</span>
-                  <input value={msForm.area} onChange={(e) => setMsForm(f => ({...f, area: e.target.value}))} placeholder="Ticket / Broadcast / WA…" style={{background:'#111827',color:'#cbd5e1',border:'1px solid #1e293b',borderRadius:4,padding:'4px 7px',fontSize:11,outline:'none',fontFamily:'inherit'}} />
+                  <span style={{fontSize:10,color:'#64748b'}}>Kategori {!msForm.categoryTouched && msForm.category && <span style={{color:'#6c8cff',fontWeight:700}}>· disarankan</span>}</span>
+                  <select value={msForm.category} onChange={(e) => setMsForm(f => ({...f, category: e.target.value, categoryTouched: true}))} style={{background:'#111827',color: msForm.category ? categoryColor(msForm.category, msVocab) : '#64748b',border: '1px solid ' + (msForm.categoryTouched ? '#1e293b' : '#6c8cff55'),borderRadius:4,padding:'4px 7px',fontSize:11,outline:'none',fontWeight:600}}>
+                    <option value="">— pilih kategori —</option>
+                    {msVocab.map(c => <option key={c.slug} value={c.slug}>{c.name}{c.tier==='supporting'?' (support)':''}</option>)}
+                  </select>
                 </div>
                 <div style={{width:120,display:'flex',flexDirection:'column',gap:3}}>
                   <span style={{fontSize:10,color:'#64748b'}}>Type (OP)</span>
@@ -1515,7 +1611,14 @@ function RoadmapPage() {
   const rmQ = rmq.trim().toLowerCase();
   const allOpRows = (opCache.rows || []).filter((wp) =>
     !rmQ || String(wp.subject || "").toLowerCase().includes(rmQ) || String(wp.typeName || "").toLowerCase().includes(rmQ));
-  const allGroups = groupOpByStatus(opSortRows(allOpRows));
+  // Fase 3: category filter (only applies in category group-mode)
+  const allOpRowsCat = (groupMode === "category" && catFilter)
+    ? allOpRows.filter((wp) => wpCategoryOf(wp) === catFilter)
+    : allOpRows;
+  // group by status (default) OR category (Fase 3 toggle)
+  const allGroups = groupMode === "category"
+    ? groupOpByCategory(opSortRows(allOpRowsCat))
+    : groupOpByStatus(opSortRows(allOpRows));
   const rmKpi = {
     total: allOpRows.length,
     now: allOpRows.filter((wp) => opBucketOf(wp) === "now").length,
@@ -1523,6 +1626,10 @@ function RoadmapPage() {
     backlog: allOpRows.filter((wp) => opBucketOf(wp) === "backlog").length,
     done: allOpRows.filter((wp) => opBucketOf(wp) === "done").length,
   };
+  // Fase 3: category KPI (count per category over all rows, vocab order, non-empty)
+  const catCounts = {};
+  allOpRows.forEach((wp) => { const c = wpCategoryOf(wp); catCounts[c] = (catCounts[c] || 0) + 1; });
+  const catChips = (msVocab || RM_CATEGORY_DEFAULTS).filter((c) => catCounts[c.slug] > 0);
   return (
     <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#0B0F15", padding: "8px 24px" }}>
       {/* KPI mini strip + search — OP source */}
@@ -1535,10 +1642,30 @@ function RoadmapPage() {
         {opCache.loading && <span style={{ fontSize: 10, color: "#64748b" }}>sync…</span>}
         {opCache.ts && !opCache.loading && <span style={{ fontSize: 9, color: "#475569" }} title={new Date(opCache.ts).toLocaleString()}>synced</span>}
         <button type="button" onClick={() => refreshOpCache()} disabled={opCache.loading} style={{ background: "transparent", color: "#3b82f6", border: "1px solid #3b82f6", borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer", opacity: opCache.loading ? 0.5 : 1 }}>↻ Refresh</button>
+        {/* Fase 3: group-by toggle — Status (default) | Category */}
+        <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #1e293b", borderRadius: 6, overflow: "hidden" }}>
+          <span style={{ fontSize: 9, color: "#64748b", padding: "0 6px" }}>Group</span>
+          {[["status", "Status"], ["category", "Kategori"]].map(([m, label]) => (
+            <button key={m} type="button" onClick={() => { setGroupMode(m); if (m === "status") setCatFilter(""); }}
+              style={{ background: groupMode === m ? "#3b82f6" : "transparent", color: groupMode === m ? "#fff" : "#94a3b8", border: "none", padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>
+          ))}
+        </div>
         <input type="search" value={rmq} onChange={(e) => setRmq(e.target.value)} placeholder="Search WP…"
           style={{ marginLeft: "auto", width: 200, background: "#0f172a", border: "1px solid #1e293b", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "#e5e7eb", outline: "none", fontFamily: "inherit" }} />
         <button type="button" onClick={() => { setAddModal('milestone'); setMsForm(MS_FORM_INIT); setMsState({saving:false,error:''}); }} style={{background:'#f59e0b',color:'#1c1917',border:'none',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:4}}><span style={{fontSize:13}}>◆</span> Milestone</button>
       </div>
+      {/* Fase 3: category filter chips (only in category mode) */}
+      {groupMode === "category" && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "0 0 10px" }}>
+          <button type="button" onClick={() => setCatFilter("")}
+            style={{ background: catFilter === "" ? "#334155" : "transparent", color: catFilter === "" ? "#e5e7eb" : "#94a3b8", border: "1px solid #1e293b", borderRadius: 999, padding: "3px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Semua ({allOpRows.length})</button>
+          {catChips.map((c) => (
+            <button key={c.slug} type="button" onClick={() => setCatFilter(catFilter === c.slug ? "" : c.slug)}
+              title={c.name + (c.tier === "supporting" ? " (support)" : "")}
+              style={{ background: catFilter === c.slug ? categoryColor(c.slug, msVocab) : "transparent", color: catFilter === c.slug ? "#0B0F15" : categoryColor(c.slug, msVocab), border: "1px solid " + categoryColor(c.slug, msVocab) + "55", borderRadius: 999, padding: "3px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>{c.name} ({catCounts[c.slug]})</button>
+          ))}
+        </div>
+      )}
       <div style={{ minWidth: 640, display: "flex", flexDirection: "column" }}>
         {/* header + quarter timeline (OP dates) */}
         <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 12px", background: "#111827", borderRadius: 8, position: "sticky", top: 0, zIndex: 3 }}>
@@ -1571,12 +1698,27 @@ function RoadmapPage() {
           <div style={{ padding: 16, fontSize: 12, color: "#64748b" }}>Loading OP work packages…</div>
         ) : allOpRows.length === 0 ? (
           <div style={{ padding: 16, fontSize: 12, color: "#64748b" }}>Tidak ada work package.</div>
-        ) : allGroups.map(([bkey, blabel, bcolor, brows]) => (
+        ) : allGroups.map(([bkey, blabel, bcolor, brows]) => {
+          // Fase 3: per-group KPI (only shown in category mode)
+          const gDone = groupMode === "category" ? brows.filter((wp) => opBucketOf(wp) === "done").length : 0;
+          const gNow = groupMode === "category" ? brows.filter((wp) => opBucketOf(wp) === "now").length : 0;
+          const gPct = brows.length ? Math.round(gDone / brows.length * 100) : 0;
+          return (
           <React.Fragment key={"allbucket-" + bkey}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0 6px" }}>
               <div style={{ width: 4, height: 18, background: bcolor, borderRadius: 2 }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: bcolor }}>{blabel}</span>
               <span style={{ fontSize: 10, color: "#64748b" }}>{brows.length}</span>
+              {groupMode === "category" && (
+                <span style={{ fontSize: 9, color: "#64748b", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: "#22c55e" }}>{gDone} done</span>
+                  <span style={{ color: "#f59e0b" }}>{gNow} now</span>
+                  <span style={{ width: 54, height: 5, background: "#1e293b", borderRadius: 3, overflow: "hidden", display: "inline-block" }}>
+                    <span style={{ display: "block", width: gPct + "%", height: "100%", background: bcolor }} />
+                  </span>
+                  <span>{gPct}%</span>
+                </span>
+              )}
               <div style={{ flex: "1 1 0", height: 1, background: bcolor + "30" }} />
             </div>
             {brows.map((wp, wi) => {
@@ -1609,7 +1751,8 @@ function RoadmapPage() {
               );
             })}
           </React.Fragment>
-        ))}
+          );
+        })}
       </div>
       {qPopupEl}
       {tipEl}

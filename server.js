@@ -24,7 +24,17 @@ app.use(express.json({ limit: "10mb" }));
 
 // Serve the QA dashboard HTML
 app.use(
-  express.static(path.join(BASE, "Test"), { index: "testcase-browser.html" }),
+  express.static(path.join(BASE, "Test"), {
+    index: "testcase-browser.html",
+    // no-cache untuk aset kode (JS/HTML/CSS) → browser wajib revalidate tiap load.
+    // Patch langsung kebaca tanpa hard-refresh manual. Pakai no-cache (bukan no-store):
+    // ETag/304 tetap jalan, jadi hemat bandwidth tapi selalu fresh.
+    setHeaders: (res, filePath) => {
+      if (/\.(js|html|css)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "no-cache");
+      }
+    },
+  }),
 );
 app.use("/tmp", express.static(path.join(BASE, "tmp")));
 

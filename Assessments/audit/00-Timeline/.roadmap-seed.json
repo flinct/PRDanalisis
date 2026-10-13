@@ -28,7 +28,8 @@
       "opId": "2332",
       "risk": 1,
       "prdStatus": "",
-      "progress": 0
+      "progress": 0,
+      "category": "superadmin"
     },
     {
       "id": "t02",
@@ -64,7 +65,8 @@
       "_opStatus": "Specified",
       "_opStatusId": 3,
       "_opStatusMapped": "In Progress",
-      "progress": 0
+      "progress": 0,
+      "category": "growth"
     },
     {
       "id": "t03",
@@ -93,7 +95,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4430",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "growth"
     },
     {
       "id": "t04",
@@ -124,7 +127,8 @@
       "opId": "666",
       "prdStatus": "",
       "progress": 0,
-      "_descH": 229
+      "_descH": 229,
+      "category": "channels"
     },
     {
       "id": "t05",
@@ -144,7 +148,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4456",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "infra"
     },
     {
       "id": "t06",
@@ -178,7 +183,8 @@
       "_opStatus": "In progress",
       "_opStatusId": 7,
       "_opStatusMapped": "In Progress",
-      "progress": 0
+      "progress": 0,
+      "category": "notification"
     },
     {
       "id": "t07",
@@ -207,7 +213,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4432",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "sales"
     },
     {
       "id": "t08",
@@ -238,7 +245,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4434",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "billing"
     },
     {
       "id": "t09",
@@ -273,7 +281,8 @@
       "_opStatusId": 3,
       "_opStatusMapped": "In Progress",
       "progress": 0,
-      "_descH": 397
+      "_descH": 397,
+      "category": "export"
     },
     {
       "id": "t10",
@@ -302,7 +311,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4435",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "conversation"
     },
     {
       "id": "t11",
@@ -322,7 +332,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4450",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "widget"
     },
     {
       "id": "t12",
@@ -351,7 +362,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4436",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "ticket"
     },
     {
       "id": "t13",
@@ -380,7 +392,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4438",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "setting"
     },
     {
       "id": "t14",
@@ -409,7 +422,8 @@
       "risk": 1.3,
       "pm_front_weeks": 0,
       "opId": "4439",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "conversation"
     },
     {
       "id": "t15",
@@ -440,7 +454,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4433",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "sales"
     },
     {
       "id": "t16",
@@ -469,7 +484,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4431",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "conversation"
     },
     {
       "id": "t17",
@@ -500,7 +516,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4437",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "conversation"
     },
     {
       "id": "t18",
@@ -529,7 +546,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4451",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "setting"
     },
     {
       "id": "t19",
@@ -565,7 +583,8 @@
       "_source": "linked",
       "_opStatus": "Specified",
       "_opStatusId": 3,
-      "_opStatusMapped": "In Progress"
+      "_opStatusMapped": "In Progress",
+      "category": "widget"
     },
     {
       "id": "t20",
@@ -596,7 +615,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4457",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "sales"
     },
     {
       "id": "t21",
@@ -616,7 +636,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4452",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "infra"
     },
     {
       "id": "t22",
@@ -636,7 +657,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "3400",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "billing"
     },
     {
       "id": "t23",
@@ -656,7 +678,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4453",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "ai"
     },
     {
       "id": "t24",
@@ -678,7 +701,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "2910",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "ai"
     },
     {
       "id": "t25",
@@ -698,7 +722,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "2449",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "infra"
     },
     {
       "id": "t26",
@@ -718,7 +743,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "4454",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "widget"
     },
     {
       "id": "t27",
@@ -738,7 +764,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "168",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "channels"
     },
     {
       "id": "t28",
@@ -758,7 +785,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "2183",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "channels"
     },
     {
       "id": "t29",
@@ -780,7 +808,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "2830",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "channels"
     },
     {
       "id": "tmtwdn18t",
@@ -802,7 +831,8 @@
       "risk": 1,
       "pm_front_weeks": 0,
       "opId": "2910",
-      "prdStatus": ""
+      "prdStatus": "",
+      "category": "ai"
     },
     {
       "id": "tmucfgez3",
@@ -834,7 +864,8 @@
       "prdStatus": "",
       "progress": 0,
       "_descH": 143,
-      "type": 2
+      "type": 2,
+      "category": "analytics"
     },
     {
       "id": "op-3844",
@@ -870,7 +901,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-3977",
@@ -906,7 +938,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3973",
@@ -942,7 +975,8 @@
       "_opType": "Feature",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-3912",
@@ -978,7 +1012,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-3889",
@@ -1014,7 +1049,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-3843",
@@ -1050,7 +1086,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-3868",
@@ -1086,7 +1123,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-3732",
@@ -1122,7 +1160,8 @@
       "_opType": "Feature",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "analytics"
     },
     {
       "id": "op-3192",
@@ -1158,7 +1197,8 @@
       "_opType": "Feature",
       "_opAssignee": "agung d",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "export"
     },
     {
       "id": "op-3191",
@@ -1194,7 +1234,8 @@
       "_opType": "Feature",
       "_opAssignee": "agung d",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "export"
     },
     {
       "id": "op-3190",
@@ -1230,7 +1271,8 @@
       "_opType": "Feature",
       "_opAssignee": "agung d",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "export"
     },
     {
       "id": "op-3189",
@@ -1266,7 +1308,8 @@
       "_opType": "Feature",
       "_opAssignee": "agung d",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "export"
     },
     {
       "id": "op-3799",
@@ -1302,7 +1345,8 @@
       "_opType": "Task",
       "_opAssignee": "Naftal Yunior",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3788",
@@ -1338,7 +1382,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3774",
@@ -1374,7 +1419,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-3762",
@@ -1410,7 +1456,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3734",
@@ -1446,7 +1493,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3731",
@@ -1482,7 +1530,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-3733",
@@ -1518,7 +1567,8 @@
       "_opType": "Feature",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "billing"
     },
     {
       "id": "op-3727",
@@ -1554,7 +1604,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "sales"
     },
     {
       "id": "op-2901",
@@ -1590,7 +1641,8 @@
       "_opType": "Feature",
       "_opAssignee": "agung d",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "infra"
     },
     {
       "id": "op-3305",
@@ -1626,7 +1678,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "growth"
     },
     {
       "id": "op-3275",
@@ -1662,7 +1715,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-2970",
@@ -1698,7 +1752,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "sales"
     },
     {
       "id": "op-2965",
@@ -1734,7 +1789,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-2135",
@@ -1770,7 +1826,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-1836",
@@ -1806,7 +1863,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "sales"
     },
     {
       "id": "op-1271",
@@ -1842,7 +1900,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "billing"
     },
     {
       "id": "op-3327",
@@ -1878,7 +1937,8 @@
       "_opType": "Task",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "billing"
     },
     {
       "id": "op-3281",
@@ -1914,7 +1974,8 @@
       "_opType": "Task",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-3183",
@@ -1950,7 +2011,8 @@
       "_opType": "Feature",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "growth"
     },
     {
       "id": "op-3161",
@@ -1986,7 +2048,8 @@
       "_opType": "Task",
       "_opAssignee": "Naftal Yunior",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-3146",
@@ -2022,7 +2085,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "conversation"
     },
     {
       "id": "op-3711",
@@ -2058,7 +2122,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "analytics"
     },
     {
       "id": "op-3709",
@@ -2094,7 +2159,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "analytics"
     },
     {
       "id": "op-3708",
@@ -2130,7 +2196,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "analytics"
     },
     {
       "id": "op-3691",
@@ -2166,7 +2233,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "analytics"
     },
     {
       "id": "op-3214",
@@ -2202,7 +2270,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "conversation"
     },
     {
       "id": "op-3199",
@@ -2238,7 +2307,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "broadcast"
     },
     {
       "id": "op-3006",
@@ -2274,7 +2344,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "conversation"
     },
     {
       "id": "op-2331",
@@ -2310,7 +2381,8 @@
       "_opType": "Feature",
       "_opAssignee": "Naftal Yunior",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "superadmin"
     },
     {
       "id": "op-3400",
@@ -2346,7 +2418,8 @@
       "_opType": "Feature",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "billing"
     },
     {
       "id": "op-3520",
@@ -2382,7 +2455,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "channels"
     },
     {
       "id": "op-3394",
@@ -2418,7 +2492,8 @@
       "_opType": "Feature",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "infra"
     },
     {
       "id": "op-3200",
@@ -2454,7 +2529,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "infra"
     },
     {
       "id": "op-3194",
@@ -2490,7 +2566,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "stab"
     },
     {
       "id": "op-3201",
@@ -2526,7 +2603,8 @@
       "_opType": "Feature",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "conversation"
     },
     {
       "id": "op-4116",
@@ -2562,7 +2640,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-4115",
@@ -2598,7 +2677,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-4154",
@@ -2634,7 +2714,8 @@
       "_opType": "Task",
       "_opAssignee": "dany christian",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-4289",
@@ -2670,7 +2751,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "release"
     },
     {
       "id": "op-4282",
@@ -2706,7 +2788,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "growth"
     },
     {
       "id": "op-4155",
@@ -2742,7 +2825,8 @@
       "_opType": "Task",
       "_opAssignee": "",
       "_opProgress": 100,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "ops"
     },
     {
       "id": "op-4128",
@@ -2778,7 +2862,8 @@
       "_opType": "Bug",
       "_opAssignee": "",
       "_opProgress": 0,
-      "_opDue": ""
+      "_opDue": "",
+      "category": "conversation"
     },
     {
       "id": "tmv4r29na0",
@@ -2805,7 +2890,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4440"
+      "opId": "4440",
+      "category": "ticket"
     },
     {
       "id": "tmv4r29na1",
@@ -2832,7 +2918,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4441"
+      "opId": "4441",
+      "category": "conversation"
     },
     {
       "id": "tmv4r29na2",
@@ -2859,7 +2946,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4442"
+      "opId": "4442",
+      "category": "ticket"
     },
     {
       "id": "tmv4r29na3",
@@ -2886,7 +2974,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4443"
+      "opId": "4443",
+      "category": "broadcast"
     },
     {
       "id": "tmv4r29na4",
@@ -2913,7 +3002,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4444"
+      "opId": "4444",
+      "category": "broadcast"
     },
     {
       "id": "tmv4r29na5",
@@ -2940,7 +3030,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4445"
+      "opId": "4445",
+      "category": "broadcast"
     },
     {
       "id": "tmv4r29na6",
@@ -2967,7 +3058,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4446"
+      "opId": "4446",
+      "category": "broadcast"
     },
     {
       "id": "tmv4r29na7",
@@ -2994,7 +3086,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4455"
+      "opId": "4455",
+      "category": "ticket"
     },
     {
       "id": "tmv4r29na8",
@@ -3021,7 +3114,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4458"
+      "opId": "4458",
+      "category": "ticket"
     },
     {
       "id": "tmv4r29na9",
@@ -3048,7 +3142,8 @@
       },
       "status": "active",
       "dependency": [],
-      "opId": "4459"
+      "opId": "4459",
+      "category": "growth"
     }
   ],
   "roadmap_quarters_v1": [
@@ -3121,7 +3216,100 @@
     ]
   },
   "roadmap_weeks_v1": {},
-  "roadmap_cfg_v1": {},
+  "roadmap_cfg_v1": {
+    "categoryVocab": [
+      {
+        "slug": "superadmin",
+        "name": "SuperAdmin Global Company Access",
+        "tier": "primary"
+      },
+      {
+        "slug": "export",
+        "name": "Advanced Offline Export Suite",
+        "tier": "primary"
+      },
+      {
+        "slug": "release",
+        "name": "Release Engineering v2.8.x",
+        "tier": "primary"
+      },
+      {
+        "slug": "sales",
+        "name": "Sales Module Revamp & Leads",
+        "tier": "primary"
+      },
+      {
+        "slug": "conversation",
+        "name": "Conversation & Inbox Experience",
+        "tier": "primary"
+      },
+      {
+        "slug": "ticket",
+        "name": "Ticketing & Post-Sales Flow",
+        "tier": "primary"
+      },
+      {
+        "slug": "channels",
+        "name": "Channel Expansion & WhatsApp Web",
+        "tier": "primary"
+      },
+      {
+        "slug": "broadcast",
+        "name": "Broadcast & Anti-Spam Engine",
+        "tier": "primary"
+      },
+      {
+        "slug": "analytics",
+        "name": "Analytics & Reporting",
+        "tier": "primary"
+      },
+      {
+        "slug": "ai",
+        "name": "AI & Automation",
+        "tier": "primary"
+      },
+      {
+        "slug": "notification",
+        "name": "Notification Service",
+        "tier": "primary"
+      },
+      {
+        "slug": "widget",
+        "name": "Widget Platform",
+        "tier": "primary"
+      },
+      {
+        "slug": "setting",
+        "name": "Settings & Onboarding",
+        "tier": "primary"
+      },
+      {
+        "slug": "growth",
+        "name": "Growth, GTM & Demo Readiness",
+        "tier": "primary"
+      },
+      {
+        "slug": "infra",
+        "name": "Infra, Performance & Security Hardening",
+        "tier": "supporting"
+      },
+      {
+        "slug": "billing",
+        "name": "Billing, Subscription & Fraud",
+        "tier": "supporting"
+      },
+      {
+        "slug": "stab",
+        "name": "Production Stabilization - Incidents & Bugfix",
+        "tier": "supporting"
+      },
+      {
+        "slug": "ops",
+        "name": "Ops, QA & BAU",
+        "tier": "supporting"
+      }
+    ]
+  },
   "roadmap_op_edits_v1": {
     "2901": {
       "status": "backlog"
