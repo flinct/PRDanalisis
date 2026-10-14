@@ -447,6 +447,48 @@ app.put("/api/new-request", (req, res) => {
   }
 });
 
+// ── Planner people & absen (role dev/qa + off-days + cap) — persisted to DB (app_state) ──
+app.get("/api/dashboard/planner-people", (_req, res) => {
+  try {
+    const row = db
+      .prepare("SELECT value, updated_at, updated_by FROM app_state WHERE key = ?")
+      .get("planner_people_v1");
+    const data = row ? JSON.parse(row.value) : { people: [], cap: 0.8 };
+    res.json({
+      ok: true,
+      people: Array.isArray(data.people) ? data.people : [],
+      cap: typeof data.cap === "number" ? data.cap : 0.8,
+      updatedAt: row?.updated_at || null,
+      updatedBy: row?.updated_by || null,
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.put("/api/dashboard/planner-people", (req, res) => {
+  const { people, cap, updatedBy } = req.body || {};
+  if (!Array.isArray(people))
+    return res.status(400).json({ ok: false, error: "people must be array" });
+  try {
+    db.prepare(
+      `INSERT INTO app_state (key, value, updated_by, updated_at)
+      VALUES (?, ?, ?, datetime('now'))
+      ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_by=excluded.updated_by, updated_at=datetime('now')`,
+    ).run(
+      "planner_people_v1",
+      JSON.stringify({ people, cap: typeof cap === "number" ? cap : 0.8 }),
+      String(updatedBy || "user"),
+    );
+    const row = db
+      .prepare("SELECT updated_at, updated_by FROM app_state WHERE key = ?")
+      .get("planner_people_v1");
+    res.json({ ok: true, updatedAt: row?.updated_at || null, updatedBy: row?.updated_by || null });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get("/api/tracker", async (_req, res) => {
   try {
     try {

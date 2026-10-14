@@ -42,7 +42,45 @@
   function nthWorkdayFor(p, startISO, n) { let d = parseISO(startISO), c = 0; while (c < n) { const di = iso(d); if (isWorkday(d) && !isOff(p, di)) c++; if (c < n) d = addDays(d, 1); } return iso(d); }
   function nextWorkdayFor(p, dateISO) { let d = addDays(parseISO(dateISO), 1); while (!isWorkday(d) || isOff(p, iso(d))) d = addDays(d, 1); return iso(d); }
   function workdaysForPerson(p, fromISO, toISO) { const out = []; let d = parseISO(fromISO); const end = parseISO(toISO); while (d <= end) { const di = iso(d); if (isWorkday(d) && !isOff(p, di)) out.push(di); d = addDays(d, 1); } return out; }
-  const phaseDays = (level, kind, risk, cap) => { const base = (kind === "dev" ? CAL.DEV_DAYS : CAL.QA_DAYS)[level] || (kind === "dev" ? 20 : 10); return Math.max(1, Math.round(base * (risk || 1) / (cap || CAL.DEFAULT_CAP))); };
+  // phaseDays: L/M/H level → working-days. Cap is applied ONCE in effectiveCapacity, NOT here.
+  // empty/invalid level → 0 (unestimated, not forced to a default).
+  const phaseDays = (level, kind, risk) => {
+    const map = kind === "dev" ? CAL.DEV_DAYS : CAL.QA_DAYS;
+    const base = map[level];
+    if (!base) return 0; // unestimated
+    return Math.max(1, Math.round(base * (risk || 1)));
+  };
+
+  // Parse OpenProject ISO-8601 duration (PT6H, P1DT8H, P2D) → working-days (OP workday = 8h).
+  function parseOpDuration(s) {
+    if (!s || typeof s !== "string") return 0;
+    const m = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/.exec(s.trim());
+    if (!m) return 0;
+    const w = +m[1] || 0, d = +m[2] || 0, h = +m[3] || 0, mi = +m[4] || 0;
+    const hours = w * 40 + d * 8 + h + mi / 60;
+    return hours / 8; // working-days
+  }
+
+  // Dev-days precedence (user decision 2026-10-14): OP estimatedTime → override effort L/M/H → unestimated(0).
+  function devDaysOf(t) {
+    if (t.opEstDays > 0) return Math.max(1, Math.round(t.opEstDays));
+    return phaseDays(t.effort, "dev", t.risk); // 0 if effort empty
+  }
+  // QA-days: from testing level only (override). No OP native field. 0 if testing empty.
+  function qaDaysOf(t) { return phaseDays(t.testing, "qa", 1); }
+
+  // ordering score: status bucket > prio > metric (impact H / effort L / testing L first). Mirror ui-roadmap opSortRows.
+  const ORD_STATUS = { now: 0, next: 1, backlog: 2, done: 3 };
+  const ORD_PR = { P0: 0, P1: 1, P2: 2, P3: 3 };
+  const ORD_LV = { H: 3, M: 2, L: 1, "": 0 };
+  function metricScore(t) { const i = ORD_LV[t.impact] || 0, e = ORD_LV[t.effort] || 2, tt = ORD_LV[t.testing] || 2; return i * 100 + (4 - e) * 10 + (4 - tt) * 1; }
+  function bucketRankOf(t) { return ORD_STATUS[t.bucket] != null ? ORD_STATUS[t.bucket] : 2; }
+  // compare two tasks: status↑, prio↑, metric↓ (quick-win high first)
+  function orderCmp(a, b) {
+    return bucketRankOf(a) - bucketRankOf(b)
+      || (ORD_PR[a.priority] ?? 3) - (ORD_PR[b.priority] ?? 3)
+      || metricScore(b) - metricScore(a);
+  }
 
   // ── OP → task mapping (mirror ui-roadmap opPrioToRm/opStatusBucket) ──────
   const opPrioToRm = (name) => ({ urgent: "P0", high: "P1", medium: "P2", normal: "P2", low: "P3" })[String(name || "").trim().toLowerCase()] || "P2";
@@ -55,27 +93,36 @@
   const opStatusBucket = (name) => OP_STATUS_BUCKET[String(name || "").trim().toLowerCase()] || "backlog";
 
   // Build a scheduler task from an OP WP + its local edit overlay.
-  // effort/impact/testing have no native OP field → read overlay, fall back to M/M/L.
+  // OP has NO native effort/impact/testing field → come from the local edit overlay only.
+  // Dev estimate precedence: OP estimatedTime → overlay effort L/M/H → unestimated.
   function wpToTask(wp, edit) {
     const e = edit || {};
     const prio = e.prio != null ? e.prio : opPrioToRm(wp.priorityName);
     const bucket = e.status != null ? e.status : opStatusBucket(wp.statusName);
-    return {
+    const opEstDays = parseOpDuration(wp.estimatedTime);
+    const effort = e.effort || "";   // empty = unestimated (NOT defaulted to M)
+    const testing = e.testing || ""; // empty = QA unestimated
+    const t = {
       id: "op-" + wp.id, opId: wp.id,
       title: wp.subject || wp.typeName || ("WP " + wp.id),
       fullTitle: wp.subject || wp.typeName || ("WP " + wp.id),
       typeName: wp.typeName || "",
-      effort: e.effort || "M", impact: e.impact || "M", testing: e.testing || "L",
+      effort: effort, impact: e.impact || "", testing: testing,
+      opEstDays: opEstDays,
       priority: prio,
-      // scheduler sections: now→current, next/backlog→schedule/backlog. done excluded.
       current: bucket === "now",
       schedule: bucket === "next" ? { } : null,
       status: (bucket === "done") ? "done" : "active",
       bucket: bucket,
       dependency: [], risk: 1, rank: 0,
       opStatus: wp.statusName || "",
+      versionId: wp.versionId != null ? String(wp.versionId) : null,
       assigneeId: wp.assigneeId || null, assigneeName: wp.assigneeName || "",
     };
+    t.devDays = devDaysOf(t);
+    t.qaDays = qaDaysOf(t);
+    t.unestimated = t.devDays === 0; // no OP estimate and no manual effort
+    return t;
   }
 
   // ── greedy day scheduler, absen-aware, one lane per person ──────────────
@@ -89,8 +136,8 @@
     const sectionOf = (t) => t.current ? "current" : t.schedule ? "next" : "backlog";
     const SECT = { current: 2, next: 1, backlog: 0 }, IMPW = { H: 3, M: 2, L: 1 }, EFFINV = { L: 3, M: 2, H: 1 };
     const prioScore = (t) => { const P = { P0: 4, P1: 3, P2: 2, P3: 1, Backlog: 0 }[t.priority] || 0; return P * 1000 + (IMPW[t.impact] || 0) * 100 + (EFFINV[t.effort] || 0) * 10 + ({ L: 3, M: 2, H: 1 }[t.testing] || 0); };
-    // schedule active non-done; include next+backlog too (full horizon) so everything lands on a date.
-    const active = tasks.filter((t) => t.status !== "done");
+    // schedule active non-done WITH a dev estimate; unestimated (0d) can't be placed on a date.
+    const active = tasks.filter((t) => t.status !== "done" && (devDaysOf(t) > 0 || qaDaysOf(t) > 0));
     const depsOf = (t) => Array.isArray(t.dependency) ? t.dependency : t.dependency ? [t.dependency] : [];
     const remaining = new Set(active.map((t) => t.id));
     const done = {}, result = {};
@@ -102,18 +149,20 @@
     while (remaining.size && guard++ < 5000) {
       const ready = active.filter((t) => remaining.has(t.id) && depOk(t));
       if (!ready.length) break;
-      ready.sort((a, b) => SECT[sectionOf(b)] - SECT[sectionOf(a)] || prioScore(b) - prioScore(a) || (a.rank || 0) - (b.rank || 0));
+      ready.sort((a, b) => orderCmp(a, b) || (a.rank || 0) - (b.rank || 0));
       const t = ready[0];
       const depEnds = depsOf(t).map((d) => done[d] || anchor);
       const dl = earliest(devFree), devP = devPeople[dl];
+      const devN = devDaysOf(t);
       let devStart = maxISO([devFree[dl]].concat(depEnds, [anchor]));
       while (!isWorkday(parseISO(devStart)) || isOff(devP, devStart)) devStart = nextWorkdayFor(devP, devStart);
-      const devEnd = nthWorkdayFor(devP, devStart, phaseDays(t.effort, "dev", t.risk, cap));
+      const devEnd = devN > 0 ? nthWorkdayFor(devP, devStart, devN) : devStart;
       devFree[dl] = nextWorkdayFor(devP, devEnd);
       const ql = earliest(qaFree), qaP = qaPeople[ql];
+      const qaN = qaDaysOf(t);
       let qaStart = maxISO([qaFree[ql], nextWorkdayFor(qaP, devEnd)]);
       while (!isWorkday(parseISO(qaStart)) || isOff(qaP, qaStart)) qaStart = nextWorkdayFor(qaP, qaStart);
-      const qaEnd = nthWorkdayFor(qaP, qaStart, phaseDays(t.testing, "qa", 1, cap));
+      const qaEnd = qaN > 0 ? nthWorkdayFor(qaP, qaStart, qaN) : qaStart;
       qaFree[ql] = nextWorkdayFor(qaP, qaEnd);
       done[t.id] = qaEnd;
       result[t.id] = { devStart, devEnd, qaStart, qaEnd, start: devStart, end: qaEnd,
@@ -146,7 +195,7 @@
 
   // expose engine for the Roadmap header summary (shared, no duplication)
   window.PlannerEngine = { CAL, computeAnchor, iso, parseISO, isWorkday, addDays, daysInMonth, startOfWeek,
-    workdaysBetween, workdaysForPerson, phaseDays, wpToTask, computeSchedule, effectiveCapacity, buildDayMap, MONTHS, PRIO_COL, PRIO_TINT };
+    workdaysBetween, workdaysForPerson, phaseDays, parseOpDuration, devDaysOf, qaDaysOf, orderCmp, metricScore, wpToTask, computeSchedule, effectiveCapacity, buildDayMap, MONTHS, PRIO_COL, PRIO_TINT };
 
   // PlannerPage component is defined in the UI section appended below.
   window.PlannerModule = window.PlannerModule || {};
@@ -182,7 +231,21 @@
         try { const c = await window.loadRoadmapIDB("op_cache_v1"); if (c && Array.isArray(c.rows) && c.rows.length) setOpRows(c.rows); } catch (_) {}
         try { const e = await window.loadRoadmapIDB("roadmap_op_edits_v1"); if (e && typeof e === "object") setOpEdits(e); } catch (_) {}
         try { const pm = await window.loadRoadmapIDB("roadmap_op_meta_v1"); if (pm && Array.isArray(pm.people)) setOpUsers(pm.people); } catch (_) {}
-        try { const saved = await window.loadRoadmapIDB("roadmap_people_v1"); if (saved && Array.isArray(saved.people)) { setPeople(saved.people); if (saved.cap) setCap(saved.cap); } } catch (_) {}
+        // people & absen now persist to DB (server). Load from server; one-time migrate old local IDB if server empty.
+        try {
+          const pr = await fetch("/api/dashboard/planner-people");
+          const pd = await pr.json();
+          if (pd && pd.ok && Array.isArray(pd.people) && pd.people.length) {
+            setPeople(pd.people); if (typeof pd.cap === "number") setCap(pd.cap);
+          } else {
+            // server empty → migrate legacy IDB roster once, then push up
+            const legacy = await window.loadRoadmapIDB("roadmap_people_v1");
+            if (legacy && Array.isArray(legacy.people) && legacy.people.length) {
+              setPeople(legacy.people); if (legacy.cap) setCap(legacy.cap);
+              try { await fetch("/api/dashboard/planner-people", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ people: legacy.people, cap: legacy.cap || 0.8, updatedBy: "migrate" }) }); } catch (_) {}
+            }
+          }
+        } catch (_) {}
         setPeopleLoaded(true);
         try { const r = await fetch("/api/dashboard/openproject/available-assignees?projectId=7"); const d = await r.json(); if (d.ok && Array.isArray(d.assignees)) setOpUsers(d.assignees); } catch (_) {}
         // fallback: if IDB cache empty (Roadmap tab never opened), fetch WP from server directly.
@@ -196,7 +259,17 @@
         } catch (_) {}
       })();
     }, []);
-    useEffect(() => { if (!peopleLoaded) return; if (!peopleSaveRef.current) { peopleSaveRef.current = true; return; } window.saveRoadmapIDB({ people, cap }, "roadmap_people_v1"); }, [people, cap, peopleLoaded]);
+    // persist people+absen to DB (server), debounced; skip the initial mount write.
+    useEffect(() => {
+      if (!peopleLoaded) return;
+      if (!peopleSaveRef.current) { peopleSaveRef.current = true; return; }
+      const payload = JSON.stringify({ people, cap, updatedBy: "planner" });
+      const t = setTimeout(() => {
+        fetch("/api/dashboard/planner-people", { method: "PUT", headers: { "Content-Type": "application/json" }, body: payload }).catch(() => {});
+        try { window.saveRoadmapIDB({ people, cap }, "roadmap_people_v1"); } catch (_) {} // local mirror (offline fallback)
+      }, 600);
+      return () => clearTimeout(t);
+    }, [people, cap, peopleLoaded]);
     // mirror roster to window so the Roadmap header estimate summary can read it without coupling.
     useEffect(() => { window._plannerPeople = people; }, [people]);
 
@@ -224,18 +297,29 @@
     const removeOff = (id, date) => { setPeople((p) => p.map((x) => x.id === id ? { ...x, off: x.off.filter((d) => d !== date) } : x)); setSched(null); };
 
     const capStats = useMemo(() => {
-      const rows = tasks.filter((t) => t.status !== "done");
+      // scope = EXACTLY the Roadmap Month View set: WP whose versionId ∈ linked versions of the active quarter.
+      // Mirrors ui-roadmap mvOp (version filter). Deterministic — does NOT depend on Compute.
+      const mv = (typeof window !== "undefined" && window._mvScope) || null;
+      const hasScope = mv && mv.active && Array.isArray(mv.versionIds) && mv.versionIds.length;
+      const verSet = hasScope ? new Set(mv.versionIds.map(String)) : null;
+      // window = selected month (from Roadmap) OR current calendar month fallback.
+      const monthStart = hasScope ? mv.monthStart : E.iso(new Date(Date.UTC(cursorDate.getUTCFullYear(), cursorDate.getUTCMonth(), 1)));
+      const monthEnd = hasScope ? mv.monthEnd : E.iso(new Date(Date.UTC(cursorDate.getUTCFullYear(), cursorDate.getUTCMonth(), E.daysInMonth(cursorDate.getUTCFullYear(), cursorDate.getUTCMonth()))));
+      let rows = tasks.filter((t) => t.status !== "done");
+      if (verSet) rows = rows.filter((t) => verSet.has(t.versionId));
+      rows = rows.slice().sort(E.orderCmp); // status > prio > metric
+      const estRows = rows.filter((t) => E.devDaysOf(t) > 0 || E.qaDaysOf(t) > 0);
+      const unestimated = rows.length - estRows.length;
       let dev = 0, qa = 0;
-      rows.forEach((t) => { dev += E.phaseDays(t.effort, "dev", t.risk, cap); qa += E.phaseDays(t.testing, "qa", 1, cap); });
-      let from = anchor, to = null;
-      if (sched && sched.result) { for (const id in sched.result) { const e = sched.result[id].qaEnd; if (!to || e > to) to = e; } }
-      if (!to) { const a = E.parseISO(anchor); to = E.iso(new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), E.daysInMonth(a.getUTCFullYear(), a.getUTCMonth())))); }
+      estRows.forEach((t) => { dev += E.devDaysOf(t); qa += E.qaDaysOf(t); });
+      // capacity window = SAME as workload window (the selected month) → % is apples-to-apples.
+      const from = monthStart, to = monthEnd;
       const devCap = Math.max(1, E.effectiveCapacity(people, "dev", from, to, cap));
       const qaCap = Math.max(1, E.effectiveCapacity(people, "qa", from, to, cap));
       const nDev = people.filter((p) => p.role === "dev").length, nQa = people.filter((p) => p.role === "qa").length;
       const offDays = people.reduce((a, p) => a + p.off.filter((d) => d >= from && d <= to).length, 0);
-      return { rows, dev, qa, devCap, qaCap, pctD: Math.round(dev / devCap * 100), pctQ: Math.round(qa / qaCap * 100), nDev, nQa, offDays };
-    }, [tasks, people, cap, sched, anchor]);
+      return { rows, estRows, unestimated, dev, qa, devCap, qaCap, pctD: Math.round(dev / devCap * 100), pctQ: Math.round(qa / qaCap * 100), nDev, nQa, offDays, from, to, scoped: !!verSet, monthStart, monthEnd };
+    }, [tasks, people, cap, cursorDate]);
 
     const monthTasksById = tasksById;
     const todayISO = E.iso(new Date());
@@ -387,9 +471,11 @@
     return (
       <div style={{ ...STYLES.panel, flex: "1 1 56%" }}>
         <div style={STYLES.phead}>
-          <div style={STYLES.ptitle}><span style={{ color: "#3B82F6" }}>▤</span> Capacity Analysis <span style={STYLES.sub}>cap efektif = Σ hari kerja (setelah absen) × cap</span></div>
+          <div style={STYLES.ptitle}><span style={{ color: "#3B82F6" }}>▤</span> Capacity Analysis <span style={STYLES.sub}>dev=OP estimatedTime→effort L/M/H · qa=testing L/M/H · cap ×kapasitas (sekali)</span></div>
           <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", fontSize: 10, color: "#A7B1C2" }}>
-            <span>Tasks <strong style={{ color: "#E6EAF1" }}>{cs.rows.length}</strong></span>
+            <span>Scope <strong style={{ color: "#E6EAF1" }}>{cs.rows.length}</strong> task (bln ini)</span>
+            <span>Estimasi <strong style={{ color: "#E6EAF1" }}>{cs.estRows.length}</strong></span>
+            {cs.unestimated > 0 && <span style={{ color: "#F59E0B" }} title="task tanpa OP estimatedTime & tanpa effort manual — tidak dihitung ke workload">⚠ {cs.unestimated} belum diestimasi</span>}
             <span>Dev <strong style={{ color: "#E6EAF1" }}>{cs.dev}d</strong></span>
             <span>QA <strong style={{ color: "#E6EAF1" }}>{cs.qa}d</strong></span>
             <span>👥 <strong style={{ color: "#E6EAF1" }}>{cs.nDev}</strong> dev · <strong style={{ color: "#E6EAF1" }}>{cs.nQa}</strong> qa</span>
@@ -402,22 +488,24 @@
         </div>
         <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
           <table style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", fontSize: 10, fontVariantNumeric: "tabular-nums" }}>
-            <thead><tr>{["Task title", "Imp", "Eff", "Test", "Dev", "QA", "Total", "Assigned"].map((hh, i) => (
+            <thead><tr>{["Task title", "Src", "Eff", "Test", "Dev", "QA", "Total", "Assigned"].map((hh, i) => (
               <th key={hh} style={{ position: "sticky", top: 0, background: "#151B23", color: "#8293AD", textAlign: i === 0 ? "left" : "center", fontSize: 9, fontWeight: 700, padding: "7px 8px", borderBottom: "1px solid #263244", whiteSpace: "nowrap" }}>{hh}</th>
             ))}</tr></thead>
             <tbody>
               {cs.rows.map((t) => {
-                const d = E.phaseDays(t.effort, "dev", t.risk, cap), q = E.phaseDays(t.testing, "qa", 1, cap);
+                const d = E.devDaysOf(t), q = E.qaDaysOf(t);
+                const src = t.opEstDays > 0 ? "OP" : (t.effort ? "man" : "—");
                 const r = sched && sched.result[t.id];
+                const dim = (d + q) === 0;
                 return (
-                  <tr key={t.id} style={{ borderBottom: "1px solid #26324480" }}>
-                    <td style={{ padding: "6px 8px", color: "#E6EAF1", maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={esc(t.fullTitle)}>{esc(t.title)}</td>
-                    <td style={{ textAlign: "center", padding: "6px 4px" }}>{lev(t.impact)}</td>
+                  <tr key={t.id} style={{ borderBottom: "1px solid #26324480", opacity: dim ? 0.5 : 1 }}>
+                    <td style={{ padding: "6px 8px", color: "#E6EAF1", maxWidth: 340, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={esc(t.fullTitle)}>{esc(t.title)}</td>
+                    <td style={{ textAlign: "center", padding: "6px 4px", fontSize: 8, color: src === "OP" ? "#60a5fa" : src === "man" ? "#fbbf24" : "#6B7280" }} title={src === "OP" ? "dari OP estimatedTime" : src === "man" ? "effort L/M/H manual" : "belum diestimasi"}>{src}</td>
                     <td style={{ textAlign: "center", padding: "6px 4px" }}>{lev(t.effort)}</td>
                     <td style={{ textAlign: "center", padding: "6px 4px" }}>{lev(t.testing)}</td>
-                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: "#E6EAF1" }}>{d}d</td>
-                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: "#E6EAF1" }}>{q}d</td>
-                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: "#E6EAF1" }}>{d + q}d</td>
+                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: d ? "#E6EAF1" : "#6B7280" }}>{d ? d + "d" : "—"}</td>
+                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: q ? "#E6EAF1" : "#6B7280" }}>{q ? q + "d" : "—"}</td>
+                    <td style={{ textAlign: "center", padding: "6px 8px", fontWeight: 700, color: (d + q) ? "#E6EAF1" : "#6B7280" }}>{(d + q) ? (d + q) + "d" : "—"}</td>
                     <td style={{ textAlign: "center", padding: "6px 8px", fontSize: 9 }}>{r ? <span><span style={{ color: "#3B82F6" }}>{esc(r.devPersonName)}</span> · <span style={{ color: "#22C55E" }}>{esc(r.qaPersonName)}</span></span> : <span style={{ color: "#6B7280" }}>—</span>}</td>
                   </tr>
                 );
@@ -523,7 +611,7 @@
   // ── Detail side panel ──
   function DetailPanel({ task, sched, cap, onClose }) {
     const t = task;
-    const dd = E.phaseDays(t.effort, "dev", t.risk, cap), qd = E.phaseDays(t.testing, "qa", 1, cap);
+    const dd = E.devDaysOf(t), qd = E.qaDaysOf(t);
     const row = (l, v, col) => <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "2px 0" }}><span style={{ color: "#6B7280" }}>{l}</span><span style={{ fontWeight: 600, color: col || "#E6EAF1" }}>{v}</span></div>;
     return (
       <div style={{ position: "fixed", right: 0, top: 0, bottom: 0, width: 300, background: "#151B23", borderLeft: "1px solid #263244", overflowY: "auto", zIndex: 40, boxShadow: "-12px 0 36px #0008" }}>

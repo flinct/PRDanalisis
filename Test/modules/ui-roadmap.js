@@ -265,9 +265,11 @@ function RoadmapPage() {
     { label: "Q3 2027", dot: "#475569", months: ["Jul", "Agu", "Sep"] },
   ];
   const [QUARTERS, setQuarters] = React.useState(QUARTERS_INIT);
-  const [saveCd, setSaveCd] = React.useState(0); // countdown to server save
-  const [savedFlash, setSavedFlash] = React.useState(false); // "✓ saved" flash after save
-  React.useEffect(() => { const iv = setInterval(() => { setSaveCd(_rmSaveCountdown); setSavedFlash(_rmSavedFlashUntil > Date.now()); }, 500); return () => clearInterval(iv); }, []);
+  // NOTE: the auto-save countdown/✓-saved indicator is rendered by the HOST via the
+  // DOM span #rm-save-inline (testcase-browser.html initSaveBanner). The old React
+  // state + 500ms setInterval here re-rendered the whole RoadmapPage every half-second
+  // for a value nothing rendered — which remounted open dropdowns / in-progress inline
+  // edits mid-interaction ("autosave mereset state"). Removed; the host handles display.
   const qLoaded = React.useRef(false);
   // persist custom quarter list to IDB (roadmap_quarters_v1) — load on mount, save on change (same pattern as qLink)
   React.useEffect(() => {
@@ -309,6 +311,7 @@ function RoadmapPage() {
   const [addModal, setAddModal] = React.useState(null); // null | 'single' | 'multi' | 'import'
   const [groupMode, setGroupMode] = React.useState('status'); // Fase 3: 'status' (default) | 'category' — All View grouping
   const [catFilter, setCatFilter] = React.useState(''); // Fase 3: '' = semua, atau slug kategori
+  const [mvSearch, setMvSearch] = React.useState(''); // Month View: cari milestone/task name + orang (assignee/QA/responsible)
   // ── Milestone intake (Fase 4): 1 request → 1 Milestone WP in OP. Supporting docs stay LOCAL (analysis only, never pushed). ──
   const MS_FORM_INIT = { title: '', desc: '', area: '', category: '', categoryTouched: false, prio: 'P2', typeName: 'Milestone', docs: [], checkResult: null, checking: false };
   const [msForm, setMsForm] = React.useState(MS_FORM_INIT);
@@ -453,6 +456,19 @@ function RoadmapPage() {
     const rows = (opCache.rows || []).filter((wp) => verSet.has(String(wp.versionId)));
     return { verId: mvVerIds.join(","), loading: opCache.loading, rows };
   }, [mvVerIds.join(","), opCache.rows, opCache.loading]);
+  // expose current Month-View scope so the Planner tab can mirror EXACTLY the same task set + month.
+  React.useEffect(() => {
+    if (monthView && mvVerIds.length) {
+      const mAbs = (monthView.mi != null ? monthView.mi : 0);
+      const q0y = parseInt(String((QUARTERS[0] && QUARTERS[0].label) || "").match(/\d{4}/) || ["2026"], 10) || 2026;
+      const realMonth = (9 + mAbs) % 12, realYear = q0y + Math.floor((9 + mAbs) / 12);
+      const ms = new Date(Date.UTC(realYear, realMonth, 1)).toISOString().slice(0, 10);
+      const me = new Date(Date.UTC(realYear, realMonth + 1, 0)).toISOString().slice(0, 10);
+      window._mvScope = { versionIds: mvVerIds.map(String), qLabel: monthView.qLabel, mi: monthView.mi, monthStart: ms, monthEnd: me, active: true };
+    } else {
+      window._mvScope = { versionIds: [], active: false };
+    }
+  }, [monthView && monthView.qLabel, monthView && monthView.mi, mvVerIds.join(",")]);
   const addQuarter = React.useCallback(() => {
     setQuarters((prev) => {
       const used = prev.map((q) => q.dot);
@@ -612,10 +628,25 @@ function RoadmapPage() {
     };
   };
   // ponytail: OP rows sort by prio only — no grouping by status, no metric tiebreak
+  // ordering: status bucket > prio > metric (impact H / effort L / testing L = quick-win first).
+  const RM_STATUS_RANK = { now: 0, next: 1, backlog: 2, done: 3 };
+  const RM_PR_RANK = { P0: 0, P1: 1, P2: 2, P3: 3 };
+  const RM_LV = { H: 3, M: 2, L: 1, "": 0 };
+  // higher metricScore = do first: impact dominant, then LOW effort, then LOW testing.
+  const rmMetricScore = (v) => {
+    const i = RM_LV[v.impact] || 0, e = RM_LV[v.effort] || 2, t = RM_LV[v.testing] || 2;
+    return i * 100 + (4 - e) * 10 + (4 - t) * 1;
+  };
   const opSortRows = (rows) => {
-    const PR = { P0: 0, P1: 1, P2: 2, P3: 3 };
-    const key = (wp) => { const v = opRowView(wp); return PR[v.prio] != null ? PR[v.prio] : 3; };
-    return [...rows].sort((a, b) => key(a) - key(b));
+    const keyed = (wp) => { const v = opRowView(wp); return {
+      s: RM_STATUS_RANK[opBucketOf(wp)] != null ? RM_STATUS_RANK[opBucketOf(wp)] : 2,
+      p: RM_PR_RANK[v.prio] != null ? RM_PR_RANK[v.prio] : 3,
+      m: rmMetricScore(v),
+    }; };
+    return [...rows].sort((a, b) => {
+      const ka = keyed(a), kb = keyed(b);
+      return ka.s - kb.s || ka.p - kb.p || kb.m - ka.m; // status↑, prio↑, metric↓ (high first)
+    });
   };
   // ── Milestone intake: create ONE Milestone WP in OP (typeId=2), stash supporting docs LOCALLY, then refetch cache. ──
   // Flow (OQ3): form submit → POST OP create → save docs to IDB keyed by new opId → refreshOpCache → milestone appears from cache.
@@ -737,7 +768,34 @@ function RoadmapPage() {
       const d = await r.json();
       if (!d.ok) throw new Error(d.error || "push gagal");
       setOpPushState((p) => ({ ...p, [wp.id]: "ok" }));
-    } catch (e) { setOpPushState((p) => ({ ...p, [wp.id]: String(e.message || e) })); }
+      return true;
+    } catch (e) { setOpPushState((p) => ({ ...p, [wp.id]: String(e.message || e) })); return false; }
+  };
+  // ── Bulk push: kirim SEMUA task yang punya perubahan lokal (opEdits) ke OpenProject. ──
+  // scope = daftar wp yang sedang tampil (mis. Month View rows); hanya yang punya overlay edit yang dipush.
+  const [opBulkPush, setOpBulkPush] = React.useState(null); // null | { total, done, ok, fail, running, errors:[{id,msg}] }
+  const dirtyOpIds = (scopeRows) => {
+    const ids = new Set(scopeRows.map((w) => String(w.id)));
+    return Object.keys(opEdits).filter((id) => ids.has(String(id)) && opEdits[id] && Object.keys(opEdits[id]).length > 0);
+  };
+  const pushAllOpToOP = async (scopeRows) => {
+    const byId = Object.fromEntries((opCache.rows || []).map((w) => [String(w.id), w]));
+    const ids = dirtyOpIds(scopeRows);
+    if (!ids.length) { setOpBulkPush({ total: 0, done: 0, ok: 0, fail: 0, running: false, errors: [] }); setTimeout(() => setOpBulkPush(null), 2500); return; }
+    setOpBulkPush({ total: ids.length, done: 0, ok: 0, fail: 0, running: true, errors: [] });
+    let ok = 0, fail = 0; const errors = [];
+    const pushedOk = [];
+    for (const id of ids) {
+      const wp = byId[String(id)];
+      if (!wp) { fail++; errors.push({ id, msg: "WP tak ada di cache" }); setOpBulkPush({ total: ids.length, done: ok + fail, ok, fail, running: true, errors: [...errors] }); continue; }
+      const good = await pushOpToOP(wp); // sequential — OP API tak suka burst paralel
+      if (good) { ok++; pushedOk.push(String(id)); } else { fail++; errors.push({ id, msg: opPushState[id] || "gagal" }); }
+      setOpBulkPush({ total: ids.length, done: ok + fail, ok, fail, running: true, errors: [...errors] });
+    }
+    // bersihkan overlay untuk yang sukses supaya tanda "unsynced" hilang & tak ter-push dobel
+    if (pushedOk.length) setOpEdits((p) => { const n = { ...p }; pushedOk.forEach((id) => { delete n[id]; }); return n; });
+    setOpBulkPush({ total: ids.length, done: ids.length, ok, fail, running: false, errors });
+    if (!fail) setTimeout(() => setOpBulkPush(null), 2500);
   };
   // ── OP relations (real dependency / manual relation / breakdown linkage) ──
   // opRels[wpId] = { loading, error, list:[{id,type,toId,toName,fromId,fromName}] }
@@ -1469,7 +1527,20 @@ function RoadmapPage() {
     const WK = ["W1", "W2", "W3", "W4"];
     let rc = 0;
     // Month View OP-source (Fase 6): all rows from opCache-by-version, grouped by status. No roadmap-local rows.
-    const monthOpRows = opSortRows(mvOp.rows);
+    const monthOpRowsAll = opSortRows(mvOp.rows);
+    // Search: cocokkan nama milestone/task ATAU nama orang (PIC/QA/accountable). kosong = semua.
+    const mvQ = mvSearch.trim().toLowerCase();
+    const mvNameById = Object.fromEntries((opPeople || []).map((p) => [String(p.id), (p.name || "").toLowerCase()]));
+    const mvNameOf = (pid) => mvNameById[String(pid)] || "";
+    const monthOpRows = !mvQ ? monthOpRowsAll : monthOpRowsAll.filter((wp) => {
+      const v = opRowView(wp);
+      const hay = [
+        v.subject || "", wp.subject || "", wp.typeName || "",
+        mvNameOf(v.assigneeId), mvNameOf(v.responsibleId),
+        ...((v.qa || []).map(mvNameOf)),
+      ].join(" ").toLowerCase();
+      return hay.includes(mvQ);
+    });
     // Fase 3b: Month View ikut mode grouping yang sama (Status | Kategori | Status→Kategori).
     const mvCatModeActive = groupMode === "category" || groupMode === "status-category";
     const monthOpRowsCat = (mvCatModeActive && catFilter)
@@ -1591,15 +1662,25 @@ function RoadmapPage() {
                 let sum = null;
                 if (PE) {
                   const anchor = PE.computeAnchor();
+                  // window = selected month (same as Planner), from _mvScope; fallback anchor month.
+                  const mv = window._mvScope || {};
                   const a = PE.parseISO(anchor), yy = a.getUTCFullYear(), mm = a.getUTCMonth();
-                  const to = PE.iso(new Date(Date.UTC(yy, mm, PE.daysInMonth(yy, mm))));
+                  const from = mv.monthStart || PE.iso(new Date(Date.UTC(yy, mm, 1)));
+                  const to = mv.monthEnd || PE.iso(new Date(Date.UTC(yy, mm + 1, 0)));
                   const cap = 0.8;
                   const ppl = (() => { try { return (window._plannerPeople || []); } catch (_) { return []; } })();
-                  let dev = 0, qa = 0;
-                  monthOpRows.forEach((wp) => { const o = opRowView(wp); dev += PE.phaseDays(o.effort || "M", "dev", 1, cap); qa += PE.phaseDays(o.testing || "L", "qa", 1, cap); });
-                  const devCap = Math.max(1, PE.effectiveCapacity(ppl, "dev", anchor, to, cap));
-                  const qaCap = Math.max(1, PE.effectiveCapacity(ppl, "qa", anchor, to, cap));
-                  sum = { dev, qa, pctD: Math.round(dev / devCap * 100), pctQ: Math.round(qa / qaCap * 100), hasPeople: ppl.length > 0 };
+                  let dev = 0, qa = 0, estN = 0, unest = 0;
+                  monthOpRows.forEach((wp) => {
+                    if (PE.wpToTask && PE.devDaysOf) {
+                      const t = PE.wpToTask(wp, (opEdits || {})[wp.id]);
+                      if (t.status === "done") return;
+                      const d = PE.devDaysOf(t), q = PE.qaDaysOf(t);
+                      if (d > 0 || q > 0) { dev += d; qa += q; estN++; } else unest++;
+                    }
+                  });
+                  const devCap = Math.max(1, PE.effectiveCapacity(ppl, "dev", from, to, cap));
+                  const qaCap = Math.max(1, PE.effectiveCapacity(ppl, "qa", from, to, cap));
+                  sum = { dev, qa, estN, unest, pctD: Math.round(dev / devCap * 100), pctQ: Math.round(qa / qaCap * 100), hasPeople: ppl.length > 0 };
                 }
                 return (
                   <React.Fragment>
@@ -1607,9 +1688,10 @@ function RoadmapPage() {
                       onClick={() => { if (window.__setDashSub) window.__setDashSub("planner"); }}
                       style={{ background: "#f59e0b", color: "#1c1917", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>⚡ Planner</button>
                     {sum && (
-                      <span style={{ fontSize: 10, color: "#64748b", display: "inline-flex", gap: 8, alignItems: "center" }} title={sum.hasPeople ? "Estimasi vs kapasitas tim (dari Planner)" : "Set people di tab Planner untuk kapasitas akurat"}>
+                      <span style={{ fontSize: 10, color: "#64748b", display: "inline-flex", gap: 8, alignItems: "center" }} title={sum.hasPeople ? "Estimasi vs kapasitas tim 3 bulan (dari Planner)" : "Set people di tab Planner untuk kapasitas akurat"}>
                         <span>Dev <b style={{ color: "#e5e7eb" }}>{sum.dev}d</b>{sum.hasPeople && <span style={{ color: sum.pctD > 100 ? "#ef4444" : "#22c55e" }}> · {sum.pctD}%</span>}</span>
                         <span>QA <b style={{ color: "#e5e7eb" }}>{sum.qa}d</b>{sum.hasPeople && <span style={{ color: sum.pctQ > 100 ? "#ef4444" : "#22c55e" }}> · {sum.pctQ}%</span>}</span>
+                        {sum.unest > 0 && <span style={{ color: "#f59e0b" }} title="task tanpa estimasi (OP estimatedTime / effort) — tak dihitung">⚠{sum.unest}</span>}
                       </span>
                     )}
                   </React.Fragment>
@@ -1621,6 +1703,19 @@ function RoadmapPage() {
         <div style={{ minWidth: 598 + 4 * 152, display: "flex", flexDirection: "column", padding: "0 24px" }}>
           {/* Fase 3b: Month View group toggle + category chips — mirrors All View */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "8px 4px 6px" }}>
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <span style={{ position: "absolute", left: 8, fontSize: 11, color: "#64748b", pointerEvents: "none" }}>🔍</span>
+              <input value={mvSearch} onChange={(e) => setMvSearch(e.target.value)}
+                placeholder="Cari task / milestone / orang…"
+                style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 6, color: "#e5e7eb", fontSize: 11, padding: "5px 24px 5px 26px", width: 220, outline: "none" }} />
+              {mvSearch && (
+                <button type="button" onClick={() => setMvSearch("")} title="Bersihkan"
+                  style={{ position: "absolute", right: 4, background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 13, lineHeight: 1, padding: "2px 4px" }}>×</button>
+              )}
+            </div>
+            {mvSearch.trim() && (
+              <span style={{ fontSize: 10, color: "#64748b" }}>{monthOpRows.length} hasil</span>
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #1e293b", borderRadius: 6, overflow: "hidden" }}>
               <span style={{ fontSize: 9, color: "#64748b", padding: "0 6px" }}>Group</span>
               {[["status", "Status"], ["category", "Kategori"], ["status-category", "Status→Kat"]].map(([m, label]) => (
@@ -1639,8 +1734,29 @@ function RoadmapPage() {
                 ))}
               </div>
             )}
+            {/* Bulk push: kirim semua task yang punya perubahan lokal (di antara rows yang tampil) ke OpenProject */}
+            {(() => {
+              const nDirty = dirtyOpIds(monthOpRows).length;
+              const bp = opBulkPush;
+              const ready = nDirty > 0 && !(bp && bp.running);
+              return (
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+                  {bp && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: bp.running ? "#f59e0b" : bp.fail ? "#ef4444" : "#22c55e" }}
+                      title={bp.errors && bp.errors.length ? bp.errors.map((e) => "#" + e.id + ": " + e.msg).join("\n") : ""}>
+                      {bp.running ? `Push ${bp.done}/${bp.total}…` : bp.total === 0 ? "Tak ada perubahan" : `✓ ${bp.ok} terkirim${bp.fail ? ` · ✗ ${bp.fail} gagal` : ""}`}
+                    </span>
+                  )}
+                  <button type="button" disabled={(bp && bp.running) || nDirty === 0}
+                    onClick={() => { if (nDirty > 0) pushAllOpToOP(monthOpRows); }}
+                    title={nDirty === 0 ? "Belum ada perubahan task di tampilan ini" : `Push ${nDirty} task berubah ke OpenProject`}
+                    style={{ background: ready ? "#f59e0b" : "#1e293b", color: ready ? "#1c1917" : "#64748b", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: ready ? "pointer" : "default", whiteSpace: "nowrap" }}>
+                    ⬆ Push ke OP{nDirty > 0 ? ` (${nDirty})` : ""}
+                  </button>
+                </div>
+              );
+            })()}
           </div>
-          {/* header: frozen cols + W1-W4 */}
           <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 12px", background: "#111827", borderRadius: 8 }}>
             <div style={txt(COLW.num, "#e5e7eb", 10, true)}>#</div>
             <div style={txt(COLW.task, "#e5e7eb", 10, true, { flex: 1, width: "auto", flexShrink: 1, minWidth: COLW.task })}>Task</div>

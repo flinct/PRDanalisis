@@ -3817,7 +3817,8 @@
     },
     "1271": {
       "startDate": "2042-08-06",
-      "dueDate": "2042-09-17"
+      "dueDate": "2042-09-17",
+      "prio": "P3"
     },
     "1272": {
       "startDate": "2031-05-21",
@@ -4389,7 +4390,10 @@
     },
     "2076": {
       "startDate": "2030-07-10",
-      "dueDate": "2030-08-21"
+      "dueDate": "2030-08-21",
+      "impact": "H",
+      "effort": "M",
+      "testing": "M"
     },
     "2124": {
       "startDate": "2063-02-07",
@@ -4397,7 +4401,8 @@
     },
     "2135": {
       "startDate": "2042-07-02",
-      "dueDate": "2042-08-13"
+      "dueDate": "2042-08-13",
+      "prio": "P3"
     },
     "2159": {
       "startDate": "2046-11-28",
@@ -4485,7 +4490,10 @@
     },
     "2331": {
       "startDate": "2030-02-20",
-      "dueDate": "2030-04-03"
+      "dueDate": "2030-04-03",
+      "impact": "M",
+      "effort": "H",
+      "testing": "M"
     },
     "2332": {
       "startDate": "2048-02-26",
@@ -4549,7 +4557,10 @@
     },
     "2541": {
       "startDate": "2029-07-25",
-      "dueDate": "2029-09-05"
+      "dueDate": "2029-09-05",
+      "impact": "H",
+      "effort": "H",
+      "testing": "H"
     },
     "2560": {
       "startDate": "2044-09-14",
@@ -4573,7 +4584,10 @@
     },
     "2697": {
       "startDate": "2029-08-29",
-      "dueDate": "2029-10-10"
+      "dueDate": "2029-10-10",
+      "impact": "H",
+      "effort": "H",
+      "testing": "H"
     },
     "2830": {
       "startDate": "2044-08-10",
@@ -4586,7 +4600,11 @@
     },
     "2908": {
       "startDate": "2043-07-22",
-      "dueDate": "2043-09-02"
+      "dueDate": "2043-09-02",
+      "prio": "P1",
+      "impact": "M",
+      "effort": "M",
+      "testing": "M"
     },
     "2909": {
       "startDate": "2063-01-03",
@@ -4598,11 +4616,19 @@
     },
     "2965": {
       "startDate": "2029-12-12",
-      "dueDate": "2030-01-23"
+      "dueDate": "2030-01-23",
+      "prio": "P3",
+      "impact": "H",
+      "effort": "H",
+      "testing": "L"
     },
     "2970": {
       "startDate": "2029-11-07",
-      "dueDate": "2029-12-19"
+      "dueDate": "2029-12-19",
+      "impact": "H",
+      "effort": "H",
+      "testing": "H",
+      "assigneeId": 14
     },
     "2974": {
       "startDate": "2063-05-23",
@@ -4650,15 +4676,20 @@
     },
     "3194": {
       "startDate": "2044-01-13",
-      "dueDate": "2044-02-24"
+      "dueDate": "2044-02-24",
+      "status": "backlog"
     },
     "3199": {
       "startDate": "2030-01-16",
-      "dueDate": "2030-02-27"
+      "dueDate": "2030-02-27",
+      "impact": "H",
+      "effort": "M",
+      "testing": "M"
     },
     "3200": {
       "startDate": "2043-12-09",
-      "dueDate": "2044-01-20"
+      "dueDate": "2044-01-20",
+      "prio": "P3"
     },
     "3201": {
       "startDate": "2044-02-17",
@@ -4674,11 +4705,14 @@
     },
     "3275": {
       "startDate": "2029-10-03",
-      "dueDate": "2029-11-14"
+      "dueDate": "2029-11-14",
+      "opStatus": "On hold",
+      "status": "backlog"
     },
     "3281": {
       "startDate": "2042-10-15",
-      "dueDate": "2042-11-26"
+      "dueDate": "2042-11-26",
+      "prio": "P3"
     },
     "3305": {
       "startDate": "2026-10-01",
@@ -4699,7 +4733,10 @@
     "3400": {
       "subject": "fraud dashboard (invoice fraud via broadcast + integrasi Lincah)",
       "startDate": "2028-12-27",
-      "dueDate": "2029-02-07"
+      "dueDate": "2029-02-07",
+      "prio": "P3",
+      "status": "backlog",
+      "opStatus": "On hold"
     },
     "3412": {
       "startDate": "2037-10-21",
@@ -4711,7 +4748,8 @@
     },
     "3520": {
       "startDate": "2043-09-30",
-      "dueDate": "2043-11-11"
+      "dueDate": "2043-11-11",
+      "status": "backlog"
     },
     "3523": {
       "startDate": "2044-03-23",
@@ -4727,23 +4765,33 @@
     },
     "3708": {
       "startDate": "2043-06-17",
-      "dueDate": "2043-07-29"
+      "dueDate": "2043-07-29",
+      "prio": "P3"
     },
     "3709": {
       "startDate": "2043-05-13",
-      "dueDate": "2043-06-24"
+      "dueDate": "2043-06-24",
+      "prio": "P3"
     },
     "3711": {
       "startDate": "2043-04-08",
-      "dueDate": "2043-05-20"
+      "dueDate": "2043-05-20",
+      "prio": "P3"
     },
     "3727": {
       "startDate": "2035-03-21",
-      "dueDate": "2035-05-02"
+      "dueDate": "2035-05-02",
+      "impact": "H",
+      "effort": "H",
+      "testing": "M"
     },
     "3732": {
-      "startDate": "2035-02-14",
-      "dueDate": "2035-03-28"
+      "startDate": "2026-10-01",
+      "dueDate": "2026-10-24",
+      "status": "now",
+      "impact": "H",
+      "effort": "M",
+      "testing": "L"
     },
     "3733": {
       "startDate": "2042-05-28",
@@ -4751,16 +4799,21 @@
     },
     "3774": {
       "startDate": "2042-04-23",
-      "dueDate": "2042-06-04"
+      "dueDate": "2042-06-04",
+      "prio": "P3"
     },
     "3799": {
       "desc": "[object Object] aa",
       "startDate": "2029-06-20",
-      "dueDate": "2029-08-01"
+      "dueDate": "2029-08-01",
+      "prio": "P3"
     },
     "3830": {
       "startDate": "2029-03-07",
-      "dueDate": "2029-04-18"
+      "dueDate": "2029-04-18",
+      "impact": "H",
+      "effort": "H",
+      "testing": "H"
     },
     "3868": {
       "startDate": "2029-05-16",
@@ -4775,15 +4828,18 @@
       "dueDate": "2026-11-25",
       "impact": "H",
       "effort": "H",
-      "testing": "M"
+      "testing": "H"
     },
     "4046": {
       "startDate": "2027-07-21",
       "dueDate": "2027-09-01"
     },
     "4128": {
-      "startDate": "2027-08-25",
-      "dueDate": "2027-10-06"
+      "startDate": "2026-10-01",
+      "dueDate": "2026-10-31",
+      "impact": "H",
+      "effort": "M",
+      "testing": "M"
     },
     "4154": {
       "prio": "P1",
@@ -4805,7 +4861,10 @@
     },
     "4371": {
       "startDate": "2035-01-10",
-      "dueDate": "2035-02-21"
+      "dueDate": "2035-02-21",
+      "impact": "H",
+      "effort": "M",
+      "testing": "M"
     },
     "4430": {
       "startDate": "2034-12-06",
@@ -4849,31 +4908,38 @@
     },
     "4440": {
       "startDate": "2036-11-05",
-      "dueDate": "2036-12-17"
+      "dueDate": "2036-12-17",
+      "impact": "L"
     },
     "4441": {
       "startDate": "2036-10-01",
-      "dueDate": "2036-11-12"
+      "dueDate": "2036-11-12",
+      "impact": "L"
     },
     "4442": {
       "startDate": "2036-08-27",
-      "dueDate": "2036-10-08"
+      "dueDate": "2036-10-08",
+      "impact": "L"
     },
     "4443": {
       "startDate": "2036-07-23",
-      "dueDate": "2036-09-03"
+      "dueDate": "2036-09-03",
+      "impact": "L"
     },
     "4444": {
       "startDate": "2036-06-18",
-      "dueDate": "2036-07-30"
+      "dueDate": "2036-07-30",
+      "impact": "L"
     },
     "4445": {
       "startDate": "2036-05-14",
-      "dueDate": "2036-06-25"
+      "dueDate": "2036-06-25",
+      "impact": "L"
     },
     "4446": {
       "startDate": "2036-04-09",
-      "dueDate": "2036-05-21"
+      "dueDate": "2036-05-21",
+      "impact": "L"
     },
     "4450": {
       "startDate": "2042-01-08",
@@ -4881,11 +4947,15 @@
     },
     "4451": {
       "startDate": "2041-12-04",
-      "dueDate": "2042-01-15"
+      "dueDate": "2042-01-15",
+      "impact": "M",
+      "testing": "L",
+      "effort": "M"
     },
     "4452": {
       "startDate": "2041-10-30",
-      "dueDate": "2041-12-11"
+      "dueDate": "2041-12-11",
+      "prio": "P3"
     },
     "4453": {
       "startDate": "2041-09-25",
@@ -4893,7 +4963,8 @@
     },
     "4454": {
       "startDate": "2041-08-21",
-      "dueDate": "2041-10-02"
+      "dueDate": "2041-10-02",
+      "prio": "P3"
     },
     "4455": {
       "startDate": "2041-07-17",
@@ -4901,15 +4972,20 @@
     },
     "4456": {
       "startDate": "2041-06-12",
-      "dueDate": "2041-07-24"
+      "dueDate": "2041-07-24",
+      "prio": "P3"
     },
     "4457": {
       "startDate": "2041-05-08",
-      "dueDate": "2041-06-19"
+      "dueDate": "2041-06-19",
+      "impact": "H",
+      "effort": "H",
+      "testing": "H"
     },
     "4458": {
       "startDate": "2041-04-03",
-      "dueDate": "2041-05-15"
+      "dueDate": "2041-05-15",
+      "impact": "L"
     },
     "4459": {
       "startDate": "2041-02-27",
