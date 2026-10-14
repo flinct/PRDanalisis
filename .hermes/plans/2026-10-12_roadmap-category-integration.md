@@ -273,3 +273,12 @@ Tiap fase bisa di-review terpisah sebelum lanjut.
 - **Verified browser:** toggle Status↔Kategori jalan, 18 chip dengan count (1537 WP ter-kategori live), klik chip filter ke 1 kategori, group header KPI tampil, balik ke Status restore NOW/NEXT/BACKLOG/DONE. Screenshot OK.
 
 > **Catatan cakupan:** All View membaca SELURUH `opCache` (±1537 WP), bukan cuma v2.8.3's 59. Jadi Category mode meng-kategorikan seluruh backlog OP secara live via `suggestCategory`. Kategori tetap LOCAL (tidak menyentuh OP).
+
+### ✅ Fase 3b — Nested grouping + Month View (2026-10-14)
+- **3 mode toggle** (All View + Month View): `status` (default) | `category` (flat) | `status-category` (nested).
+- **Nested Status→Category** (`groupOpStatusThenCategory`): status jadi grup LUAR (NOW/NEXT/BACKLOG/DONE), kategori sub-grup terindent di dalamnya (`catSubHeader`), lalu task rows. Tiap level punya KPI %.
+- `catModeActive` = category|status-category → filter chips aktif di kedua mode.
+- `renderOpRow` (All View) + `renderMonthRow` (Month View, dengan week-timeline bars) diekstrak jadi fungsi, dipakai ulang di grup flat & nested.
+- **Month View** ikut mode grouping sama: toggle + chips + nested, week-timeline bars dipertahankan.
+- **BUG & FIX:** `catSubHeader` awalnya didefinisikan di scope All View (setelah return Month View) → Month View crash `TypeError: catSubHeader is not a function`. Fix: angkat `catSubHeader` ke scope komponen bersama (dekat `groupOpStatusThenCategory`, sebelum cabang `if (monthView)`), agar kedua view lihat.
+- **Verified browser (Chromium bersih):** All View nested (Status→Category→Task, visual confirmed) + Month View nested (`errs:[]`, 4 status heads, cat chips, week cols, KPI %). 69 WP di version prod-2.8.3 Month View.

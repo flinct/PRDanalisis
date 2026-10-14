@@ -514,6 +514,29 @@ function RoadmapPage() {
     Object.keys(byCat).forEach((slug) => { if (!(msVocab || RM_CATEGORY_DEFAULTS).some((c) => c.slug === slug)) ordered.push([slug, slug, "#64748b", byCat[slug]]); });
     return ordered.filter(([, , , r]) => r.length > 0);
   };
+  // ── Fase 3b: nested grouping Status → Category. NOW → [Ticket, Broadcast...], NEXT → [...]. ──
+  // Returns [statusKey, statusLabel, statusColor, subGroups[]] where subGroups = groupOpByCategory output.
+  const groupOpStatusThenCategory = (rows) => {
+    const b = { now: [], next: [], backlog: [], done: [] };
+    (rows || []).forEach((wp) => { (b[opBucketOf(wp)] || b.backlog).push(wp); });
+    return OP_BUCKET_META
+      .map(([k, label, color]) => [k, label, color, groupOpByCategory(b[k])])
+      .filter(([, , , subs]) => subs.length > 0);
+  };
+  // Fase 3b: category sub-group header (used inside nested status→category) — shared by All View + Month View. Indented, lighter.
+  const catSubHeader = (slug, name, color, rows) => {
+    const sDone = rows.filter((wp) => opBucketOf(wp) === "done").length;
+    const sPct = rows.length ? Math.round(sDone / rows.length * 100) : 0;
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 0 4px 16px" }}>
+        <div style={{ width: 3, height: 12, background: color, borderRadius: 2 }} />
+        <span style={{ fontSize: 10.5, fontWeight: 700, color }}>{name}</span>
+        <span style={{ fontSize: 9, color: "#64748b" }}>{rows.length}</span>
+        <span style={{ fontSize: 8.5, color: "#475569" }}>{sPct}%</span>
+        <div style={{ flex: "1 1 0", height: 1, background: color + "22" }} />
+      </div>
+    );
+  };
   // OP timeline = WHEN worked (which week), from the work package's start/due dates intersected with the viewed month.
   // roadmap fiscal year starts Oct (monthAbs 0 = Oct of the first quarter's year). returns [w1,w4] 1-based, or null if no date in this month.
   const Q0_YEAR = parseInt(String((QUARTERS[0] && QUARTERS[0].label) || "").match(/\d{4}/) || ["2026"], 10) || 2026;
@@ -1447,6 +1470,74 @@ function RoadmapPage() {
     let rc = 0;
     // Month View OP-source (Fase 6): all rows from opCache-by-version, grouped by status. No roadmap-local rows.
     const monthOpRows = opSortRows(mvOp.rows);
+    // Fase 3b: Month View ikut mode grouping yang sama (Status | Kategori | Status→Kategori).
+    const mvCatModeActive = groupMode === "category" || groupMode === "status-category";
+    const monthOpRowsCat = (mvCatModeActive && catFilter)
+      ? monthOpRows.filter((wp) => wpCategoryOf(wp) === catFilter)
+      : monthOpRows;
+    const mvGroups = groupMode === "category"
+      ? groupOpByCategory(monthOpRowsCat)
+      : groupMode === "status-category"
+      ? groupOpStatusThenCategory(monthOpRowsCat)
+      : groupOpByStatus(monthOpRows);
+    // Month View category chips (counts over this month's rows)
+    const mvCatCounts = {};
+    monthOpRows.forEach((wp) => { const c = wpCategoryOf(wp); mvCatCounts[c] = (mvCatCounts[c] || 0) + 1; });
+    const mvCatChips = (msVocab || RM_CATEGORY_DEFAULTS).filter((c) => mvCatCounts[c.slug] > 0);
+    // Month View row renderer (has week-timeline bars — distinct from All View's renderOpRow).
+    const renderMonthRow = (wp, wi) => {
+      const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
+      const v = opRowView(wp);
+      const opWk = opWeeksForMonth(wp, monthAbs);
+      const ouid = "op-" + wp.id;
+      const oOpen = !!expanded[ouid];
+      const opById = Object.fromEntries((opPeople || []).map((p) => [String(p.id), p]));
+      const opChip = (pid) => { const p = opById[String(pid)]; return p ? { ini: iniOf(p.name), color: colorOf(p.name), name: p.name } : null; };
+      const opFlat = [opChip(v.assigneeId), ...((v.qa || []).map(opChip)), opChip(v.responsibleId)].filter(Boolean);
+      return (
+        <React.Fragment key={wp.id}>
+        <div onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } toggle(ouid); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "7px 12px", background: zebra, cursor: "pointer" }}>
+          <div style={txt(COLW.num, "#475569", 10, false)}>{oOpen ? "▾" : "▸"} {wp.id}</div>
+          <div style={txt(COLW.task, "#f1f5f9", 11, true, { flex: 1, width: "auto", flexShrink: 1, minWidth: COLW.task, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" })}>{v.subject || wp.typeName || "—"}</div>
+          <div style={txt(COLW.area, "#94a3b8", 10, false)}>{wp.typeName || "—"}</div>
+          <div style={{width:40,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <button type="button" onClick={(e) => { e.stopPropagation(); bdClick(wp.id, {id:wp.id,task:v.subject||wp.typeName,opId:wp.id,typeName:wp.typeName,assigneeName:wp.assigneeName,priorityName:wp.priorityName}); }} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'var(--accent-warning,#F59E0B)',fontSize:14}} title="Breakdown → Subtask">⚡</button>
+          </div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.prio} options={PRIO_OPTS} colorMap={prio} w={COLW.prio} radius={4} onChange={(x) => setOpEdit(wp.id, "prio", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.status} options={["now", "next", "backlog", "done", "hold", "blocked"]} colorMap={stat} w={COLW.status} radius={12} onChange={(x) => setOpEdit(wp.id, "status", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.impact || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "impact", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
+          {(() => {
+            const segs = monthWeeks(monthAbs);
+            const liveWk = opWeeksForMonth({ startDate: v.startDate, dueDate: v.dueDate }, monthAbs) || opWk;
+            const drag = barDrag && barDrag.wpId === wp.id && barDrag.kind === "w" ? barDrag : null;
+            const dragLo = drag ? Math.min(drag.anchor, drag.hover) : null, dragHi = drag ? Math.max(drag.anchor, drag.hover) : null;
+            const mLbl = q.months[monthView.mi];
+            const totalW = 608;
+            return segs.map((seg, i) => {
+              const w = i + 1;
+              const inDrag = drag && w >= dragLo && w <= dragHi;
+              const on = !drag && liveWk && w >= liveWk[0] && w <= liveWk[1];
+              const tip = seg.s + "–" + seg.e + " " + mLbl + " · drag untuk set rentang";
+              return (
+                <div key={w} title={tip}
+                  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); setBarDrag({ wpId: wp.id, kind: "w", monthAbs, anchor: w, hover: w }); }}
+                  onMouseEnter={() => { if (barDragRef.current && barDragRef.current.wpId === wp.id && barDragRef.current.kind === "w") setBarDrag((d) => ({ ...d, hover: w })); }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: totalW / segs.length, flexShrink: 0, height: 26, padding: "2px 3px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "ew-resize" }}>
+                  <div style={{ width: "100%", height: 10, background: inDrag ? "#3b82f6" : on ? "#f59e0b55" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
+                  <span style={{ fontSize: 8, lineHeight: 1, color: (inDrag || on) ? "#f59e0b" : "#475569", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</span>
+                </div>
+              );
+            });
+          })()}
+        </div>
+        {oOpen && <OpDetailPanel wp={wp} opWk={opWk} monthLabel={q.months[monthView.mi]} />}
+        </React.Fragment>
+      );
+    };
     return (
       <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#0B0F15", padding: "0 0 8px" }}>
         {/* single header row: All toggle · Qn-version · month tabs · KPI pills */}
@@ -1494,12 +1585,61 @@ function RoadmapPage() {
               {rmPill(k.now, "Now", stat.now)}{rmPill(k.next, "Next", stat.next)}{rmPill(k.backlog, "Backlog", stat.backlog)}{rmPill(k.done, "Done", stat.done)}
               {mvOp.loading && <span style={{ fontSize: 10, color: "#64748b" }}>sync…</span>}
               <div style={{width:1,height:18,background:"#1e293b"}} />
-              <div id="cap-month-pills" style={{display:"inline-flex",alignItems:"center",gap:5}}></div>
+              {/* Planner entry (replaces old DEV%/QA% pills) + estimate summary */}
+              {(() => {
+                const PE = window.PlannerEngine;
+                let sum = null;
+                if (PE) {
+                  const anchor = PE.computeAnchor();
+                  const a = PE.parseISO(anchor), yy = a.getUTCFullYear(), mm = a.getUTCMonth();
+                  const to = PE.iso(new Date(Date.UTC(yy, mm, PE.daysInMonth(yy, mm))));
+                  const cap = 0.8;
+                  const ppl = (() => { try { return (window._plannerPeople || []); } catch (_) { return []; } })();
+                  let dev = 0, qa = 0;
+                  monthOpRows.forEach((wp) => { const o = opRowView(wp); dev += PE.phaseDays(o.effort || "M", "dev", 1, cap); qa += PE.phaseDays(o.testing || "L", "qa", 1, cap); });
+                  const devCap = Math.max(1, PE.effectiveCapacity(ppl, "dev", anchor, to, cap));
+                  const qaCap = Math.max(1, PE.effectiveCapacity(ppl, "qa", anchor, to, cap));
+                  sum = { dev, qa, pctD: Math.round(dev / devCap * 100), pctQ: Math.round(qa / qaCap * 100), hasPeople: ppl.length > 0 };
+                }
+                return (
+                  <React.Fragment>
+                    <button type="button" title="Buka Planner (capacity + kalender + people/absen)"
+                      onClick={() => { if (window.__setDashSub) window.__setDashSub("planner"); }}
+                      style={{ background: "#f59e0b", color: "#1c1917", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>⚡ Planner</button>
+                    {sum && (
+                      <span style={{ fontSize: 10, color: "#64748b", display: "inline-flex", gap: 8, alignItems: "center" }} title={sum.hasPeople ? "Estimasi vs kapasitas tim (dari Planner)" : "Set people di tab Planner untuk kapasitas akurat"}>
+                        <span>Dev <b style={{ color: "#e5e7eb" }}>{sum.dev}d</b>{sum.hasPeople && <span style={{ color: sum.pctD > 100 ? "#ef4444" : "#22c55e" }}> · {sum.pctD}%</span>}</span>
+                        <span>QA <b style={{ color: "#e5e7eb" }}>{sum.qa}d</b>{sum.hasPeople && <span style={{ color: sum.pctQ > 100 ? "#ef4444" : "#22c55e" }}> · {sum.pctQ}%</span>}</span>
+                      </span>
+                    )}
+                  </React.Fragment>
+                );
+              })()}
             </div>);
           })()}
-          <div id="cap-month-panel"></div>
         </div>
         <div style={{ minWidth: 598 + 4 * 152, display: "flex", flexDirection: "column", padding: "0 24px" }}>
+          {/* Fase 3b: Month View group toggle + category chips — mirrors All View */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "8px 4px 6px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #1e293b", borderRadius: 6, overflow: "hidden" }}>
+              <span style={{ fontSize: 9, color: "#64748b", padding: "0 6px" }}>Group</span>
+              {[["status", "Status"], ["category", "Kategori"], ["status-category", "Status→Kat"]].map(([m, label]) => (
+                <button key={m} type="button" onClick={() => { setGroupMode(m); if (m === "status") setCatFilter(""); }}
+                  style={{ background: groupMode === m ? "#3b82f6" : "transparent", color: groupMode === m ? "#fff" : "#94a3b8", border: "none", padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>
+              ))}
+            </div>
+            {mvCatModeActive && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <button type="button" onClick={() => setCatFilter("")}
+                  style={{ background: catFilter === "" ? "#334155" : "transparent", color: catFilter === "" ? "#e5e7eb" : "#94a3b8", border: "1px solid #1e293b", borderRadius: 999, padding: "3px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Semua ({monthOpRows.length})</button>
+                {mvCatChips.map((c) => (
+                  <button key={c.slug} type="button" onClick={() => setCatFilter(catFilter === c.slug ? "" : c.slug)}
+                    title={c.name + (c.tier === "supporting" ? " (support)" : "")}
+                    style={{ background: catFilter === c.slug ? categoryColor(c.slug, msVocab) : "transparent", color: catFilter === c.slug ? "#0B0F15" : categoryColor(c.slug, msVocab), border: "1px solid " + categoryColor(c.slug, msVocab) + "55", borderRadius: 999, padding: "3px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>{c.name} ({mvCatCounts[c.slug]})</button>
+                ))}
+              </div>
+            )}
+          </div>
           {/* header: frozen cols + W1-W4 */}
           <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 12px", background: "#111827", borderRadius: 8 }}>
             <div style={txt(COLW.num, "#e5e7eb", 10, true)}>#</div>
@@ -1528,73 +1668,35 @@ function RoadmapPage() {
                 <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Loading OP tasks…</div>
               ) : monthOpRows.length === 0 ? (
                 <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Tidak ada task OP di version ini.</div>
-              ) : groupOpByStatus(monthOpRows).map(([bkey, blabel, bcolor, brows]) => (
+              ) : mvGroups.length === 0 ? (
+                <div style={{ padding: "12px", fontSize: 12, color: "#64748b" }}>Tidak ada task untuk filter ini.</div>
+              ) : mvGroups.map(([bkey, blabel, bcolor, brows]) => {
+                const nested = groupMode === "status-category";
+                const flatRows = nested ? brows.flatMap((s) => s[3]) : brows;
+                const gTotal = flatRows.length;
+                const gDone = (groupMode === "category" || nested) ? flatRows.filter((wp) => opBucketOf(wp) === "done").length : 0;
+                const gPct = gTotal ? Math.round(gDone / gTotal * 100) : 0;
+                return (
                 <React.Fragment key={"bucket-" + bkey}>
-                  {/* status-group header: NOW / NEXT / BACKLOG / DONE. On hold → BACKLOG. */}
+                  {/* group header: status bucket OR category (depending on groupMode). */}
                   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px 4px" }}>
                     <div style={{ width: 4, height: 14, background: bcolor, borderRadius: 2 }} />
                     <span style={{ fontSize: 11, fontWeight: 700, color: bcolor, letterSpacing: 0.4 }}>{blabel}</span>
-                    <span style={{ fontSize: 10, color: "#64748b" }}>{brows.length}</span>
+                    <span style={{ fontSize: 10, color: "#64748b" }}>{gTotal}</span>
+                    {(groupMode === "category" || nested) && <span style={{ fontSize: 8.5, color: "#475569" }}>{gDone} done · {gPct}%</span>}
                     <div style={{ flex: "1 1 0", height: 1, background: bcolor + "22" }} />
                   </div>
-                  {brows.map((wp, wi) => {
-                const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
-                const v = opRowView(wp);
-                const opWk = opWeeksForMonth(wp, monthAbs); // [w1,w4] when this WP is worked in this month, or null
-                const ouid = "op-" + wp.id;
-                const oOpen = !!expanded[ouid];
-                const push = opPushState[wp.id];
-                // OP roles → avatar cluster (img-3: OP column matches roadmap). name→initials+hashed color (no fixed AV map for OP people).
-                const opById = Object.fromEntries((opPeople || []).map((p) => [String(p.id), p]));
-                const opChip = (pid) => { const p = opById[String(pid)]; return p ? { ini: iniOf(p.name), color: colorOf(p.name), name: p.name } : null; };
-                const opFlat = [opChip(v.assigneeId), ...((v.qa || []).map(opChip)), opChip(v.responsibleId)].filter(Boolean);
-                return (
-                  <React.Fragment key={wp.id}>
-                  <div onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } toggle(ouid); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "7px 12px", background: zebra, cursor: "pointer" }}>
-                    <div style={txt(COLW.num, "#475569", 10, false)}>{oOpen ? "▾" : "▸"} {wp.id}</div>
-                    <div style={txt(COLW.task, "#f1f5f9", 11, true, { flex: 1, width: "auto", flexShrink: 1, minWidth: COLW.task, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" })}>{v.subject || wp.typeName || "—"}</div>
-                    <div style={txt(COLW.area, "#94a3b8", 10, false)}>{wp.typeName || "—"}</div>
-                    <div style={{width:40,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); bdClick(wp.id, {id:wp.id,task:v.subject||wp.typeName,opId:wp.id,typeName:wp.typeName,assigneeName:wp.assigneeName,priorityName:wp.priorityName}); }} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'var(--accent-warning,#F59E0B)',fontSize:14}} title="Breakdown → Subtask">⚡</button>
-                    </div>
-                    <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.prio} options={PRIO_OPTS} colorMap={prio} w={COLW.prio} radius={4} onChange={(x) => setOpEdit(wp.id, "prio", x)} /></div>
-                    <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.status} options={["now", "next", "backlog", "done", "hold", "blocked"]} colorMap={stat} w={COLW.status} radius={12} onChange={(x) => setOpEdit(wp.id, "status", x)} /></div>
-                    <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.impact || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "impact", x)} /></div>
-                    <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
-                    <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
-                    <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
-                    {/* OP timeline bar = real calendar weeks (Sun–Sat) of this month. DRAG across weeks to set start→due. Saved to opEdits, pushed on "Push ke OP". */}
-                    {(() => {
-                      const segs = monthWeeks(monthAbs); // real calendar weeks (4–6 cells)
-                      const liveWk = opWeeksForMonth({ startDate: v.startDate, dueDate: v.dueDate }, monthAbs) || opWk;
-                      const drag = barDrag && barDrag.wpId === wp.id && barDrag.kind === "w" ? barDrag : null;
-                      const dragLo = drag ? Math.min(drag.anchor, drag.hover) : null, dragHi = drag ? Math.max(drag.anchor, drag.hover) : null;
-                      const mLbl = q.months[monthView.mi];
-                      const totalW = 608; // keep the week-strip overall width stable (was 4×152)
-                      return segs.map((seg, i) => {
-                        const w = i + 1;
-                        const inDrag = drag && w >= dragLo && w <= dragHi;
-                        const on = !drag && liveWk && w >= liveWk[0] && w <= liveWk[1];
-                        const tip = seg.s + "–" + seg.e + " " + mLbl + " · drag untuk set rentang";
-                        return (
-                          <div key={w} title={tip}
-                            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); setBarDrag({ wpId: wp.id, kind: "w", monthAbs, anchor: w, hover: w }); }}
-                            onMouseEnter={() => { if (barDragRef.current && barDragRef.current.wpId === wp.id && barDragRef.current.kind === "w") setBarDrag((d) => ({ ...d, hover: w })); }}
-                            onClick={(e) => e.stopPropagation()}
-                            style={{ width: totalW / segs.length, flexShrink: 0, height: 26, padding: "2px 3px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "ew-resize" }}>
-                            <div style={{ width: "100%", height: 10, background: inDrag ? "#3b82f6" : on ? "#f59e0b55" : "#1e293b", borderRadius: 5, transition: "background .1s" }} />
-                            <span style={{ fontSize: 8, lineHeight: 1, color: (inDrag || on) ? "#f59e0b" : "#475569", whiteSpace: "nowrap" }}>{seg.s}–{seg.e}</span>
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                  {oOpen && <OpDetailPanel wp={wp} opWk={opWk} monthLabel={q.months[monthView.mi]} />}
-                  </React.Fragment>
+                  {nested
+                    ? brows.map(([cslug, cname, ccolor, crows]) => (
+                        <React.Fragment key={bkey + "-" + cslug}>
+                          {catSubHeader(cslug, cname, ccolor, crows)}
+                          {crows.map((wp, wi) => renderMonthRow(wp, wi))}
+                        </React.Fragment>
+                      ))
+                    : brows.map((wp, wi) => renderMonthRow(wp, wi))}
+                </React.Fragment>
                 );
               })}
-                </React.Fragment>
-              ))}
             </>
           )}
         </div>
@@ -1611,13 +1713,16 @@ function RoadmapPage() {
   const rmQ = rmq.trim().toLowerCase();
   const allOpRows = (opCache.rows || []).filter((wp) =>
     !rmQ || String(wp.subject || "").toLowerCase().includes(rmQ) || String(wp.typeName || "").toLowerCase().includes(rmQ));
-  // Fase 3: category filter (only applies in category group-mode)
-  const allOpRowsCat = (groupMode === "category" && catFilter)
+  // Fase 3: category filter (applies in category or status-category modes)
+  const catModeActive = groupMode === "category" || groupMode === "status-category";
+  const allOpRowsCat = (catModeActive && catFilter)
     ? allOpRows.filter((wp) => wpCategoryOf(wp) === catFilter)
     : allOpRows;
-  // group by status (default) OR category (Fase 3 toggle)
+  // group by status (default) | category (flat) | status→category (nested)
   const allGroups = groupMode === "category"
     ? groupOpByCategory(opSortRows(allOpRowsCat))
+    : groupMode === "status-category"
+    ? groupOpStatusThenCategory(opSortRows(allOpRowsCat))
     : groupOpByStatus(opSortRows(allOpRows));
   const rmKpi = {
     total: allOpRows.length,
@@ -1630,6 +1735,37 @@ function RoadmapPage() {
   const catCounts = {};
   allOpRows.forEach((wp) => { const c = wpCategoryOf(wp); catCounts[c] = (catCounts[c] || 0) + 1; });
   const catChips = (msVocab || RM_CATEGORY_DEFAULTS).filter((c) => catCounts[c.slug] > 0);
+  // Fase 3b: extracted WP-row renderer — reused by flat groups AND nested sub-groups.
+  const renderOpRow = (wp, wi) => {
+    const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
+    const v = opRowView(wp);
+    const ouid = "op-" + wp.id;
+    const oOpen = !!expanded[ouid];
+    const opById = Object.fromEntries((opPeople || []).map((p) => [String(p.id), p]));
+    const opChip = (pid) => { const p = opById[String(pid)]; return p ? { ini: iniOf(p.name), color: colorOf(p.name), name: p.name } : null; };
+    const opFlat = [opChip(v.assigneeId), ...((v.qa || []).map(opChip)), opChip(v.responsibleId)].filter(Boolean);
+    return (
+      <React.Fragment key={wp.id}>
+        <div onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } toggle(ouid); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "7px 12px", background: zebra, cursor: "pointer" }}>
+          <div style={txt(COLW.num, "#475569", 10, false)}>{oOpen ? "▾" : "▸"} {wp.id}</div>
+          <div style={txt(COLW.task, "#f1f5f9", 11, true, { flex: 1, width: "auto", flexShrink: 1, minWidth: COLW.task, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" })}>{v.subject || wp.typeName || "—"}</div>
+          <div style={txt(COLW.area, "#94a3b8", 10, false)}>{wp.typeName || "—"}</div>
+          <div style={{width:40,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <button type="button" onClick={(e) => { e.stopPropagation(); bdClick(wp.id, {id:wp.id,task:v.subject||wp.typeName,opId:wp.id,typeName:wp.typeName,assigneeName:wp.assigneeName,priorityName:wp.priorityName}); }} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'var(--accent-warning,#F59E0B)',fontSize:14}} title="Breakdown → Feature">⚡</button>
+          </div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.prio} options={PRIO_OPTS} colorMap={prio} w={COLW.prio} radius={4} onChange={(x) => setOpEdit(wp.id, "prio", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.status} options={["now", "next", "backlog", "done", "hold", "blocked"]} colorMap={stat} w={COLW.status} radius={12} onChange={(x) => setOpEdit(wp.id, "status", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.impact || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "impact", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
+          <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
+          {qStrip(QUARTERS.map((_q, qi) => barQuarterEdit(wp, qi)))}
+        </div>
+        {oOpen && <OpDetailPanel wp={wp} />}
+      </React.Fragment>
+    );
+  };
+
   return (
     <div style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#0B0F15", padding: "8px 24px" }}>
       {/* KPI mini strip + search — OP source */}
@@ -1642,10 +1778,10 @@ function RoadmapPage() {
         {opCache.loading && <span style={{ fontSize: 10, color: "#64748b" }}>sync…</span>}
         {opCache.ts && !opCache.loading && <span style={{ fontSize: 9, color: "#475569" }} title={new Date(opCache.ts).toLocaleString()}>synced</span>}
         <button type="button" onClick={() => refreshOpCache()} disabled={opCache.loading} style={{ background: "transparent", color: "#3b82f6", border: "1px solid #3b82f6", borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer", opacity: opCache.loading ? 0.5 : 1 }}>↻ Refresh</button>
-        {/* Fase 3: group-by toggle — Status (default) | Category */}
+        {/* Fase 3: group-by toggle — Status (default) | Kategori (flat) | Status→Kategori (nested) */}
         <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #1e293b", borderRadius: 6, overflow: "hidden" }}>
           <span style={{ fontSize: 9, color: "#64748b", padding: "0 6px" }}>Group</span>
-          {[["status", "Status"], ["category", "Kategori"]].map(([m, label]) => (
+          {[["status", "Status"], ["category", "Kategori"], ["status-category", "Status→Kat"]].map(([m, label]) => (
             <button key={m} type="button" onClick={() => { setGroupMode(m); if (m === "status") setCatFilter(""); }}
               style={{ background: groupMode === m ? "#3b82f6" : "transparent", color: groupMode === m ? "#fff" : "#94a3b8", border: "none", padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>
           ))}
@@ -1654,8 +1790,8 @@ function RoadmapPage() {
           style={{ marginLeft: "auto", width: 200, background: "#0f172a", border: "1px solid #1e293b", borderRadius: 6, padding: "5px 10px", fontSize: 11, color: "#e5e7eb", outline: "none", fontFamily: "inherit" }} />
         <button type="button" onClick={() => { setAddModal('milestone'); setMsForm(MS_FORM_INIT); setMsState({saving:false,error:''}); }} style={{background:'#f59e0b',color:'#1c1917',border:'none',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:4}}><span style={{fontSize:13}}>◆</span> Milestone</button>
       </div>
-      {/* Fase 3: category filter chips (only in category mode) */}
-      {groupMode === "category" && (
+      {/* Fase 3: category filter chips (category or status-category modes) */}
+      {catModeActive && (
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "0 0 10px" }}>
           <button type="button" onClick={() => setCatFilter("")}
             style={{ background: catFilter === "" ? "#334155" : "transparent", color: catFilter === "" ? "#e5e7eb" : "#94a3b8", border: "1px solid #1e293b", borderRadius: 999, padding: "3px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>Semua ({allOpRows.length})</button>
@@ -1699,17 +1835,20 @@ function RoadmapPage() {
         ) : allOpRows.length === 0 ? (
           <div style={{ padding: 16, fontSize: 12, color: "#64748b" }}>Tidak ada work package.</div>
         ) : allGroups.map(([bkey, blabel, bcolor, brows]) => {
-          // Fase 3: per-group KPI (only shown in category mode)
-          const gDone = groupMode === "category" ? brows.filter((wp) => opBucketOf(wp) === "done").length : 0;
-          const gNow = groupMode === "category" ? brows.filter((wp) => opBucketOf(wp) === "now").length : 0;
-          const gPct = brows.length ? Math.round(gDone / brows.length * 100) : 0;
+          // nested mode: brows is actually subGroups [[catSlug,catName,catColor,rows]...]
+          const nested = groupMode === "status-category";
+          const flatRows = nested ? brows.flatMap((s) => s[3]) : brows;
+          const gDone = (groupMode === "category" || nested) ? flatRows.filter((wp) => opBucketOf(wp) === "done").length : 0;
+          const gNow = (groupMode === "category" || nested) ? flatRows.filter((wp) => opBucketOf(wp) === "now").length : 0;
+          const gTotal = flatRows.length;
+          const gPct = gTotal ? Math.round(gDone / gTotal * 100) : 0;
           return (
           <React.Fragment key={"allbucket-" + bkey}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0 6px" }}>
               <div style={{ width: 4, height: 18, background: bcolor, borderRadius: 2 }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: bcolor }}>{blabel}</span>
-              <span style={{ fontSize: 10, color: "#64748b" }}>{brows.length}</span>
-              {groupMode === "category" && (
+              <span style={{ fontSize: 10, color: "#64748b" }}>{gTotal}</span>
+              {(groupMode === "category" || nested) && (
                 <span style={{ fontSize: 9, color: "#64748b", display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ color: "#22c55e" }}>{gDone} done</span>
                   <span style={{ color: "#f59e0b" }}>{gNow} now</span>
@@ -1721,35 +1860,14 @@ function RoadmapPage() {
               )}
               <div style={{ flex: "1 1 0", height: 1, background: bcolor + "30" }} />
             </div>
-            {brows.map((wp, wi) => {
-              const zebra = (wi % 2 === 0) ? "#0f172a" : "#00000000";
-              const v = opRowView(wp);
-              const ouid = "op-" + wp.id;
-              const oOpen = !!expanded[ouid];
-              const opById = Object.fromEntries((opPeople || []).map((p) => [String(p.id), p]));
-              const opChip = (pid) => { const p = opById[String(pid)]; return p ? { ini: iniOf(p.name), color: colorOf(p.name), name: p.name } : null; };
-              const opFlat = [opChip(v.assigneeId), ...((v.qa || []).map(opChip)), opChip(v.responsibleId)].filter(Boolean);
-              return (
-                <React.Fragment key={wp.id}>
-                <div onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } toggle(ouid); }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "7px 12px", background: zebra, cursor: "pointer" }}>
-                  <div style={txt(COLW.num, "#475569", 10, false)}>{oOpen ? "▾" : "▸"} {wp.id}</div>
-                  <div style={txt(COLW.task, "#f1f5f9", 11, true, { flex: 1, width: "auto", flexShrink: 1, minWidth: COLW.task, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" })}>{v.subject || wp.typeName || "—"}</div>
-                  <div style={txt(COLW.area, "#94a3b8", 10, false)}>{wp.typeName || "—"}</div>
-                  <div style={{width:40,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                    <button type="button" onClick={(e) => { e.stopPropagation(); bdClick(wp.id, {id:wp.id,task:v.subject||wp.typeName,opId:wp.id,typeName:wp.typeName,assigneeName:wp.assigneeName,priorityName:wp.priorityName}); }} style={{background:'none',border:'none',cursor:'pointer',padding:0,color:'var(--accent-warning,#F59E0B)',fontSize:14}} title="Breakdown → Feature">⚡</button>
-                  </div>
-                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.prio} options={PRIO_OPTS} colorMap={prio} w={COLW.prio} radius={4} onChange={(x) => setOpEdit(wp.id, "prio", x)} /></div>
-                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.status} options={["now", "next", "backlog", "done", "hold", "blocked"]} colorMap={stat} w={COLW.status} radius={12} onChange={(x) => setOpEdit(wp.id, "status", x)} /></div>
-                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.impact || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "impact", x)} /></div>
-                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.effort || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "effort", x)} /></div>
-                  <div onClick={(e) => e.stopPropagation()}><RoadmapDropdown value={v.testing || "—"} options={EIM_OPTS} colorMap={eim} w={COLW.eim} radius={4} onChange={(x) => setOpEdit(wp.id, "testing", x)} /></div>
-                  <div onClick={(e) => e.stopPropagation()}>{avatars(ouid, v.subject || "", opFlat, () => setOpAssign({ wpId: wp.id }))}</div>
-                  {qStrip(QUARTERS.map((_q, qi) => barQuarterEdit(wp, qi)))}
-                </div>
-                {oOpen && <OpDetailPanel wp={wp} />}
-                </React.Fragment>
-              );
-            })}
+            {nested
+              ? brows.map(([cslug, cname, ccolor, crows]) => (
+                  <React.Fragment key={bkey + "-" + cslug}>
+                    {catSubHeader(cslug, cname, ccolor, crows)}
+                    {crows.map((wp, wi) => renderOpRow(wp, wi))}
+                  </React.Fragment>
+                ))
+              : brows.map((wp, wi) => renderOpRow(wp, wi))}
           </React.Fragment>
           );
         })}

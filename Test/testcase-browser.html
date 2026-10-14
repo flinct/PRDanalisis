@@ -411,6 +411,7 @@
     <script type="text/babel" src="./modules/ui-new-request.js"></script>
     <script type="text/babel" src="./modules/ui-overview.js"></script>
     <script type="text/babel" src="./modules/ui-roadmap.js"></script>
+    <script type="text/babel" src="./modules/ui-planner.js"></script>
     <script type="text/babel" src="./modules/ui-tracker-v2.js"></script>
     <script type="text/babel" src="./modules/ui-cost.js"></script>
     <script>
@@ -6819,6 +6820,7 @@
       const { RoadmapPage } = window.RoadmapV2Module;
       const { TrackerPage } = window.TrackerV2Module;
       const { CostDashboard } = window.CostModule;
+      const PlannerPage = (window.PlannerModule && window.PlannerModule.PlannerPage) || (() => null);
 
 
       function App() {
@@ -6969,7 +6971,8 @@
         const [trackerSheet, setTrackerSheet] = useState("all");
         const [trackerSheetTabs, setTrackerSheetTabs] = useState([]);
         // Dashboard v2 tier-2 sub-nav + embedded-tracker state. ponytail: resets to overview on mount.
-        const [dashV2Sub, setDashV2Sub] = useState("overview"); // 'overview'|'roadmap'|'tracker'|'cost'
+        const [dashV2Sub, setDashV2Sub] = useState("overview"); // 'overview'|'roadmap'|'planner'|'tracker'|'cost'
+        React.useEffect(() => { window.__setDashSub = setDashV2Sub; return () => { if (window.__setDashSub === setDashV2Sub) window.__setDashSub = null; }; }, []);
         const [dashTrackerTab, setDashTrackerTab] = useState("statistics");
         const [dashTrackerSheet, setDashTrackerSheet] = useState("all");
 
@@ -8859,7 +8862,7 @@
               {/* ── Dashboard v2 tier-2 sub-nav. ponytail: only renders for dashboard-v2; other modules unaffected. ── */}
               {mainNav === "dashboard-v2" ? (
                 <div style={{ display: "flex", gap: 4, alignItems: "center", padding: "6px 20px", background: "var(--app-bg)", borderBottom: "1px solid var(--border-1)", flexShrink: 0 }}>
-                  {[["overview", "Overview"], ["roadmap", "Roadmap"], ["tracker", "Tracker"], ["cost", "Cost"]].map(([id, lbl]) => (
+                  {[["overview", "Overview"], ["roadmap", "Roadmap"], ["planner", "Planner"], ["tracker", "Tracker"], ["cost", "Cost"]].map(([id, lbl]) => (
                     <div key={id} onClick={() => setDashV2Sub(id)}
                       style={{ cursor: "pointer", padding: "6px 12px", borderRadius: 6, fontSize: 12, whiteSpace: "nowrap", fontWeight: id === dashV2Sub ? 600 : 400, color: id === dashV2Sub ? "var(--text-1)" : "var(--text-3)", background: id === dashV2Sub ? "var(--elevated-bg)" : "transparent", transition: "background 0.1s, color 0.1s" }}>
                       {lbl}
@@ -8881,6 +8884,7 @@
                 // ── Dashboard v2: tracker-driven overview + roadmap/tracker/cost sub-pages ──
                 if (mainNav === "dashboard-v2") {
                   if (dashV2Sub === "roadmap") return <RoadmapPage />;
+                  if (dashV2Sub === "planner") return <PlannerPage />;
                   if (dashV2Sub === "tracker") return <TrackerPage />;
                   if (dashV2Sub === "cost") return <CostDashboard />;
                   return <OverviewPage onOpen={setDashV2Sub} />;
